@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,11 +22,11 @@
 #define __PLUGIN_INTERFACE_2_H
 
 #include "NativeFeatureIncludes.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "Export.h"
 #include "PacketPriority.h"
 
-namespace RakNet {
+namespace SLNet {
 
 /// Forward declarations
 class RakPeerInterface;
@@ -159,16 +164,16 @@ public:
 	/// \param[in] internalPacket The user message, along with all send data.
 	/// \param[in] frameNumber The number of frames sent or received so far for this player depending on \a isSend .  Indicates the frame of this user message.
 	/// \param[in] remoteSystemAddress The player we sent or got this packet from
-	/// \param[in] time The current time as returned by RakNet::GetTimeMS()
+	/// \param[in] time The current time as returned by SLNet::GetTimeMS()
 	/// \param[in] isSend Is this callback representing a send event or receive event?
-	virtual void OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, RakNet::TimeMS time, int isSend) {(void) internalPacket; (void) frameNumber; (void) remoteSystemAddress; (void) time; (void) isSend;}
+	virtual void OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time, int isSend) {(void) internalPacket; (void) frameNumber; (void) remoteSystemAddress; (void) time; (void) isSend;}
 
 	/// Called when we get an ack for a message we reliably sent
 	/// \pre To be called, UsesReliabilityLayer() must return true
 	/// \param[in] messageNumber The numerical identifier for which message this is
 	/// \param[in] remoteSystemAddress The player we sent or got this packet from
-	/// \param[in] time The current time as returned by RakNet::GetTimeMS()
-	virtual void OnAck(unsigned int messageNumber, SystemAddress remoteSystemAddress, RakNet::TimeMS time) {(void) messageNumber; (void) remoteSystemAddress; (void) time;}
+	/// \param[in] time The current time as returned by SLNet::GetTimeMS()
+	virtual void OnAck(unsigned int messageNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time) {(void) messageNumber; (void) remoteSystemAddress; (void) time;}
 
 	/// System called RakPeerInterface::PushBackPacket
 	/// \param[in] data The data being sent
@@ -190,7 +195,7 @@ public:
 
 protected:
 	// Send through either rakPeerInterface or tcpInterface, whichever is available
-	void SendUnified( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
+	void SendUnified( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
 	void SendUnified( const char * data, const int length, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
 	bool SendListUnified( const char **data, const int *lengths, const int numParameters, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
 
@@ -205,7 +210,7 @@ protected:
 #endif
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

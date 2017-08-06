@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -20,16 +25,16 @@
 #define __RAK_PEER_H
 
 #include "ReliabilityLayer.h"
-#include "RakPeerInterface.h"
+#include "peerinterface.h"
 #include "BitStream.h"
 #include "SingleProducerConsumer.h"
 #include "SimpleMutex.h"
 #include "DS_OrderedList.h"
 #include "Export.h"
-#include "RakString.h"
-#include "RakThread.h"
-//#include "RakNetSocket.h"
-#include "RakNetSmartPtr.h"
+#include "string.h"
+#include "thread.h"
+//#include "socket.h"
+#include "smartptr.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
 #include "SignaledEvent.h"
 #include "NativeFeatureIncludes.h"
@@ -37,7 +42,7 @@
 #include "LocklessTypes.h"
 #include "DS_Queue.h"
 
-namespace RakNet {
+namespace SLNet {
 /// Forward declarations
 class HuffmanEncodingTree;
 class PluginInterface2;
@@ -159,7 +164,7 @@ public:
 	/// \return CONNECTION_ATTEMPT_STARTED on successful initiation. Otherwise, an appropriate enumeration indicating failure.
 	/// \note CONNECTION_ATTEMPT_STARTED does not mean you are already connected!
 	/// \note It is possible to immediately get back ID_CONNECTION_ATTEMPT_FAILED if you exceed the maxConnections parameter passed to Startup(). This could happen if you call CloseConnection() with sendDisconnectionNotificaiton true, then immediately call Connect() before the connection has closed.
-	ConnectionAttemptResult Connect( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey=0, unsigned connectionSocketIndex=0, unsigned sendConnectionAttemptCount=6, unsigned timeBetweenSendConnectionAttemptsMS=1000, RakNet::TimeMS timeoutTime=0 );
+	ConnectionAttemptResult Connect( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey=0, unsigned connectionSocketIndex=0, unsigned sendConnectionAttemptCount=6, unsigned timeBetweenSendConnectionAttemptsMS=1000, SLNet::TimeMS timeoutTime=0 );
 
 	/// \brief Connect to the specified host (ip or domain name) and server port.
 	/// \param[in] host Either a dotted IP address or a domain name.
@@ -172,7 +177,7 @@ public:
 	/// \param[in] timeoutTime Time to elapse before dropping the connection if a reliable message could not be sent. 0 to use the default from SetTimeoutTime(UNASSIGNED_SYSTEM_ADDRESS);
 	/// \return CONNECTION_ATTEMPT_STARTED on successful initiation. Otherwise, an appropriate enumeration indicating failure.
 	/// \note CONNECTION_ATTEMPT_STARTED does not mean you are already connected!
-	virtual ConnectionAttemptResult ConnectWithSocket(const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, RakNetSocket2* socket, PublicKey *publicKey=0, unsigned sendConnectionAttemptCount=6, unsigned timeBetweenSendConnectionAttemptsMS=1000, RakNet::TimeMS timeoutTime=0);
+	virtual ConnectionAttemptResult ConnectWithSocket(const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, RakNetSocket2* socket, PublicKey *publicKey=0, unsigned sendConnectionAttemptCount=6, unsigned timeBetweenSendConnectionAttemptsMS=1000, SLNet::TimeMS timeoutTime=0);
 
 	/* /// \brief Connect to the specified network ID (Platform specific console function)
 	/// \details Does built-in NAT traversal
@@ -241,12 +246,12 @@ public:
 	/// \param[in] forceReceipt If 0, will automatically determine the receipt number to return. If non-zero, will return what you give it.
 	/// \return 0 on bad input. Otherwise a number that identifies this message. If \a reliability is a type that returns a receipt, on a later call to Receive() you will get ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS with bytes 1-4 inclusive containing this number
 	/// \note COMMON MISTAKE: When writing the first byte, bitStream->Write((unsigned char) ID_MY_TYPE) be sure it is casted to a byte, and you are not writing a 4 byte enumeration.
-	uint32_t Send( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber=0 );
+	uint32_t Send( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber=0 );
 
 	/// \brief Sends multiple blocks of data, concatenating them automatically.
 	///
 	/// This is equivalent to:
-	/// RakNet::BitStream bs;
+	/// SLNet::BitStream bs;
 	/// bs.WriteAlignedBytes(block1, blockLength1);
 	/// bs.WriteAlignedBytes(block2, blockLength2);
 	/// bs.WriteAlignedBytes(block3, blockLength3);
@@ -270,7 +275,7 @@ public:
 	/// User-thread functions, such as RPC calls and the plugin function PluginInterface::Update occur here.
 	/// \return 0 if no packets are waiting to be handled, otherwise a pointer to a packet.
 	/// \note COMMON MISTAKE: Be sure to call this in a loop, once per game tick, until it returns 0. If you only process one packet per game tick they will buffer up.
-	/// \sa RakNetTypes.h contains struct Packet.
+	/// \sa types.h contains struct Packet.
 	Packet* Receive( void );
 
 	/// \brief Call this to deallocate a message returned by Receive() when you are done handling it.
@@ -329,7 +334,7 @@ public:
 	/// \details Banned IPs persist between connections but are not saved on shutdown nor loaded on startup.
 	/// \param[in] IP Dotted IP address. You can use * for a wildcard address, such as 128.0.0. * will ban all IP addresses starting with 128.0.0.
 	/// \param[in] milliseconds Gives time in milli seconds for a temporary ban of the IP address.  Use 0 for a permanent ban.
-	void AddToBanList( const char *IP, RakNet::TimeMS milliseconds=0 );
+	void AddToBanList( const char *IP, SLNet::TimeMS milliseconds=0 );
 
 	/// \brief Allows a previously banned IP to connect. 
 	/// param[in] Dotted IP address. You can use * as a wildcard. An IP such as 128.0.0.* will ban all IP addresses starting with 128.0.0.
@@ -355,7 +360,7 @@ public:
 	void Ping( const SystemAddress target );
 
 	/// \brief Send a ping to the specified unconnected system. 
-	/// \details The remote system, if it is Initialized, will respond with ID_PONG followed by sizeof(RakNet::TimeMS) containing the system time the ping was sent. Default is 4 bytes - See __GET_TIME_64BIT in RakNetTypes.h
+	/// \details The remote system, if it is Initialized, will respond with ID_PONG followed by sizeof(SLNet::TimeMS) containing the system time the ping was sent. Default is 4 bytes - See __GET_TIME_64BIT in types.h
 	/// System should reply with ID_PONG if it is active
 	/// \param[in] host Either a dotted IP address or a domain name.  Can be 255.255.255.255 for LAN broadcast.
 	/// \param[in] remotePort Which port to connect to on the remote machine.
@@ -389,7 +394,7 @@ public:
 	/// Subtract GetClockDifferential() from a time returned by the remote system to get that time relative to your own system
 	/// Returns 0 if the system is unknown
 	/// \param[in] systemIdentifier Which system we are referring to
-	RakNet::Time GetClockDifferential( const AddressOrGUID systemIdentifier );
+	SLNet::Time GetClockDifferential( const AddressOrGUID systemIdentifier );
 	
 	// --------------------------------------------------------------------------------------------Static Data Functions - Functions dealing with API defined synchronized memory--------------------------------------------------------------------------------------------
 	/// \brief Sets the data to send along with a LAN server discovery or offline ping reply.
@@ -456,12 +461,12 @@ public:
 	/// Do not set different values for different computers that are connected to each other, or you won't be able to reconnect after ID_CONNECTION_LOST
     /// \param[in] timeMS Time, in MS
 	/// \param[in] target SystemAddress structure of the target system. Pass UNASSIGNED_SYSTEM_ADDRESS for all systems.
-	void SetTimeoutTime( RakNet::TimeMS timeMS, const SystemAddress target );
+	void SetTimeoutTime(SLNet::TimeMS timeMS, const SystemAddress target );
 	
 	/// \brief Returns the Timeout time for the given system.
 	/// \param[in] target Target system to get the TimeoutTime for. Pass UNASSIGNED_SYSTEM_ADDRESS to get the default value.
 	/// \return Timeout time for a given system.
-	RakNet::TimeMS GetTimeoutTime( const SystemAddress target );
+	SLNet::TimeMS GetTimeoutTime( const SystemAddress target );
 
 	/// \brief Returns the current MTU size
 	/// \param[in] target Which system to get MTU for.  UNASSIGNED_SYSTEM_ADDRESS to get the default
@@ -514,7 +519,7 @@ public:
 	/// Useful if the network is clogged up.
 	/// Set to 0 or less to never timeout.  Defaults to 0.
 	/// \param[in] timeoutMS How many ms to wait before simply not sending an unreliable message.
-	void SetUnreliableTimeout(RakNet::TimeMS timeoutMS);
+	void SetUnreliableTimeout(SLNet::TimeMS timeoutMS);
 
 	/// \brief Send a message to a host, with the IP socket option TTL set to 3.
 	/// \details This message will not reach the host, but will open the router.
@@ -570,7 +575,7 @@ public:
 	virtual void ReleaseSockets( DataStructures::List<RakNetSocket2* > &sockets );
 
 	/// \internal
-	virtual void WriteOutOfBandHeader(RakNet::BitStream *bitStream);
+	virtual void WriteOutOfBandHeader(SLNet::BitStream *bitStream);
 
 	/// If you need code to run in the same thread as RakNet's update thread, this function can be used for that
 	/// \param[in] _userUpdateThreadPtr C callback function
@@ -611,7 +616,7 @@ public:
 	/// \param[in] systemAddress Which connected system to get statistics for.
 	/// \param[in] rns If you supply this structure,the network statistics will be written to it. Otherwise the method uses a static struct to write the data, which is not threadsafe.
 	/// \return 0 if the specified system can't be found. Otherwise a pointer to the struct containing the specified system's network statistics.
-	/// \sa RakNetStatistics.h
+	/// \sa statistics.h
 	RakNetStatistics * GetStatistics( const SystemAddress systemAddress, RakNetStatistics *rns=0 );
 	/// \brief Returns the network statistics of the system at the given index in the remoteSystemList.
 	///	\return True if the index is less than the maximum number of peers allowed and the system is active. False otherwise.
@@ -655,7 +660,7 @@ public:
 	struct PingAndClockDifferential
 	{
 		unsigned short pingTime;
-		RakNet::Time clockDifferential;
+		SLNet::Time clockDifferential;
 	};
 
 	/// \internal
@@ -669,11 +674,11 @@ public:
 		ReliabilityLayer reliabilityLayer;  /// The reliability layer associated with this player
 		bool weInitiatedTheConnection; /// True if we started this connection via Connect.  False if someone else connected to us.
 		PingAndClockDifferential pingAndClockDifferential[ PING_TIMES_ARRAY_SIZE ];  /// last x ping times and calculated clock differentials with it
-		RakNet::Time pingAndClockDifferentialWriteIndex;  /// The index we are writing into the pingAndClockDifferential circular buffer
+		SLNet::Time pingAndClockDifferentialWriteIndex;  /// The index we are writing into the pingAndClockDifferential circular buffer
 		unsigned short lowestPing; ///The lowest ping value encountered
-		RakNet::Time nextPingTime;  /// When to next ping this player
-		RakNet::Time lastReliableSend; /// When did the last reliable send occur.  Reliable sends must occur at least once every timeoutTime/2 units to notice disconnects
-		RakNet::Time connectionTime; /// connection time, if active.
+		SLNet::Time nextPingTime;  /// When to next ping this player
+		SLNet::Time lastReliableSend; /// When did the last reliable send occur.  Reliable sends must occur at least once every timeoutTime/2 units to notice disconnects
+		SLNet::Time connectionTime; /// connection time, if active.
 //		int connectionSocketIndex; // index into connectionSockets to send back on.
 		RakNetGUID guid;
 		int MTUSize;
@@ -694,7 +699,7 @@ public:
 	};
 
 	// DS_APR
-	//void ProcessChromePacket(RakNetSocket2 *s, const char *buffer, int dataSize, const SystemAddress& recvFromAddress, RakNet::TimeUS timeRead);
+	//void ProcessChromePacket(RakNetSocket2 *s, const char *buffer, int dataSize, const SystemAddress& recvFromAddress, SLNet::TimeUS timeRead);
 	// /DS_APR
 protected:
 
@@ -702,17 +707,17 @@ protected:
 	//friend RAK_THREAD_DECLARATION(RecvFromLoop);
 	friend RAK_THREAD_DECLARATION(UDTConnect);
 
-	friend bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, bool *isOfflineMessage, RakNet::TimeUS timeRead );
-	friend void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNet::TimeUS timeRead, BitStream &updateBitStream );
-	friend void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, RakNet::TimeUS timeRead, BitStream &updateBitStream );
+	friend bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, bool *isOfflineMessage, SLNet::TimeUS timeRead );
+	friend void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, SLNet::TimeUS timeRead, BitStream &updateBitStream );
+	friend void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket2* rakNetSocket, SLNet::TimeUS timeRead, BitStream &updateBitStream );
 
 	int GetIndexFromSystemAddress( const SystemAddress systemAddress, bool calledFromNetworkThread ) const;
 	int GetIndexFromGuid( const RakNetGUID guid );
 
 	//void RemoveFromRequestedConnectionsList( const SystemAddress systemAddress );
 	// Two versions needed because some buggy compilers strip the last parameter if unused, and crashes
-	ConnectionAttemptResult SendConnectionRequest( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, RakNet::TimeMS timeoutTime, RakNetSocket2* socket );
-	ConnectionAttemptResult SendConnectionRequest( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, RakNet::TimeMS timeoutTime );
+	ConnectionAttemptResult SendConnectionRequest( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, SLNet::TimeMS timeoutTime, RakNetSocket2* socket );
+	ConnectionAttemptResult SendConnectionRequest( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, SLNet::TimeMS timeoutTime );
 	///Get the reliability layer associated with a systemAddress.  
 	/// \param[in] systemAddress The player identifier 
 	/// \return 0 if none
@@ -722,7 +727,7 @@ protected:
 	RemoteSystemStruct *GetRemoteSystemFromGUID( const RakNetGUID guid, bool onlyActive ) const;
 	///Parse out a connection request packet
 	void ParseConnectionRequestPacket( RakPeer::RemoteSystemStruct *remoteSystem, const SystemAddress &systemAddress, const char *data, int byteSize);
-	void OnConnectionRequest( RakPeer::RemoteSystemStruct *remoteSystem, RakNet::Time incomingTimestamp );
+	void OnConnectionRequest( RakPeer::RemoteSystemStruct *remoteSystem, SLNet::Time incomingTimestamp );
 	///Send a reliable disconnect packet to this player and disconnect them when it is delivered
 	void NotifyAndFlagForShutdown( const SystemAddress systemAddress, bool performImmediate, unsigned char orderingChannel, PacketPriority disconnectionNotificationPriority );
 	///Returns how many remote systems initiated a connection to us
@@ -743,7 +748,7 @@ protected:
 	/// Get the most accurate clock differential for a certain player.
 	/// \param[in] systemAddress The player with whose clock the time difference is calculated.
 	/// \returns The clock differential for a certain player.
-	RakNet::Time GetBestClockDifferential( const SystemAddress systemAddress ) const;
+	SLNet::Time GetBestClockDifferential( const SystemAddress systemAddress ) const;
 
 	bool IsLoopbackAddress(const AddressOrGUID &systemIdentifier, bool matchPort) const;
 	SystemAddress GetLoopbackAddress(void) const;
@@ -753,7 +758,7 @@ protected:
 	///true if the peer thread is active. 
 	volatile bool isMainLoopThreadActive;
 	
-	// RakNet::LocklessUint32_t isRecvFromLoopThreadActive;
+	// SLNet::LocklessUint32_t isRecvFromLoopThreadActive;
 
 
 	bool occasionalPing;  /// Do we occasionally ping the other systems?*/
@@ -764,7 +769,7 @@ protected:
 	//unsigned short remoteSystemListSize;
 	///Store the maximum incoming connection allowed 
 	unsigned int maximumIncomingConnections;
-	RakNet::BitStream offlinePingResponse;
+	SLNet::BitStream offlinePingResponse;
 	///Local Player ID
 	// SystemAddress mySystemAddress[MAXIMUM_NUMBER_OF_INTERNAL_IDS];
 	char incomingPassword[256];
@@ -825,13 +830,13 @@ protected:
 	struct BanStruct
 	{
 		char *IP;
-		RakNet::TimeMS timeout; // 0 for none
+		SLNet::TimeMS timeout; // 0 for none
 	};
 
 	struct RequestedConnectionStruct
 	{
 		SystemAddress systemAddress;
-		RakNet::Time nextRequestTime;
+		SLNet::Time nextRequestTime;
 		unsigned char requestsMade;
 		char *data;
 		unsigned short dataLength;
@@ -841,7 +846,7 @@ protected:
 		unsigned int extraData;
 		unsigned sendConnectionAttemptCount;
 		unsigned timeBetweenSendConnectionAttemptsMS;
-		RakNet::TimeMS timeoutTime;
+		SLNet::TimeMS timeoutTime;
 		PublicKeyMode publicKeyMode;
 		RakNetSocket2* socket;
 		enum {CONNECT=1, /*PING=2, PING_OPEN_CONNECTIONS=4,*/ /*ADVERTISE_SYSTEM=2*/} actionToTake;
@@ -899,9 +904,9 @@ protected:
 	// DataStructures::ThreadsafeAllocatingQueue<RNS2RecvStruct> bufferedPackets;
 
 	DataStructures::Queue<RNS2RecvStruct*> bufferedPacketsFreePool;
-	RakNet::SimpleMutex bufferedPacketsFreePoolMutex;
+	SLNet::SimpleMutex bufferedPacketsFreePoolMutex;
 	DataStructures::Queue<RNS2RecvStruct*> bufferedPacketsQueue;
-	RakNet::SimpleMutex bufferedPacketsQueueMutex;
+	SLNet::SimpleMutex bufferedPacketsQueueMutex;
 
 	virtual void DeallocRNS2RecvStruct(RNS2RecvStruct *s, const char *file, unsigned int line);
 	virtual RNS2RecvStruct *AllocRNS2RecvStruct(const char *file, unsigned int line);
@@ -926,15 +931,15 @@ protected:
 	void CloseConnectionInternal( const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification, bool performImmediate, unsigned char orderingChannel, PacketPriority disconnectionNotificationPriority );
 	void SendBuffered( const char *data, BitSize_t numberOfBitsToSend, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RemoteSystemStruct::ConnectMode connectionMode, uint32_t receipt );
 	void SendBufferedList( const char **data, const int *lengths, const int numParameters, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RemoteSystemStruct::ConnectMode connectionMode, uint32_t receipt );
-	bool SendImmediate( char *data, BitSize_t numberOfBitsToSend, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, bool useCallerDataAllocation, RakNet::TimeUS currentTime, uint32_t receipt );
-	//bool HandleBufferedRPC(BufferedCommandStruct *bcs, RakNet::TimeMS time);
+	bool SendImmediate( char *data, BitSize_t numberOfBitsToSend, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, bool useCallerDataAllocation, SLNet::TimeUS currentTime, uint32_t receipt );
+	//bool HandleBufferedRPC(BufferedCommandStruct *bcs, SLNet::TimeMS time);
 	void ClearBufferedCommands(void);
 	void ClearBufferedPackets(void);
 	void ClearSocketQueryOutput(void);
 	void ClearRequestedConnectionList(void);
-	void AddPacketToProducer(RakNet::Packet *p);
+	void AddPacketToProducer(SLNet::Packet *p);
 	unsigned int GenerateSeedFromGuid(void);
-	RakNet::Time GetClockDifferentialInt(RemoteSystemStruct *remoteSystem) const;
+	SLNet::Time GetClockDifferentialInt(RemoteSystemStruct *remoteSystem) const;
 	SimpleMutex securityExceptionMutex;
 
 	//DataStructures::AVLBalancedBinarySearchTree<RPCNode> rpcTree;
@@ -946,11 +951,11 @@ protected:
 	void DerefAllSockets(void);
 	unsigned int GetRakNetSocketFromUserConnectionSocketIndex(unsigned int userIndex) const;
 	// Used for RPC replies
-	RakNet::BitStream *replyFromTargetBS;
+	SLNet::BitStream *replyFromTargetBS;
 	SystemAddress replyFromTargetPlayer;
 	bool replyFromTargetBroadcast;
 
-	RakNet::TimeMS defaultTimeoutTime;
+	SLNet::TimeMS defaultTimeoutTime;
 
 	// Generate and store a unique GUID
 	void GenerateGUID(void);
@@ -972,12 +977,12 @@ protected:
 
 	SystemAddress firstExternalID;
 	int splitMessageProgressInterval;
-	RakNet::TimeMS unreliableTimeout;
+	SLNet::TimeMS unreliableTimeout;
 
 	bool (*incomingDatagramEventHandler)(RNS2RecvStruct *);
 
 	// Systems in this list will not go through the secure connection process, even when secure connections are turned on. Wildcards are accepted.
-	DataStructures::List<RakNet::RakString> securityExceptionList;
+	DataStructures::List<SLNet::RakString> securityExceptionList;
 
 	SystemAddress ipList[ MAXIMUM_NUMBER_OF_INTERNAL_IDS ];
 
@@ -1004,7 +1009,7 @@ protected:
 	SimpleMutex sendReceiptSerialMutex;
 	uint32_t sendReceiptSerial;
 	void ResetSendReceipt(void);
-	void OnConnectedPong(RakNet::Time sendPingTime, RakNet::Time sendPongTime, RemoteSystemStruct *remoteSystem);
+	void OnConnectedPong(SLNet::Time sendPingTime, SLNet::Time sendPongTime, RemoteSystemStruct *remoteSystem);
 	void CallPluginCallbacks(DataStructures::List<PluginInterface2*> &pluginList, Packet *packet);
 
 #if LIBCAT_SECURITY==1
@@ -1029,6 +1034,6 @@ protected:
 // #endif
 ;
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

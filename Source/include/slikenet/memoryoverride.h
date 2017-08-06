@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -18,7 +23,7 @@
 #define __RAK_MEMORY_H
 
 #include "Export.h"
-#include "RakNetDefines.h"
+#include "defines.h"
 #include <new>
 
 
@@ -27,7 +32,7 @@
 
 
 
-#include "RakAlloca.h"
+#include "alloca.h"
 
 // #if _USE_RAK_MEMORY_OVERRIDE==1
 // 	#if defined(new)
@@ -75,7 +80,7 @@ extern RAK_DLL_EXPORT void *(*GetDLMallocMMap())(size_t size);
 extern RAK_DLL_EXPORT void *(*GetDLMallocDirectMMap())(size_t size);
 extern RAK_DLL_EXPORT int (*GetDLMallocMUnmap())(void* ptr, size_t size);
 
-namespace RakNet
+namespace SLNet
 {
 
 	template <class Type>
@@ -227,9 +232,9 @@ namespace RakNet
 // Initial and reallocations will be done through whatever function is pointed to by yourMMapFunction, and yourDirectMMapFunction (default is malloc)
 // Allocations will be freed through whatever function is pointed to by yourMUnmapFunction (default free)
 void UseRaknetFixedHeap(size_t initialCapacity,
-						void * (*yourMMapFunction) (size_t size) = RakNet::_DLMallocMMap,
-						void * (*yourDirectMMapFunction) (size_t size) = RakNet::_DLMallocDirectMMap,
-						int (*yourMUnmapFunction) (void *p, size_t size) = RakNet::_DLMallocMUnmap);
+						void * (*yourMMapFunction) (size_t size) = SLNet::_DLMallocMMap,
+						void * (*yourDirectMMapFunction) (size_t size) = SLNet::_DLMallocDirectMMap,
+						int (*yourMUnmapFunction) (void *p, size_t size) = SLNet::_DLMallocMUnmap);
 
 // Free memory allocated from UseRaknetFixedHeap
 void FreeRakNetFixedHeap(void);

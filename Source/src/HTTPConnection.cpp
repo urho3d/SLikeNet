@@ -1,31 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 /// \brief Contains HTTPConnection, used to communicate with web servers
 ///
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_HTTPConnection==1 && _RAKNET_SUPPORT_TCPInterface==1
 
-#include "TCPInterface.h"
-#include "HTTPConnection.h"
-#include "RakSleep.h"
-#include "RakString.h"
-#include "RakAssert.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/HTTPConnection.h"
+#include "slikenet/sleep.h"
+#include "slikenet/string.h"
+#include "slikenet/assert.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(HTTPConnection,HTTPConnection);
 
@@ -60,7 +65,7 @@ void HTTPConnection::Get(const char *path)
 	outgoingCommand.Push(op, _FILE_AND_LINE_ );
 }
 
-bool HTTPConnection::HasBadResponse(int *code, RakNet::RakString *data)
+bool HTTPConnection::HasBadResponse(int *code, SLNet::RakString *data)
 {
     if(badResponses.IsEmpty())
         return false;
@@ -201,12 +206,12 @@ RakString HTTPConnection::Read(void)
 	if (results.IsEmpty())
 		return RakString();
 
-	RakNet::RakString resultStr = results.Pop();
+	SLNet::RakString resultStr = results.Pop();
     // const char *start_of_body = strstr(resultStr.C_String(), "\r\n\r\n");
 	const char *start_of_body = strpbrk(resultStr.C_String(), "\001\002\003%");
     
     if(start_of_body)
-		return RakNet::RakString::NonVariadic(start_of_body);
+		return SLNet::RakString::NonVariadic(start_of_body);
 	else
 		return resultStr;
 }
@@ -234,7 +239,7 @@ void HTTPConnection::ProcessTCPPacket(Packet *packet)
 			}
 		}
 
-		RakNet::RakString incomingTemp = RakNet::RakString::NonVariadic((const char*) packet->data);
+		SLNet::RakString incomingTemp = SLNet::RakString::NonVariadic((const char*) packet->data);
 		incomingTemp.URLDecode();
 		incomingData += incomingTemp;
 

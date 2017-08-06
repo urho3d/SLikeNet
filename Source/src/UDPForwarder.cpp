@@ -1,36 +1,49 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "UDPForwarder.h"
+#include "slikenet/UDPForwarder.h"
 
 #if _RAKNET_SUPPORT_UDPForwarder==1
 
-#include "GetTime.h"
-#include "MTUSize.h"
-#include "SocketLayer.h"
-#include "WSAStartupSingleton.h"
-#include "RakSleep.h"
-#include "DS_OrderedList.h"
-#include "LinuxStrings.h"
-#include "SocketDefines.h"
-#include "VitaIncludes.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MTUSize.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/WSAStartupSingleton.h"
+#include "slikenet/sleep.h"
+#include "slikenet/DS_OrderedList.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/SocketDefines.h"
+#include "slikenet/VitaIncludes.h"
 #include "errno.h"
+
+#ifdef _WIN32
+#include <tchar.h>
+#else
+#ifndef _T
+#define _T(x) (x)
+#endif
+#endif
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 static const unsigned short DEFAULT_MAX_FORWARD_ENTRIES=64;
 
-namespace RakNet
+namespace SLNet
 {
 	RAK_THREAD_DECLARATION(UpdateUDPForwarderGlobal);
 }
@@ -38,7 +51,7 @@ namespace RakNet
 UDPForwarder::ForwardEntry::ForwardEntry()
 {
 	socket=INVALID_SOCKET;
-	timeLastDatagramForwarded=RakNet::GetTimeMS();
+	timeLastDatagramForwarded= SLNet::GetTimeMS();
 	addr1Confirmed=UNASSIGNED_SYSTEM_ADDRESS;
 	addr2Confirmed=UNASSIGNED_SYSTEM_ADDRESS;
 }
@@ -77,7 +90,7 @@ void UDPForwarder::Startup(void)
 
 
 
-	errorCode = RakNet::RakThread::Create(UpdateUDPForwarderGlobal, this);
+	errorCode = SLNet::RakThread::Create(UpdateUDPForwarderGlobal, this);
 
 	if ( errorCode != 0 )
 	{
@@ -99,7 +112,7 @@ void UDPForwarder::Shutdown(void)
 
 	unsigned int j;
 	for (j=0; j < forwardListNotUpdated.Size(); j++)
-		RakNet::OP_DELETE(forwardListNotUpdated[j],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(forwardListNotUpdated[j],_FILE_AND_LINE_);
 	forwardListNotUpdated.Clear(false, _FILE_AND_LINE_);
 }
 void UDPForwarder::SetMaxForwardEntries(unsigned short maxEntries)
@@ -115,7 +128,7 @@ int UDPForwarder::GetUsedForwardEntries(void) const
 {
 	return (int) forwardListNotUpdated.Size();
 }
-UDPForwarderResult UDPForwarder::StartForwarding(SystemAddress source, SystemAddress destination, RakNet::TimeMS timeoutOnNoDataMS, const char *forceHostAddress, unsigned short socketFamily,
+UDPForwarderResult UDPForwarder::StartForwarding(SystemAddress source, SystemAddress destination, SLNet::TimeMS timeoutOnNoDataMS, const char *forceHostAddress, unsigned short socketFamily,
 								  unsigned short *forwardingPort, __UDPSOCKET__ *forwardingSocket)
 {
 	// Invalid parameters?
@@ -141,10 +154,7 @@ UDPForwarderResult UDPForwarder::StartForwarding(SystemAddress source, SystemAdd
 	sfis->inputId=inputId;
 	startForwardingInput.Push(sfis);
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while (1)
+	for(;;)
 	{
 		RakSleep(0);
 		startForwardingOutputMutex.Lock();
@@ -167,8 +177,6 @@ UDPForwarderResult UDPForwarder::StartForwarding(SystemAddress source, SystemAdd
 		}
 		startForwardingOutputMutex.Unlock();
 	}
-
-	return UDPFORWARDER_RESULT_COUNT;
 }
 void UDPForwarder::StopForwarding(SystemAddress source, SystemAddress destination)
 {
@@ -178,7 +186,7 @@ void UDPForwarder::StopForwarding(SystemAddress source, SystemAddress destinatio
 	sfs->source=source;
 	stopForwardingCommands.Push(sfs);
 }
-void UDPForwarder::RecvFrom(RakNet::TimeMS curTime, ForwardEntry *forwardEntry)
+void UDPForwarder::RecvFrom(SLNet::TimeMS curTime, ForwardEntry *forwardEntry)
 {
 #ifndef __native_client__
 	char data[ MAXIMUM_MTU_SIZE ];
@@ -227,12 +235,12 @@ void UDPForwarder::RecvFrom(RakNet::TimeMS curTime, ForwardEntry *forwardEntry)
 
 		if (dwIOError!=WSAECONNRESET && dwIOError!=WSAEINTR && dwIOError!=WSAETIMEDOUT && dwIOError!=WSAEWOULDBLOCK)
 		{
-			LPVOID messageBuffer;
+			LPTSTR messageBuffer;
 			FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// something has gone wrong here...
-			RAKNET_DEBUG_PRINTF( "recvfrom failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_TPRINTF( _T("recvfrom failed:Error code - %lu\n%s"), dwIOError, messageBuffer );
 
 			//Free the buffer.
 			LocalFree( messageBuffer );
@@ -397,7 +405,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 #endif
 	*/
 
-	RakNet::TimeMS curTime = RakNet::GetTimeMS();
+	SLNet::TimeMS curTime = SLNet::GetTimeMS();
 
 	StartForwardingInputStruct *sfis;
 	StartForwardingOutputStruct sfos;
@@ -406,10 +414,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 	sfos.inputId=0;
 	sfos.result=UDPFORWARDER_RESULT_COUNT;
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while (1)
+	for(;;)
 	{
 		sfis = startForwardingInput.Pop();
 		if (sfis==0)
@@ -446,7 +451,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 				int sock_opt;
 				sockaddr_in listenerSocketAddress;
 				listenerSocketAddress.sin_port = 0;
-				ForwardEntry *fe = RakNet::OP_NEW<UDPForwarder::ForwardEntry>(_FILE_AND_LINE_);
+				ForwardEntry *fe = SLNet::OP_NEW<UDPForwarder::ForwardEntry>(_FILE_AND_LINE_);
 				fe->addr1Unconfirmed=sfis->source;
 				fe->addr2Unconfirmed=sfis->destination;
 				fe->timeoutOnNoDataMS=sfis->timeoutOnNoDataMS;
@@ -460,8 +465,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 
 
 
-
-					listenerSocketAddress.sin_addr.s_addr = inet_addr__( sfis->forceHostAddress.C_String() );
+					inet_pton(AF_INET, sfis->forceHostAddress.C_String(), &listenerSocketAddress.sin_addr.s_addr);
 
 				}
 				else
@@ -471,7 +475,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 				int ret = bind__( fe->socket, ( struct sockaddr * ) & listenerSocketAddress, sizeof( listenerSocketAddress ) );
 				if (ret==-1)
 				{
-					RakNet::OP_DELETE(fe,_FILE_AND_LINE_);
+					SLNet::OP_DELETE(fe,_FILE_AND_LINE_);
 					sfos.result=UDPFORWARDER_BIND_FAILED;
 				}
 				else
@@ -553,10 +557,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 
 	StopForwardingStruct *sfs;
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while (1)
+	for(;;)
 	{
 		sfs = stopForwardingCommands.Pop();
 		if (sfs==0)
@@ -575,7 +576,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 			{
 				fe = forwardListNotUpdated[i];
 				forwardListNotUpdated.RemoveAtIndexFast(i);
-				RakNet::OP_DELETE(fe, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fe, _FILE_AND_LINE_);
 				break;
 			}
 		}
@@ -591,7 +592,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 		if (curTime > forwardListNotUpdated[i]->timeLastDatagramForwarded && // Account for timestamp wrap
 			curTime > forwardListNotUpdated[i]->timeLastDatagramForwarded+forwardListNotUpdated[i]->timeoutOnNoDataMS)
 		{
-			RakNet::OP_DELETE(forwardListNotUpdated[i],_FILE_AND_LINE_);
+			SLNet::OP_DELETE(forwardListNotUpdated[i],_FILE_AND_LINE_);
 			forwardListNotUpdated.RemoveAtIndex(i);
 		}
 		else
@@ -606,7 +607,7 @@ void UDPForwarder::UpdateUDPForwarder(void)
 	}
 }
 
-namespace RakNet {
+namespace SLNet {
 RAK_THREAD_DECLARATION(UpdateUDPForwarderGlobal)
 {
 
@@ -638,6 +639,6 @@ RAK_THREAD_DECLARATION(UpdateUDPForwarderGlobal)
 
 }
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // #if _RAKNET_SUPPORT_FileOperations==1

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file CloudServer.h
@@ -21,9 +26,9 @@
 #define __CLOUD_SERVER_H
 
 #include "PluginInterface2.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "NativeTypes.h"
-#include "RakString.h"
+#include "string.h"
 #include "DS_Hash.h"
 #include "CloudCommon.h"
 #include "DS_OrderedList.h"
@@ -31,7 +36,7 @@
 /// If the data is smaller than this value, an allocation is avoid. However, this value exists for every row
 #define CLOUD_SERVER_DATA_STACK_SIZE 32
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -280,7 +285,7 @@ protected:
 		CloudQueryWithAddresses cloudQueryWithAddresses;
 
 		// When request started. If takes too long for a response from another system, can abort remaining systems
-		RakNet::Time requestStartTime;
+		SLNet::Time requestStartTime;
 
 		// Assigned by server that gets the request to identify response. See nextGetRequestId
 		uint32_t requestId;
@@ -291,7 +296,7 @@ protected:
 	};
 	static int GetRequestComp(const uint32_t &key, GetRequest* const &data );
 	DataStructures::OrderedList<uint32_t, GetRequest*, CloudServer::GetRequestComp> getRequests;
-	RakNet::Time nextGetRequestsCheck;
+	SLNet::Time nextGetRequestsCheck;
 
 	uint32_t nextGetRequestId;
 
@@ -332,7 +337,7 @@ protected:
 };
 
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

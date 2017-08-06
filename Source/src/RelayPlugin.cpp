@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_RelayPlugin==1
 
-#include "RelayPlugin.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
+#include "slikenet/RelayPlugin.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(RelayPlugin,RelayPlugin);
 
@@ -32,9 +37,9 @@ RelayPlugin::~RelayPlugin()
 	strToGuidHash.GetAsList(itemList, keyList, _FILE_AND_LINE_);
 	guidToStrHash.Clear(_FILE_AND_LINE_);
 	for (unsigned int i=0; i < itemList.Size(); i++)
-		RakNet::OP_DELETE(itemList[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(itemList[i], _FILE_AND_LINE_);
 	for (unsigned int i=0; i < chatRooms.Size(); i++)
-		RakNet::OP_DELETE(chatRooms[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(chatRooms[i], _FILE_AND_LINE_);
 }
 
 RelayPluginEnums RelayPlugin::AddParticipantOnServer(const RakString &key, const RakNetGUID &guid)
@@ -51,10 +56,10 @@ RelayPluginEnums RelayPlugin::AddParticipantOnServer(const RakString &key, const
 	if (guidToStrHash.Pop(strAndGuidExisting, guid, _FILE_AND_LINE_))
 	{
 		strToGuidHash.Remove(strAndGuidExisting->str, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(strAndGuidExisting, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(strAndGuidExisting, _FILE_AND_LINE_);
 	}
 
-	StrAndGuidAndRoom *strAndGuid = RakNet::OP_NEW<StrAndGuidAndRoom>(_FILE_AND_LINE_);
+	StrAndGuidAndRoom *strAndGuid = SLNet::OP_NEW<StrAndGuidAndRoom>(_FILE_AND_LINE_);
 	strAndGuid->guid=guid;
 	strAndGuid->str=key;
 
@@ -70,7 +75,7 @@ void RelayPlugin::RemoveParticipantOnServer(const RakNetGUID &guid)
 	{
 		LeaveGroup(&strAndGuid);
 		strToGuidHash.Remove(strAndGuid->str, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(strAndGuid, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(strAndGuid, _FILE_AND_LINE_);
 	}
 }
 
@@ -276,7 +281,7 @@ RelayPlugin::RP_Group* RelayPlugin::JoinGroup(RakNetGUID userGuid, RakString roo
 		}
 
 		// Create new room
-		RP_Group *room = RakNet::OP_NEW<RP_Group>(_FILE_AND_LINE_);
+		RP_Group *room = SLNet::OP_NEW<RP_Group>(_FILE_AND_LINE_);
 		room->roomName=roomName;
 		chatRooms.Push(room, _FILE_AND_LINE_);
 		return JoinGroup(room,strAndGuidSender);
@@ -305,7 +310,7 @@ void RelayPlugin::LeaveGroup(StrAndGuidAndRoom **strAndGuidSender)
 
 					if (room->usersInRoom.Size()==0)
 					{
-						RakNet::OP_DELETE(room, _FILE_AND_LINE_);
+						SLNet::OP_DELETE(room, _FILE_AND_LINE_);
 						chatRooms.RemoveAtIndexFast(i);
 						return;
 					}
@@ -349,10 +354,10 @@ void RelayPlugin::SendMessageToRoom(StrAndGuidAndRoom **strAndGuidSender, BitStr
 			bsOut.Write(message);
 
 			RP_Group *room = chatRooms[i];
-			for (unsigned int i=0; i < room->usersInRoom.Size(); i++)
+			for (unsigned int j=0; j < room->usersInRoom.Size(); j++)
 			{
-				if (room->usersInRoom[i].guid!=(*strAndGuidSender)->guid)
-					SendUnified(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, room->usersInRoom[i].guid, false);
+				if (room->usersInRoom[j].guid!=(*strAndGuidSender)->guid)
+					SendUnified(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, room->usersInRoom[j].guid, false);
 			}
 
 			break;

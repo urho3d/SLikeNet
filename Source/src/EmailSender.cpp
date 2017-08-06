@@ -1,43 +1,50 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_EmailSender==1 && _RAKNET_SUPPORT_TCPInterface==1 && _RAKNET_SUPPORT_FileOperations==1
 
 // Useful sites
 // http://www.faqs.org\rfcs\rfc2821.html
 // http://www2.rad.com\networks/1995/mime/examples.htm
 
-#include "EmailSender.h"
-#include "TCPInterface.h"
-#include "GetTime.h"
-#include "Rand.h"
-#include "FileList.h"
-#include "BitStream.h"
-#include "Base64Encoder.h"
+#include "slikenet/EmailSender.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/FileList.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/Base64Encoder.h"
 #include <stdio.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 
 
 
 
-#include "RakSleep.h"
+#include "slikenet/sleep.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 
 STATIC_FACTORY_DEFINITIONS(EmailSender,EmailSender);
 
 const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, const char *sender, const char *recipient, const char *senderName, const char *recipientName, const char *subject, const char *body, FileList *attachedFiles, bool doPrintf, const char *password)
 {
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	char query[1024];
 	TCPInterface tcpInterface;
 	SystemAddress emailServer;
@@ -49,9 +56,9 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 #if  OPEN_SSL_CLIENT_SUPPORT==1
 	tcpInterface.StartSSLClient(emailServer);
 #endif
-	RakNet::TimeMS timeoutTime = RakNet::GetTimeMS()+3000;
+	SLNet::TimeMS timeoutTime = SLNet::GetTimeMS()+3000;
 	packet=0;
-	while (RakNet::GetTimeMS() < timeoutTime)
+	while (SLNet::GetTimeMS() < timeoutTime)
 	{
 		packet = tcpInterface.Receive();
 		if (packet)
@@ -72,10 +79,7 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 	tcpInterface.Send("EHLO\r\n", 6, emailServer,false);
 	const char *response;
 	bool authenticate=false;
-#ifdef _MSC_VER
-#pragma warning(disable:4127)   // conditional expression is constant
-#endif
-	while (1)
+	for(;;)
 	{
 		response=GetResponse(&tcpInterface, emailServer, doPrintf);
 
@@ -96,15 +100,15 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 
 	if (authenticate)
 	{
-		sprintf(query, "EHLO %s\r\n", sender);
+		sprintf_s(query, "EHLO %s\r\n", sender);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 		response=GetResponse(&tcpInterface, emailServer, doPrintf);
 		if (response!=0)
 			return response;
 		if (password==0)
 			return "Password needed";
-		char *outputData = RakNet::OP_NEW_ARRAY<char >((const int) (strlen(sender)+strlen(password)+2)*3, _FILE_AND_LINE_ );
-		RakNet::BitStream bs;
+		char *outputData = SLNet::OP_NEW_ARRAY<char >((const int) (strlen(sender)+strlen(password)+2)*3, _FILE_AND_LINE_ );
+		SLNet::BitStream bs;
 		char zero=0;
 		bs.Write(&zero,1);
 		bs.Write(sender,(const unsigned int)strlen(sender));
@@ -114,7 +118,7 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 		bs.Write(&zero,1);
 		//bs.Write("not.my.real.password",(const unsigned int)strlen("not.my.real.password"));
 		Base64Encoding((const unsigned char*)bs.GetData(), bs.GetNumberOfBytesUsed(), outputData);
-		sprintf(query, "AUTH PLAIN %s", outputData);
+		sprintf_s(query, "AUTH PLAIN %s", outputData);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 		response=GetResponse(&tcpInterface, emailServer, doPrintf);
 		if (response!=0)
@@ -123,18 +127,18 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 
 
 	if (sender)
-		sprintf(query, "MAIL From: <%s>\r\n", sender);
+		sprintf_s(query, "MAIL From: <%s>\r\n", sender);
 	else
-		sprintf(query, "MAIL From: <>\r\n");
+		sprintf_s(query, "MAIL From: <>\r\n");
 	tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	response=GetResponse(&tcpInterface, emailServer, doPrintf);
 	if (response!=0)
 		return response;
 
 	if (recipient)
-		sprintf(query, "RCPT TO: <%s>\r\n", recipient);
+		sprintf_s(query, "RCPT TO: <%s>\r\n", recipient);
 	else
-		sprintf(query, "RCPT TO: <>\r\n");
+		sprintf_s(query, "RCPT TO: <>\r\n");
 	tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	response=GetResponse(&tcpInterface, emailServer, doPrintf);
 	if (response!=0)
@@ -150,17 +154,17 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 
 	if (subject)
 	{
-		sprintf(query, "Subject: %s\r\n", subject);
+		sprintf_s(query, "Subject: %s\r\n", subject);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	}
 	if (senderName)
 	{
-		sprintf(query, "From: %s\r\n", senderName);
+		sprintf_s(query, "From: %s\r\n", senderName);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	}
 	if (recipientName)
 	{
-		sprintf(query, "To: %s\r\n", recipientName);
+		sprintf_s(query, "To: %s\r\n", recipientName);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	}
 
@@ -169,26 +173,26 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 	int i,j;
 	if (attachedFiles && attachedFiles->fileList.Size())
 	{
-		rakNetRandom.SeedMT((unsigned int) RakNet::GetTimeMS());
+		rakNetRandom.SeedMT((unsigned int)SLNet::GetTimeMS());
 		// Random multipart message boundary
 		for (i=0; i < boundarySize; i++)
 			boundary[i]=Base64Map()[rakNetRandom.RandomMT()%64];
 		boundary[boundarySize]=0;
 	}
 
-	sprintf(query, "MIME-version: 1.0\r\n");
+	sprintf_s(query, "MIME-version: 1.0\r\n");
 	tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 
 	if (attachedFiles && attachedFiles->fileList.Size())
 	{
-		sprintf(query, "Content-type: multipart/mixed; BOUNDARY=\"%s\"\r\n\r\n", boundary);
+		sprintf_s(query, "Content-type: multipart/mixed; BOUNDARY=\"%s\"\r\n\r\n", boundary);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 
-		sprintf(query, "This is a multi-part message in MIME format.\r\n\r\n--%s\r\n", boundary);
+		sprintf_s(query, "This is a multi-part message in MIME format.\r\n\r\n--%s\r\n", boundary);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	}
 	
-	sprintf(query, "Content-Type: text/plain; charset=\"US-ASCII\"\r\n\r\n");
+	sprintf_s(query, "Content-Type: text/plain; charset=\"US-ASCII\"\r\n\r\n");
 	tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 
 	// Write the body of the email, doing some lame shitty shit where I have to make periods at the start of a newline have a second period.
@@ -273,10 +277,10 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 		for (i=0; i < (int) attachedFiles->fileList.Size(); i++)
 		{
 			// Write boundary
-			sprintf(query, "\r\n--%s\r\n", boundary);
+			sprintf_s(query, "\r\n--%s\r\n", boundary);
 			tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 
-			sprintf(query, "Content-Type: APPLICATION/Octet-Stream; SizeOnDisk=%i; name=\"%s\"\r\nContent-Transfer-Encoding: BASE64\r\nContent-Description: %s\r\n\r\n", attachedFiles->fileList[i].dataLengthBytes, attachedFiles->fileList[i].filename.C_String(), attachedFiles->fileList[i].filename.C_String());
+			sprintf_s(query, "Content-Type: APPLICATION/Octet-Stream; SizeOnDisk=%i; name=\"%s\"\r\nContent-Transfer-Encoding: BASE64\r\nContent-Description: %s\r\n\r\n", attachedFiles->fileList[i].dataLengthBytes, attachedFiles->fileList[i].filename.C_String(), attachedFiles->fileList[i].filename.C_String());
 			tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 
 			newBody = (char*) rakMalloc_Ex( (size_t) (attachedFiles->fileList[i].dataLengthBytes*3)/2, _FILE_AND_LINE_ );
@@ -290,12 +294,12 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 		}
 
 		// Write last boundary
-		sprintf(query, "\r\n--%s--\r\n", boundary);
+		sprintf_s(query, "\r\n--%s--\r\n", boundary);
 		tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	}
 
 
-	sprintf(query, "\r\n.\r\n");
+	sprintf_s(query, "\r\n.\r\n");
 	tcpInterface.Send(query, (unsigned int)strlen(query), emailServer,false);
 	response=GetResponse(&tcpInterface, emailServer, doPrintf);
 	if (response!=0)
@@ -320,13 +324,10 @@ const char *EmailSender::Send(const char *hostAddress, unsigned short hostPort, 
 
 const char *EmailSender::GetResponse(TCPInterface *tcpInterface, const SystemAddress &emailServer, bool doPrintf)
 {
-	RakNet::Packet *packet;
-	RakNet::TimeMS timeout;
-	timeout=RakNet::GetTimeMS()+5000;
-#ifdef _MSC_VER
-	#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while (1)
+	SLNet::Packet *packet;
+	SLNet::TimeMS timeout;
+	timeout= SLNet::GetTimeMS()+5000;
+	for(;;)
 	{
 		if (tcpInterface->HasLostConnection()==emailServer)
 			return "Connection to server lost.";
@@ -367,7 +368,7 @@ const char *EmailSender::GetResponse(TCPInterface *tcpInterface, const SystemAdd
 			if (strstr((const char*)packet->data, "553"))
 				return "Failed on error code 553";
 		}
-		if (RakNet::GetTimeMS() > timeout)
+		if (SLNet::GetTimeMS() > timeout)
 			return "Timed out";
 		RakSleep(100);
 	}

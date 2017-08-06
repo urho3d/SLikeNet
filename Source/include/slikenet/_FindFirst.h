@@ -1,3 +1,13 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 ///
 /// Original file by the_viking, fixed by Rômulo Fernandes
 /// Should emulate windows finddata structure
@@ -10,7 +20,7 @@
 
 #include <dirent.h>
 
-#include "RakString.h"
+#include "string.h"
 
 #define _A_NORMAL 		0x00 		// Normal file
 #define _A_RDONLY 		0x01 		// Read-only file
@@ -43,8 +53,8 @@ typedef struct _finddata_t
 typedef struct _findinfo_t
 {
 	DIR*	openedDir;
-	RakNet::RakString filter;    
-	RakNet::RakString dirName;
+	SLNet::RakString filter;    
+	SLNet::RakString dirName;
 } _findinfo;
 
 long _findfirst(const char *name, _finddata_t *f);

@@ -1,15 +1,20 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakAssert.h"
-#include "GridSectorizer.h"
+#include "slikenet/assert.h"
+#include "slikenet/GridSectorizer.h"
 //#include <stdlib.h>
 #include <math.h>
 
@@ -20,13 +25,13 @@ GridSectorizer::GridSectorizer()
 GridSectorizer::~GridSectorizer()
 {
 	if (grid)
-		RakNet::OP_DELETE_ARRAY(grid, _FILE_AND_LINE_);
+		SLNet::OP_DELETE_ARRAY(grid, _FILE_AND_LINE_);
 }
 void GridSectorizer::Init(const float _maxCellWidth, const float _maxCellHeight, const float minX, const float minY, const float maxX, const float maxY)
 {
 	RakAssert(_maxCellWidth > 0.0f && _maxCellHeight > 0.0f);
 	if (grid)
-		RakNet::OP_DELETE_ARRAY(grid, _FILE_AND_LINE_);
+		SLNet::OP_DELETE_ARRAY(grid, _FILE_AND_LINE_);
 
 	cellOriginX=minX;
 	cellOriginY=minY;
@@ -41,10 +46,10 @@ void GridSectorizer::Init(const float _maxCellWidth, const float _maxCellHeight,
 	invCellHeight = 1.0f / cellHeight;
 
 #ifdef _USE_ORDERED_LIST
-	grid = RakNet::OP_NEW<DataStructures::OrderedList<void*, void*>>(gridCellWidthCount*gridCellHeightCount, _FILE_AND_LINE_ );
+	grid = SLNet::OP_NEW<DataStructures::OrderedList<void*, void*>>(gridCellWidthCount*gridCellHeightCount, _FILE_AND_LINE_ );
 	DataStructures::OrderedList<void*,void*>::IMPLEMENT_DEFAULT_COMPARISON();
 #else
-	grid = RakNet::OP_NEW_ARRAY<DataStructures::List<void*> >(gridCellWidthCount*gridCellHeightCount, _FILE_AND_LINE_ );
+	grid = SLNet::OP_NEW_ARRAY<DataStructures::List<void*> >(gridCellWidthCount*gridCellHeightCount, _FILE_AND_LINE_ );
 #endif
 }
 void GridSectorizer::AddEntry(void *entry, const float minX, const float minY, const float maxX, const float maxY)

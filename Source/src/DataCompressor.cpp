@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "DataCompressor.h"
-#include "DS_HuffmanEncodingTree.h"
-#include "RakAssert.h"
+#include "slikenet/DataCompressor.h"
+#include "slikenet/DS_HuffmanEncodingTree.h"
+#include "slikenet/assert.h"
 #include <string.h> // Use string.h rather than memory.h for a console
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(DataCompressor,DataCompressor)
 
-void DataCompressor::Compress( unsigned char *userData, unsigned sizeInBytes, RakNet::BitStream * output )
+void DataCompressor::Compress( unsigned char *userData, unsigned sizeInBytes, SLNet::BitStream * output )
 {
 	// Don't use this for small files as you will just make them bigger!
 	RakAssert(sizeInBytes > 2048);
@@ -45,7 +50,7 @@ void DataCompressor::Compress( unsigned char *userData, unsigned sizeInBytes, Ra
 	output->SetWriteOffset(writeOffset2);
 }
 
-unsigned DataCompressor::DecompressAndAllocate( RakNet::BitStream * input, unsigned char **output )
+unsigned DataCompressor::DecompressAndAllocate(SLNet::BitStream * input, unsigned char **output )
 {
 	HuffmanEncodingTree tree;
 	unsigned int bitsUsed, destinationSizeInBytes;

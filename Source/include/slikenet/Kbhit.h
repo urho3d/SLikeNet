@@ -1,12 +1,20 @@
 /*****************************************************************************
-kbhit() and getch() for Linux/UNIX
+_kbhit() and _getch() for Linux/UNIX
 Chris Giese <geezer@execpc.com>	http://my.execpc.com/~geezer
 Release date: ?
 This code is public domain (no copyright).
 You can do whatever you want with it.
 *****************************************************************************/
+/*
+ *  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications in this file are put under the public domain.
+ *  Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The
+ *  license can be found in the license.txt file in the root directory of this source tree.
+ */
+
 #if defined(_WIN32)
-#include <conio.h> /* kbhit(), getch() */
+#include <conio.h> /* _kbhit(), _getch() */
 
 #else
 #include <sys/time.h> /* struct timeval, select() */
@@ -48,7 +56,7 @@ static void raw(void)
 }
 /*****************************************************************************
 *****************************************************************************/
-static int kbhit(void)
+static int _kbhit(void)
 {
 	struct timeval timeout;
 	fd_set read_handles;
@@ -62,14 +70,14 @@ static int kbhit(void)
 	status = select(0 + 1, &read_handles, NULL, NULL, &timeout);
 	if(status < 0)
 	{
-		printf("select() failed in kbhit()\n");
+		printf("select() failed in _kbhit()\n");
 		exit(1);
 	}
 	return status;
 }
 /*****************************************************************************
 *****************************************************************************/
-static int getch(void)
+static int _getch(void)
 {
 	unsigned char temp;
 

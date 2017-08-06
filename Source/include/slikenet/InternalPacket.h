@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -16,18 +21,18 @@
 #define __INTERNAL_PACKET_H
 
 #include "PacketPriority.h"
-#include "RakNetTypes.h"
-#include "RakMemoryOverride.h"
-#include "RakNetDefines.h"
+#include "types.h"
+#include "memoryoverride.h"
+#include "defines.h"
 #include "NativeTypes.h"
-#include "RakNetDefines.h"
+#include "defines.h"
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL!=1
 #include "CCRakNetUDT.h"
 #else
 #include "CCRakNetSlidingWindow.h"
 #endif
 
-namespace RakNet {
+namespace SLNet {
 
 typedef uint16_t SplitPacketIdType;
 typedef uint32_t SplitPacketIndexType;
@@ -40,7 +45,7 @@ typedef uint24_t MessageNumberType;
 /// were to wrap, the newly wrapped values would no longer be in use.  Warning: Too large of a value wastes bandwidth!
 typedef MessageNumberType OrderingIndexType;
 
-typedef RakNet::TimeUS RemoteSystemTimeType;
+typedef SLNet::TimeUS RemoteSystemTimeType;
 
 struct InternalPacketFixedSizeTransmissionHeader
 {
@@ -87,11 +92,11 @@ struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
 	/// Was this packet number used this update to track windowing drops or increases?  Each packet number is only used once per update.
 //	bool allowWindowUpdate;
 	///When this packet was created
-	RakNet::TimeUS creationTime;
+	SLNet::TimeUS creationTime;
 	///The resendNext time to take action on this packet
-	RakNet::TimeUS nextActionTime;
+	SLNet::TimeUS nextActionTime;
 	// For debugging
-	RakNet::TimeUS retransmissionTime;
+	SLNet::TimeUS retransmissionTime;
 	// Size of the header when encoded into a bitstream
 	BitSize_t headerLength;
 	/// Buffer is a pointer to the actual data, assuming this packet has data at all
@@ -124,7 +129,7 @@ struct InternalPacket : public InternalPacketFixedSizeTransmissionHeader
 	unsigned char stackData[128];
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

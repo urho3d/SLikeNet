@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -16,7 +21,7 @@
 #ifndef __RELIABILITY_LAYER_H
 #define __RELIABILITY_LAYER_H
 
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "MTUSize.h"
 #include "DS_LinkedList.h"
 #include "DS_List.h"
@@ -25,20 +30,20 @@
 #include "DS_Queue.h"
 #include "BitStream.h"
 #include "InternalPacket.h"
-#include "RakNetStatistics.h"
+#include "statistics.h"
 #include "DR_SHA1.h"
 #include "DS_OrderedList.h"
 #include "DS_RangeList.h"
 #include "DS_BPlusTree.h"
 #include "DS_MemoryPool.h"
-#include "RakNetDefines.h"
+#include "defines.h"
 #include "DS_Heap.h"
 #include "BitStream.h"
 #include "NativeFeatureIncludes.h"
 #include "SecureHandshake.h"
 #include "PluginInterface2.h"
 #include "Rand.h"
-#include "RakNetSocket2.h"
+#include "socket2.h"
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL!=1
 #include "CCRakNetUDT.h"
@@ -53,7 +58,7 @@
 
 #define RESEND_TREE_ORDER 32
 
-namespace RakNet {
+namespace SLNet {
 
 	/// Forward declarations
 class PluginInterface2;
@@ -87,7 +92,7 @@ struct BPSTracker
 	~BPSTracker();
 	void Reset(const char *file, unsigned int line);
 	inline void Push1(CCTimeType time, uint64_t value1) {dataQueue.Push(TimeAndValue2(time,value1),_FILE_AND_LINE_); total1+=value1; lastSec1+=value1;}
-//	void Push2(RakNet::TimeUS time, uint64_t value1, uint64_t value2);
+//	void Push2(SLNet::TimeUS time, uint64_t value1, uint64_t value2);
 	inline uint64_t GetBPS1(CCTimeType time) {(void) time; return lastSec1;}
 	inline uint64_t GetBPS1Threadsafe(CCTimeType time) {(void) time; return lastSec1;}
 //	uint64_t GetBPS2(RakNetTimeUS time);
@@ -100,7 +105,7 @@ struct BPSTracker
 		TimeAndValue2();
 		~TimeAndValue2();
 		TimeAndValue2(CCTimeType t, uint64_t v1);
-	//	TimeAndValue2(RakNet::TimeUS t, uint64_t v1, uint64_t v2);
+	//	TimeAndValue2(SLNet::TimeUS t, uint64_t v1, uint64_t v2);
 	//	uint64_t value1, value2;
 		uint64_t value1;
 		CCTimeType time;
@@ -110,7 +115,7 @@ struct BPSTracker
 //	uint64_t total2, lastSec2;
 	DataStructures::Queue<TimeAndValue2> dataQueue;
 	void ClearExpired1(CCTimeType time);
-//	void ClearExpired2(RakNet::TimeUS time);
+//	void ClearExpired2(SLNet::TimeUS time);
 };
 
 /// Datagram reliable, ordered, unordered and sequenced sends.  Flow control.  Message splitting, reassembly, and coalescence.
@@ -130,11 +135,11 @@ public:
 	/// Set the time, in MS, to use before considering ourselves disconnected after not being able to deliver a reliable packet
 	/// Default time is 10,000 or 10 seconds in release and 30,000 or 30 seconds in debug.
 	/// \param[in] time Time, in MS
-	void SetTimeoutTime( RakNet::TimeMS time );
+	void SetTimeoutTime(SLNet::TimeMS time );
 
 	/// Returns the value passed to SetTimeoutTime. or the default if it was never called
 	/// \param[out] the value passed to SetTimeoutTime
-	RakNet::TimeMS GetTimeoutTime(void);
+	SLNet::TimeMS GetTimeoutTime(void);
 
 	/// Packets are read directly from the socket layer and skip the reliability layer because unconnected players do not use the reliability layer
 	/// This function takes packet data after a player has been confirmed as connected.
@@ -162,7 +167,7 @@ public:
 	/// \param[in] orderingChannel 0 to 31.  Specifies what channel to use, for relational ordering and sequencing of packets.
 	/// \param[in] makeDataCopy If true \a data will be copied.  Otherwise, only a pointer will be stored.
 	/// \param[in] MTUSize maximum datagram size
-	/// \param[in] currentTime Current time, as per RakNet::GetTimeMS()
+	/// \param[in] currentTime Current time, as per SLNet::GetTimeMS()
 	/// \param[in] receipt This number will be returned back with ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS and is only returned with the reliability types that contain RECEIPT in the name
 	/// \return True or false for success or failure.
 	bool Send( char *data, BitSize_t numberOfBitsToSend, PacketPriority priority, PacketReliability reliability, unsigned char orderingChannel, bool makeDataCopy, int MTUSize, CCTimeType currentTime, uint32_t receipt );
@@ -195,43 +200,43 @@ public:
 	bool AreAcksWaiting(void);
 
 	// Set outgoing lag and packet loss properties
-	void ApplyNetworkSimulator( double _maxSendBPS, RakNet::TimeMS _minExtraPing, RakNet::TimeMS _extraPingVariance );
+	void ApplyNetworkSimulator( double _maxSendBPS, SLNet::TimeMS _minExtraPing, SLNet::TimeMS _extraPingVariance );
 
 	/// Returns if you previously called ApplyNetworkSimulator
 	/// \return If you previously called ApplyNetworkSimulator
 	bool IsNetworkSimulatorActive( void );
 
 	void SetSplitMessageProgressInterval(int interval);
-	void SetUnreliableTimeout(RakNet::TimeMS timeoutMS);
+	void SetUnreliableTimeout(SLNet::TimeMS timeoutMS);
 	/// Has a lot of time passed since the last ack
-	bool AckTimeout(RakNet::Time curTime);
+	bool AckTimeout(SLNet::Time curTime);
 	CCTimeType GetNextSendTime(void) const;
 	CCTimeType GetTimeBetweenPackets(void) const;
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
 	CCTimeType GetAckPing(void) const;
 #endif
-	RakNet::TimeMS GetTimeLastDatagramArrived(void) const {return timeLastDatagramArrived;}
+	SLNet::TimeMS GetTimeLastDatagramArrived(void) const {return timeLastDatagramArrived;}
 
 	// If true, will update time between packets quickly based on ping calculations
 	//void SetDoFastThroughputReactions(bool fast);
 
 	// Encoded as numMessages[unsigned int], message1BitLength[unsigned int], message1Data (aligned), ...
-	//void GetUndeliveredMessages(RakNet::BitStream *messages, int MTUSize);
+	//void GetUndeliveredMessages(SLNet::BitStream *messages, int MTUSize);
 
 private:
 	/// Send the contents of a bitstream to the socket
 	/// \param[in] s The socket used for sending data
 	/// \param[in] systemAddress The address and port to send to
 	/// \param[in] bitStream The data to send.
-	void SendBitStream( RakNetSocket2 *s, SystemAddress &systemAddress, RakNet::BitStream *bitStream, RakNetRandom *rnr, CCTimeType currentTime);
+	void SendBitStream( RakNetSocket2 *s, SystemAddress &systemAddress, SLNet::BitStream *bitStream, RakNetRandom *rnr, CCTimeType currentTime);
 
 	///Parse an internalPacket and create a bitstream to represent this data
 	/// \return Returns number of bits used
-	BitSize_t WriteToBitStreamFromInternalPacket( RakNet::BitStream *bitStream, const InternalPacket *const internalPacket, CCTimeType curTime );
+	BitSize_t WriteToBitStreamFromInternalPacket(SLNet::BitStream *bitStream, const InternalPacket *const internalPacket, CCTimeType curTime );
 
 
 	/// Parse a bitstream and create an internal packet to represent this data
-	InternalPacket* CreateInternalPacketFromBitStream( RakNet::BitStream *bitStream, CCTimeType time );
+	InternalPacket* CreateInternalPacketFromBitStream(SLNet::BitStream *bitStream, CCTimeType time );
 
 	/// Does what the function name says
 	unsigned RemovePacketFromResendListAndDeleteOlderReliableSequenced( const MessageNumberType messageNumber, CCTimeType time, DataStructures::List<PluginInterface2*> &messageHandlerList, const SystemAddress &systemAddress );
@@ -274,7 +279,7 @@ private:
 	void InsertIntoSplitPacketList( InternalPacket * internalPacket, CCTimeType time );
 
 	/// Take all split chunks with the specified splitPacketId and try to reconstruct a packet. If we can, allocate and return it.  Otherwise return 0
-	InternalPacket * BuildPacketFromSplitPacketList( SplitPacketIdType splitPacketId, CCTimeType time,
+	InternalPacket * BuildPacketFromSplitPacketList( SplitPacketIdType inSplitPacketId, CCTimeType time,
 		RakNetSocket2 *s, SystemAddress &systemAddress, RakNetRandom *rnr, BitStream &updateBitStream);
 	InternalPacket * BuildPacketFromSplitPacketList( SplitPacketChannel *splitPacketChannel, CCTimeType time );
 
@@ -311,7 +316,7 @@ private:
 
 
 	/// Does this packet number represent a packet that was skipped (out of order?)
-	//unsigned int IsReceivedPacketHole(unsigned int input, RakNet::TimeMS currentTime) const;
+	//unsigned int IsReceivedPacketHole(unsigned int input, SLNet::TimeMS currentTime) const;
 
 	/// Skip an element in the received packets list
 	//unsigned int MakeReceivedPacketHole(unsigned int input) const;
@@ -355,12 +360,12 @@ private:
 	struct UnreliableWithAckReceiptNode
 	{
 		UnreliableWithAckReceiptNode() {}
-		UnreliableWithAckReceiptNode(DatagramSequenceNumberType _datagramNumber, uint32_t _sendReceiptSerial, RakNet::TimeUS _nextActionTime) :
+		UnreliableWithAckReceiptNode(DatagramSequenceNumberType _datagramNumber, uint32_t _sendReceiptSerial, SLNet::TimeUS _nextActionTime) :
 			datagramNumber(_datagramNumber), sendReceiptSerial(_sendReceiptSerial), nextActionTime(_nextActionTime)
 		{}
 		DatagramSequenceNumberType datagramNumber;
 		uint32_t sendReceiptSerial;
-		RakNet::TimeUS nextActionTime;
+		SLNet::TimeUS nextActionTime;
 	};
 	DataStructures::List<UnreliableWithAckReceiptNode> unreliableWithAckReceiptHistory;
 
@@ -388,7 +393,7 @@ private:
 	// Set to the current time if it is not zero, and we get incoming data
 	// If the current time - timeResendQueueNonEmpty is greater than a threshold, we are disconnected
 //	CCTimeType timeResendQueueNonEmpty;
-	RakNet::TimeMS timeLastDatagramArrived;
+	SLNet::TimeMS timeLastDatagramArrived;
 
 
 	// If we backoff due to packetloss, don't remeasure until all waiting resends have gone out or else we overcount
@@ -411,10 +416,10 @@ private:
 	MessageNumberType sendReliableMessageNumberIndex;
 	MessageNumberType internalOrderIndex;
 	//unsigned int windowSize;
-	//RakNet::BitStream updateBitStream;
+	//SLNet::BitStream updateBitStream;
 	bool deadConnection, cheater;
 	SplitPacketIdType splitPacketId;
-	RakNet::TimeMS timeoutTime; // How long to wait in MS before timing someone out
+	SLNet::TimeMS timeoutTime; // How long to wait in MS before timing someone out
 	//int MAX_AVERAGE_PACKETS_PER_SECOND; // Name says it all
 //	int RECEIVED_PACKET_LOG_LENGTH, requestedReceivedPacketLogLength; // How big the receivedPackets array is
 //	unsigned int *receivedPackets;
@@ -501,7 +506,7 @@ private:
 		RakNetSocket2 *s;
 		char data[ MAXIMUM_MTU_SIZE ];
 		unsigned int length;
-		RakNet::TimeMS sendTime;
+		SLNet::TimeMS sendTime;
 		//	SystemAddress systemAddress;
 		unsigned short remotePortRakNetWasStartedOn_PS3;
 		unsigned int extraSocketOptions;
@@ -510,7 +515,7 @@ private:
 
 	// Internet simulator
 	double packetloss;
-	RakNet::TimeMS minExtraPing, extraPingVariance;
+	SLNet::TimeMS minExtraPing, extraPingVariance;
 #endif
 
 	CCTimeType elapsedTimeSinceLastUpdate;
@@ -519,9 +524,9 @@ private:
 
 	
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL==1
-	RakNet::CCRakNetSlidingWindow congestionManager;
+	SLNet::CCRakNetSlidingWindow congestionManager;
 #else
-	RakNet::CCRakNetUDT congestionManager;
+	SLNet::CCRakNetUDT congestionManager;
 #endif
 
 
@@ -591,6 +596,6 @@ protected:
 #endif // LIBCAT_SECURITY
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

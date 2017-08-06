@@ -1,26 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakThread.h"
-#include "RakAssert.h"
-#include "RakNetDefines.h"
-#include "RakSleep.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/thread.h"
+#include "slikenet/assert.h"
+#include "slikenet/defines.h"
+#include "slikenet/sleep.h"
+#include "slikenet/memoryoverride.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 
 
 
 #if   defined(_WIN32)
-	#include "WindowsIncludes.h"
+	#include "slikenet/WindowsIncludes.h"
 	#include <stdio.h>
 	#if !defined(_WIN32_WCE)
 		#include <process.h>

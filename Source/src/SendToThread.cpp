@@ -1,26 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "SendToThread.h"
+#include "slikenet/SendToThread.h"
 #ifdef USE_THREADED_SEND
-#include "RakThread.h"
-#include "InternalPacket.h"
-#include "GetTime.h"
+#include "slikenet/thread.h"
+#include "slikenet/InternalPacket.h"
+#include "slikenet/GetTime.h"
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL!=1
-#include "CCRakNetUDT.h"
+#include "slikenet/CCRakNetUDT.h"
 #else
-#include "CCRakNetSlidingWindow.h"
+#include "slikenet/CCRakNetSlidingWindow.h"
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 
 int SendToThread::refCount=0;
 DataStructures::ThreadsafeAllocatingQueue<SendToThread::SendToThreadBlock> SendToThread::objectQueue;
@@ -30,8 +35,8 @@ SendToThread::SendToThreadBlock* SendToWorkerThread(SendToThread::SendToThreadBl
 {
 	(void) perThreadData;
 	*returnOutput=false;
-//	RakNet::TimeUS *mostRecentTime=(RakNet::TimeUS *)input->data;
-//	*mostRecentTime=RakNet::GetTimeUS();
+//	SLNet::TimeUS *mostRecentTime=(SLNet::TimeUS *)input->data;
+//	*mostRecentTime=SLNet::GetTimeUS();
 	SocketLayer::SendTo(input->s, input->data, input->dataWriteOffset, input->systemAddress, _FILE_AND_LINE_);
 	SendToThread::objectQueue.Push(input);
 	return 0;

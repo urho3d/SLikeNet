@@ -1,28 +1,40 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 /**
-* Original file by the_viking, fixed by RâˆšÂ¥mulo Fernandes, fixed by Emmanuel Nars
+* Original file by the_viking, fixed by Rv¥mulo Fernandes, fixed by Emmanuel Nars
 * Should emulate windows finddata structure
 */
 #if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(_WIN32)
-#include "_FindFirst.h"
-#include "DS_List.h"
+#include "slikenet/_FindFirst.h"
+#include "slikenet/DS_List.h"
 
 #include <sys/stat.h>
 
 #include <fnmatch.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 
 static DataStructures::List< _findinfo_t* > fileInfo;
 	
-#include "RakMemoryOverride.h"
-#include "RakAssert.h"
+#include "slikenet/memoryoverride.h"
+#include "slikenet/assert.h"
 
 /**
 * _findfirst - equivalent
 */
 long _findfirst(const char *name, _finddata_t *f)
 {
-	RakNet::RakString nameCopy = name;
-        RakNet::RakString filter;
+	SLNet::RakString nameCopy = name;
+	SLNet::RakString filter;
 
         // This is linux only, so don't bother with '\'
 	const char* lastSep = strrchr(name,'/');
@@ -44,7 +56,7 @@ long _findfirst(const char *name, _finddata_t *f)
         
 	if(!dir) return -1;
 
-	_findinfo_t* fi = RakNet::OP_NEW<_findinfo_t>( _FILE_AND_LINE_ );
+	_findinfo_t* fi = SLNet::OP_NEW<_findinfo_t>( _FILE_AND_LINE_ );
 	fi->filter    = filter;
 	fi->dirName   = nameCopy;  // we need to remember this for stat()
 	fi->openedDir = dir;
@@ -107,7 +119,7 @@ int _findnext(long h, _finddata_t *f)
                 // a stat...  don't rely on entry->d_type, as this
                 // might be unavailable!
                 struct stat filestat;
-                RakNet::RakString fullPath = fi->dirName + entry->d_name;             
+				SLNet::RakString fullPath = fi->dirName + entry->d_name;
                 if (stat(fullPath, &filestat) != 0)
                 {
                     RAKNET_DEBUG_PRINTF("Cannot stat %s\n", fullPath.C_String());
@@ -125,7 +137,7 @@ int _findnext(long h, _finddata_t *f)
                                  // are not supported.
 
                 f->size = filestat.st_size;
-                strncpy(f->name, entry->d_name, STRING_BUFFER_SIZE);
+                strncpy_s(f->name, entry->d_name, STRING_BUFFER_SIZE);
                 
                 return 0;
 	}
@@ -153,7 +165,7 @@ int _findclose(long h)
     _findinfo_t* fi = fileInfo[h];
     closedir(fi->openedDir);
     fileInfo.RemoveAtIndex(h);
-    RakNet::OP_DELETE(fi, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(fi, _FILE_AND_LINE_);
     return 0;   
 }
 #endif

@@ -1,19 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "FileList.h"
+#include "slikenet/FileList.h"
 
 #if _RAKNET_SUPPORT_FileOperations==1
 
 #include <stdio.h> // RAKNET_DEBUG_PRINTF
-#include "RakAssert.h"
+#include "slikenet/assert.h"
 #if defined(ANDROID)
 #include <asm/io.h>
 #elif defined(_WIN32) || defined(__CYGWIN__)
@@ -34,19 +39,21 @@
 #include <sys/stat.h>
 #endif
 
-//#include "DR_SHA1.h"
-#include "DS_Queue.h"
-#include "StringCompressor.h"
-#include "BitStream.h"
-#include "FileOperations.h"
-#include "SuperFastHash.h"
-#include "RakAssert.h"
-#include "LinuxStrings.h"
+//#include "slikenet/DR_SHA1.h"
+#include "slikenet/DS_Queue.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/SuperFastHash.h"
+#include "slikenet/assert.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #define MAX_FILENAME_LENGTH 512
 static const unsigned HASH_LENGTH=4;
 
-using namespace RakNet;
+using namespace SLNet;
 
 // alloca
 
@@ -61,11 +68,11 @@ using namespace RakNet;
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "_FindFirst.h"
+#include "slikenet/_FindFirst.h"
 #include <stdint.h> //defines intptr_t
 #endif
 
-#include "RakAlloca.h"
+#include "slikenet/alloca.h"
 
 //int RAK_DLL_EXPORT FileListNodeComp( char * const &key, const FileListNode &data )
 //{
@@ -76,10 +83,6 @@ using namespace RakNet;
 STATIC_FACTORY_DEFINITIONS(FileListProgress,FileListProgress)
 STATIC_FACTORY_DEFINITIONS(FLP_Printf,FLP_Printf)
 STATIC_FACTORY_DEFINITIONS(FileList,FileList)
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
 
 /// First callback called when FileList::AddFilesFromDirectory() starts
 void FLP_Printf::OnAddFilesFromDirectoryStarted(FileList *fileList, char *dir) {
@@ -95,13 +98,13 @@ void FLP_Printf::OnFilePushesComplete( SystemAddress systemAddress, unsigned sho
 	(void) setID;
 
 	char str[32];
-	systemAddress.ToString(true, (char*) str);
+	systemAddress.ToString(true, (char*) str, 32);
 	RAKNET_DEBUG_PRINTF("File pushes complete to %s\n", str);	
 }
 void FLP_Printf::OnSendAborted( SystemAddress systemAddress )
 {
 	char str[32];
-	systemAddress.ToString(true, (char*) str);
+	systemAddress.ToString(true, (char*) str, 32);
 	RAKNET_DEBUG_PRINTF("Send aborted to %s\n", str);
 }
 FileList::FileList()
@@ -120,8 +123,8 @@ void FileList::AddFile(const char *filepath, const char *filename, FileListNodeC
 	//std::fstream file;
 	//file.open(filename, std::ios::in | std::ios::binary);
 
-	FILE *fp = fopen(filepath, "rb");
-	if (fp==0)
+	FILE *fp;
+	if (fopen_s(&fp, filepath, "rb") != 0)
 		return;
 	fseek(fp, 0, SEEK_END);
 	int length = ftell(fp);
@@ -129,7 +132,7 @@ void FileList::AddFile(const char *filepath, const char *filename, FileListNodeC
 
 	if (length > (int) ((unsigned int)-1 / 8))
 	{
-		// If this assert hits, split up your file. You could also change BitSize_t in RakNetTypes.h to unsigned long long but this is not recommended for performance reasons
+		// If this assert hits, split up your file. You could also change BitSize_t in types.h to unsigned long long but this is not recommended for performance reasons
 		RakAssert("Cannot add files over 536 MB" && 0);
 		fclose(fp);
 		return;
@@ -238,15 +241,15 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	RakAssert(dirSoFar);
 
 	if (applicationDirectory)
-		strcpy(root, applicationDirectory);
+		strcpy_s(root, applicationDirectory);
 	else
 		root[0]=0;
 
 	int rootLen=(int)strlen(root);
 	if (rootLen)
 	{
-		strcpy(dirSoFar, root);
-		if (FixEndingSlash(dirSoFar))
+		strcpy_s(dirSoFar, 520, root);
+		if (FixEndingSlash(dirSoFar, 520))
 			rootLen++;
 	}
 	else
@@ -254,8 +257,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	
 	if (subDirectory)
 	{
-		strcat(dirSoFar, subDirectory);
-		FixEndingSlash(dirSoFar);
+		strcat_s(dirSoFar, 520, subDirectory);
+		FixEndingSlash(dirSoFar, 520);
 	}
 	for (unsigned int flpcIndex=0; flpcIndex < fileListProgressCallbacks.Size(); flpcIndex++)
 		fileListProgressCallbacks[flpcIndex]->OnAddFilesFromDirectoryStarted(this, dirSoFar);
@@ -264,9 +267,9 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 	while (dirList.Size())
 	{
 		dirSoFar=dirList.Pop();
-		strcpy(fullPath, dirSoFar);
+		strcpy_s(fullPath, dirSoFar);
 		// Changed from *.* to * for Linux compatibility
-		strcat(fullPath, "*");
+		strcat_s(fullPath, "*");
 
 
                 dir=_findfirst(fullPath, &fileInfo );
@@ -295,8 +298,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
                     
 			if ((fileInfo.attrib & (_A_HIDDEN | _A_SUBDIR | _A_SYSTEM))==0)
 			{
-				strcpy(fullPath, dirSoFar);
-				strcat(fullPath, fileInfo.name);
+				strcpy_s(fullPath, dirSoFar);
+				strcat_s(fullPath, fileInfo.name);
 				fileData=0;
 
 				for (unsigned int flpcIndex=0; flpcIndex < fileListProgressCallbacks.Size(); flpcIndex++)
@@ -304,8 +307,7 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 
 				if (writeData && writeHash)
 				{
-					fp = fopen(fullPath, "rb");
-					if (fp)
+					if (fopen_s(&fp, fullPath, "rb") == 0)
 					{
 						fileData= (char*) rakMalloc_Ex( fileInfo.size+HASH_LENGTH, _FILE_AND_LINE_ );
 						RakAssert(fileData);
@@ -313,8 +315,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 						fclose(fp);
 
 						unsigned int hash = SuperFastHash(fileData+HASH_LENGTH, fileInfo.size);
-						if (RakNet::BitStream::DoEndianSwap())
-							RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+						if (SLNet::BitStream::DoEndianSwap())
+							SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 						memcpy(fileData, &hash, HASH_LENGTH);
 
 						//					sha1.Reset();
@@ -332,8 +334,8 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 //					sha1.Final();
 
 					unsigned int hash = SuperFastHashFile(fullPath);
-					if (RakNet::BitStream::DoEndianSwap())
-						RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+					if (SLNet::BitStream::DoEndianSwap())
+						SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 
 					// Hash only
 				//	AddFile((const char*)fullPath+rootLen, (const char*)sha1.GetHash(), HASH_LENGTH, fileInfo.size, context);
@@ -343,7 +345,7 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 				{
 					fileData= (char*) rakMalloc_Ex( fileInfo.size, _FILE_AND_LINE_ );
 					RakAssert(fileData);
-					fp = fopen(fullPath, "rb");
+					fopen_s(&fp, fullPath, "rb");
 					fread(fileData, fileInfo.size, 1, fp);
 					fclose(fp);
 
@@ -363,9 +365,9 @@ void FileList::AddFilesFromDirectory(const char *applicationDirectory, const cha
 			{
 				char *newDir=(char*) rakMalloc_Ex( 520, _FILE_AND_LINE_ );
 				RakAssert(newDir);
-				strcpy(newDir, dirSoFar);
-				strcat(newDir, fileInfo.name);
-				strcat(newDir, "/");
+				strcpy_s(newDir, 520, dirSoFar);
+				strcat_s(newDir, 520, fileInfo.name);
+				strcat_s(newDir, 520, "/");
 				dirList.Push(newDir, _FILE_AND_LINE_ );
 			}
 
@@ -385,7 +387,7 @@ void FileList::Clear(void)
 	}
 	fileList.Clear(false, _FILE_AND_LINE_);
 }
-void FileList::Serialize(RakNet::BitStream *outBitStream)
+void FileList::Serialize(SLNet::BitStream *outBitStream)
 {
 	outBitStream->WriteCompressed(fileList.Size());
 	unsigned i;
@@ -409,7 +411,7 @@ void FileList::Serialize(RakNet::BitStream *outBitStream)
 			outBitStream->WriteCompressed(fileList[i].fileLengthBytes);
 	}
 }
-bool FileList::Deserialize(RakNet::BitStream *inBitStream)
+bool FileList::Deserialize(SLNet::BitStream *inBitStream)
 {
 	bool b, dataLenNonZero=false, fileLenMatchesDataLen=false;
 	char filename[512];
@@ -552,11 +554,10 @@ void FileList::ListMissingOrChangedFiles(const char *applicationDirectory, FileL
 
 	for (i=0; i < fileList.Size(); i++)
 	{
-		strcpy(fullPath, applicationDirectory);
-		FixEndingSlash(fullPath);
-		strcat(fullPath,fileList[i].filename);
-		fp=fopen(fullPath, "rb");
-		if (fp==0)
+		strcpy_s(fullPath, applicationDirectory);
+		FixEndingSlash(fullPath, 512);
+		strcat_s(fullPath,fileList[i].filename);
+		if (fopen_s(&fp, fullPath, "rb") != 0)
 		{
 			missingOrChangedFiles->AddFile(fileList[i].filename, fileList[i].fullPathToFile, 0, 0, 0, FileListNodeContext(0,0,0,0), false);
 		}
@@ -583,8 +584,8 @@ void FileList::ListMissingOrChangedFiles(const char *applicationDirectory, FileL
 //				rakFree_Ex(fileData, _FILE_AND_LINE_ );
 
 				unsigned int hash = SuperFastHashFilePtr(fp);
-				if (RakNet::BitStream::DoEndianSwap())
-					RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+				if (SLNet::BitStream::DoEndianSwap())
+					SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 
 				//if (fileLength != fileList[i].fileLength || memcmp( sha1.GetHash(), fileList[i].data, HASH_LENGTH)!=0)
 				if (fileLength != fileList[i].fileLengthBytes || memcmp( &hash, fileList[i].data, HASH_LENGTH)!=0)
@@ -611,11 +612,10 @@ void FileList::PopulateDataFromDisk(const char *applicationDirectory, bool write
 	while (i < fileList.Size())
 	{
 		rakFree_Ex(fileList[i].data, _FILE_AND_LINE_ );
-		strcpy(fullPath, applicationDirectory);
-		FixEndingSlash(fullPath);
-		strcat(fullPath,fileList[i].filename.C_String());
-		fp=fopen(fullPath, "rb");
-		if (fp)
+		strcpy_s(fullPath, applicationDirectory);
+		FixEndingSlash(fullPath, 512);
+		strcat_s(fullPath,fileList[i].filename.C_String());
+		if (fopen_s(&fp, fullPath, "rb") == 0)
 		{
 			if (writeFileHash || writeFileData)
 			{
@@ -634,8 +634,8 @@ void FileList::PopulateDataFromDisk(const char *applicationDirectory, bool write
 //						sha1.Update((unsigned char*)fileList[i].data+HASH_LENGTH, fileList[i].fileLength);
 //						sha1.Final();
 						unsigned int hash = SuperFastHash(fileList[i].data+HASH_LENGTH, fileList[i].fileLengthBytes);
-						if (RakNet::BitStream::DoEndianSwap())
-							RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+						if (SLNet::BitStream::DoEndianSwap())
+							SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 //						memcpy(fileList[i].data, sha1.GetHash(), HASH_LENGTH);
 						memcpy(fileList[i].data, &hash, HASH_LENGTH);
 					}
@@ -653,8 +653,8 @@ void FileList::PopulateDataFromDisk(const char *applicationDirectory, bool write
 				//		sha1.Update((unsigned char*)fileList[i].data, fileList[i].fileLength);
 				//		sha1.Final();
 						unsigned int hash = SuperFastHash(fileList[i].data, fileList[i].fileLengthBytes);
-						if (RakNet::BitStream::DoEndianSwap())
-							RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+						if (SLNet::BitStream::DoEndianSwap())
+							SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 						// memcpy(fileList[i].data, sha1.GetHash(), HASH_LENGTH);
 						memcpy(fileList[i].data, &hash, HASH_LENGTH);
 					}
@@ -703,9 +703,9 @@ void FileList::WriteDataToDisk(const char *applicationDirectory)
 
 	for (i=0; i < fileList.Size(); i++)
 	{
-		strcpy(fullPath, applicationDirectory);
-		FixEndingSlash(fullPath);
-		strcat(fullPath,fileList[i].filename.C_String());
+		strcpy_s(fullPath, applicationDirectory);
+		FixEndingSlash(fullPath, 512);
+		strcat_s(fullPath,fileList[i].filename.C_String());
 		
 		// Security - Don't allow .. in the filename anywhere so you can't write outside of the root directory
 		for (j=1; j < fileList[i].filename.GetLength(); j++)
@@ -724,9 +724,6 @@ void FileList::WriteDataToDisk(const char *applicationDirectory)
 	}
 }
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4996 ) // unlink declared deprecated by Microsoft in order to make it harder to be cross platform.  I don't agree it's deprecated.
-#endif
 void FileList::DeleteFiles(const char *applicationDirectory)
 {
 
@@ -750,12 +747,12 @@ void FileList::DeleteFiles(const char *applicationDirectory)
 			}
 		}
 
-		strcpy(fullPath, applicationDirectory);
-		FixEndingSlash(fullPath);
-		strcat(fullPath, fileList[i].filename.C_String());
+		strcpy_s(fullPath, applicationDirectory);
+		FixEndingSlash(fullPath, 512);
+		strcat_s(fullPath, fileList[i].filename.C_String());
 	
 		// Do not rename to _unlink as linux uses unlink
-#if defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
+#if defined(_WIN32)
 		int result = _unlink(fullPath);
 #else
         int result = unlink(fullPath);
@@ -792,27 +789,23 @@ void FileList::GetCallbacks(DataStructures::List<FileListProgress*> &callbacks)
 }
 
 
-bool FileList::FixEndingSlash(char *str)
+bool FileList::FixEndingSlash(char *str, size_t strLength)
 {
 #ifdef _WIN32
 	if (str[strlen(str)-1]!='/' && str[strlen(str)-1]!='\\')
 	{
-		strcat(str, "\\"); // Only \ works with system commands, used by AutopatcherClient
+		strcat_s(str, strLength, "\\"); // Only \ works with system commands, used by AutopatcherClient
 		return true;
 	}
 #else
 	if (str[strlen(str)-1]!='\\' && str[strlen(str)-1]!='/')
 	{
-		strcat(str, "/"); // Only / works with Linux
+		strcat_s(str, strLength, "/"); // Only / works with Linux
 		return true;
 	}
 #endif
 
 	return false;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_FileOperations

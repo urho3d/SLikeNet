@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file BitStream.h
@@ -13,22 +18,17 @@
 /// \details BitStream is used extensively throughout RakNet and is designed to be used by users as well.
 ///
 
-
-#if defined(_MSC_VER) && _MSC_VER < 1299 // VC6 doesn't support template specialization
-#include "BitStream_NoTemplate.h"
-#else
-
 #ifndef __BITSTREAM_H
 #define __BITSTREAM_H
 
-#include "RakMemoryOverride.h"
-#include "RakNetDefines.h"
+#include "memoryoverride.h"
+#include "defines.h"
 #include "Export.h"
-#include "RakNetTypes.h"
-#include "RakString.h"
-#include "RakWString.h"
-#include "RakAssert.h"
-#include <math.h>
+#include "types.h"
+#include "string.h"
+#include "wstring.h"
+#include "assert.h"
+#include <cmath>
 #include <float.h>
 
 #ifdef _MSC_VER
@@ -40,7 +40,7 @@
 #define _copysign copysign
 #endif
 
-namespace RakNet
+namespace SLNet
 {
 	/// This class allows you to write and read native types as a string of bits.  BitStream is used extensively throughout RakNet and is designed to be used by users as well.
 	/// \sa BitStreamSample.txt
@@ -65,7 +65,7 @@ namespace RakNet
 		/// You shouldn't call Write functions with \a _copyData as false, as this will write to unallocated memory
 		/// 99% of the time you will use this function to cast Packet::data to a bitstream for reading, in which case you should write something as follows:
 		/// \code
-		/// RakNet::BitStream bs(packet->data, packet->length, false);
+		/// SLNet::BitStream bs(packet->data, packet->length, false);
 		/// \endcode
 		/// \param[in] _data An array of bytes.
 		/// \param[in] lengthInBytes Size of the \a _data.
@@ -279,6 +279,13 @@ namespace RakNet
 		template <class templateType>
 			bool Read(templateType &outTemplateVar);
 
+		/// \brief Read a wchar from a bitstream.  
+		/// \details Define __BITSTREAM_NATIVE_END if you need endian swapping.
+		/// \param[in] varString The value to read
+		/// \param[in] varStringLength The length of the given varString array (in wchar_t)
+		/// \return true on success, false on failure.
+		bool Read(wchar_t *&varString, size_t varStringLength);
+
 		/// \brief Read any integral type from a bitstream.  
 		/// \details If the written value differed from the value compared against in the write function,
 		/// var will be updated.  Otherwise it will retain the current value.
@@ -297,6 +304,15 @@ namespace RakNet
 		/// \return true on success, false on failure.
 		template <class templateType>
 			bool ReadCompressed(templateType &outTemplateVar);
+
+		/// \brief Read a wchar from a bitstream.  
+		/// \details Define __BITSTREAM_NATIVE_END if you need endian swapping.
+		/// This is lossless, but only has benefit if you use less than half the bits of the type
+		/// If you are not using __BITSTREAM_NATIVE_END the opposite is true
+		/// \param[in] varString The value to read
+		/// \param[in] varStringLength The length of the given varString array (in wchar_t)
+		/// \return true on success, false on failure.
+		bool ReadCompressed(wchar_t *&varString, size_t varStringLength);
 
 		/// \brief Read any integral type from a bitstream.  
 		/// \details If the written value differed from the value compared against in the write function,
@@ -477,9 +493,9 @@ namespace RakNet
 		void AssertStreamEmpty( void );
 
 		/// \brief RAKNET_DEBUG_PRINTF the bits in the stream.  Great for debugging.
-		void PrintBits( char *out ) const;
+		void PrintBits( char *out, size_t outLength ) const;
 		void PrintBits( void ) const;
-		void PrintHex( char *out ) const;
+		void PrintHex( char *out, size_t outLength ) const;
 		void PrintHex( void ) const;
 
 		/// \brief Ignore data we don't intend to read
@@ -701,186 +717,6 @@ namespace RakNet
 		}
 
 		/// ---- Member function template specialization declarations ----
-		// Used for VC7
-#if defined(_MSC_VER) && _MSC_VER == 1300
-		/// Write a bool to a bitstream.
-		/// \param[in] var The value to write
-		template <>
-			void Write(const bool &var);
-
-		/// Write a systemAddress to a bitstream
-		/// \param[in] var The value to write
-		template <>
-			void Write(const SystemAddress &var);
-
-		/// Write a uint24_t to a bitstream
-		/// \param[in] var The value to write
-		template <>
-		void Write(const uint24_t &var);
-
-		/// Write a RakNetGUID to a bitsteam
-		/// \param[in] var The value to write
-		template <>
-			void Write(const RakNetGuid &var);
-
-		/// Write a string to a bitstream
-		/// \param[in] var The value to write
-		template <>
-			void Write(const char* const &var);
-		template <>
-			void Write(const unsigned char* const &var);
-		template <>
-			void Write(char* const &var);
-		template <>
-			void Write(unsigned char* const &var);
-		template <>
-			void Write(const RakString &var);
-		template <>
-			void Write(const RakWString &var);
-
-		/// \brief Write a systemAddress.  
-		/// \details If the current value is different from the last value
-		/// the current value will be written.  Otherwise, a single bit will be written
-		/// \param[in] currentValue The current value to write
-		/// \param[in] lastValue The last value to compare against
-		template <>
-			void WriteDelta(const SystemAddress &currentValue, const SystemAddress &lastValue);
-
-		template <>
-		void WriteDelta(const uint24_t &currentValue, const uint24_t &lastValue);
-
-		template <>
-			void WriteDelta(const RakNetGUID &currentValue, const RakNetGUID &lastValue);
-
-		/// \brief Write a bool delta.  
-		/// \details Same thing as just calling Write
-		/// \param[in] currentValue The current value to write
-		/// \param[in] lastValue The last value to compare against
-		template <>
-			void WriteDelta(const bool &currentValue, const bool &lastValue);
-
-		template <>
-			void WriteCompressed(const SystemAddress &var);
-
-		template <>
-		void WriteCompressed(const uint24_t &var);
-
-		template <>
-			void WriteCompressed(const RakNetGUID &var);
-
-		template <>
-			void WriteCompressed(const bool &var);
-
-		/// For values between -1 and 1
-		template <>
-			void WriteCompressed(const float &var);
-
-		/// For values between -1 and 1
-		template <>
-			void WriteCompressed(const double &var);
-
-		/// Compressed string
-		template <>
-			void WriteCompressed(const char* var);
-		template <>
-			void WriteCompressed(const unsigned char* var);
-		template <>
-			void WriteCompressed(char* var);
-		template <>
-			void WriteCompressed(unsigned char* var);
-		template <>
-			void WriteCompressed(const RakString &var);
-		template <>
-			void WriteCompressed(const RakWString &var);
-
-		/// \brief Write a bool delta.  
-		/// \details Same thing as just calling Write
-		/// \param[in] currentValue The current value to write
-		/// \param[in] lastValue The last value to compare against
-		template <>
-			void WriteCompressedDelta(const bool &currentValue, const bool &lastValue);
-
-		/// \brief Save as WriteCompressedDelta(bool currentValue, const templateType &lastValue) 
-		/// when we have an unknown second bool
-		template <>
-			void WriteCompressedDelta(const bool &currentValue);
-
-		/// \brief Read a bool from a bitstream.
-		/// \param[in] var The value to read
-		/// \return true on success, false on failure.
-		template <>
-			bool Read(bool &var);
-
-		/// \brief Read a systemAddress from a bitstream.
-		/// \param[in] var The value to read
-		/// \return true on success, false on failure.
-		template <>
-			bool Read(SystemAddress &var);
-
-		template <>
-		bool Read(uint24_t &var);
-
-		template <>
-			bool Read(RakNetGUID &var);
-
-		/// \brief Read a String from a bitstream.
-		/// \param[in] var The value to read
-		/// \return true on success, false on failure.
-		template <>
-			bool Read(char *&var);
-		template <>
-			bool Read(wchar_t *&var);
-		template <>
-			bool Read(unsigned char *&var);
-		template <>
-			bool Read(RakString &var);
-		template <>
-			bool Read(RakWString &var);
-
-		/// \brief Read a bool from a bitstream.
-		/// \param[in] var The value to read
-		/// \return true on success, false on failure.
-		template <>
-			bool ReadDelta(bool &var);
-
-		template <>
-			bool ReadCompressed(SystemAddress &var);
-
-		template <>
-		bool ReadCompressed(uint24_t &var);
-
-		template <>
-			bool ReadCompressed(RakNetGUID &var);
-
-		template <>
-			bool ReadCompressed(bool &var);
-
-		template <>
-			bool ReadCompressed(float &var);
-
-		/// For values between -1 and 1
-		/// \return true on success, false on failure.
-		template <>
-		bool ReadCompressed(double &var);
-
-		template <>
-			bool ReadCompressed(char* &var);
-		template <>
-			bool ReadCompressed(wchar_t* &var);
-		template <>
-			bool ReadCompressed(unsigned char *&var);
-		template <>
-			bool ReadCompressed(RakString &var);
-		template <>
-			bool ReadCompressed(RakWString &var);
-
-		/// \brief Read a bool from a bitstream.
-		/// \param[in] var The value to read
-		/// \return true on success, false on failure.
-		template <>
-			bool ReadCompressedDelta(bool &var);
-#endif
-
 		inline static bool DoEndianSwap(void) {
 #ifndef __BITSTREAM_NATIVE_END
 			return IsNetworkOrder()==false;
@@ -1283,10 +1119,6 @@ namespace RakNet
 		else
 		{
 #ifndef __BITSTREAM_NATIVE_END
-#ifdef _MSC_VER
-#pragma warning(disable:4244)   // '=' : conversion from 'unsigned long' to 'unsigned short', possible loss of data
-#endif
-
 			if (DoEndianSwap())
 			{
 				unsigned char output[sizeof(templateType)];
@@ -1450,9 +1282,6 @@ namespace RakNet
 		else
 		{
 #ifndef __BITSTREAM_NATIVE_END
-#ifdef _MSC_VER
-#pragma warning(disable:4244)   // '=' : conversion from 'unsigned long' to 'unsigned short', possible loss of data
-#endif
 			if (DoEndianSwap())
 			{
 				unsigned char output[sizeof(templateType)];
@@ -1569,10 +1398,9 @@ namespace RakNet
 	{
 		return RakString::Deserialize(varString,this);
 	}
-	template <>
-	inline bool BitStream::Read(wchar_t *&varString)
+	inline bool BitStream::Read(wchar_t *&varString, size_t varStringLength)
 	{
-		return RakWString::Deserialize(varString,this);
+		return RakWString::Deserialize(varString,varStringLength,this);
 	}
 	template <>
 		inline bool BitStream::Read(unsigned char *&varString)
@@ -1703,10 +1531,9 @@ namespace RakNet
 	{
 		return RakString::DeserializeCompressed(outTemplateVar,this,false);
 	}
-	template <>
-	inline bool BitStream::ReadCompressed(wchar_t *&outTemplateVar)
+	inline bool BitStream::ReadCompressed(wchar_t *&outTemplateVar, size_t varStringLength)
 	{
-		return RakWString::Deserialize(outTemplateVar,this);
+		return RakWString::Deserialize(outTemplateVar,varStringLength,this);
 	}
 	template <>
 	inline bool BitStream::ReadCompressed(unsigned char *&outTemplateVar)
@@ -2044,5 +1871,3 @@ namespace RakNet
 #endif
 
 #endif
-
-#endif // VC6

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -20,14 +25,14 @@
 #define __UDP_PROXY_COORDINATOR_H
 
 #include "Export.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PluginInterface2.h"
-#include "RakString.h"
+#include "string.h"
 #include "BitStream.h"
 #include "DS_Queue.h"
 #include "DS_OrderedList.h"
 
-namespace RakNet
+namespace SLNet
 {
 	/// When NAT Punchthrough fails, it is possible to use a non-NAT system to forward messages from us to the recipient, and vice-versa
 	/// The class to forward messages is UDPForwarder, and it is triggered over the network via the UDPProxyServer plugin.
@@ -46,7 +51,7 @@ namespace RakNet
 		/// For UDPProxyServers logging in remotely, they must pass a password to UDPProxyServer::LoginToCoordinator(). It must match the password set here.
 		/// If no password is set, they cannot login remotely.
 		/// By default, no password is set
-		void SetRemoteLoginPassword(RakNet::RakString password);
+		void SetRemoteLoginPassword(SLNet::RakString password);
 
 		/// \internal
 		virtual void Update(void);
@@ -69,16 +74,16 @@ namespace RakNet
 
 		struct ForwardingRequest
 		{
-			RakNet::TimeMS timeoutOnNoDataMS;
-			RakNet::TimeMS timeoutAfterSuccess;
+			SLNet::TimeMS timeoutOnNoDataMS;
+			SLNet::TimeMS timeoutAfterSuccess;
 			SenderAndTargetAddress sata;
 			SystemAddress requestingAddress; // Which system originally sent the network message to start forwarding
 			SystemAddress currentlyAttemptedServerAddress;
 			DataStructures::Queue<SystemAddress> remainingServersToTry;
-			RakNet::BitStream serverSelectionBitstream;
+			SLNet::BitStream serverSelectionBitstream;
 
 			DataStructures::List<ServerWithPing> sourceServerPings, targetServerPings;
-			RakNet::TimeMS timeRequestedPings;
+			SLNet::TimeMS timeRequestedPings;
 			// Order based on sourceServerPings and targetServerPings
 			void OrderRemainingServersToTry(void);
 		
@@ -96,7 +101,7 @@ namespace RakNet
 		void SendAllBusy(SystemAddress senderClientAddress, SystemAddress targetClientAddress, RakNetGUID targetClientGuid, SystemAddress requestingAddress);
 		void Clear(void);
 
-		void SendForwardingRequest(SystemAddress sourceAddress, SystemAddress targetAddress, SystemAddress serverAddress, RakNet::TimeMS timeoutOnNoDataMS);
+		void SendForwardingRequest(SystemAddress sourceAddress, SystemAddress targetAddress, SystemAddress serverAddress, SLNet::TimeMS timeoutOnNoDataMS);
 
 		// Logged in servers
 		//DataStructures::Multilist<ML_UNORDERED_LIST, SystemAddress> serverList;
@@ -106,7 +111,7 @@ namespace RakNet
 		//DataStructures::Multilist<ML_ORDERED_LIST, ForwardingRequest*, SenderAndTargetAddress> forwardingRequestList;
 		DataStructures::OrderedList<SenderAndTargetAddress, ForwardingRequest*, ForwardingRequestComp> forwardingRequestList;
 
-		RakNet::RakString remoteLoginPassword;
+		SLNet::RakString remoteLoginPassword;
 
 	};
 

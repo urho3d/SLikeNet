@@ -1,20 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
+
+#define NOMINMAX
 
 #if   defined (WINDOWS_STORE_RT)
 #include <windows.h>
 #include <winsock.h>
 #elif defined (_WIN32)
-#include <WinSock2.h>
+#include <winsock2.h>
 #include <windows.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 
 // Must always include Winsock2.h before windows.h
 // or else:

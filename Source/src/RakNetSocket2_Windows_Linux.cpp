@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "EmptyHeader.h"
+#include "slikenet/EmptyHeader.h"
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
@@ -78,19 +83,21 @@ void GetMyIP_Windows_Linux_IPV4( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTER
     (void) err;
 	RakAssert(err != -1);
 	
-	struct hostent *phe = gethostbyname( ac );
+	struct addrinfo *curAddress = NULL;
+	err = getaddrinfo(ac, NULL, NULL, &curAddress);
 
-	if ( phe == 0 )
+	if ( err != 0 || curAddress == 0 )
 	{
-		RakAssert(phe!=0);
+		RakAssert(false);
 		return ;
 	}
-	for ( idx = 0; idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS; ++idx )
+	while (curAddress != NULL && idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS)
 	{
-		if (phe->h_addr_list[ idx ] == 0)
-			break;
-
-		memcpy(&addresses[idx].address.addr4.sin_addr,phe->h_addr_list[ idx ],sizeof(struct in_addr));
+		if (curAddress->ai_family == AF_INET) {
+			addresses[idx].address.addr4 = *((struct sockaddr_in *)curAddress->ai_addr);
+			++idx;
+		}
+		curAddress = curAddress->ai_next;
 	}
 	
 	while (idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS)

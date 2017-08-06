@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "WSAStartupSingleton.h"
+#include "slikenet/WSAStartupSingleton.h"
 
 
 
@@ -23,8 +28,16 @@
 
 
 #endif
-#include "RakNetDefines.h"
+#include "slikenet/defines.h"
 #include <stdio.h>
+
+#ifdef _WIN32
+#include <tchar.h>
+#else
+#ifndef _T
+#define _T(x) (x)
+#endif
+#endif
 
 int WSAStartupSingleton::refCount=0;
 
@@ -48,12 +61,12 @@ void WSAStartupSingleton::AddRef(void)
 	{
 #if  defined(_DEBUG) && !defined(WINDOWS_PHONE_8)
 		DWORD dwIOError = GetLastError();
-		LPVOID messageBuffer;
+		LPTSTR messageBuffer;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "WSAStartup failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_TPRINTF( _T("WSAStartup failed:Error code - %lu\n%s"), dwIOError, messageBuffer );
 		//Free the buffer.
 		LocalFree( messageBuffer );
 #endif

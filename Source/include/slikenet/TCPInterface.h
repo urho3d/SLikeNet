@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,14 +24,14 @@
 #ifndef __SIMPLE_TCP_SERVER
 #define __SIMPLE_TCP_SERVER
 
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "DS_List.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "Export.h"
-#include "RakThread.h"
+#include "thread.h"
 #include "DS_Queue.h"
 #include "SimpleMutex.h"
-#include "RakNetDefines.h"
+#include "defines.h"
 #include "SocketIncludes.h"
 #include "DS_ByteQueue.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
@@ -41,7 +46,7 @@
 #include <openssl/err.h>
 #endif
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 struct RemoteClient;
@@ -148,12 +153,12 @@ protected:
 	// Plugins
 	DataStructures::List<PluginInterface2*> messageHandlerList;
 
-	RakNet::LocklessUint32_t isStarted, threadRunning;
+	SLNet::LocklessUint32_t isStarted, threadRunning;
 	__TCPSOCKET__ listenSocket;
 
 	DataStructures::Queue<Packet*> headPush, tailPush;
 	RemoteClient* remoteClients;
-	int remoteClientsLength;
+	unsigned short remoteClientsLength;
 
 	// Assuming remoteClients is only used by one thread!
 	// DataStructures::List<RemoteClient*> remoteClients;
@@ -255,7 +260,7 @@ struct RemoteClient
 	void SendOrBuffer(const char **data, const unsigned int *lengths, const int numParameters);
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file TwoWayAuthentication.h
@@ -40,15 +45,15 @@
 #endif
 
 #include "PluginInterface2.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "NativeTypes.h"
-#include "RakString.h"
+#include "string.h"
 #include "DS_Hash.h"
 #include "DS_Queue.h"
 
 typedef int64_t FCM2Guid;
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -75,14 +80,14 @@ public:
 	/// \param[in] identifier A unique identifier representing this password. This is transmitted in plaintext and should be considered insecure
 	/// \param[in] password The password to add
 	/// \return True on success, false on identifier==password, either identifier or password is blank, or identifier is already in use
-	bool AddPassword(RakNet::RakString identifier, RakNet::RakString password);
+	bool AddPassword(SLNet::RakString identifier, SLNet::RakString password);
 
 	/// \brief Challenge another system for the specified identifier
 	/// \details After calling Challenge, you will get back ID_TWO_WAY_AUTHENTICATION_SUCCESS, ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_TIMEOUT, or ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_FAILED
 	/// ID_TWO_WAY_AUTHENTICATION_SUCCESS will be returned if and only if the other system has called AddPassword() with the same identifier\password pair as this system.
 	/// \param[in] identifier A unique identifier representing this password. This is transmitted in plaintext and should be considered insecure
 	/// \return True on success, false on remote system not connected, or identifier not previously added with AddPassword()
-	bool Challenge(RakNet::RakString identifier, AddressOrGUID remoteSystem);
+	bool Challenge(SLNet::RakString identifier, AddressOrGUID remoteSystem);
 
 	/// \brief Free all memory
 	void Clear(void);
@@ -99,9 +104,9 @@ public:
 	/// \internal
 	struct PendingChallenge
 	{
-		RakNet::RakString identifier;
+		SLNet::RakString identifier;
 		AddressOrGUID remoteSystem;
-		RakNet::Time time;
+		SLNet::Time time;
 		bool sentHash;
 	};
 
@@ -111,32 +116,32 @@ public:
 	struct NonceAndRemoteSystemRequest
 	{
 		char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH];
-		RakNet::AddressOrGUID remoteSystem;
+		SLNet::AddressOrGUID remoteSystem;
 		unsigned short requestId;
-		RakNet::Time whenGenerated;
+		SLNet::Time whenGenerated;
 	};
 	/// \internal
 	struct RAK_DLL_EXPORT NonceGenerator
 	{
 		NonceGenerator();
 		~NonceGenerator();
-		void GetNonce(char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], unsigned short *requestId, RakNet::AddressOrGUID remoteSystem);
+		void GetNonce(char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], unsigned short *requestId, SLNet::AddressOrGUID remoteSystem);
 		void GenerateNonce(char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH]);
-		bool GetNonceById(char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], unsigned short requestId, RakNet::AddressOrGUID remoteSystem, bool popIfFound);
+		bool GetNonceById(char nonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], unsigned short requestId, SLNet::AddressOrGUID remoteSystem, bool popIfFound);
 		void Clear(void);
-		void ClearByAddress(RakNet::AddressOrGUID remoteSystem);
-		void Update(RakNet::Time curTime);
+		void ClearByAddress(SLNet::AddressOrGUID remoteSystem);
+		void Update(SLNet::Time curTime);
 
 		DataStructures::List<TwoWayAuthentication::NonceAndRemoteSystemRequest*> generatedNonces;
 		unsigned short nextRequestId;
 	};
 
 protected:
-	void PushToUser(MessageID messageId, RakNet::RakString password, RakNet::AddressOrGUID remoteSystem);
+	void PushToUser(MessageID messageId, SLNet::RakString password, SLNet::AddressOrGUID remoteSystem);
 	// Key is identifier, data is password
-	DataStructures::Hash<RakNet::RakString, RakNet::RakString, 16, RakNet::RakString::ToInteger > passwords;
+	DataStructures::Hash<SLNet::RakString, SLNet::RakString, 16, SLNet::RakString::ToInteger > passwords;
 
-	RakNet::Time whenLastTimeoutCheck;
+	SLNet::Time whenLastTimeoutCheck;
 
 	NonceGenerator nonceGenerator;
 
@@ -144,10 +149,10 @@ protected:
 	void OnNonceReply(Packet *packet);
 	PluginReceiveResult OnHashedNonceAndPassword(Packet *packet);
 	void OnPasswordResult(Packet *packet);
-	void Hash(char thierNonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], RakNet::RakString password, char out[HASHED_NONCE_AND_PW_LENGTH]);
+	void Hash(char thierNonce[TWO_WAY_AUTHENTICATION_NONCE_LENGTH], SLNet::RakString password, char out[HASHED_NONCE_AND_PW_LENGTH]);
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

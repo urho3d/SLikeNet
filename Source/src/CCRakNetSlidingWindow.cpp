@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "CCRakNetSlidingWindow.h"
+#include "slikenet/CCRakNetSlidingWindow.h"
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL==1
 
@@ -20,14 +25,14 @@ static const CCTimeType SYN=10;
 static const CCTimeType SYN=10000;
 #endif
 
-#include "MTUSize.h"
+#include "slikenet/MTUSize.h"
 #include <stdio.h>
 #include <cmath>
 #include <stdlib.h>
-#include "RakAssert.h"
-#include "RakAlloca.h"
+#include "slikenet/assert.h"
+#include "slikenet/alloca.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // ****************************************************** PUBLIC METHODS ******************************************************
 
@@ -160,7 +165,7 @@ bool CCRakNetSlidingWindow::OnGotPacket(DatagramSequenceNumberType datagramSeque
 	return true;
 }
 // ----------------------------------------------------------------------------------------------------------------------------
-void CCRakNetSlidingWindow::OnResend(CCTimeType curTime, RakNet::TimeUS nextActionTime)
+void CCRakNetSlidingWindow::OnResend(CCTimeType curTime, SLNet::TimeUS nextActionTime)
 {
 	(void) curTime;
 	(void) nextActionTime;

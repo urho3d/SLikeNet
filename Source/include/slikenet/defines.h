@@ -1,21 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __RAKNET_DEFINES_H
 #define __RAKNET_DEFINES_H
 
+#ifdef _RETAIL
+// retail builds imply release configurations
+#define _RELEASE
+#endif
+
 // If you want to change these defines, put them in RakNetDefinesOverrides so your changes are not lost when updating RakNet
 // The user should not edit this file
-#include "RakNetDefinesOverrides.h"
+#include "defineoverrides.h"
 
-/// Define __GET_TIME_64BIT to have RakNet::TimeMS use a 64, rather than 32 bit value.  A 32 bit value will overflow after about 5 weeks.
+/// Define __GET_TIME_64BIT to have SLNet::TimeMS use a 64, rather than 32 bit value.  A 32 bit value will overflow after about 5 weeks.
 /// However, this doubles the bandwidth use for sending times, so don't do it unless you have a reason to.
 /// Comment out if you are using the iPod Touch TG. See http://www.jenkinssoftware.com/forum/index.php?topic=2717.0
 /// This must be the same on all systems, or they won't connect
@@ -25,8 +35,19 @@
 
 // Define _FILE_AND_LINE_ to "",0 if you want to strip out file and line info for memory tracking from the EXE
 #ifndef _FILE_AND_LINE_
+#ifdef _RETAIL
+// retail builds do not contain source-code related information in order to reduce the overall EXE size
+#define _FILE_AND_LINE_ "",0
+#else
 #define _FILE_AND_LINE_ __FILE__,__LINE__
 #endif
+#endif
+
+/// Define RAKNET_COMPATIBILITY to enable API compatibility with RakNet.
+/// This allows you to keep existing code which was compatible with RakNet 4.082 unmodified and
+/// use SLikeNet as an in-place replacement for the RakNet library without having to modify any
+/// of your code.
+// #define RAKNET_COMPATIBILITY
 
 /// Define __BITSTREAM_NATIVE_END to NOT support endian swapping in the BitStream class.  This is faster and is what you should use
 /// unless you actually plan to have different endianness systems connect to each other
@@ -46,7 +67,7 @@
 #endif
 
 /// Uncomment to use RakMemoryOverride for custom memory tracking
-/// See RakMemoryOverride.h. 
+/// See memoryoverride.h. 
 #ifndef _USE_RAK_MEMORY_OVERRIDE
 #define _USE_RAK_MEMORY_OVERRIDE 0
 #endif
@@ -69,6 +90,10 @@
 // Redefine if you want to disable or change the target for debug RAKNET_DEBUG_PRINTF
 #ifndef RAKNET_DEBUG_PRINTF
 #define RAKNET_DEBUG_PRINTF printf
+#endif
+
+#ifndef RAKNET_DEBUG_TPRINTF
+#define RAKNET_DEBUG_TPRINTF _tprintf
 #endif
 
 // Maximum number of local IP addresses supported
@@ -111,9 +136,9 @@
 
 #ifndef GET_TIME_SPIKE_LIMIT
 /// Workaround for http://support.microsoft.com/kb/274323
-/// If two calls between RakNet::GetTime() happen farther apart than this time in microseconds, this delta will be returned instead
+/// If two calls between SLNet::GetTime() happen farther apart than this time in microseconds, this delta will be returned instead
 /// Note: This will cause ID_TIMESTAMP to be temporarily inaccurate if you set a breakpoint that pauses the UpdateNetworkLoop() thread in RakPeer
-/// Define in RakNetDefinesOverrides.h to enable (non-zero) or disable (0)
+/// Define in definesoverrides.h to enable (non-zero) or disable (0)
 #define GET_TIME_SPIKE_LIMIT 0
 #endif
 
@@ -191,5 +216,11 @@
 
 
 //#define USE_THREADED_SEND
+
+#ifdef RAKNET_COMPATIBILITY
+// set the namespace RakNet as alias to the SLikeNet namespace
+namespace SLNet { }
+namespace RakNet = SLNet;
+#endif
 
 #endif // __RAKNET_DEFINES_H

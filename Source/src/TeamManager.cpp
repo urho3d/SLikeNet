@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_TeamManager==1
 
-#include "TeamManager.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
+#include "slikenet/TeamManager.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 
 enum TeamManagerOperations
@@ -368,9 +373,9 @@ bool TM_TeamMember::LeaveTeam(TM_Team* team, NoTeamId _noTeamSubcategory)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bool TM_TeamMember::LeaveAllTeams(NoTeamId noTeamSubcategory)
+bool TM_TeamMember::LeaveAllTeams(NoTeamId inNoTeamSubcategory)
 {
-	return RequestTeam(TeamSelection::NoTeam(noTeamSubcategory));
+	return RequestTeam(TeamSelection::NoTeam(inNoTeamSubcategory));
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -481,10 +486,10 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 
 	WorldId worldId;
 	constructionBitstream->Read(worldId);
-	TM_World *world = teamManager->GetWorldWithId(worldId);
-	RakAssert(world);
+	TM_World *curWorld = teamManager->GetWorldWithId(worldId);
+	RakAssert(curWorld);
 	constructionBitstream->Read(networkId);
-	world->ReferenceTeamMember(this,networkId);
+	curWorld->ReferenceTeamMember(this,networkId);
 
 	success=constructionBitstream->Read(teamsRequestedSize);
 	for (unsigned int i=0; i < teamsRequestedSize; i++)
@@ -500,7 +505,7 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 		if (hasTeamToLeave)
 		{
 			constructionBitstream->Read(teamToLeaveId);
-			rt.teamToLeave = world->GetTeamByNetworkID(teamToLeaveId);
+			rt.teamToLeave = curWorld->GetTeamByNetworkID(teamToLeaveId);
 			RakAssert(rt.teamToLeave);
 		}
 		else
@@ -511,11 +516,11 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 		if (hasTeamRequested)
 		{
 			success=constructionBitstream->Read(teamRequestedId);
-			rt.requested = world->GetTeamByNetworkID(teamRequestedId);
+			rt.requested = curWorld->GetTeamByNetworkID(teamRequestedId);
 			RakAssert(rt.requested);
 		}
-		rt.whenRequested=RakNet::GetTime();
-		rt.requestIndex=world->teamRequestIndex++; // In case whenRequested is the same between two teams when sorting team requests
+		rt.whenRequested= SLNet::GetTime();
+		rt.requestIndex= curWorld->teamRequestIndex++; // In case whenRequested is the same between two teams when sorting team requests
 		if (
 			(hasTeamToLeave==false || (hasTeamToLeave==true && rt.teamToLeave!=0)) &&
 			(hasTeamRequested==false || (hasTeamRequested==true && rt.requested!=0))
@@ -527,7 +532,7 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 
 
 	if (success)
-		world->teamManager->ProcessTeamAssigned(constructionBitstream);
+		curWorld->teamManager->ProcessTeamAssigned(constructionBitstream);
 	return success;
 }
 
@@ -677,7 +682,7 @@ void TM_TeamMember::UpdateTeamsRequestedToAny(void)
 {
 	teamsRequested.Clear(true, _FILE_AND_LINE_);
 	joinTeamType=JOIN_ANY_AVAILABLE_TEAM;
-	whenJoinAnyRequested=RakNet::GetTime();
+	whenJoinAnyRequested= SLNet::GetTime();
 	joinAnyRequestIndex=world->teamRequestIndex++; // In case whenRequested is the same between two teams when sorting team requests
 }
 
@@ -699,7 +704,7 @@ void TM_TeamMember::AddToRequestedTeams(TM_Team *teamToJoin)
 	rt.isTeamSwitch=false;
 	rt.requested=teamToJoin;
 	rt.teamToLeave=0;
-	rt.whenRequested=RakNet::GetTime();
+	rt.whenRequested= SLNet::GetTime();
 	rt.requestIndex=world->teamRequestIndex++; // In case whenRequested is the same between two teams when sorting team requests
 	teamsRequested.Push(rt, _FILE_AND_LINE_ );
 }
@@ -714,7 +719,7 @@ void TM_TeamMember::AddToRequestedTeams(TM_Team *teamToJoin, TM_Team *teamToLeav
 	rt.isTeamSwitch=true;
 	rt.requested=teamToJoin;
 	rt.teamToLeave=teamToLeave;
-	rt.whenRequested=RakNet::GetTime();
+	rt.whenRequested= SLNet::GetTime();
 	rt.requestIndex=world->teamRequestIndex++; // In case whenRequested is the same between two teams when sorting team requests
 	teamsRequested.Push(rt, _FILE_AND_LINE_ );
 }
@@ -979,8 +984,8 @@ bool TM_Team::DeserializeConstruction(TeamManager *teamManager, BitStream *const
 {
 	WorldId worldId;
 	constructionBitstream->Read(worldId);
-	TM_World *world = teamManager->GetWorldWithId(worldId);
-	RakAssert(world);
+	TM_World *curWorld = teamManager->GetWorldWithId(worldId);
+	RakAssert(curWorld);
 	constructionBitstream->Read(ID);
 	constructionBitstream->Read(joinPermissions);
 	constructionBitstream->Read(balancingApplies);
@@ -988,7 +993,7 @@ bool TM_Team::DeserializeConstruction(TeamManager *teamManager, BitStream *const
 	RakAssert(b);
 	if (b)
 	{
-		world->ReferenceTeam(this,ID,balancingApplies);
+		curWorld->ReferenceTeam(this,ID,balancingApplies);
 	}
 	return b;
 }
@@ -1164,14 +1169,14 @@ void TM_World::DereferenceTeam(TM_Team *team, NoTeamId noTeamSubcategory)
 	{
 		if (teams[i]==team)
 		{
-			TM_Team *team = teams[i];
-			while (team->teamMembers.Size())
+			TM_Team *curTeam = teams[i];
+			while (curTeam->teamMembers.Size())
 			{
-				team->teamMembers[team->teamMembers.Size()-1]->LeaveTeam(team, noTeamSubcategory);
+				curTeam->teamMembers[curTeam->teamMembers.Size()-1]->LeaveTeam(curTeam, noTeamSubcategory);
 			}
 			teams.RemoveAtIndex(i);
 
-			teamsHash.Remove(team->GetNetworkID(),_FILE_AND_LINE_);
+			teamsHash.Remove(curTeam->GetNetworkID(),_FILE_AND_LINE_);
 
 			break;
 		}
@@ -1644,7 +1649,7 @@ void TM_World::GetSortedJoinRequests(DataStructures::OrderedList<TM_World::JoinR
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TM_World::BroadcastToParticipants(RakNet::BitStream *bsOut, RakNetGUID exclusionGuid)
+void TM_World::BroadcastToParticipants(SLNet::BitStream *bsOut, RakNetGUID exclusionGuid)
 {
 	for (unsigned int i=0; i < participants.Size(); i++)
 	{
@@ -1745,7 +1750,7 @@ int TM_World::JoinSpecificTeam(TM_TeamMember *teamMember, TM_Team *team, bool is
 
 					// Send ID_TEAM_BALANCER_TEAM_ASSIGNED to all, for swapped member
 					// Calling function sends ID_RUN_RemoveFromTeamsRequestedAndAddTeam which pushes ID_TEAM_BALANCER_TEAM_ASSIGNED for teamMember
-					RakNet::BitStream bitStream;
+					SLNet::BitStream bitStream;
 					bitStream.WriteCasted<MessageID>(ID_TEAM_BALANCER_TEAM_ASSIGNED);
 					teamManager->EncodeTeamAssigned(&bitStream, swappingMember);
 					BroadcastToParticipants(&bitStream, UNASSIGNED_RAKNET_GUID);
@@ -1833,7 +1838,7 @@ TM_World* TeamManager::AddWorld(WorldId worldId)
 {
 	RakAssert(worldsArray[worldId]==0 && "World already in use");
 
-	TM_World *newWorld = RakNet::OP_NEW<TM_World>(_FILE_AND_LINE_);
+	TM_World *newWorld = SLNet::OP_NEW<TM_World>(_FILE_AND_LINE_);
 	newWorld->worldId=worldId;
 	newWorld->teamManager=this;
 	newWorld->hostGuid=GetMyGUIDUnified();
@@ -1851,7 +1856,7 @@ void TeamManager::RemoveWorld(WorldId worldId)
 	{
 		if (worldsList[i]==worldsArray[worldId])
 		{
-			RakNet::OP_DELETE(worldsList[i],_FILE_AND_LINE_);
+			SLNet::OP_DELETE(worldsList[i],_FILE_AND_LINE_);
 			worldsList.RemoveAtIndexFast(i);
 			break;
 		}
@@ -1901,7 +1906,7 @@ void TeamManager::SetTopology(TMTopology _topology)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::EncodeTeamFull(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
+void TeamManager::EncodeTeamFull(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
 {
 	bitStream->WriteCasted<MessageID>(ID_TEAM_BALANCER_REQUESTED_TEAM_FULL);
 	EncodeTeamFullOrLocked(bitStream, teamMember, team);
@@ -1920,7 +1925,7 @@ void TeamManager::DecomposeTeamFull(Packet *packet,
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::EncodeTeamLocked(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
+void TeamManager::EncodeTeamLocked(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
 {
 	bitStream->WriteCasted<MessageID>(ID_TEAM_BALANCER_REQUESTED_TEAM_LOCKED);
 	EncodeTeamFullOrLocked(bitStream, teamMember, team);
@@ -1928,7 +1933,7 @@ void TeamManager::EncodeTeamLocked(RakNet::BitStream *bitStream, TM_TeamMember *
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::EncodeTeamFullOrLocked(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
+void TeamManager::EncodeTeamFullOrLocked(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team)
 {
 	bitStream->Write(teamMember->world->GetWorldId());
 	bitStream->Write(teamMember->GetNetworkID());
@@ -1941,7 +1946,7 @@ void TeamManager::EncodeTeamFullOrLocked(RakNet::BitStream *bitStream, TM_TeamMe
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::DecomposeTeamFullOrLocked(RakNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, TM_Team **team,
+void TeamManager::DecomposeTeamFullOrLocked(SLNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, TM_Team **team,
 							   uint16_t &currentMembers, uint16_t &memberLimitIncludingBalancing, bool &balancingIsActive, JoinPermissions &joinPermissions)
 {
 	WorldId worldId;
@@ -1981,7 +1986,7 @@ void TeamManager::DecomposeTeamLocked(Packet *packet,
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::EncodeTeamAssigned(RakNet::BitStream *bitStream, TM_TeamMember *teamMember)
+void TeamManager::EncodeTeamAssigned(SLNet::BitStream *bitStream, TM_TeamMember *teamMember)
 {
 	bitStream->Write(teamMember->world->GetWorldId());
 	bitStream->Write(teamMember->GetNetworkID());
@@ -1996,7 +2001,7 @@ void TeamManager::EncodeTeamAssigned(RakNet::BitStream *bitStream, TM_TeamMember
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::ProcessTeamAssigned(RakNet::BitStream *bsIn)
+void TeamManager::ProcessTeamAssigned(SLNet::BitStream *bsIn)
 {
 	TM_World *world;
 	TM_TeamMember *teamMember;
@@ -2033,7 +2038,7 @@ void TeamManager::DecodeTeamAssigned(Packet *packet, TM_World **world, TM_TeamMe
 	WorldId worldId;
 	NetworkID teamMemberId;
 
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 	bsIn.Read(worldId);
 	bsIn.Read(teamMemberId);
@@ -2055,7 +2060,7 @@ void TeamManager::DecodeTeamCancelled(Packet *packet, TM_World **world, TM_TeamM
 	WorldId worldId;
 	NetworkID teamMemberId;
 
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 	bsIn.Read(worldId);
 	bsIn.Read(teamMemberId);
@@ -2278,7 +2283,7 @@ void TeamManager::OnNewConnection(const SystemAddress &systemAddress, RakNetGUID
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::Send( const RakNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast )
+void TeamManager::Send( const SLNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast )
 {
 	SendUnified(bitStream,HIGH_PRIORITY, RELIABLE_ORDERED, 0, systemIdentifier, broadcast);
 }
@@ -2310,7 +2315,7 @@ void TeamManager::RemoveFromTeamsRequestedAndAddTeam(TM_TeamMember *teamMember, 
 void TeamManager::PushTeamAssigned(TM_TeamMember *teamMember)
 {
 	// Push ID_TEAM_BALANCER_TEAM_ASSIGNED locally
-	RakNet::BitStream bitStream;
+	SLNet::BitStream bitStream;
 	bitStream.WriteCasted<MessageID>(ID_TEAM_BALANCER_TEAM_ASSIGNED);
 	EncodeTeamAssigned(&bitStream, teamMember);
 
@@ -2319,7 +2324,7 @@ void TeamManager::PushTeamAssigned(TM_TeamMember *teamMember)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void TeamManager::PushBitStream(RakNet::BitStream *bitStream)
+void TeamManager::PushBitStream(SLNet::BitStream *bitStream)
 {
 	Packet *p = AllocatePacketUnified(bitStream->GetNumberOfBytesUsed());
 	memcpy(p->data, bitStream->GetData(), bitStream->GetNumberOfBytesUsed());
@@ -2410,7 +2415,7 @@ void TeamManager::OnJoinAnyTeam(Packet *packet, TM_World *world)
 			// Send to sender ID_TEAM_BALANCER_TEAM_ASSIGNED
 			if (packet->guid!=GetMyGUIDUnified())
 			{
-				RakNet::BitStream bitStream;
+				SLNet::BitStream bitStream;
 				bitStream.WriteCasted<MessageID>(ID_TEAM_BALANCER_TEAM_ASSIGNED);
 				EncodeTeamAssigned(&bitStream, teamMember);
 				SendUnified(&bitStream, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);
@@ -2529,7 +2534,7 @@ void TeamManager::OnJoinRequestedTeam(Packet *packet, TM_World *world)
 			// Send to sender ID_TEAM_BALANCER_TEAM_ASSIGNED
 			if (packet->guid!=GetMyGUIDUnified())
 			{
-				RakNet::BitStream bitStream;
+				SLNet::BitStream bitStream;
 				bitStream.WriteCasted<MessageID>(ID_TEAM_BALANCER_TEAM_ASSIGNED);
 				EncodeTeamAssigned(&bitStream, teamMember);
 				SendUnified(&bitStream, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->guid, false);

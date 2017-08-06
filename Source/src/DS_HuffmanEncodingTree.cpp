@@ -1,23 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "DS_HuffmanEncodingTree.h"
-#include "DS_Queue.h"
-#include "BitStream.h"
-#include "RakAssert.h" 
+#include "slikenet/DS_HuffmanEncodingTree.h"
+#include "slikenet/DS_Queue.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/assert.h" 
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-using namespace RakNet;
+using namespace SLNet;
 
 HuffmanEncodingTree::HuffmanEncodingTree()
 {
@@ -51,7 +52,7 @@ void HuffmanEncodingTree::FreeMemory( void )
 		if ( node->right )
 			nodeQueue.Push( node->right, _FILE_AND_LINE_  );
 
-		RakNet::OP_DELETE(node, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(node, _FILE_AND_LINE_);
 	}
 
 	// Delete the encoding table
@@ -77,7 +78,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 
 	for ( counter = 0; counter < 256; counter++ )
 	{
-		node = RakNet::OP_NEW<HuffmanEncodingTreeNode>( _FILE_AND_LINE_ );
+		node = SLNet::OP_NEW<HuffmanEncodingTreeNode>( _FILE_AND_LINE_ );
 		node->left = 0;
 		node->right = 0;
 		node->value = (unsigned char) counter;
@@ -94,16 +95,13 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 
 	// 2.  While there is more than one tree, take the two smallest trees and merge them so that the two trees are the left and right
 	// children of a new node, where the new node has the weight the sum of the weight of the left and right child nodes.
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while ( 1 )
+	for(;;)
 	{
 		huffmanEncodingTreeNodeList.Beginning();
 		HuffmanEncodingTreeNode *lesser, *greater;
 		lesser = huffmanEncodingTreeNodeList.Pop();
 		greater = huffmanEncodingTreeNodeList.Pop();
-		node = RakNet::OP_NEW<HuffmanEncodingTreeNode>( _FILE_AND_LINE_ );
+		node = SLNet::OP_NEW<HuffmanEncodingTreeNode>( _FILE_AND_LINE_ );
 		node->left = lesser;
 		node->right = greater;
 		node->weight = lesser->weight + greater->weight;
@@ -125,7 +123,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 	bool tempPath[ 256 ]; // Maximum path length is 256
 	unsigned short tempPathLength;
 	HuffmanEncodingTreeNode *currentNode;
-	RakNet::BitStream bitStream;
+	SLNet::BitStream bitStream;
 
 	// Generate the encryption table. From before, we have an array of pointers to all the leaves which contain pointers to their parents.
 	// This can be done more efficiently but this isn't bad and it's way easier to program and debug
@@ -168,7 +166,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 }
 
 // Pass an array of bytes to array and a preallocated BitStream to receive the output
-void HuffmanEncodingTree::EncodeArray( unsigned char *input, size_t sizeInBytes, RakNet::BitStream * output )
+void HuffmanEncodingTree::EncodeArray( unsigned char *input, size_t sizeInBytes, SLNet::BitStream * output )
 {		
 	unsigned counter;
 
@@ -199,7 +197,7 @@ void HuffmanEncodingTree::EncodeArray( unsigned char *input, size_t sizeInBytes,
 	}
 }
 
-unsigned HuffmanEncodingTree::DecodeArray( RakNet::BitStream * input, BitSize_t sizeInBits, size_t maxCharsToWrite, unsigned char *output )
+unsigned HuffmanEncodingTree::DecodeArray(SLNet::BitStream * input, BitSize_t sizeInBits, size_t maxCharsToWrite, unsigned char *output )
 {
 	HuffmanEncodingTreeNode * currentNode;
 
@@ -232,14 +230,14 @@ unsigned HuffmanEncodingTree::DecodeArray( RakNet::BitStream * input, BitSize_t 
 }
 
 // Pass an array of encoded bytes to array and a preallocated BitStream to receive the output
-void HuffmanEncodingTree::DecodeArray( unsigned char *input, BitSize_t sizeInBits, RakNet::BitStream * output )
+void HuffmanEncodingTree::DecodeArray( unsigned char *input, BitSize_t sizeInBits, SLNet::BitStream * output )
 {
 	HuffmanEncodingTreeNode * currentNode;
 
 	if ( sizeInBits <= 0 )
 		return ;
 
-	RakNet::BitStream bitStream( input, BITS_TO_BYTES(sizeInBits), false );
+	SLNet::BitStream bitStream( input, BITS_TO_BYTES(sizeInBits), false );
 
 	currentNode = root;
 
@@ -271,10 +269,7 @@ void HuffmanEncodingTree::InsertNodeIntoSortedList( HuffmanEncodingTreeNode * no
 	huffmanEncodingTreeNodeList->Beginning();
 
 	unsigned counter = 0;
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-	while ( 1 )
+	for(;;)
 	{
 		if ( huffmanEncodingTreeNodeList->Peek()->weight < node->weight )
 			++( *huffmanEncodingTreeNodeList );
@@ -296,7 +291,3 @@ void HuffmanEncodingTree::InsertNodeIntoSortedList( HuffmanEncodingTreeNode * no
 		}
 	}
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

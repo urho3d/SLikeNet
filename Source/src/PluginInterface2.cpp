@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 
-#include "PluginInterface2.h"
-#include "PacketizedTCP.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 PluginInterface2::PluginInterface2()
 {
@@ -27,7 +32,7 @@ PluginInterface2::~PluginInterface2()
 {
 
 }
-void PluginInterface2::SendUnified( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast )
+void PluginInterface2::SendUnified( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast )
 {
 	if (rakPeerInterface)
 	{
@@ -108,7 +113,7 @@ Packet *PluginInterface2::AllocatePacketUnified(unsigned dataSize)
 	}
 #endif
 
-	Packet *packet = RakNet::OP_NEW<Packet>(_FILE_AND_LINE_);
+	Packet *packet = SLNet::OP_NEW<Packet>(_FILE_AND_LINE_);
 	packet->data = (unsigned char*) rakMalloc_Ex(dataSize, _FILE_AND_LINE_);
 	packet->bitSize=BYTES_TO_BITS(dataSize);
 	packet->deleteData=true;
@@ -151,7 +156,7 @@ void PluginInterface2::DeallocPacketUnified(Packet *packet)
 #endif
 
 	rakFree_Ex(packet->data, _FILE_AND_LINE_);
-	RakNet::OP_DELETE(packet, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(packet, _FILE_AND_LINE_);
 }
 bool PluginInterface2::SendListUnified( const char **data, const int *lengths, const int numParameters, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast )
 {

@@ -1,19 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RandSync.h"
-#include "BitStream.h"
+#include "slikenet/RandSync.h"
+#include "slikenet/BitStream.h"
 #include <limits>
 #include <limits.h>
 
-namespace RakNet
+namespace SLNet
 {
 
 RakNetRandomSync::RakNetRandomSync()
@@ -80,12 +85,12 @@ void RakNetRandomSync::SetCallCount( uint32_t i )
 {
 	callCount = i;
 }
-void RakNetRandomSync::SerializeConstruction(RakNet::BitStream *constructionBitstream)
+void RakNetRandomSync::SerializeConstruction(SLNet::BitStream *constructionBitstream)
 {
 	constructionBitstream->Write(seed);
 	constructionBitstream->Write(callCount);
 }
-bool RakNetRandomSync::DeserializeConstruction(RakNet::BitStream *constructionBitstream)
+bool RakNetRandomSync::DeserializeConstruction(SLNet::BitStream *constructionBitstream)
 {
 	uint32_t _seed;
 	uint32_t _skipValues;
@@ -95,11 +100,11 @@ bool RakNetRandomSync::DeserializeConstruction(RakNet::BitStream *constructionBi
 		SeedMT(_seed, _skipValues);
 	return success;
 }
-void RakNetRandomSync::Serialize(RakNet::BitStream *outputBitstream)
+void RakNetRandomSync::Serialize(SLNet::BitStream *outputBitstream)
 {
 	outputBitstream->Write(callCount);
 }
-void RakNetRandomSync::Deserialize(RakNet::BitStream *outputBitstream)
+void RakNetRandomSync::Deserialize(SLNet::BitStream *outputBitstream)
 {
 	uint32_t _callCount;
 	outputBitstream->Read(_callCount);
@@ -126,7 +131,7 @@ void RakNetRandomSync::Skip( uint32_t count )
 	callCount+=count;
 }
 
-} // namespace RakNet
+} // namespace SLNet
 
 /*
 RakNetRandomSync r1, r2;

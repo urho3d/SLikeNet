@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_UDPProxyServer==1 && _RAKNET_SUPPORT_UDPForwarder==1
 
-#include "UDPProxyServer.h"
-#include "BitStream.h"
-#include "UDPProxyCommon.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/UDPProxyServer.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/UDPProxyCommon.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(UDPProxyServer,UDPProxyServer);
 
@@ -38,7 +43,7 @@ void UDPProxyServer::SetResultHandler(UDPProxyServerResultHandler *rh)
 {
 	resultHandler=rh;
 }
-bool UDPProxyServer::LoginToCoordinator(RakNet::RakString password, SystemAddress coordinatorAddress)
+bool UDPProxyServer::LoginToCoordinator(SLNet::RakString password, SystemAddress coordinatorAddress)
 {
 	unsigned int insertionIndex;
 	bool objectExists;
@@ -48,7 +53,7 @@ bool UDPProxyServer::LoginToCoordinator(RakNet::RakString password, SystemAddres
 	loggedInCoordinators.GetIndexFromKey(coordinatorAddress,&objectExists);
 	if (objectExists==true)
 		return false;
-	RakNet::BitStream outgoingBs;
+	SLNet::BitStream outgoingBs;
 	outgoingBs.Write((MessageID)ID_UDP_PROXY_GENERAL);
 	outgoingBs.Write((MessageID)ID_UDP_PROXY_LOGIN_REQUEST_FROM_SERVER_TO_COORDINATOR);
 	outgoingBs.Write(password);
@@ -90,9 +95,9 @@ PluginReceiveResult UDPProxyServer::OnReceive(Packet *packet)
 				{
 					loggingInCoordinators.RemoveAtIndex(removalIndex);
 
-					RakNet::BitStream incomingBs(packet->data, packet->length, false);
+					SLNet::BitStream incomingBs(packet->data, packet->length, false);
 					incomingBs.IgnoreBytes(2);
-					RakNet::RakString password;
+					SLNet::RakString password;
 					incomingBs.Read(password);
 					switch (packet->data[1])
 					{
@@ -154,17 +159,17 @@ void UDPProxyServer::OnDetach(void)
 void UDPProxyServer::OnForwardingRequestFromCoordinatorToServer(Packet *packet)
 {
 	SystemAddress sourceAddress, targetAddress;
-	RakNet::BitStream incomingBs(packet->data, packet->length, false);
+	SLNet::BitStream incomingBs(packet->data, packet->length, false);
 	incomingBs.IgnoreBytes(2);
 	incomingBs.Read(sourceAddress);
 	incomingBs.Read(targetAddress);
-	RakNet::TimeMS timeoutOnNoDataMS;
+	SLNet::TimeMS timeoutOnNoDataMS;
 	incomingBs.Read(timeoutOnNoDataMS);
 	RakAssert(timeoutOnNoDataMS > 0 && timeoutOnNoDataMS <= UDP_FORWARDER_MAXIMUM_TIMEOUT);
 
 	unsigned short forwardingPort=0;
 	UDPForwarderResult success = udpForwarder.StartForwarding(sourceAddress, targetAddress, timeoutOnNoDataMS, 0, socketFamily, &forwardingPort, 0);
-	RakNet::BitStream outgoingBs;
+	SLNet::BitStream outgoingBs;
 	outgoingBs.Write((MessageID)ID_UDP_PROXY_GENERAL);
 	outgoingBs.Write((MessageID)ID_UDP_PROXY_FORWARDING_REPLY_FROM_SERVER_TO_COORDINATOR);
 	outgoingBs.Write(sourceAddress);

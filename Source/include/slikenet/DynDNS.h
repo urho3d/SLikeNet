@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file DynDNS.h
@@ -20,9 +25,9 @@
 #ifndef __DYN_DNS_H
 #define __DYN_DNS_H
 
-#include "RakString.h"
+#include "string.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 class TCPInterface;
@@ -73,14 +78,14 @@ public:
 	// Output
 	bool IsRunning(void) const {return connectPhase!=CP_IDLE;}
 	bool IsCompleted(void) const {return connectPhase==CP_IDLE;}
-	RakNet::DynDnsResultCode GetCompletedResultCode(void) {return result;}
+	SLNet::DynDnsResultCode GetCompletedResultCode(void) {return result;}
 	const char *GetCompletedDescription(void) const {return resultDescription;}
 	bool WasResultSuccessful(void) const {return result==RC_SUCCESS || result==RC_DNS_ALREADY_SET || result==RC_NO_CHANGE;}
 	char *GetMyPublicIP(void) const {return (char*) myIPStr;} // We get our public IP as part of the process. This is valid once completed
 
 protected:
 	void Stop(void);
-	void SetCompleted(RakNet::DynDnsResultCode _result, const char *_resultDescription) {Stop(); result=_result; resultDescription=_resultDescription;}
+	void SetCompleted(SLNet::DynDnsResultCode _result, const char *_resultDescription) {Stop(); result=_result; resultDescription=_resultDescription;}
 
 	enum ConnectPhase
 	{
@@ -92,18 +97,18 @@ protected:
 	};
 
 	TCPInterface *tcp;
-	RakNet::RakString getString;
+	SLNet::RakString getString;
 	SystemAddress serverAddress;
 	ConnectPhase connectPhase;
-	RakNet::RakString host;
-	RakNet::Time phaseTimeout;
+	SLNet::RakString host;
+	SLNet::Time phaseTimeout;
 	SystemAddress checkIpAddress;
 	const char *resultDescription;
-	RakNet::DynDnsResultCode result;
+	SLNet::DynDnsResultCode result;
 	char myIPStr[32];
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __DYN_DNS_H
 

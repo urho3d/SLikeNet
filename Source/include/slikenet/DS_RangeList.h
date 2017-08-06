@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file DS_RangeList.h
@@ -19,8 +24,8 @@
 
 #include "DS_OrderedList.h"
 #include "BitStream.h"
-#include "RakMemoryOverride.h"
-#include "RakAssert.h"
+#include "memoryoverride.h"
+#include "assert.h"
 
 namespace DataStructures
 {
@@ -55,18 +60,18 @@ namespace DataStructures
 		void Clear(void);
 		unsigned Size(void) const;
 		unsigned RangeSum(void) const;
-		RakNet::BitSize_t Serialize(RakNet::BitStream *in, RakNet::BitSize_t maxBits, bool clearSerialized);
-		bool Deserialize(RakNet::BitStream *out);
+		SLNet::BitSize_t Serialize(SLNet::BitStream *in, SLNet::BitSize_t maxBits, bool clearSerialized);
+		bool Deserialize(SLNet::BitStream *out);
 
 		DataStructures::OrderedList<range_type, RangeNode<range_type> , RangeNodeComp<range_type> > ranges;
 	};
 
 	template <class range_type>
-	RakNet::BitSize_t RangeList<range_type>::Serialize(RakNet::BitStream *in, RakNet::BitSize_t maxBits, bool clearSerialized)
+	SLNet::BitSize_t RangeList<range_type>::Serialize(SLNet::BitStream *in, SLNet::BitSize_t maxBits, bool clearSerialized)
 	{
 		RakAssert(ranges.Size() < (unsigned short)-1);
-		RakNet::BitStream tempBS;
-		RakNet::BitSize_t bitsWritten;
+		SLNet::BitStream tempBS;
+		SLNet::BitSize_t bitsWritten;
 		unsigned short countWritten;
 		unsigned i;
 		countWritten=0;
@@ -92,7 +97,7 @@ namespace DataStructures
 		}
 
 		in->AlignWriteToByteBoundary();
-		RakNet::BitSize_t before=in->GetWriteOffset();
+		SLNet::BitSize_t before=in->GetWriteOffset();
 		in->Write(countWritten);
 		bitsWritten+=in->GetWriteOffset()-before;
 	//	RAKNET_DEBUG_PRINTF("%i ", in->GetNumberOfBitsUsed());
@@ -112,7 +117,7 @@ namespace DataStructures
 		return bitsWritten;
 	}
 	template <class range_type>
-	bool RangeList<range_type>::Deserialize(RakNet::BitStream *out)
+	bool RangeList<range_type>::Deserialize(SLNet::BitStream *out)
 	{
 		ranges.Clear(true, _FILE_AND_LINE_);
 		unsigned short count;

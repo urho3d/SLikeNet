@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -18,13 +23,13 @@
 #ifndef __NAT_PUNCHTHROUGH_CLIENT_H
 #define __NAT_PUNCHTHROUGH_CLIENT_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "Export.h"
 #include "PluginInterface2.h"
 #include "PacketPriority.h"
 #include "SocketIncludes.h"
 #include "DS_List.h"
-#include "RakString.h"
+#include "string.h"
 #include "DS_Queue.h"
 
 // Trendnet TEW-632BRP sometimes starts at port 1024 and increments sequentially.
@@ -35,7 +40,7 @@
 // Buffalo WHR-HP-G54 OK
 // Netgear WGR614 ok
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -65,8 +70,8 @@ struct RAK_DLL_EXPORT PunchthroughConfiguration
 	}
 
 	/// How much time between each UDP send
-	RakNet::Time TIME_BETWEEN_PUNCH_ATTEMPTS_INTERNAL;
-	RakNet::Time TIME_BETWEEN_PUNCH_ATTEMPTS_EXTERNAL;
+	SLNet::Time TIME_BETWEEN_PUNCH_ATTEMPTS_INTERNAL;
+	SLNet::Time TIME_BETWEEN_PUNCH_ATTEMPTS_EXTERNAL;
 
 	/// How many tries for one port before giving up and going to the next port
 	int UDP_SENDS_PER_PORT_INTERNAL;
@@ -197,7 +202,7 @@ public:
 
 	struct SendPing
 	{
-		RakNet::Time nextActionTime;
+		SLNet::Time nextActionTime;
 		SystemAddress targetAddress;
 		SystemAddress facilitator;
 		SystemAddress internalIds[MAXIMUM_NUMBER_OF_INTERNAL_IDS];
@@ -266,7 +271,7 @@ protected:
 	};
 	DataStructures::Queue<DSTAndFac> queuedOpenNat;
 
-	void IncrementExternalAttemptCount(RakNet::Time time, RakNet::Time delta);
+	void IncrementExternalAttemptCount(SLNet::Time time, SLNet::Time delta);
 	unsigned short portStride;
 	enum
 	{
@@ -275,12 +280,12 @@ protected:
 		CALCULATING_PORT_STRIDE,
 		INCAPABLE_PORT_STRIDE
 	} hasPortStride;
-	RakNet::Time portStrideCalTimeout;
+	SLNet::Time portStrideCalTimeout;
 
 	/*
 	struct TimeAndGuid
 	{
-		RakNet::Time time;
+		SLNet::Time time;
 		RakNetGUID guid;
 	};
 	DataStructures::List<TimeAndGuid> groupRequestsInProgress;
@@ -299,7 +304,7 @@ protected:
 	*/
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

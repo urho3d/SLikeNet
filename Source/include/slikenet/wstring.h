@@ -1,19 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __RAK_W_STRING_H
 #define __RAK_W_STRING_H 
 
 #include "Export.h"
-#include "RakNetTypes.h" // int64_t
-#include "RakString.h"
+#include "types.h" // int64_t
+#include "string.h"
 
 #ifdef _WIN32
 
@@ -22,7 +27,7 @@
 #include "WindowsIncludes.h"
 #endif
 
-namespace RakNet
+namespace SLNet
 {
 	/// \brief String class for Unicode
 	class RAK_DLL_EXPORT RakWString
@@ -107,7 +112,7 @@ namespace RakNet
 		bool Deserialize(BitStream *bs);
 
 		/// Static version of the Deserialize() function
-		static bool Deserialize(wchar_t *str, BitStream *bs);
+		static bool Deserialize(wchar_t *str, size_t strLength, BitStream *bs);
 
 
 	protected:
@@ -117,7 +122,7 @@ namespace RakNet
 
 }
 
-const RakNet::RakWString RAK_DLL_EXPORT operator+(const RakNet::RakWString &lhs, const RakNet::RakWString &rhs);
+const SLNet::RakWString RAK_DLL_EXPORT operator+(const SLNet::RakWString &lhs, const SLNet::RakWString &rhs);
 
 
 #endif

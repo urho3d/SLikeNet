@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,19 +18,21 @@
 
 
 
-#include "ReliabilityLayer.h"
-#include "GetTime.h"
-#include "SocketLayer.h"
-#include "PluginInterface2.h"
-#include "RakAssert.h"
-#include "Rand.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/ReliabilityLayer.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/assert.h"
+#include "slikenet/Rand.h"
+#include "slikenet/MessageIdentifiers.h"
 #ifdef USE_THREADED_SEND
-#include "SendToThread.h"
+#include "slikenet/SendToThread.h"
 #endif
 #include <math.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // Can't figure out which library has this function on the PS3
 double Ceil(double d) {if (((double)((int)d))==d) return d; return (int) (d+1.0);}
@@ -53,10 +60,6 @@ static const CCTimeType STARTING_TIME_BETWEEN_PACKETS=MAX_TIME_BETWEEN_PACKETS;
 
 typedef uint32_t BitstreamLengthEncoding;
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
 //#define PRINT_TO_FILE_RELIABLE_ORDERED_TEST
 #ifdef PRINT_TO_FILE_RELIABLE_ORDERED_TEST
 static unsigned int packetNumber=0;
@@ -68,8 +71,8 @@ static FILE *fp=0;
 
 BPSTracker::TimeAndValue2::TimeAndValue2() {}
 BPSTracker::TimeAndValue2::~TimeAndValue2() {}
-BPSTracker::TimeAndValue2::TimeAndValue2(RakNet::TimeUS t, uint64_t v1) : value1(v1), time(t) {}
-//BPSTracker::TimeAndValue2::TimeAndValue2(RakNet::TimeUS t, uint64_t v1, uint64_t v2) : time(t), value1(v1), value2(v2) {}
+BPSTracker::TimeAndValue2::TimeAndValue2(SLNet::TimeUS t, uint64_t v1) : value1(v1), time(t) {}
+//BPSTracker::TimeAndValue2::TimeAndValue2(SLNet::TimeUS t, uint64_t v1, uint64_t v2) : time(t), value1(v1), value2(v2) {}
 BPSTracker::BPSTracker() {Reset(_FILE_AND_LINE_);}
 BPSTracker::~BPSTracker() {}
 //void BPSTracker::Reset(const char *file, unsigned int line) {total1=total2=lastSec1=lastSec2=0; dataQueue.Clear(file,line);}
@@ -80,8 +83,8 @@ void BPSTracker::Reset(const char *file, unsigned int line) {total1=lastSec1=0; 
 uint64_t BPSTracker::GetTotal1(void) const {return total1;}
 //uint64_t BPSTracker::GetTotal2(void) const {return total2;}
 
-// void BPSTracker::ClearExpired2(RakNet::TimeUS time) {
-// 	RakNet::TimeUS threshold=time;
+// void BPSTracker::ClearExpired2(SLNet::TimeUS time) {
+// 	SLNet::TimeUS threshold=time;
 // 	if (threshold < 1000000)
 // 		return;
 // 	threshold-=1000000;
@@ -92,7 +95,7 @@ uint64_t BPSTracker::GetTotal1(void) const {return total1;}
 // 		dataQueue.Pop();
 // 	}
 // }
-void BPSTracker::ClearExpired1(RakNet::TimeUS time)
+void BPSTracker::ClearExpired1(SLNet::TimeUS time)
 {
 	while (dataQueue.IsEmpty()==false &&
 #if CC_TIME_TYPE_BYTES==8
@@ -132,7 +135,7 @@ struct DatagramHeaderFormat
 
 	static unsigned int GetDataHeaderByteLength()
 	{
-		//return 2 + 3 + sizeof(RakNet::TimeMS) + sizeof(float)*2;
+		//return 2 + 3 + sizeof(SLNet::TimeMS) + sizeof(float)*2;
 		return 2 + 3 +
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
 			sizeof(RakNetTimeMS) +
@@ -140,7 +143,7 @@ struct DatagramHeaderFormat
 			sizeof(float)*1;
 	}
 
-	void Serialize(RakNet::BitStream *b)
+	void Serialize(SLNet::BitStream *b)
 	{
 		// Not endian safe
 		//		RakAssert(GetDataHeaderByteLength()==sizeof(DatagramHeaderFormat));
@@ -154,7 +157,7 @@ struct DatagramHeaderFormat
 			b->Write(hasBAndAS);
 			b->AlignWriteToByteBoundary();
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			RakNet::TimeMS timeMSLow=(RakNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
+			SLNet::TimeMS timeMSLow=(SLNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
 #endif
 			if (hasBAndAS)
 			{
@@ -176,12 +179,12 @@ struct DatagramHeaderFormat
 			b->Write(needsBAndAs);
 			b->AlignWriteToByteBoundary();
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			RakNet::TimeMS timeMSLow=(RakNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
+			SLNet::TimeMS timeMSLow=(SLNet::TimeMS) sourceSystemTime&0xFFFFFFFF; b->Write(timeMSLow);
 #endif
 			b->Write(datagramNumber);
 		}
 	}
-	void Deserialize(RakNet::BitStream *b)
+	void Deserialize(SLNet::BitStream *b)
 	{
 		// Not endian safe
 		//		b->ReadAlignedBytes((unsigned char*) this, sizeof(DatagramHeaderFormat));
@@ -196,7 +199,7 @@ struct DatagramHeaderFormat
 			b->Read(hasBAndAS);
 			b->AlignReadToByteBoundary();
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			RakNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
+			SLNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
 #endif
 			if (hasBAndAS)
 			{
@@ -218,7 +221,7 @@ struct DatagramHeaderFormat
 				b->Read(needsBAndAs);
 				b->AlignReadToByteBoundary();
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-				RakNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
+				SLNet::TimeMS timeMS; b->Read(timeMS); sourceSystemTime=(CCTimeType) timeMS;
 #endif
 				b->Read(datagramNumber);
 			}
@@ -226,14 +229,10 @@ struct DatagramHeaderFormat
 	}
 };
 
-#if  !defined(__GNUC__) && !defined(__ARMCC)
-#pragma warning(disable:4702)   // unreachable code
-#endif
-
 #ifdef _WIN32
 //#define _DEBUG_LOGGER
 #ifdef _DEBUG_LOGGER
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 #endif
 #endif
 
@@ -242,9 +241,9 @@ struct DatagramHeaderFormat
 static int waitFlag=-1;
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 
-int RakNet::SplitPacketChannelComp( SplitPacketIdType const &key, SplitPacketChannel* const &data )
+int SLNet::SplitPacketChannelComp( SplitPacketIdType const &key, SplitPacketChannel* const &data )
 {
 #if PREALLOCATE_LARGE_MESSAGES==1
 	if (key < data->returnedPacket->splitPacketId)
@@ -321,7 +320,7 @@ ReliabilityLayer::ReliabilityLayer()
 #ifdef PRINT_TO_FILE_RELIABLE_ORDERED_TEST
 	if (fp==0 && 0)
 	{
-		fp = fopen("reliableorderedoutput.txt", "wt");
+		fopen_s(&fp, "reliableorderedoutput.txt", "wt");
 	}
 #endif
 
@@ -358,14 +357,14 @@ void ReliabilityLayer::Reset( bool resetVariables, int MTUSize, bool _useSecurit
 #else
 		(void) _useSecurity;
 #endif // LIBCAT_SECURITY
-		congestionManager.Init(RakNet::GetTimeUS(), MTUSize - UDP_HEADER_SIZE);
+		congestionManager.Init(SLNet::GetTimeUS(), MTUSize - UDP_HEADER_SIZE);
 	}
 }
 
 //-------------------------------------------------------------------------------------------------------
 // Set the time, in MS, to use before considering ourselves disconnected after not being able to deliver a reliable packet
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::SetTimeoutTime( RakNet::TimeMS time )
+void ReliabilityLayer::SetTimeoutTime(SLNet::TimeMS time )
 {
 	timeoutTime=time;
 }
@@ -373,7 +372,7 @@ void ReliabilityLayer::SetTimeoutTime( RakNet::TimeMS time )
 //-------------------------------------------------------------------------------------------------------
 // Returns the value passed to SetTimeoutTime. or the default if it was never called
 //-------------------------------------------------------------------------------------------------------
-RakNet::TimeMS ReliabilityLayer::GetTimeoutTime(void)
+SLNet::TimeMS ReliabilityLayer::GetTimeoutTime(void)
 {
 	return timeoutTime;
 }
@@ -390,7 +389,7 @@ void ReliabilityLayer::InitializeVariables( void )
 	memset( &statistics, 0, sizeof( statistics ) );
 	memset( &heapIndexOffsets, 0, sizeof( heapIndexOffsets ) );
 	
-	statistics.connectionStartTime = RakNet::GetTimeUS();
+	statistics.connectionStartTime = SLNet::GetTimeUS();
 	splitPacketId = 0;
 	elapsedTimeSinceLastUpdate=0;
 	throughputCapCountdown=0;
@@ -398,7 +397,7 @@ void ReliabilityLayer::InitializeVariables( void )
 	internalOrderIndex=0;
 	timeToNextUnreliableCull=0;
 	unreliableLinkedListHead=0;
-	lastUpdateTime= RakNet::GetTimeUS();
+	lastUpdateTime= SLNet::GetTimeUS();
 	bandwidthExceededStatistic=false;
 	remoteSystemTime=0;
 	unreliableTimeout=0;
@@ -412,7 +411,7 @@ void ReliabilityLayer::InitializeVariables( void )
 	timeOfLastContinualSend=0;
 
 	// timeResendQueueNonEmpty = 0;
-	timeLastDatagramArrived=RakNet::GetTimeMS();
+	timeLastDatagramArrived= SLNet::GetTimeMS();
 	//	packetlossThisSample=false;
 	//	backoffThisSample=0;
 	//	packetlossThisSampleResendCount=0;
@@ -486,7 +485,7 @@ void ReliabilityLayer::FreeThreadSafeMemory( void )
 			ReleaseToInternalPacketPool( splitPacketChannelList[i]->returnedPacket );
 		}
 #endif
-		RakNet::OP_DELETE(splitPacketChannelList[i], __FILE__, __LINE__);
+		SLNet::OP_DELETE(splitPacketChannelList[i], __FILE__, __LINE__);
 	}
 	splitPacketChannelList.Clear(false, _FILE_AND_LINE_);
 
@@ -515,7 +514,7 @@ void ReliabilityLayer::FreeThreadSafeMemory( void )
 					ReleaseToInternalPacketPool( internalPacket );
 				}
 
-				RakNet::OP_DELETE(theList, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(theList, _FILE_AND_LINE_);
 			}
 		}
 	}
@@ -544,10 +543,7 @@ void ReliabilityLayer::FreeThreadSafeMemory( void )
 		InternalPacket *prev;
 		InternalPacket *iter = resendLinkedListHead;
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-		while (1)
+		for(;;)
 		{
 			if (iter->data)
 				FreeInternalPacketData(iter, _FILE_AND_LINE_ );
@@ -576,8 +572,8 @@ void ReliabilityLayer::FreeThreadSafeMemory( void )
 	outgoingPacketBuffer.Clear(true, _FILE_AND_LINE_);
 
 #ifdef _DEBUG
-	for (unsigned i = 0; i < delayList.Size(); i++ )
-		RakNet::OP_DELETE(delayList[ i ], __FILE__, __LINE__);
+	for (i = 0; i < delayList.Size(); i++ )
+		SLNet::OP_DELETE(delayList[ i ], __FILE__, __LINE__);
 	delayList.Clear(__FILE__, __LINE__);
 #endif
 
@@ -657,7 +653,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 		return true;
 	}
 
-	timeLastDatagramArrived=RakNet::GetTimeMS();
+	timeLastDatagramArrived= SLNet::GetTimeMS();
 
 	//	CCTimeType time;
 //	bool indexFound;
@@ -677,8 +673,8 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 	}
 #endif
 
-	RakNet::BitStream socketData( (unsigned char*) buffer, length, false ); // Convert the incoming data to a bitstream for easy parsing
-	//	time = RakNet::GetTimeUS();
+	SLNet::BitStream socketData( (unsigned char*) buffer, length, false ); // Convert the incoming data to a bitstream for easy parsing
+	//	time = SLNet::GetTimeUS();
 
 	// Set to the current time if it is not zero, and we get incoming data
 	// 	if (timeResendQueueNonEmpty!=0)
@@ -699,7 +695,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 		// datagramNumber=dhf.datagramNumber;
 
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-		RakNet::TimeMS timeMSLow=(RakNet::TimeMS) timeRead&0xFFFFFFFF;
+		SLNet::TimeMS timeMSLow=(SLNet::TimeMS) timeRead&0xFFFFFFFF;
 		CCTimeType rtt = timeMSLow-dhf.sourceSystemTime;
 #if CC_TIME_TYPE_BYTES==4
 		if (rtt > 10000)
@@ -711,7 +707,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 			rtt=(CCTimeType) congestionManager.GetRTT();
 		}
 		//	RakAssert(rtt < 500000);
-		//	printf("%i ", (RakNet::TimeMS)(rtt/1000));
+		//	printf("%i ", (SLNet::TimeMS)(rtt/1000));
 		ackPing=rtt;
 #endif
 
@@ -901,7 +897,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 #if CC_TIME_TYPE_BYTES==4
 				messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, receivePacketCount, systemAddress, timeRead, false);
 #else
-				messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, receivePacketCount, systemAddress, (RakNet::TimeMS)(timeRead/(CCTimeType)1000), false);
+				messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, receivePacketCount, systemAddress, (SLNet::TimeMS)(timeRead/(CCTimeType)1000), false);
 #endif
 			}
 
@@ -1254,7 +1250,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 					// ___________________
 					BitStream bitStream(internalPacket->data, BITS_TO_BYTES(internalPacket->dataBitLength), false);
 					unsigned int receivedPacketNumber;
-					RakNet::Time receivedTime;
+					SLNet::Time receivedTime;
 					unsigned char streamNumber;
 					PacketReliability reliability;
 					// ___________________
@@ -1664,7 +1660,7 @@ bool ReliabilityLayer::Send( char *data, BitSize_t numberOfBitsToSend, PacketPri
 		//sendPacketSet[priority].CancelWriteLock(internalPacket);
 		//SplitPacket( &packetCopy, MTUSize );
 		SplitPacket( internalPacket );
-		//RakNet::OP_DELETE_ARRAY(packetCopy.data, _FILE_AND_LINE_);
+		//SLNet::OP_DELETE_ARRAY(packetCopy.data, _FILE_AND_LINE_);
 		return true;
 	}
 
@@ -1693,12 +1689,12 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 {
 	(void) MTUSize;
 
-	RakNet::TimeMS timeMs;
+	SLNet::TimeMS timeMs;
 #if CC_TIME_TYPE_BYTES==4
 	time/=1000;
 	timeMs=time;
 #else
-	timeMs=(RakNet::TimeMS) (time/(CCTimeType)1000);
+	timeMs=(SLNet::TimeMS) (time/(CCTimeType)1000);
 #endif
 
 #ifdef _DEBUG
@@ -1715,7 +1711,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 			bsp.systemAddress = systemAddress;
 			dat->s->Send(&bsp, _FILE_AND_LINE_);
 
-			RakNet::OP_DELETE(dat,__FILE__,__LINE__);
+			SLNet::OP_DELETE(dat,__FILE__,__LINE__);
 		}
 		else
 		{
@@ -1752,10 +1748,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 				InternalPacket *cur = unreliableLinkedListHead;
 				InternalPacket *end = unreliableLinkedListHead->unreliablePrev;
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-				while (1)
+				for(;;)
 				{
 					if (time > cur->creationTime+(CCTimeType)unreliableTimeout)
 					{
@@ -1793,12 +1786,12 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 	}
 
 
-	// Due to thread vagarities and the way I store the time to avoid slow calls to RakNet::GetTime
+	// Due to thread vagarities and the way I store the time to avoid slow calls to SLNet::GetTime
 	// time may be less than lastAck
 #if CC_TIME_TYPE_BYTES==4
 	if ( statistics.messagesInResendBuffer!=0 && AckTimeout(time) )
 #else
-	if ( statistics.messagesInResendBuffer!=0 && AckTimeout(RakNet::TimeMS(time/(CCTimeType)1000)) )
+	if ( statistics.messagesInResendBuffer!=0 && AckTimeout(SLNet::TimeMS(time/(CCTimeType)1000)) )
 #endif
 	{
 		// SHOW - dead connection
@@ -1942,9 +1935,9 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 						for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
 						{
 #if CC_TIME_TYPE_BYTES==4
-							messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (RakNet::TimeMS) time, true);
+							messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (SLNet::TimeMS) time, true);
 #else
-							messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (RakNet::TimeMS)(time/(CCTimeType)1000), true);
+							messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (SLNet::TimeMS)(time/(CCTimeType)1000), true);
 #endif
 						}
 
@@ -2112,9 +2105,9 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 					for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
 					{
 #if CC_TIME_TYPE_BYTES==4
-						messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (RakNet::TimeMS)time, true);
+						messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (SLNet::TimeMS)time, true);
 #else
-						messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (RakNet::TimeMS)(time/(CCTimeType)1000), true);
+						messageHandlerList[messageHandlerIndex]->OnInternalPacket(internalPacket, packetsToSendThisUpdateDatagramBoundaries.Size()+congestionManager.GetNextDatagramSequenceNumber(), systemAddress, (SLNet::TimeMS)(time/(CCTimeType)1000), true);
 #endif
 					}
 					pushedAnything=true;
@@ -2162,7 +2155,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 
 			// More accurate time to reset here
 #if INCLUDE_TIMESTAMP_WITH_DATAGRAMS==1
-			dhf.sourceSystemTime=RakNet::GetTimeUS();
+			dhf.sourceSystemTime= SLNet::GetTimeUS();
 #endif
 			updateBitStream.Reset();
 			dhf.Serialize(&updateBitStream);
@@ -2244,7 +2237,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 //-------------------------------------------------------------------------------------------------------
 // Writes a bitstream to the socket
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAddress, RakNet::BitStream *bitStream, RakNetRandom *rnr, CCTimeType currentTime)
+void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAddress, SLNet::BitStream *bitStream, RakNetRandom *rnr, CCTimeType currentTime)
 {
 	(void) systemAddress;
 	(void) rnr;
@@ -2265,7 +2258,7 @@ void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAdd
 	{
 #ifdef FLIP_SEND_ORDER_TEST
 		// Flip order of sends without delaying them for testing
-		DataAndTime *dat = RakNet::OP_NEW<DataAndTime>(__FILE__,__LINE__);
+		DataAndTime *dat = SLNet::OP_NEW<DataAndTime>(__FILE__,__LINE__);
 		memcpy(dat->data, ( char* ) bitStream->GetData(), length );
 		dat->s=s;
 		dat->length=length;
@@ -2274,16 +2267,16 @@ void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAdd
 		dat->extraSocketOptions=extraSocketOptions;
 		delayList.PushAtHead(dat, 0, _FILE_AND_LINE_);
 #else
-		RakNet::TimeMS delay = minExtraPing;
+		SLNet::TimeMS delay = minExtraPing;
 		if (extraPingVariance>0)
 			delay += (randomMT() % extraPingVariance);
 		if (delay > 0)
 		{
-			DataAndTime *dat = RakNet::OP_NEW<DataAndTime>(__FILE__,__LINE__);
+			DataAndTime *dat = SLNet::OP_NEW<DataAndTime>(__FILE__,__LINE__);
 			memcpy(dat->data, ( char* ) bitStream->GetData(), length );
 			dat->s=s;
 			dat->length=length;
-			dat->sendTime = RakNet::GetTimeMS() + delay;
+			dat->sendTime = SLNet::GetTimeMS() + delay;
 			for (unsigned int i=0; i < delayList.Size(); i++)
 			{
 				if (dat->sendTime < delayList[i]->sendTime)
@@ -2364,7 +2357,7 @@ bool ReliabilityLayer::AreAcksWaiting(void)
 	return acknowlegements.Size() > 0;
 }
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::ApplyNetworkSimulator( double _packetloss, RakNet::TimeMS _minExtraPing, RakNet::TimeMS _extraPingVariance )
+void ReliabilityLayer::ApplyNetworkSimulator( double _packetloss, SLNet::TimeMS _minExtraPing, SLNet::TimeMS _extraPingVariance )
 {
 #ifdef _DEBUG
 	packetloss=_packetloss;
@@ -2380,7 +2373,7 @@ void ReliabilityLayer::SetSplitMessageProgressInterval(int interval)
 	splitMessageProgressInterval=interval;
 }
 //-------------------------------------------------------------------------------------------------------
-void ReliabilityLayer::SetUnreliableTimeout(RakNet::TimeMS timeoutMS)
+void ReliabilityLayer::SetUnreliableTimeout(SLNet::TimeMS timeoutMS)
 {
 #if CC_TIME_TYPE_BYTES==4
 	unreliableTimeout=timeoutMS;
@@ -2450,7 +2443,7 @@ unsigned ReliabilityLayer::RemovePacketFromResendListAndDeleteOlderReliableSeque
 #if CC_TIME_TYPE_BYTES==4
 		messageHandlerList[messageHandlerIndex]->OnAck(messageNumber, systemAddress, time);
 #else
-		messageHandlerList[messageHandlerIndex]->OnAck(messageNumber, systemAddress, (RakNet::TimeMS)(time/(CCTimeType)1000));
+		messageHandlerList[messageHandlerIndex]->OnAck(messageNumber, systemAddress, (SLNet::TimeMS)(time/(CCTimeType)1000));
 #endif
 	}
 
@@ -2607,7 +2600,7 @@ BitSize_t ReliabilityLayer::GetMessageHeaderLengthBits( const InternalPacket *co
 //-------------------------------------------------------------------------------------------------------
 // Parse an internalPacket and create a bitstream to represent this data
 //-------------------------------------------------------------------------------------------------------
-BitSize_t ReliabilityLayer::WriteToBitStreamFromInternalPacket( RakNet::BitStream *bitStream, const InternalPacket *const internalPacket, CCTimeType curTime )
+BitSize_t ReliabilityLayer::WriteToBitStreamFromInternalPacket(SLNet::BitStream *bitStream, const InternalPacket *const internalPacket, CCTimeType curTime )
 {
 	(void) curTime;
 
@@ -2679,7 +2672,7 @@ BitSize_t ReliabilityLayer::WriteToBitStreamFromInternalPacket( RakNet::BitStrea
 //-------------------------------------------------------------------------------------------------------
 // Parse a bitstream and create an internal packet to represent this data
 //-------------------------------------------------------------------------------------------------------
-InternalPacket* ReliabilityLayer::CreateInternalPacketFromBitStream( RakNet::BitStream *bitStream, CCTimeType time )
+InternalPacket* ReliabilityLayer::CreateInternalPacketFromBitStream(SLNet::BitStream *bitStream, CCTimeType time )
 {
 	bool bitStreamSucceeded;
 	InternalPacket* internalPacket;
@@ -2942,7 +2935,7 @@ void ReliabilityLayer::SplitPacket( InternalPacket *internalPacket )
 	internalPacket->splitPacketCount = ( ( dataByteLength - 1 ) / ( maximumSendBlockBytes ) + 1 );
 
 	// Optimization
-	// internalPacketArray = RakNet::OP_NEW<InternalPacket*>(internalPacket->splitPacketCount, _FILE_AND_LINE_ );
+	// internalPacketArray = SLNet::OP_NEW<InternalPacket*>(internalPacket->splitPacketCount, _FILE_AND_LINE_ );
 	bool usedAlloca=false;
 #if USE_ALLOCA==1
 	if (sizeof( InternalPacket* ) * internalPacket->splitPacketCount < MAX_ALLOCA_STACK_ALLOCATION)
@@ -3043,7 +3036,7 @@ void ReliabilityLayer::InsertIntoSplitPacketList( InternalPacket * internalPacke
 	index=splitPacketChannelList.GetIndexFromKey(internalPacket->splitPacketId, &objectExists);
 	if (objectExists==false)
 	{
-		SplitPacketChannel *newChannel = RakNet::OP_NEW<SplitPacketChannel>( __FILE__, __LINE__ );
+		SplitPacketChannel *newChannel = SLNet::OP_NEW<SplitPacketChannel>( __FILE__, __LINE__ );
 #if PREALLOCATE_LARGE_MESSAGES==1
 		index=splitPacketChannelList.Insert(internalPacket->splitPacketId, newChannel, true, __FILE__,__LINE__);
 		newChannel->returnedPacket=CreateInternalPacketCopy( internalPacket, 0, 0, time );
@@ -3185,7 +3178,7 @@ InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketCh
 {
 #if PREALLOCATE_LARGE_MESSAGES==1
 	InternalPacket *returnedPacket=splitPacketChannel->returnedPacket;
-	RakNet::OP_DELETE(splitPacketChannel, __FILE__, __LINE__);
+	SLNet::OP_DELETE(splitPacketChannel, __FILE__, __LINE__);
 	(void) time;
 	return returnedPacket;
 #else
@@ -3216,13 +3209,13 @@ InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketCh
 		FreeInternalPacketData(splitPacketChannel->splitPacketList[j], _FILE_AND_LINE_ );
 		ReleaseToInternalPacketPool(splitPacketChannel->splitPacketList[j]);
 	}
-	RakNet::OP_DELETE(splitPacketChannel, __FILE__, __LINE__);
+	SLNet::OP_DELETE(splitPacketChannel, __FILE__, __LINE__);
 
 	return internalPacket;
 #endif
 }
 //-------------------------------------------------------------------------------------------------------
-InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketIdType splitPacketId, CCTimeType time,
+InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketIdType inSplitPacketId, CCTimeType time,
 																  RakNetSocket2 *s, SystemAddress &systemAddress, RakNetRandom *rnr, 
 																  BitStream &updateBitStream)
 {
@@ -3232,7 +3225,7 @@ InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketId
 	InternalPacket * internalPacket;
 
 	// Find in splitPacketChannelList the SplitPacketChannel with this splitPacketId
-	i=splitPacketChannelList.GetIndexFromKey(splitPacketId, &objectExists);
+	i=splitPacketChannelList.GetIndexFromKey(inSplitPacketId, &objectExists);
 	splitPacketChannel=splitPacketChannelList[i];
 	
 #if PREALLOCATE_LARGE_MESSAGES==1
@@ -3270,10 +3263,10 @@ if (time > splitPacketChannelList[i]->lastUpdateTime + (CCTimeType)timeoutTime*(
 {
 for (j=0; j < splitPacketChannelList[i]->splitPacketList.Size(); j++)
 {
-RakNet::OP_DELETE_ARRAY(splitPacketChannelList[i]->splitPacketList[j]->data, _FILE_AND_LINE_);
+SLNet::OP_DELETE_ARRAY(splitPacketChannelList[i]->splitPacketList[j]->data, _FILE_AND_LINE_);
 ReleaseToInternalPacketPool(splitPacketChannelList[i]->splitPacketList[j]);
 }
-RakNet::OP_DELETE(splitPacketChannelList[i], _FILE_AND_LINE_);
+SLNet::OP_DELETE(splitPacketChannelList[i], _FILE_AND_LINE_);
 splitPacketChannelList.RemoveAtIndex(i);
 }
 else
@@ -3378,7 +3371,7 @@ void ReliabilityLayer::KillConnection( void )
 RakNetStatistics * ReliabilityLayer::GetStatistics( RakNetStatistics *rns )
 {
 	unsigned i;
-	RakNet::TimeUS time = RakNet::GetTimeUS();
+	SLNet::TimeUS time = SLNet::GetTimeUS();
 	uint64_t uint64Denominator;
 	double doubleDenominator;
 
@@ -3425,7 +3418,7 @@ unsigned int ReliabilityLayer::GetResendListDataSize(void) const
 }
 
 //-------------------------------------------------------------------------------------------------------
-bool ReliabilityLayer::AckTimeout(RakNet::Time curTime)
+bool ReliabilityLayer::AckTimeout(SLNet::Time curTime)
 {
 	// I check timeLastDatagramArrived-curTime because with threading it is possible that timeLastDatagramArrived is
 	// slightly greater than curTime, in which case this is NOT an ack timeout
@@ -3472,11 +3465,11 @@ void ReliabilityLayer::PushPacket(CCTimeType time, InternalPacket *internalPacke
 // This code tells me how much time elapses between when you send, and when the message actually goes out
 // 	if (internalPacket->data[0]==0)
 // 	{
-// 		RakNet::TimeMS t;
-// 		RakNet::BitStream bs(internalPacket->data+1,sizeof(t),false);
+// 		SLNet::TimeMS t;
+// 		SLNet::BitStream bs(internalPacket->data+1,sizeof(t),false);
 // 		bs.Read(t);
-// 		RakNet::TimeMS curTime=RakNet::GetTimeMS();
-// 		RakNet::TimeMS diff = curTime-t;
+// 		SLNet::TimeMS curTime=SLNet::GetTimeMS();
+// 		SLNet::TimeMS diff = curTime-t;
 // 	}
 
 	congestionManager.OnSendBytes(time, BITS_TO_BYTES(internalPacket->dataBitLength)+BITS_TO_BYTES(internalPacket->headerLength));
@@ -3842,7 +3835,7 @@ void ReliabilityLayer::AllocInternalPacketData(InternalPacket *internalPacket, I
 	if (*refCounter==0)
 	{
 		*refCounter = refCountedDataPool.Allocate(_FILE_AND_LINE_);
-		// *refCounter = RakNet::OP_NEW<InternalPacketRefCountedData>(_FILE_AND_LINE_);
+		// *refCounter = SLNet::OP_NEW<InternalPacketRefCountedData>(_FILE_AND_LINE_);
 		(*refCounter)->refCount=1;
 		(*refCounter)->sharedDataBlock=externallyAllocatedPtr;
 	}
@@ -3886,7 +3879,7 @@ void ReliabilityLayer::FreeInternalPacketData(InternalPacket *internalPacket, co
 		{
 			rakFree_Ex(internalPacket->refCountedData->sharedDataBlock, file, line );
 			internalPacket->refCountedData->sharedDataBlock=0;
-			// RakNet::OP_DELETE(internalPacket->refCountedData,file, line);
+			// SLNet::OP_DELETE(internalPacket->refCountedData,file, line);
 			refCountedDataPool.Release(internalPacket->refCountedData,file, line);
 			internalPacket->refCountedData=0;
 		}
@@ -3953,8 +3946,3 @@ reliabilityHeapWeightType ReliabilityLayer::GetNextWeight(int priorityLevel)
 // #pragma pop_macro("new")
 // #undef RELIABILITY_LAYER_NEW_UNDEF_ALLOCATING_QUEUE
 // #endif
-
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

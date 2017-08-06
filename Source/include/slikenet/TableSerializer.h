@@ -1,52 +1,57 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __TABLE_SERIALIZER_H
 #define __TABLE_SERIALIZER_H
 
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "DS_Table.h"
 #include "Export.h"
 
-namespace RakNet
+namespace SLNet
 {
 	class BitStream;
 }
 
-namespace RakNet
+namespace SLNet
 {
 
 class RAK_DLL_EXPORT TableSerializer
 {
 public:
-	static void SerializeTable(DataStructures::Table *in, RakNet::BitStream *out);
+	static void SerializeTable(DataStructures::Table *in, SLNet::BitStream *out);
 	static bool DeserializeTable(unsigned char *serializedTable, unsigned int dataLength, DataStructures::Table *out);
-	static bool DeserializeTable(RakNet::BitStream *in, DataStructures::Table *out);
-	static void SerializeColumns(DataStructures::Table *in, RakNet::BitStream *out);
-	static void SerializeColumns(DataStructures::Table *in, RakNet::BitStream *out, DataStructures::List<int> &skipColumnIndices);
-	static bool DeserializeColumns(RakNet::BitStream *in, DataStructures::Table *out);	
-	static void SerializeRow(DataStructures::Table::Row *in, unsigned keyIn, const DataStructures::List<DataStructures::Table::ColumnDescriptor> &columns, RakNet::BitStream *out);
-	static void SerializeRow(DataStructures::Table::Row *in, unsigned keyIn, const DataStructures::List<DataStructures::Table::ColumnDescriptor> &columns, RakNet::BitStream *out, DataStructures::List<int> &skipColumnIndices);
-	static bool DeserializeRow(RakNet::BitStream *in, DataStructures::Table *out);
-	static void SerializeCell(RakNet::BitStream *out, DataStructures::Table::Cell *cell, DataStructures::Table::ColumnType columnType);
-	static bool DeserializeCell(RakNet::BitStream *in, DataStructures::Table::Cell *cell, DataStructures::Table::ColumnType columnType);
-	static void SerializeFilterQuery(RakNet::BitStream *in, DataStructures::Table::FilterQuery *query);
+	static bool DeserializeTable(SLNet::BitStream *in, DataStructures::Table *out);
+	static void SerializeColumns(DataStructures::Table *in, SLNet::BitStream *out);
+	static void SerializeColumns(DataStructures::Table *in, SLNet::BitStream *out, DataStructures::List<int> &skipColumnIndices);
+	static bool DeserializeColumns(SLNet::BitStream *in, DataStructures::Table *out);
+	static void SerializeRow(DataStructures::Table::Row *in, unsigned keyIn, const DataStructures::List<DataStructures::Table::ColumnDescriptor> &columns, SLNet::BitStream *out);
+	static void SerializeRow(DataStructures::Table::Row *in, unsigned keyIn, const DataStructures::List<DataStructures::Table::ColumnDescriptor> &columns, SLNet::BitStream *out, DataStructures::List<int> &skipColumnIndices);
+	static bool DeserializeRow(SLNet::BitStream *in, DataStructures::Table *out);
+	static void SerializeCell(SLNet::BitStream *out, DataStructures::Table::Cell *cell, DataStructures::Table::ColumnType columnType);
+	static bool DeserializeCell(SLNet::BitStream *in, DataStructures::Table::Cell *cell, DataStructures::Table::ColumnType columnType);
+	static void SerializeFilterQuery(SLNet::BitStream *in, DataStructures::Table::FilterQuery *query);
 	// Note that this allocates query->cell->c!
-	static bool DeserializeFilterQuery(RakNet::BitStream *out, DataStructures::Table::FilterQuery *query);
-	static void SerializeFilterQueryList(RakNet::BitStream *in, DataStructures::Table::FilterQuery *query, unsigned int numQueries, unsigned int maxQueries);
+	static bool DeserializeFilterQuery(SLNet::BitStream *out, DataStructures::Table::FilterQuery *query);
+	static void SerializeFilterQueryList(SLNet::BitStream *in, DataStructures::Table::FilterQuery *query, unsigned int numQueries, unsigned int maxQueries);
 	// Note that this allocates queries, cells, and query->cell->c!. Use DeallocateQueryList to free.
-	static bool DeserializeFilterQueryList(RakNet::BitStream *out, DataStructures::Table::FilterQuery **query, unsigned int *numQueries, unsigned int maxQueries, int allocateExtraQueries=0);
+	static bool DeserializeFilterQueryList(SLNet::BitStream *out, DataStructures::Table::FilterQuery **query, unsigned int *numQueries, unsigned int maxQueries, int allocateExtraQueries=0);
 	static void DeallocateQueryList(DataStructures::Table::FilterQuery *query, unsigned int numQueries);
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 
@@ -196,7 +201,7 @@ void main(void)
 		RAKNET_DEBUG_PRINTF("%s\n", out);
 	}
 
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	RAKNET_DEBUG_PRINTF("PreSerialize:\n");
 	for (i=0; i < table.GetRowCount(); i++)
 	{

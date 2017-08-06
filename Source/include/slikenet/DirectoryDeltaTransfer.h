@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file DirectoryDeltaTransfer.h
@@ -20,8 +25,8 @@
 #ifndef __DIRECTORY_DELTA_TRANSFER_H
 #define __DIRECTORY_DELTA_TRANSFER_H
 
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
+#include "memoryoverride.h"
+#include "types.h"
 #include "Export.h"
 #include "PluginInterface2.h"
 #include "DS_Map.h"
@@ -48,7 +53,7 @@
 /// While pathToApplication can be anything you want, applicationSubdirectory must match either partially or fully between systems.
 /// \ingroup DIRECTORY_DELTA_TRANSFER_GROUP
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -165,7 +170,7 @@ protected:
 	unsigned int chunkSize;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

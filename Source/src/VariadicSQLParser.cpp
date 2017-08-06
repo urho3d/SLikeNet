@@ -1,15 +1,20 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "VariadicSQLParser.h"
-#include "BitStream.h"
+#include "slikenet/VariadicSQLParser.h"
+#include "slikenet/BitStream.h"
 #include <stdarg.h>
 
 using namespace VariadicSQLParser;
@@ -73,8 +78,8 @@ void VariadicSQLParser::ExtractArguments( va_list argptr, const DataStructures::
 		return;
 
 	unsigned int i;
-	*argumentBinary=RakNet::OP_NEW_ARRAY<char *>(indices.Size(), _FILE_AND_LINE_);
-	*argumentLengths=RakNet::OP_NEW_ARRAY<int>(indices.Size(), _FILE_AND_LINE_);
+	*argumentBinary= SLNet::OP_NEW_ARRAY<char *>(indices.Size(), _FILE_AND_LINE_);
+	*argumentLengths= SLNet::OP_NEW_ARRAY<int>(indices.Size(), _FILE_AND_LINE_);
 
 	char **paramData=*argumentBinary;
 	int *paramLength=*argumentLengths;
@@ -91,7 +96,7 @@ void VariadicSQLParser::ExtractArguments( va_list argptr, const DataStructures::
 				paramLength[i]=sizeof(val);
 				paramData[i]=(char*) rakMalloc_Ex(paramLength[i], _FILE_AND_LINE_);
 				memcpy(paramData[i], &val, paramLength[i]);
-				if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+				if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 			}
 			break;
 		case 's':
@@ -108,7 +113,7 @@ void VariadicSQLParser::ExtractArguments( va_list argptr, const DataStructures::
 				paramLength[i]=sizeof(val);
 				paramData[i]=(char*) rakMalloc_Ex(paramLength[i], _FILE_AND_LINE_);
 				memcpy(paramData[i], &val, paramLength[i]);
-				if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+				if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 			}
 			break;
 			/*
@@ -120,7 +125,7 @@ void VariadicSQLParser::ExtractArguments( va_list argptr, const DataStructures::
 				paramLength[i]=sizeof(val);
 				paramData[i]=(char*) rakMalloc_Ex(paramLength[i], _FILE_AND_LINE_);
 				memcpy(paramData[i], &val, paramLength[i]);
-				if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+				if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 			}
 			break;
 			*/
@@ -132,7 +137,7 @@ void VariadicSQLParser::ExtractArguments( va_list argptr, const DataStructures::
 				paramLength[i]=sizeof(val);
 				paramData[i]=(char*) rakMalloc_Ex(paramLength[i], _FILE_AND_LINE_);
 				memcpy(paramData[i], &val, paramLength[i]);
-				if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+				if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 			}
 			break;
 		case 'a':
@@ -155,6 +160,6 @@ void VariadicSQLParser::FreeArguments(const DataStructures::List<IndexAndType> &
 	unsigned int i;
 	for (i=0; i < indices.Size(); i++)
 		rakFree_Ex(argumentBinary[i],_FILE_AND_LINE_);
-	RakNet::OP_DELETE_ARRAY(argumentBinary,_FILE_AND_LINE_);
-	RakNet::OP_DELETE_ARRAY(argumentLengths,_FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(argumentBinary,_FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(argumentLengths,_FILE_AND_LINE_);
 }

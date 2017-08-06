@@ -1,30 +1,33 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "DS_Table.h"
-#include "DS_OrderedList.h"
+#include "slikenet/DS_Table.h"
+#include "slikenet/DS_OrderedList.h"
 #include <string.h>
-#include "RakAssert.h"
-#include "RakAssert.h"
-#include "Itoa.h"
+#include "slikenet/assert.h"
+#include "slikenet/assert.h"
+#include "slikenet/Itoa.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 using namespace DataStructures;
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
 
 void ExtendRows(Table::Row* input, int index)
 {
 	(void) index;
-	input->cells.Insert(RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
+	input->cells.Insert(SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
 }
 void FreeRow(Table::Row* input, int index)
 {
@@ -33,9 +36,9 @@ void FreeRow(Table::Row* input, int index)
 	unsigned i;
 	for (i=0; i < input->cells.Size(); i++)
 	{
-		RakNet::OP_DELETE(input->cells[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(input->cells[i], _FILE_AND_LINE_);
 	}
-	RakNet::OP_DELETE(input, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(input, _FILE_AND_LINE_);
 }
 Table::Cell::Cell()
 {
@@ -106,7 +109,7 @@ void Table::Cell::Set(const char *input)
 	{
 		i=(int)strlen(input)+1;
 		c =  (char*) rakMalloc_Ex( (int) i, _FILE_AND_LINE_ );
-		strcpy(c, input);
+		strcpy_s(c, (int) i, input);
 	}
 	else
 	{
@@ -151,10 +154,10 @@ void Table::Cell::Get(double *output)
 	RakAssert(isEmpty==false);
 	*output=i;
 }
-void Table::Cell::Get(char *output)
+void Table::Cell::Get(char *output, size_t outputLength)
 {
 	RakAssert(isEmpty==false);
-	strcpy(output, c);
+	strcpy_s(output, outputLength, c);
 }
 void Table::Cell::Get(char *output, int *outputLength)
 {
@@ -163,35 +166,35 @@ void Table::Cell::Get(char *output, int *outputLength)
 	if (outputLength)
 		*outputLength=(int) i;
 }
-RakNet::RakString Table::Cell::ToString(ColumnType columnType)
+SLNet::RakString Table::Cell::ToString(ColumnType columnType)
 {
 	if (isEmpty)
-		return RakNet::RakString();
+		return SLNet::RakString();
 
 	if (columnType==NUMERIC)
 	{
-		return RakNet::RakString("%f", i);
+		return SLNet::RakString("%f", i);
 	}
 	else if (columnType==STRING)
 	{
-		return RakNet::RakString(c);
+		return SLNet::RakString(c);
 	}
 	else if (columnType==BINARY)
 	{
-		return RakNet::RakString("<Binary>");
+		return SLNet::RakString("<Binary>");
 	}
 	else if (columnType==POINTER)
 	{
-		return RakNet::RakString("%p", ptr);
+		return SLNet::RakString("%p", ptr);
 	}
 
-	return RakNet::RakString();
+	return SLNet::RakString();
 }
 Table::Cell::Cell(double numericValue, char *charValue, void *ptr, ColumnType type)
 {
 	SetByType(numericValue,charValue,ptr,type);
 }
-void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, ColumnType type)
+void Table::Cell::SetByType(double numericValue, char *charValue, void *inPtr, ColumnType type)
 {
 	isEmpty=true;
 	if (type==NUMERIC)
@@ -208,11 +211,11 @@ void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, Col
 	}
 	else if (type==POINTER)
 	{
-		SetPtr(ptr);
+		SetPtr(inPtr);
 	}
 	else
 	{
-		ptr=(void*) charValue;
+		inPtr=(void*) charValue;
 	}
 }
 Table::ColumnType Table::Cell::EstimateColumnType(void) const
@@ -249,7 +252,7 @@ Table::ColumnDescriptor::~ColumnDescriptor()
 Table::ColumnDescriptor::ColumnDescriptor(const char cn[_TABLE_MAX_COLUMN_NAME_LENGTH], ColumnType ct)
 {
 	columnType=ct;
-	strcpy(columnName, cn);
+	strcpy_s(columnName, cn);
 }
 void Table::Row::UpdateCell(unsigned columnIndex, double value)
 {
@@ -304,7 +307,7 @@ void Table::RemoveColumn(unsigned columnIndex)
 	{
 		for (i=0; i < cur->size; i++)
 		{
-			RakNet::OP_DELETE(cur->data[i]->cells[columnIndex], _FILE_AND_LINE_);
+			SLNet::OP_DELETE(cur->data[i]->cells[columnIndex], _FILE_AND_LINE_);
 			cur->data[i]->cells.RemoveAtIndex(columnIndex);
 		}
 
@@ -348,68 +351,68 @@ unsigned Table::GetRowCount(void) const
 Table::Row* Table::AddRow(unsigned rowId)
 {
 	Row *newRow;
-	newRow = RakNet::OP_NEW<Row>( _FILE_AND_LINE_ );
+	newRow = SLNet::OP_NEW<Row>( _FILE_AND_LINE_ );
 	if (rows.Insert(rowId, newRow)==false)
 	{
-		RakNet::OP_DELETE(newRow, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(newRow, _FILE_AND_LINE_);
 		return 0; // Already exists
 	}
 	unsigned rowIndex;
 	for (rowIndex=0; rowIndex < columns.Size(); rowIndex++)
-		newRow->cells.Insert( RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
+		newRow->cells.Insert(SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
 	return newRow;
 }
 Table::Row* Table::AddRow(unsigned rowId, DataStructures::List<Cell> &initialCellValues)
 {
-	Row *newRow = RakNet::OP_NEW<Row>( _FILE_AND_LINE_ );
+	Row *newRow = SLNet::OP_NEW<Row>( _FILE_AND_LINE_ );
 	unsigned rowIndex;
 	for (rowIndex=0; rowIndex < columns.Size(); rowIndex++)
 	{
 		if (rowIndex < initialCellValues.Size() && initialCellValues[rowIndex].isEmpty==false)
 		{
 			Table::Cell *c;
-			c = RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_);
+			c = SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_);
 			c->SetByType(initialCellValues[rowIndex].i,initialCellValues[rowIndex].c,initialCellValues[rowIndex].ptr,columns[rowIndex].columnType);
 			newRow->cells.Insert(c, _FILE_AND_LINE_ );
 		}
 		else
-			newRow->cells.Insert(RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
+			newRow->cells.Insert(SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_ );
 	}
 	rows.Insert(rowId, newRow);
 	return newRow;
 }
 Table::Row* Table::AddRow(unsigned rowId, DataStructures::List<Cell*> &initialCellValues, bool copyCells)
 {
-	Row *newRow = RakNet::OP_NEW<Row>( _FILE_AND_LINE_ );
+	Row *newRow = SLNet::OP_NEW<Row>( _FILE_AND_LINE_ );
 	unsigned rowIndex;
 	for (rowIndex=0; rowIndex < columns.Size(); rowIndex++)
 	{
 		if (rowIndex < initialCellValues.Size() && initialCellValues[rowIndex] && initialCellValues[rowIndex]->isEmpty==false)
 		{
 			if (copyCells==false)
-				newRow->cells.Insert(RakNet::OP_NEW_4<Table::Cell>( _FILE_AND_LINE_, initialCellValues[rowIndex]->i, initialCellValues[rowIndex]->c, initialCellValues[rowIndex]->ptr, columns[rowIndex].columnType), _FILE_AND_LINE_);
+				newRow->cells.Insert(SLNet::OP_NEW_4<Table::Cell>( _FILE_AND_LINE_, initialCellValues[rowIndex]->i, initialCellValues[rowIndex]->c, initialCellValues[rowIndex]->ptr, columns[rowIndex].columnType), _FILE_AND_LINE_);
 			else
 			{
-				Table::Cell *c = RakNet::OP_NEW<Table::Cell>( _FILE_AND_LINE_ );
+				Table::Cell *c = SLNet::OP_NEW<Table::Cell>( _FILE_AND_LINE_ );
 				newRow->cells.Insert(c, _FILE_AND_LINE_);
 				*c=*(initialCellValues[rowIndex]);
 			}
 		}
 		else
-			newRow->cells.Insert(RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_);
+			newRow->cells.Insert(SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_);
 	}
 	rows.Insert(rowId, newRow);
 	return newRow;
 }
 Table::Row* Table::AddRowColumns(unsigned rowId, Row *row, DataStructures::List<unsigned> columnIndices)
 {
-	Row *newRow = RakNet::OP_NEW<Row>( _FILE_AND_LINE_ );
+	Row *newRow = SLNet::OP_NEW<Row>( _FILE_AND_LINE_ );
 	unsigned columnIndex;
 	for (columnIndex=0; columnIndex < columnIndices.Size(); columnIndex++)
 	{
 		if (row->cells[columnIndices[columnIndex]]->isEmpty==false)
 		{
-			newRow->cells.Insert(RakNet::OP_NEW_4<Table::Cell>( _FILE_AND_LINE_, 
+			newRow->cells.Insert(SLNet::OP_NEW_4<Table::Cell>( _FILE_AND_LINE_,
 				row->cells[columnIndices[columnIndex]]->i,
 				row->cells[columnIndices[columnIndex]]->c,
 				row->cells[columnIndices[columnIndex]]->ptr,
@@ -418,7 +421,7 @@ Table::Row* Table::AddRowColumns(unsigned rowId, Row *row, DataStructures::List<
 		}
 		else
 		{
-			newRow->cells.Insert(RakNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_);
+			newRow->cells.Insert(SLNet::OP_NEW<Table::Cell>(_FILE_AND_LINE_), _FILE_AND_LINE_);
 		}
 	}
 	rows.Insert(rowId, newRow);
@@ -530,14 +533,14 @@ void Table::GetCellValueByIndex(unsigned rowIndex, unsigned columnIndex, int *ou
 		row->cells[columnIndex]->Get(output);
 	}
 }
-void Table::GetCellValueByIndex(unsigned rowIndex, unsigned columnIndex, char *output)
+void Table::GetCellValueByIndex(unsigned rowIndex, unsigned columnIndex, char *output, size_t outputLength)
 {
 	RakAssert(columns[columnIndex].columnType==STRING);
 
 	Row *row = GetRowByIndex(rowIndex,0);
 	if (row)
 	{
-		row->cells[columnIndex]->Get(output);
+		row->cells[columnIndex]->Get(output, outputLength);
 	}
 }
 void Table::GetCellValueByIndex(unsigned rowIndex, unsigned columnIndex, char *output, int *outputLength)
@@ -953,14 +956,14 @@ void Table::PrintColumnHeaders(char *out, int outLength, char columnDelineator) 
 		{
 			len = (int) strlen(out);
 			if (len < outLength-1)
-				sprintf(out+len, "%c", columnDelineator);
+				sprintf_s(out+len, outLength-len, "%c", columnDelineator);
 			else
 				return;
 		}
 
 		len = (int) strlen(out);
 		if (len < outLength-(int) strlen(columns[i].columnName))
-			sprintf(out+len, "%s", columns[i].columnName);
+			sprintf_s(out+len, outLength-len, "%s", columns[i].columnName);
 		else
 			return;
 	}
@@ -977,7 +980,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 
 	if (inputRow->cells.Size()!=columns.Size())
 	{
-		strncpy(out, "Cell width does not match column width.\n", outLength);
+		strncpy_s(out, outLength, "Cell width does not match column width.\n", outLength);
 		out[outLength-1]=0;
 		return;
 	}
@@ -992,7 +995,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false)
 			{
-				sprintf(buff, "%f", inputRow->cells[i]->i);
+				sprintf_s(buff, "%f", inputRow->cells[i]->i);
 				len=(int)strlen(buff);
 			}
 			else
@@ -1005,7 +1008,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false && inputRow->cells[i]->c)
 			{
-				strncpy(buff, inputRow->cells[i]->c, 512-2);
+				strncpy_s(buff, inputRow->cells[i]->c, 512-2);
 				buff[512-2]=0;
 				len=(int)strlen(buff);
 			}
@@ -1019,7 +1022,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		{
 			if (inputRow->cells[i]->isEmpty==false && inputRow->cells[i]->ptr)
 			{
-				sprintf(buff, "%p", inputRow->cells[i]->ptr);
+				sprintf_s(buff, "%p", inputRow->cells[i]->ptr);
 				len=(int)strlen(buff);
 			}
 			else
@@ -1044,7 +1047,7 @@ void Table::PrintRow(char *out, int outLength, char columnDelineator, bool print
 		len=(int)strlen(out);
 		if (outLength==len+1)
 			break;
-		strncpy(out+len, buff, outLength-len);
+		strncpy_s(out+len, outLength-len, buff, outLength-len);
 		out[outLength-1]=0;
 	}
 }
@@ -1100,9 +1103,9 @@ void Table::DeleteRow(Table::Row *row)
 	unsigned rowIndex;
 	for (rowIndex=0; rowIndex < row->cells.Size(); rowIndex++)
 	{
-		RakNet::OP_DELETE(row->cells[rowIndex], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(row->cells[rowIndex], _FILE_AND_LINE_);
 	}
-	RakNet::OP_DELETE(row, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(row, _FILE_AND_LINE_);
 }
 Table& Table::operator = ( const Table& input )
 {
@@ -1125,7 +1128,3 @@ Table& Table::operator = ( const Table& input )
 
 	return *this;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

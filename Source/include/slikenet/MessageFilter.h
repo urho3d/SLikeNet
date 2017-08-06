@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -18,7 +23,7 @@
 #ifndef __MESSAGE_FILTER_PLUGIN_H
 #define __MESSAGE_FILTER_PLUGIN_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PluginInterface2.h"
 #include "DS_OrderedList.h"
 #include "DS_Hash.h"
@@ -27,7 +32,7 @@
 /// MessageIdentifier (ID_*) values shoudln't go higher than this.  Change it if you do.
 #define MESSAGE_FILTER_MAX_MESSAGE_ID 256
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -41,16 +46,16 @@ struct FilterSet
 	bool banOnFilterTimeExceed;
 	bool kickOnDisallowedMessage;
 	bool banOnDisallowedMessage;
-	RakNet::TimeMS disallowedMessageBanTimeMS;
-	RakNet::TimeMS timeExceedBanTimeMS;
-	RakNet::TimeMS maxMemberTimeMS;
+	SLNet::TimeMS disallowedMessageBanTimeMS;
+	SLNet::TimeMS timeExceedBanTimeMS;
+	SLNet::TimeMS maxMemberTimeMS;
 	void (*invalidMessageCallback)(RakPeerInterface *peer, AddressOrGUID systemAddress, int filterSetID, void *userData, unsigned char messageID);
 	void *disallowedCallbackUserData;
 	void (*timeoutCallback)(RakPeerInterface *peer, AddressOrGUID systemAddress, int filterSetID, void *userData);
 	void *timeoutUserData;
 	int filterSetID;
 	bool allowedIDs[MESSAGE_FILTER_MAX_MESSAGE_ID];
-	DataStructures::OrderedList<RakNet::RakString,RakNet::RakString> allowedRPC4;
+	DataStructures::OrderedList<SLNet::RakString, SLNet::RakString> allowedRPC4;
 };
 
 /// \internal Has to be public so some of the shittier compilers can use it.
@@ -60,7 +65,7 @@ int RAK_DLL_EXPORT FilterSetComp( const int &key, FilterSet * const &data );
 struct FilteredSystem
 {
 	FilterSet *filter;
-	RakNet::TimeMS timeEnteredThisSet;
+	SLNet::TimeMS timeEnteredThisSet;
 };
 
 /// \defgroup MESSAGEFILTER_GROUP MessageFilter
@@ -118,7 +123,7 @@ public:
 	/// \param[in] banOnDisallowed ban the system that sent a disallowed message.  See \a banTimeMS for the ban duration
 	/// \param[in] banTimeMS Passed to the milliseconds parameter of RakPeer::AddToBanList.
 	/// \param[in] filterSetID A user defined ID to represent a filter set.  If no filter with this ID exists, one will be created with default settings.
-	void SetActionOnDisallowedMessage(bool kickOnDisallowed, bool banOnDisallowed, RakNet::TimeMS banTimeMS, int filterSetID);
+	void SetActionOnDisallowedMessage(bool kickOnDisallowed, bool banOnDisallowed, SLNet::TimeMS banTimeMS, int filterSetID);
 
 	/// Set a user callback to be called on an invalid message for a particular filterSet
 	/// \param[in] filterSetID A user defined ID to represent a filter set.  If no filter with this ID exists, one will be created with default settings.
@@ -138,7 +143,7 @@ public:
 	/// \param[in] banOnExceed True or false to ban the system, or not, when \a allowedTimeMS is exceeded
 	/// \param[in] banTimeMS Passed to the milliseconds parameter of RakPeer::AddToBanList.
 	/// \param[in] filterSetID A user defined ID to represent a filter set.  If no filter with this ID exists, one will be created with default settings.
-	void SetFilterMaxTime(int allowedTimeMS, bool banOnExceed, RakNet::TimeMS banTimeMS, int filterSetID);
+	void SetFilterMaxTime(int allowedTimeMS, bool banOnExceed, SLNet::TimeMS banTimeMS, int filterSetID);
 
 	/// Get the filterSetID a system is using.  Returns -1 for none.
 	/// \param[in] addressOrGUID The system we are referring to
@@ -188,10 +193,10 @@ protected:
 	DataStructures::Hash<AddressOrGUID, FilteredSystem, 2048, AddressOrGUID::ToInteger> systemList;
 
 	int autoAddNewConnectionsToFilter;
-	RakNet::Time whenLastTimeoutCheck;
+	SLNet::Time whenLastTimeoutCheck;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

@@ -1,34 +1,33 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 ///
 
-
-
-#if defined(_MSC_VER) && _MSC_VER < 1299 // VC6 doesn't support template specialization
-#include "BitStream_NoTemplate.cpp"
-#else
-
-#include "BitStream.h"
+#include "slikenet/BitStream.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "SocketIncludes.h"
-#include "RakNetDefines.h"
+#include "slikenet/SocketIncludes.h"
+#include "slikenet/defines.h"
 
 
 
 #if   defined(_WIN32)
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 #include <memory.h>
 #include <cmath>
 #include <float.h>
@@ -46,17 +45,15 @@
 #endif
 #include <float.h>
 #endif
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // MSWin uses _copysign, others use copysign...
 #ifndef _WIN32
 #define _copysign copysign
 #endif
 
-using namespace RakNet;
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(BitStream,BitStream)
 
@@ -838,11 +835,11 @@ void BitStream::AssertStreamEmpty( void )
 {
 	RakAssert( readOffset == numberOfBitsUsed );
 }
-void BitStream::PrintBits( char *out ) const
+void BitStream::PrintBits( char *out, size_t outLength ) const
 {
 	if ( numberOfBitsUsed <= 0 )
 	{
-		strcpy(out, "No bits\n" );
+		strcpy_s(out, outLength, "No bits\n" );
 		return;
 	}
 
@@ -877,21 +874,21 @@ void BitStream::PrintBits( char *out ) const
 void BitStream::PrintBits( void ) const
 {
 	char out[2048];
-	PrintBits(out);
+	PrintBits(out, 2048);
 	RAKNET_DEBUG_PRINTF("%s", out);
 }
-void BitStream::PrintHex( char *out ) const
+void BitStream::PrintHex( char *out, size_t outLength ) const
 {
 	BitSize_t i;
 	for ( i=0; i < GetNumberOfBytesUsed(); i++)
 	{
-		sprintf(out+i*3, "%02x ", data[i]);
+		sprintf_s(out+i*3, outLength-i*3, "%02x ", data[i]);
 	}
 }
 void BitStream::PrintHex( void ) const
 {
 	char out[2048];
-	PrintHex(out);
+	PrintHex(out, 2048);
 	RAKNET_DEBUG_PRINTF("%s", out);
 }
 
@@ -1174,9 +1171,3 @@ void BitStream::WriteFloat16( float inOutFloat, float floatMin, float floatMax )
 		percentile=65535.0f;
 	Write((unsigned short)percentile);
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-
-#endif // #if _MSC_VER < 1299 

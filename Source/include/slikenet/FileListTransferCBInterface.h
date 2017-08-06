@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file FileListTransferCBInterface.h
@@ -15,14 +20,10 @@
 #ifndef __FILE_LIST_TRANSFER_CALLBACK_INTERFACE_H
 #define __FILE_LIST_TRANSFER_CALLBACK_INTERFACE_H
 
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "FileListNodeContext.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-namespace RakNet
+namespace SLNet
 {
 
 /// \brief Used by FileListTransfer plugin as a callback for when we get a file.
@@ -152,11 +153,7 @@ public:
 	virtual void OnDereference(void) {}
 };
 
-} // namespace RakNet
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+} // namespace SLNet
 
 #endif
 

@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_HTTPConnection2==1 && _RAKNET_SUPPORT_TCPInterface==1
 
-#include "HTTPConnection2.h"
-#include "TCPInterface.h"
+#include "slikenet/HTTPConnection2.h"
+#include "slikenet/TCPInterface.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(HTTPConnection2,HTTPConnection2);
 
@@ -27,7 +32,7 @@ HTTPConnection2::~HTTPConnection2()
 }
 bool HTTPConnection2::TransmitRequest(const char* stringToTransmit, const char* host, unsigned short port, bool useSSL, int ipVersion, SystemAddress useAddress, void *userData)
 {
-	Request *request = RakNet::OP_NEW<Request>(_FILE_AND_LINE_);
+	Request *request = SLNet::OP_NEW<Request>(_FILE_AND_LINE_);
 	request->host=host;
 	request->chunked = false;
 	if (useAddress!=UNASSIGNED_SYSTEM_ADDRESS)
@@ -35,7 +40,7 @@ bool HTTPConnection2::TransmitRequest(const char* stringToTransmit, const char* 
 		request->hostEstimatedAddress=useAddress;
 		if (IsConnected(useAddress)==false)
 		{
-			RakNet::OP_DELETE(request, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(request, _FILE_AND_LINE_);
 			return false;
 		}
 	}
@@ -43,7 +48,7 @@ bool HTTPConnection2::TransmitRequest(const char* stringToTransmit, const char* 
 	{
 		if (request->hostEstimatedAddress.FromString(host, '|', ipVersion)==false)
 		{
-			RakNet::OP_DELETE(request, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(request, _FILE_AND_LINE_);
 			return false;
 		}
 	}
@@ -98,13 +103,13 @@ bool HTTPConnection2::TransmitRequest(const char* stringToTransmit, const char* 
 	}
 	return true;
 }
-bool HTTPConnection2::GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, int &contentOffset )
+bool HTTPConnection2::GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, ptrdiff_t &contentOffset )
 {
 	void *userData;
 	return GetResponse(stringTransmitted, hostTransmitted, responseReceived, hostReceived, contentOffset, &userData);
 
 }
-bool HTTPConnection2::GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, int &contentOffset, void **userData )
+bool HTTPConnection2::GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, ptrdiff_t &contentOffset, void **userData )
 {
 	completedRequestsMutex.Lock();
 	if (completedRequests.Size()>0)
@@ -120,7 +125,7 @@ bool HTTPConnection2::GetResponse( RakString &stringTransmitted, RakString &host
 		contentOffset = completedRequest->contentOffset;
 		*userData = completedRequest->userData;
 
-		RakNet::OP_DELETE(completedRequest, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(completedRequest, _FILE_AND_LINE_);
 		return true;
 	}
 	else
@@ -374,7 +379,7 @@ PluginReceiveResult HTTPConnection2::OnReceive(Packet *packet)
 					const char *firstNewlineSet = strstr(sentRequest->stringReceived.C_String(), "\r\n\r\n");
 					if (firstNewlineSet!=0)
 					{
-						int offset = firstNewlineSet - sentRequest->stringReceived.C_String();
+						ptrdiff_t offset = firstNewlineSet - sentRequest->stringReceived.C_String();
 						if (sentRequest->stringReceived.C_String()[offset+4]==0)
 							sentRequest->contentOffset=-1;
 						else
@@ -498,7 +503,7 @@ void HTTPConnection2::RemovePendingRequest(SystemAddress sa)
 		if (request->hostEstimatedAddress==sa)
 		{
 			pendingRequests.RemoveAtIndex(i);
-			RakNet::OP_DELETE(request, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(request, _FILE_AND_LINE_);
 		}
 		else
 			i++;

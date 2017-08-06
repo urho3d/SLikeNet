@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __SOCKET_DEFINES_H
@@ -56,7 +61,6 @@
 	#define bind__ WinRTBind
 	#define getsockname__ RNS2_WindowsStore8::WinRTGetSockName
 	#define getsockopt__ WinRTGetSockOpt
-	#define inet_addr__ RNS2_WindowsStore8::WinRTInet_Addr
 	#define ioctlsocket__ RNS2_WindowsStore8::WinRTIOCTLSocket
 	#define listen__ WinRTListen
 	#define recv__ WinRTRecv
@@ -78,8 +82,8 @@
 		#define closesocket__ closesocket
 		#define select__ select
 	#elif defined(__native_client__)
-		// namespace RakNet { void CloseSocket(SOCKET s); }
-		// #define closesocket__ RakNet::CloseSocket
+		// namespace SLNet { void CloseSocket(SOCKET s); }
+		// #define closesocket__ SLNet::CloseSocket
 		#define select__ select
 	#else
 		#define closesocket__ close
@@ -97,8 +101,6 @@
 	#define getsockopt__ getsockopt
 
 
-
-		#define inet_addr__ inet_addr
 
 	#define ioctlsocket__ ioctlsocket
 	#define listen__ listen

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,26 +18,28 @@
 
 
 
-#include "RakNetStatistics.h"
+#include "slikenet/statistics.h"
 #include <stdio.h> // sprintf
-#include "GetTime.h"
-#include "RakString.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/string.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // Verbosity level currently supports 0 (low), 1 (medium), 2 (high)
 // Buffer must be hold enough to hold the output string.  See the source to get an idea of how many bytes will be output
-void RAK_DLL_EXPORT RakNet::StatisticsToString( RakNetStatistics *s, char *buffer, int verbosityLevel )
+void RAK_DLL_EXPORT SLNet::StatisticsToString( RakNetStatistics *s, char *buffer, size_t bufferLength, int verbosityLevel )
 {
 	if ( s == 0 )
 	{
-		sprintf( buffer, "stats is a NULL pointer in statsToString\n" );
+		sprintf_s( buffer, bufferLength, "stats is a NULL pointer in statsToString\n" );
 		return ;
 	}
 
 	if (verbosityLevel==0)
 	{
-		sprintf(buffer,
+		sprintf_s(buffer, bufferLength,
 			"Bytes per second sent     %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Bytes per second received %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Current packetloss        %.1f%%\n",
@@ -43,7 +50,7 @@ void RAK_DLL_EXPORT RakNet::StatisticsToString( RakNetStatistics *s, char *buffe
 	}
 	else if (verbosityLevel==1)
 	{
-		sprintf(buffer,
+		sprintf_s(buffer, bufferLength,
 			"Actual bytes per second sent       %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Actual bytes per second received   %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Message bytes per second pushed    %" PRINTF_64_BIT_MODIFIER "u\n"
@@ -61,33 +68,33 @@ void RAK_DLL_EXPORT RakNet::StatisticsToString( RakNetStatistics *s, char *buffe
 			(long long unsigned int) s->runningTotal[USER_MESSAGE_BYTES_PUSHED],
 			s->packetlossLastSecond*100.0f,
 			s->packetlossTotal*100.0f,
-			(long long unsigned int) (uint64_t)((RakNet::GetTimeUS()-s->connectionStartTime)/1000000)
+			(long long unsigned int) (uint64_t)((SLNet::GetTimeUS()-s->connectionStartTime)/1000000)
 			);
 
 		if (s->BPSLimitByCongestionControl!=0)
 		{
 			char buff2[128];
-			sprintf(buff2,
+			sprintf_s(buff2,
 				"Send capacity                    %" PRINTF_64_BIT_MODIFIER "u bytes per second (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByCongestionControl,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByCongestionControl
 				);
-			strcat(buffer,buff2);
+			strcat_s(buffer,bufferLength,buff2);
 		}
 		if (s->BPSLimitByOutgoingBandwidthLimit!=0)
 		{
 			char buff2[128];
-			sprintf(buff2,
+			sprintf_s(buff2,
 				"Send limit                       %" PRINTF_64_BIT_MODIFIER "u (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByOutgoingBandwidthLimit,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByOutgoingBandwidthLimit
 				);
-			strcat(buffer,buff2);
+			strcat_s(buffer,bufferLength,buff2);
 		}
 	}	
 	else
 	{
-		sprintf(buffer,
+		sprintf_s(buffer, bufferLength,
 			"Actual bytes per second sent         %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Actual bytes per second received     %" PRINTF_64_BIT_MODIFIER "u\n"
 			"Message bytes per second sent        %" PRINTF_64_BIT_MODIFIER "u\n"
@@ -129,28 +136,28 @@ void RAK_DLL_EXPORT RakNet::StatisticsToString( RakNetStatistics *s, char *buffe
 			(long long unsigned int) s->bytesInResendBuffer,
 			s->packetlossLastSecond*100.0f,
 			s->packetlossTotal*100.0f,
-			(long long unsigned int) (uint64_t)((RakNet::GetTimeUS()-s->connectionStartTime)/1000000)
+			(long long unsigned int) (uint64_t)((SLNet::GetTimeUS()-s->connectionStartTime)/1000000)
 			);
 
 		if (s->BPSLimitByCongestionControl!=0)
 		{
 			char buff2[128];
-			sprintf(buff2,
+			sprintf_s(buff2,
 				"Send capacity                    %" PRINTF_64_BIT_MODIFIER "u bytes per second (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByCongestionControl,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByCongestionControl
 				);
-			strcat(buffer,buff2);
+			strcat_s(buffer,bufferLength,buff2);
 		}
 		if (s->BPSLimitByOutgoingBandwidthLimit!=0)
 		{
 			char buff2[128];
-			sprintf(buff2,
+			sprintf_s(buff2,
 				"Send limit                       %" PRINTF_64_BIT_MODIFIER "u (%.0f%%)\n",
 				(long long unsigned int) s->BPSLimitByOutgoingBandwidthLimit,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByOutgoingBandwidthLimit
 				);
-			strcat(buffer,buff2);
+			strcat_s(buffer,bufferLength,buff2);
 		}
 	}
 }

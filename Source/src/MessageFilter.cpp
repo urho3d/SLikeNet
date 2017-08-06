@@ -1,37 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_MessageFilter==1
 
-#include "MessageFilter.h"
-#include "RakAssert.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "RakAssert.h"
-#include "RakPeerInterface.h"
-#include "PacketizedTCP.h"
-#include "BitStream.h"
+#include "slikenet/MessageFilter.h"
+#include "slikenet/assert.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/assert.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/BitStream.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
-using namespace RakNet;
-
-int RakNet::MessageFilterStrComp( char *const &key,char *const &data )
+int SLNet::MessageFilterStrComp( char *const &key,char *const &data )
 {
 	return strcmp(key,data);
 }
 
-int RakNet::FilterSetComp( const int &key, FilterSet * const &data )
+int SLNet::FilterSetComp( const int &key, FilterSet * const &data )
 {
 	if (key < data->filterSetID)
 		return -1;
@@ -44,7 +45,7 @@ STATIC_FACTORY_DEFINITIONS(MessageFilter,MessageFilter);
 
 MessageFilter::MessageFilter()
 {
-		whenLastTimeoutCheck=RakNet::GetTime();
+		whenLastTimeoutCheck= SLNet::GetTime();
 }
 MessageFilter::~MessageFilter()
 {
@@ -87,7 +88,7 @@ void MessageFilter::SetAllowRPC4(bool allow, const char* uniqueID, int filterSet
 		}
 	}
 }
-void MessageFilter::SetActionOnDisallowedMessage(bool kickOnDisallowed, bool banOnDisallowed, RakNet::TimeMS banTimeMS, int filterSetID)
+void MessageFilter::SetActionOnDisallowedMessage(bool kickOnDisallowed, bool banOnDisallowed, SLNet::TimeMS banTimeMS, int filterSetID)
 {
 	FilterSet *filterSet = GetFilterSetByID(filterSetID);
 	filterSet->kickOnDisallowedMessage=kickOnDisallowed;
@@ -106,7 +107,7 @@ void MessageFilter::SetTimeoutCallback(int filterSetID, void *userData, void (*i
 	filterSet->timeoutCallback=invalidMessageCallback;
 	filterSet->timeoutUserData=userData;
 }
-void MessageFilter::SetFilterMaxTime(int allowedTimeMS, bool banOnExceed, RakNet::TimeMS banTimeMS, int filterSetID)
+void MessageFilter::SetFilterMaxTime(int allowedTimeMS, bool banOnExceed, SLNet::TimeMS banTimeMS, int filterSetID)
 {
 	FilterSet *filterSet = GetFilterSetByID(filterSetID);
 	filterSet->maxMemberTimeMS=allowedTimeMS;
@@ -144,7 +145,7 @@ void MessageFilter::SetSystemFilterSet(AddressOrGUID addressOrGUID, int filterSe
 		FilteredSystem filteredSystem;
 		filteredSystem.filter = GetFilterSetByID(filterSetID);
 	//	filteredSystem.addressOrGUID=addressOrGUID;
-		filteredSystem.timeEnteredThisSet=RakNet::GetTimeMS();
+		filteredSystem.timeEnteredThisSet= SLNet::GetTimeMS();
 	//	systemList.Insert(addressOrGUID, filteredSystem, true, _FILE_AND_LINE_);
 		systemList.Push(addressOrGUID,filteredSystem,_FILE_AND_LINE_);
 	}
@@ -153,7 +154,7 @@ void MessageFilter::SetSystemFilterSet(AddressOrGUID addressOrGUID, int filterSe
 		if (filterSetID>=0)
 		{
 			FilterSet *filterSet = GetFilterSetByID(filterSetID);
-			systemList.ItemAtIndex(index).timeEnteredThisSet=RakNet::GetTimeMS();
+			systemList.ItemAtIndex(index).timeEnteredThisSet= SLNet::GetTimeMS();
 			systemList.ItemAtIndex(index).filter=filterSet;
 		}
 		else
@@ -235,7 +236,7 @@ void MessageFilter::Clear(void)
 }
 void MessageFilter::DeallocateFilterSet(FilterSet* filterSet)
 {
-	RakNet::OP_DELETE(filterSet, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(filterSet, _FILE_AND_LINE_);
 }
 FilterSet* MessageFilter::GetFilterSetByID(int filterSetID)
 {
@@ -247,7 +248,7 @@ FilterSet* MessageFilter::GetFilterSetByID(int filterSetID)
 		return filterList[index];
 	else
 	{
-		FilterSet *newFilterSet = RakNet::OP_NEW<FilterSet>( _FILE_AND_LINE_ );
+		FilterSet *newFilterSet = SLNet::OP_NEW<FilterSet>( _FILE_AND_LINE_ );
 		memset(newFilterSet->allowedIDs, 0, MESSAGE_FILTER_MAX_MESSAGE_ID * sizeof(bool));
 		newFilterSet->banOnFilterTimeExceed=false;
 		newFilterSet->kickOnDisallowedMessage=false;
@@ -270,7 +271,7 @@ void MessageFilter::OnInvalidMessage(FilterSet *filterSet, AddressOrGUID systemA
 	if (filterSet->banOnDisallowedMessage && rakPeerInterface)
 	{
 		char str1[64];
-		systemAddress.systemAddress.ToString(false, str1);
+		systemAddress.systemAddress.ToString(false, str1,64);
 		rakPeerInterface->AddToBanList(str1, filterSet->disallowedMessageBanTimeMS);
 	}
 	if (filterSet->kickOnDisallowedMessage)
@@ -286,7 +287,7 @@ void MessageFilter::OnInvalidMessage(FilterSet *filterSet, AddressOrGUID systemA
 void MessageFilter::Update(void)
 {
 	// Update all timers for all systems.  If those systems' filter sets are expired, take the appropriate action.
-	RakNet::Time curTime = RakNet::GetTime();
+	SLNet::Time curTime = SLNet::GetTime();
 	if (GreaterThan(curTime - 1000, whenLastTimeoutCheck))
 	{
 		DataStructures::List< FilteredSystem > itemList;
@@ -306,7 +307,7 @@ void MessageFilter::Update(void)
 				if (itemList[index].filter->banOnFilterTimeExceed && rakPeerInterface)
 				{
 					char str1[64];
-					keyList[index].ToString(false, str1);
+					keyList[index].ToString(false, str1, 64);
 					rakPeerInterface->AddToBanList(str1, itemList[index].filter->timeExceedBanTimeMS);
 				}
 				if (rakPeerInterface)
@@ -376,9 +377,9 @@ void MessageFilter::OnClosedConnection(const SystemAddress &systemAddress, RakNe
 	default:
 		if (packet->data[0]==ID_TIMESTAMP)
 		{
-			if (packet->length<sizeof(MessageID) + sizeof(RakNet::TimeMS))
+			if (packet->length<sizeof(MessageID) + sizeof(SLNet::TimeMS))
 				return RR_STOP_PROCESSING_AND_DEALLOCATE; // Invalid message
-			messageId=packet->data[sizeof(MessageID) + sizeof(RakNet::TimeMS)];
+			messageId=packet->data[sizeof(MessageID) + sizeof(SLNet::TimeMS)];
 		}
 		else
 			messageId=packet->data[0];
@@ -394,9 +395,9 @@ void MessageFilter::OnClosedConnection(const SystemAddress &systemAddress, RakNe
 		}
 		if (packet->data[0]==ID_RPC_PLUGIN)
 		{
-			RakNet::BitStream bsIn(packet->data,packet->length,false);
+			SLNet::BitStream bsIn(packet->data,packet->length,false);
 			bsIn.IgnoreBytes(2);
-			RakNet::RakString functionName;
+			SLNet::RakString functionName;
 			bsIn.ReadCompressed(functionName);
 			if (systemList.ItemAtIndex(index).filter->allowedRPC4.HasData(functionName)==false)
 			{
@@ -410,9 +411,5 @@ void MessageFilter::OnClosedConnection(const SystemAddress &systemAddress, RakNe
 	
 	return RR_CONTINUE_PROCESSING;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

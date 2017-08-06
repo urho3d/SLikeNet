@@ -1,26 +1,33 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_NatPunchthroughServer==1
 
-#include "NatPunchthroughServer.h"
-#include "SocketLayer.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "RakPeerInterface.h"
-#include "MTUSize.h"
-#include "GetTime.h"
-#include "PacketLogger.h"
+#include "slikenet/NatPunchthroughServer.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MTUSize.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 void NatPunchthroughServerDebugInterface_Printf::OnServerMessage(const char *msg)
 {
@@ -41,7 +48,7 @@ void NatPunchthroughServer::User::DeleteConnectionAttempt(NatPunchthroughServer:
 	unsigned int index = connectionAttempts.GetIndexOf(ca);
 	if ((unsigned int)index!=(unsigned int)-1)
 	{
-		RakNet::OP_DELETE(ca,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(ca,_FILE_AND_LINE_);
 		connectionAttempts.RemoveAtIndex(index);
 	}
 }
@@ -64,18 +71,18 @@ bool NatPunchthroughServer::User::HasConnectionAttemptToUser(User *user)
 	}
 	return false;
 }
-void NatPunchthroughServer::User::LogConnectionAttempts(RakNet::RakString &rs)
+void NatPunchthroughServer::User::LogConnectionAttempts(SLNet::RakString &rs)
 {
 	rs.Clear();
 	unsigned int index;
 	char guidStr[128], ipStr[128];
-	guid.ToString(guidStr);
-	systemAddress.ToString(true,ipStr);
-	rs=RakNet::RakString("User systemAddress=%s guid=%s\n", ipStr, guidStr);
-	rs+=RakNet::RakString("%i attempts in list:\n", connectionAttempts.Size());
+	guid.ToString(guidStr, 128);
+	systemAddress.ToString(true,ipStr,128);
+	rs= SLNet::RakString("User systemAddress=%s guid=%s\n", ipStr, guidStr);
+	rs+= SLNet::RakString("%i attempts in list:\n", connectionAttempts.Size());
 	for (index=0; index < connectionAttempts.Size(); index++)
 	{
-		rs+=RakNet::RakString("%i. SessionID=%i ", index+1, connectionAttempts[index]->sessionId);
+		rs+= SLNet::RakString("%i. SessionID=%i ", index+1, connectionAttempts[index]->sessionId);
 		if (connectionAttempts[index]->sender==this)
 			rs+="(We are sender) ";
 		else
@@ -90,20 +97,20 @@ void NatPunchthroughServer::User::LogConnectionAttempts(RakNet::RakString &rs)
 			rs+="(GETTING_RECENT_PORTS). ";
 		if (connectionAttempts[index]->sender==this)
 		{
-			connectionAttempts[index]->recipient->guid.ToString(guidStr);
-			connectionAttempts[index]->recipient->systemAddress.ToString(true,ipStr);
+			connectionAttempts[index]->recipient->guid.ToString(guidStr, 128);
+			connectionAttempts[index]->recipient->systemAddress.ToString(true,ipStr,128);
 		}
 		else
 		{
-			connectionAttempts[index]->sender->guid.ToString(guidStr);
-			connectionAttempts[index]->sender->systemAddress.ToString(true,ipStr);
+			connectionAttempts[index]->sender->guid.ToString(guidStr, 128);
+			connectionAttempts[index]->sender->systemAddress.ToString(true,ipStr,128);
 		}
 
-		rs+=RakNet::RakString("Target systemAddress=%s, guid=%s.\n", ipStr, guidStr);
+		rs+= SLNet::RakString("Target systemAddress=%s, guid=%s.\n", ipStr, guidStr);
 	}
 }
 
-int RakNet::NatPunchthroughServer::NatPunchthroughUserComp( const RakNetGUID &key, User * const &data )
+int SLNet::NatPunchthroughServer::NatPunchthroughUserComp( const RakNetGUID &key, User * const &data )
 {
 	if (key < data->guid)
 		return -1;
@@ -140,7 +147,7 @@ NatPunchthroughServer::~NatPunchthroughServer()
 				otherUser=connectionAttempt->sender;
 			otherUser->DeleteConnectionAttempt(connectionAttempt);
 		}
-		RakNet::OP_DELETE(user,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(user,_FILE_AND_LINE_);
 		users[0]=users[users.Size()-1];
 		users.RemoveAtIndex(users.Size()-1);
 	}
@@ -154,7 +161,7 @@ void NatPunchthroughServer::Update(void)
 	ConnectionAttempt *connectionAttempt;
 	User *user, *recipient;
 	unsigned int i,j;
-	RakNet::Time time = RakNet::GetTime();
+	SLNet::Time time = SLNet::GetTime();
 	if (time > lastUpdate+250)
 	{
 		lastUpdate=time;
@@ -171,7 +178,7 @@ void NatPunchthroughServer::Update(void)
 						time > connectionAttempt->startTime &&
 						time > 10000 + connectionAttempt->startTime ) // Formerly 5000, but sometimes false positives
 					{
-						RakNet::BitStream outgoingBs;
+						SLNet::BitStream outgoingBs;
 						
 						// that other system might not be running the plugin
 						outgoingBs.Write((MessageID)ID_NAT_TARGET_UNRESPONSIVE);
@@ -198,11 +205,11 @@ void NatPunchthroughServer::Update(void)
 							char str[1024];
 							char addr1[128], addr2[128];
 							// 8/01/09 Fixed bug where this was after DeleteConnectionAttempt()
-							connectionAttempt->sender->systemAddress.ToString(true,addr1);
-							connectionAttempt->recipient->systemAddress.ToString(true,addr2);
-							sprintf(str, "Sending ID_NAT_TARGET_UNRESPONSIVE to sender %s and recipient %s.", addr1, addr2);
+							connectionAttempt->sender->systemAddress.ToString(true,addr1,128);
+							connectionAttempt->recipient->systemAddress.ToString(true,addr2,128);
+							sprintf_s(str, "Sending ID_NAT_TARGET_UNRESPONSIVE to sender %s and recipient %s.", addr1, addr2);
 							natPunchthroughServerDebugInterface->OnServerMessage(str);
-							RakNet::RakString log;
+							SLNet::RakString log;
 							connectionAttempt->sender->LogConnectionAttempts(log);
 							connectionAttempt->recipient->LogConnectionAttempts(log);
 						}
@@ -236,14 +243,14 @@ PluginReceiveResult NatPunchthroughServer::OnReceive(Packet *packet)
 		return RR_STOP_PROCESSING_AND_DEALLOCATE;
 	case ID_NAT_REQUEST_BOUND_ADDRESSES:
 		{
-			RakNet::BitStream outgoingBs;
+		SLNet::BitStream outgoingBs;
 			outgoingBs.Write((MessageID)ID_NAT_RESPOND_BOUND_ADDRESSES);
 			
 			if (boundAddresses[0]==UNASSIGNED_SYSTEM_ADDRESS)
 			{
 				DataStructures::List<RakNetSocket2* > sockets;
 				rakPeerInterface->GetSockets(sockets);
-				for (int i=0; i < sockets.Size() && i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
+				for (unsigned i=0; i < sockets.Size() && i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
 				{
 					boundAddresses[i]=sockets[i]->GetBoundAddress();
 					boundAddressCount++;
@@ -266,12 +273,12 @@ PluginReceiveResult NatPunchthroughServer::OnReceive(Packet *packet)
 	case ID_OUT_OF_BAND_INTERNAL:
 		if (packet->length>=2 && packet->data[1]==ID_NAT_PING)
 		{
-			RakNet::BitStream bs(packet->data,packet->length,false);
+			SLNet::BitStream bs(packet->data,packet->length,false);
 			bs.IgnoreBytes(sizeof(MessageID)*2);
 			uint16_t externalPort;
 			bs.Read(externalPort);
 
-			RakNet::BitStream outgoingBs;
+			SLNet::BitStream outgoingBs;
 			outgoingBs.Write((MessageID)ID_NAT_PONG);
 			outgoingBs.Write(externalPort);
 			uint16_t externalPort2 = packet->systemAddress.GetPort();
@@ -293,7 +300,7 @@ void NatPunchthroughServer::OnClosedConnection(const SystemAddress &systemAddres
 	i = users.GetIndexFromKey(rakNetGUID, &objectExists);
 	if (objectExists)
 	{
-		RakNet::BitStream outgoingBs;
+		SLNet::BitStream outgoingBs;
 		DataStructures::List<User *> freedUpInProgressUsers;
 		User *user = users[i];
 		User *otherUser;
@@ -330,7 +337,7 @@ void NatPunchthroughServer::OnClosedConnection(const SystemAddress &systemAddres
 			otherUser->DeleteConnectionAttempt(connectionAttempt);
 		}
 
-		RakNet::OP_DELETE(users[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(users[i], _FILE_AND_LINE_);
 		users.RemoveAtIndex(i);
 
 		for (i=0; i < freedUpInProgressUsers.Size(); i++)
@@ -350,7 +357,7 @@ void NatPunchthroughServer::OnClosedConnection(const SystemAddress &systemAddres
 		{
 //			printf("DEBUG %i\n", __LINE__);
 
-			RakNet::BitStream outgoingBs;
+			SLNet::BitStream outgoingBs;
 			outgoingBs.Write((MessageID)ID_NAT_TARGET_NOT_CONNECTED);
 			outgoingBs.Write(rakNetGUID);
 			rakPeerInterface->Send(&outgoingBs,HIGH_PRIORITY,RELIABLE_ORDERED,0,users[i]->systemAddress,false);
@@ -366,7 +373,7 @@ void NatPunchthroughServer::OnNewConnection(const SystemAddress &systemAddress, 
 	(void) systemAddress;
 	(void) isIncoming;
 
-	User *user = RakNet::OP_NEW<User>(_FILE_AND_LINE_);
+	User *user = SLNet::OP_NEW<User>(_FILE_AND_LINE_);
 	user->guid=rakNetGUID;
 	user->mostRecentPort=0;
 	user->systemAddress=systemAddress;
@@ -378,8 +385,8 @@ void NatPunchthroughServer::OnNewConnection(const SystemAddress &systemAddress, 
 }
 void NatPunchthroughServer::OnNATPunchthroughRequest(Packet *packet)
 {
-	RakNet::BitStream outgoingBs;
-	RakNet::BitStream incomingBs(packet->data, packet->length, false);
+	SLNet::BitStream outgoingBs;
+	SLNet::BitStream incomingBs(packet->data, packet->length, false);
 	incomingBs.IgnoreBytes(sizeof(MessageID));
 	RakNetGUID recipientGuid, senderGuid;
 	incomingBs.Read(recipientGuid);
@@ -389,7 +396,7 @@ void NatPunchthroughServer::OnNATPunchthroughRequest(Packet *packet)
 	i = users.GetIndexFromKey(senderGuid, &objectExists);
 	RakAssert(objectExists);
 
-	ConnectionAttempt *ca = RakNet::OP_NEW<ConnectionAttempt>(_FILE_AND_LINE_);
+	ConnectionAttempt *ca = SLNet::OP_NEW<ConnectionAttempt>(_FILE_AND_LINE_);
 	ca->sender=users[i];
 	ca->sessionId=sessionId++;
 	i = users.GetIndexFromKey(recipientGuid, &objectExists);
@@ -402,7 +409,7 @@ void NatPunchthroughServer::OnNATPunchthroughRequest(Packet *packet)
 		outgoingBs.Write((MessageID)ID_NAT_TARGET_NOT_CONNECTED);
 		outgoingBs.Write(recipientGuid);
 		rakPeerInterface->Send(&outgoingBs,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
-		RakNet::OP_DELETE(ca,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(ca,_FILE_AND_LINE_);
 		return;
 	}
 	ca->recipient=users[i];
@@ -411,7 +418,7 @@ void NatPunchthroughServer::OnNATPunchthroughRequest(Packet *packet)
 		outgoingBs.Write((MessageID)ID_NAT_ALREADY_IN_PROGRESS);
 		outgoingBs.Write(recipientGuid);
 		rakPeerInterface->Send(&outgoingBs,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
-		RakNet::OP_DELETE(ca,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(ca,_FILE_AND_LINE_);
 		return;
 	}
 
@@ -433,11 +440,11 @@ void NatPunchthroughServer::OnClientReady(Packet *packet)
 }
 void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
-	uint16_t sessionId;
+	uint16_t curSessionId;
 	unsigned short mostRecentPort;
-	bsIn.Read(sessionId);
+	bsIn.Read(curSessionId);
 	bsIn.Read(mostRecentPort);
 
 	unsigned int i,j;
@@ -448,11 +455,11 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 
 	if (natPunchthroughServerDebugInterface)
 	{
-		RakNet::RakString log;
+		SLNet::RakString log;
 		char addr1[128], addr2[128];
-		packet->systemAddress.ToString(true,addr1);
-		packet->guid.ToString(addr2);
-		log=RakNet::RakString("Got ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s. port=%i. sessionId=%i. userFound=%i.", addr1, addr2, mostRecentPort, sessionId, objectExists);
+		packet->systemAddress.ToString(true,addr1,128);
+		packet->guid.ToString(addr2, 128);
+		log= SLNet::RakString("Got ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s. port=%i. sessionId=%i. userFound=%i.", addr1, addr2, mostRecentPort, curSessionId, objectExists);
 		natPunchthroughServerDebugInterface->OnServerMessage(log.C_String());
 	}
 
@@ -460,7 +467,7 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 	{
 		user=users[i];
 		user->mostRecentPort=mostRecentPort;
-		RakNet::Time time = RakNet::GetTime();
+		SLNet::Time time = SLNet::GetTime();
 
 		for (j=0; j < user->connectionAttempts.Size(); j++)
 		{
@@ -469,7 +476,7 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 				connectionAttempt->sender->mostRecentPort!=0 &&
 				connectionAttempt->recipient->mostRecentPort!=0 &&
 				// 04/29/08 add sessionId to prevent processing for other systems
-				connectionAttempt->sessionId==sessionId)
+				connectionAttempt->sessionId== curSessionId)
 			{
 				SystemAddress senderSystemAddress = connectionAttempt->sender->systemAddress;
 				SystemAddress recipientSystemAddress = connectionAttempt->recipient->systemAddress;
@@ -481,7 +488,7 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 				// Pick a time far enough in the future that both systems will have gotten the message
 				int targetPing = rakPeerInterface->GetAveragePing(recipientTargetAddress);
 				int senderPing = rakPeerInterface->GetAveragePing(senderSystemAddress);
-				RakNet::Time simultaneousAttemptTime;
+				SLNet::Time simultaneousAttemptTime;
 				if (targetPing==-1 || senderPing==-1)
 					simultaneousAttemptTime = time + 1500;
 				else
@@ -495,16 +502,16 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 
 				if (natPunchthroughServerDebugInterface)
 				{
-					RakNet::RakString log;
+					SLNet::RakString log;
 					char addr1[128], addr2[128];
-					recipientSystemAddress.ToString(true,addr1);
-					connectionAttempt->recipient->guid.ToString(addr2);
-					log=RakNet::RakString("Sending ID_NAT_CONNECT_AT_TIME to recipient systemAddress %s guid %s", addr1, addr2);
+					recipientSystemAddress.ToString(true,addr1,128);
+					connectionAttempt->recipient->guid.ToString(addr2, 128);
+					log= SLNet::RakString("Sending ID_NAT_CONNECT_AT_TIME to recipient systemAddress %s guid %s", addr1, addr2);
 					natPunchthroughServerDebugInterface->OnServerMessage(log.C_String());
 				}
 
 				// Send to recipient timestamped message to connect at time
-				RakNet::BitStream bsOut;
+				SLNet::BitStream bsOut;
 				bsOut.Write((MessageID)ID_TIMESTAMP);
 				bsOut.Write(simultaneousAttemptTime);
 				bsOut.Write((MessageID)ID_NAT_CONNECT_AT_TIME);
@@ -519,11 +526,11 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 
 				if (natPunchthroughServerDebugInterface)
 				{
-					RakNet::RakString log;
+					SLNet::RakString log;
 					char addr1[128], addr2[128];
-					senderSystemAddress.ToString(true,addr1);
-					connectionAttempt->sender->guid.ToString(addr2);
-					log=RakNet::RakString("Sending ID_NAT_CONNECT_AT_TIME to sender systemAddress %s guid %s", addr1, addr2);
+					senderSystemAddress.ToString(true,addr1,128);
+					connectionAttempt->sender->guid.ToString(addr2, 128);
+					log= SLNet::RakString("Sending ID_NAT_CONNECT_AT_TIME to sender systemAddress %s guid %s", addr1, addr2);
 					natPunchthroughServerDebugInterface->OnServerMessage(log.C_String());
 				}
 
@@ -554,11 +561,11 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 
 		if (natPunchthroughServerDebugInterface)
 		{
-			RakNet::RakString log;
+			SLNet::RakString log;
 			char addr1[128], addr2[128];
-			packet->systemAddress.ToString(true,addr1);
-			packet->guid.ToString(addr2);
-			log=RakNet::RakString("Ignoring ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s", addr1, addr2);
+			packet->systemAddress.ToString(true,addr1,128);
+			packet->guid.ToString(addr2, 128);
+			log= SLNet::RakString("Ignoring ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s", addr1, addr2);
 			natPunchthroughServerDebugInterface->OnServerMessage(log.C_String());
 		}
 
@@ -594,21 +601,21 @@ void NatPunchthroughServer::StartPunchthroughForUser(User *user)
 			{
 				char str[1024];
 				char addr1[128], addr2[128];
-				sender->systemAddress.ToString(true,addr1);
-				recipient->systemAddress.ToString(true,addr2);
-				sprintf(str, "Sending NAT_ATTEMPT_PHASE_GETTING_RECENT_PORTS to sender %s and recipient %s.", addr1, addr2);
+				sender->systemAddress.ToString(true,addr1,128);
+				recipient->systemAddress.ToString(true,addr2,128);
+				sprintf_s(str, "Sending NAT_ATTEMPT_PHASE_GETTING_RECENT_PORTS to sender %s and recipient %s.", addr1, addr2);
 				natPunchthroughServerDebugInterface->OnServerMessage(str);
 			}
 
 			sender->isReady=false;
 			recipient->isReady=false;
 			connectionAttempt->attemptPhase=ConnectionAttempt::NAT_ATTEMPT_PHASE_GETTING_RECENT_PORTS;
-			connectionAttempt->startTime=RakNet::GetTime();
+			connectionAttempt->startTime= SLNet::GetTime();
 
 			sender->mostRecentPort=0;
 			recipient->mostRecentPort=0;
 
-			RakNet::BitStream outgoingBs;
+			SLNet::BitStream outgoingBs;
 			outgoingBs.Write((MessageID)ID_NAT_GET_MOST_RECENT_PORT);
 			// 4/29/09 Write sessionID so we don't use returned port for a system we don't want
 			outgoingBs.Write(connectionAttempt->sessionId);

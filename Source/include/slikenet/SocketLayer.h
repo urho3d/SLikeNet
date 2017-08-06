@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -18,17 +23,17 @@
 #ifndef __SOCKET_LAYER_H
 #define __SOCKET_LAYER_H
 
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
-#include "RakNetSmartPtr.h"
-//#include "RakNetSocket.h"
+#include "memoryoverride.h"
+#include "types.h"
+#include "smartptr.h"
+//#include "socket.h"
 #include "Export.h"
 #include "MTUSize.h"
-#include "RakString.h"
+#include "string.h"
 
 //#include "ClientContextStruct.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeer;
@@ -104,20 +109,20 @@ public:
 	/// \param[in] errorCode An error code if an error occured .
 	/// \param[in] connectionSocketIndex Which of the sockets in RakPeer we are using
 	/// \return Returns true if you successfully read data, false on error.
-//	static void RecvFromBlocking_IPV4( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, RakNet::TimeUS *timeRead );
+//	static void RecvFromBlocking_IPV4( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 // 	#if RAKNET_SUPPORT_IPV6==1
-// 		static void RecvFromBlockingIPV4And6( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, RakNet::TimeUS *timeRead );
+// 		static void RecvFromBlockingIPV4And6( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 // 	#endif
-//	static void RecvFromBlocking( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, RakNet::TimeUS *timeRead );
+//	static void RecvFromBlocking( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 #if defined(WINDOWS_STORE_RT)
-//	static void RecvFromBlocking_WindowsStore8( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, RakNet::TimeUS *timeRead );
+//	static void RecvFromBlocking_WindowsStore8( RakNetSocket *s, RakPeer *rakPeer, char *dataOut, int *bytesReadOut, SystemAddress *systemAddressOut, SLNet::TimeUS *timeRead );
 #endif
 
 	/// Given a socket and IP, retrieves the subnet mask, on linux the socket is unused
 	/// \param[in] inSock the socket 
 	/// \param[in] inIpString The ip of the interface you wish to retrieve the subnet mask from
 	/// \return Returns the ip dotted subnet mask if successful, otherwise returns empty string ("")
-	static RakNet::RakString GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, RakNet::RakString inIpString);
+	static SLNet::RakString GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, SLNet::RakString inIpString);
 
 
 	/// Sets the socket flags to nonblocking 
@@ -192,6 +197,6 @@ private:
 //	static SocketLayerOverride *slo;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "EmptyHeader.h"
+#include "slikenet/EmptyHeader.h"
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
@@ -19,7 +24,9 @@
 
 #include <ppltasks.h>
 #include <collection.h>
-#include "RakString.h"
+#include "slikenet/string.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 using namespace Concurrency;
 using namespace Platform;
@@ -35,7 +42,7 @@ using namespace Windows::Storage::Streams;
 //using namespace Platform::Collections;
 //using namespace Windows::Foundation::Collections;
 
-namespace RakNet
+namespace SLNet
 {
 
 public ref class OutputStreamAndDataWriter sealed
@@ -81,7 +88,7 @@ private:
 };
 }
 
-using namespace RakNet;
+using namespace SLNet;
 
 ListenerContext::ListenerContext(Windows::Networking::Sockets::DatagramSocket^ listener)
 {
@@ -117,7 +124,7 @@ OutputStreamAndDataWriter ^ListenerContext::GetOutputStreamAndDataWriter(uint64_
 	//addr = ntohl(addr);
 	char buf[64];
 	unsigned char *ucp = (unsigned char *)&addr;
-	sprintf(buf, "%d.%d.%d.%d",
+	sprintf_s(buf, "%d.%d.%d.%d",
 		ucp[0] & 0xff,
 		ucp[1] & 0xff,
 		ucp[2] & 0xff,
@@ -125,10 +132,10 @@ OutputStreamAndDataWriter ^ListenerContext::GetOutputStreamAndDataWriter(uint64_
 	char portStr[32];
 	_itoa(port, portStr, 10);
 
-	RakNet::RakString rs1(buf);
+	SLNet::RakString rs1(buf);
 	WCHAR *w_char1 = rs1.ToWideChar();
 	HostName ^hostName = ref new HostName(ref new Platform::String(w_char1));
-	RakNet::RakString rs2(portStr);
+	SLNet::RakString rs2(portStr);
 	WCHAR *w_char2 = rs2.ToWideChar();
 	task< IOutputStream^ > op(listener->GetOutputStreamAsync(hostName, ref new Platform::String(w_char2)));
 	op.wait();
@@ -180,13 +187,13 @@ void ListenerContext::OnMessage(Windows::Networking::Sockets::DatagramSocket^ so
 	char ip[64];
 	RakString rs2;
 	rs2.FromWideChar(eventArguments->RemoteAddress->DisplayName->Data());
-	strcpy(ip, rs2.C_String());
+	strcpy_s(ip, rs2.C_String());
 	recvFromStruct->systemAddress.address.addr4.sin_addr.s_addr = RNS2_WindowsStore8::WinRTInet_Addr(ip);
 	char portStr[64];
 	rs2.FromWideChar(eventArguments->RemotePort->Data());
-	strcpy(portStr, rs2.C_String());
+	strcpy_s(portStr, rs2.C_String());
 	recvFromStruct->systemAddress.SetPortHostOrder(atoi(portStr));
-	recvFromStruct->timeRead=RakNet::GetTimeUS();
+	recvFromStruct->timeRead= SLNet::GetTimeUS();
 	recvFromStruct->socket = rns2;
 	eventHandler->OnRNS2Recv(recvFromStruct);
 
@@ -232,7 +239,7 @@ void ListenerContext::OnMessage(Windows::Networking::Sockets::DatagramSocket^ so
 void ListenerContext::EchoMessage(DatagramSocketMessageReceivedEventArgs^ eventArguments)
 {
 }
-RakNet::DataStructures::List<RNS2_WindowsStore8*> RNS2_WindowsStore8::rns2List;
+SLNet::DataStructures::List<RNS2_WindowsStore8*> RNS2_WindowsStore8::rns2List;
 SimpleMutex RNS2_WindowsStore8::rns2ListMutex;
 RNS2_WindowsStore8::RNS2_WindowsStore8()
 {
@@ -329,7 +336,7 @@ void RNS2_WindowsStore8::DomainNameToIP( const char *domainName, char ip[65] ) {
 //	std::wstring wid_str = std::wstring(s_str.begin(), s_str.end());
 //	const wchar_t* w_char = wid_str.c_str();
 
-	RakNet::RakString rs(domainName);
+	SLNet::RakString rs(domainName);
 	WCHAR *w_char = rs.ToWideChar();
 	
 //	DatagramSocket ^listener = ref new DatagramSocket();
@@ -359,7 +366,7 @@ void RNS2_WindowsStore8::DomainNameToIP( const char *domainName, char ip[65] ) {
 			Platform::String ^name = result2->GetAt(0)->RemoteHostName->DisplayName;
 			RakString rs2;
 			rs2.FromWideChar(name->Data());
-			strcpy(ip, rs2.C_String());
+			strcpy_s(ip, rs2.C_String());
 		}
 		else
 		{
@@ -399,7 +406,7 @@ void RNS2_WindowsStore8::DomainNameToIP( const char *domainName, char ip[65] ) {
 		Platform::String ^name = view->GetAt(0)->RemoteHostName->DisplayName;
 		RakString rs2;
 		rs2.FromWideChar(name->Data());
-		strcpy(ip, rs2.C_String());
+		strcpy_s(ip, rs2.C_String());
 	}
 	else
 	{

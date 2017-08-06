@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __RAK_STRING_H
@@ -13,7 +18,7 @@
 
 #include "Export.h"
 #include "DS_List.h"
-#include "RakNetTypes.h" // int64_t
+#include "types.h" // int64_t
 #include <stdio.h>
 #include "stdarg.h"
 
@@ -25,7 +30,7 @@
 #include "WindowsIncludes.h"
 #endif
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class SimpleMutex;
@@ -84,7 +89,7 @@ public:
 	void DeallocWideChar(WCHAR * w);
 
 	void FromWideChar(const wchar_t *source);
-	static RakNet::RakString FromWideChar_S(const wchar_t *source);
+	static SLNet::RakString FromWideChar_S(const wchar_t *source);
 #endif
 	
 	/// String class find replacement
@@ -143,14 +148,14 @@ public:
 	void SetChar( unsigned index, unsigned char c );
 
 	/// Replace character at index with string s
-	void SetChar( unsigned index, RakNet::RakString s );
+	void SetChar( unsigned index, SLNet::RakString s );
 
 	/// Make sure string is no longer than \a length
 	void Truncate(unsigned int length);
 	void TruncateUTF8(unsigned int length);
 
 	// Gets the substring starting at index for count characters
-	RakString SubStr(unsigned int index, unsigned int count) const;
+	RakString SubStr(unsigned int index, size_t count) const;
 
 	/// Erase characters out of the string at index for count
 	void Erase(unsigned int index, unsigned int count);
@@ -171,7 +176,7 @@ public:
 
 	/// Create a RakString with a value, without doing printf style parsing
 	/// Equivalent to assignment operator
-	static RakNet::RakString NonVariadic(const char *str);
+	static SLNet::RakString NonVariadic(const char *str);
 
 	/// Hash the string into an unsigned int
 	static unsigned long ToInteger(const char *str);
@@ -184,7 +189,7 @@ public:
 	static int ReadIntFromSubstring(const char *str, size_t pos, size_t n);
 
 	// Like strncat, but for a fixed length
-	void AppendBytes(const char *bytes, unsigned int count);
+	void AppendBytes(const char *bytes, size_t count);
 
 	/// Compare strings (case sensitive)
 	int StrCmp(const RakString &rhs) const;
@@ -214,37 +219,37 @@ public:
 	bool IsEmailAddress(void) const;
 
 	/// URL Encode the string. See http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4029/
-	RakNet::RakString& URLEncode(void);
+	SLNet::RakString& URLEncode(void);
 
 	/// URL decode the string
-	RakNet::RakString& URLDecode(void);
+	SLNet::RakString& URLDecode(void);
 
 	/// https://servers.api.rackspacecloud.com/v1.0 to https://,  servers.api.rackspacecloud.com, /v1.0
-	void SplitURI(RakNet::RakString &header, RakNet::RakString &domain, RakNet::RakString &path);
+	void SplitURI(SLNet::RakString &header, SLNet::RakString &domain, SLNet::RakString &path);
 
 	/// Scan for quote, double quote, and backslash and prepend with backslash
-	RakNet::RakString& SQLEscape(void);
+	SLNet::RakString& SQLEscape(void);
 
 	/// Format as a POST command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer
 	/// \param[in] contentType For example, text/plain; charset=UTF-8
 	/// \param[in] body Body of the post
 	/// \return Formatted string
-	static RakNet::RakString FormatForPOST(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
-	static RakNet::RakString FormatForPUT(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
+	static SLNet::RakString FormatForPOST(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
+	static SLNet::RakString FormatForPUT(const char* uri, const char* contentType, const char* body, const char* extraHeaders="");
 
 	/// Format as a GET command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer?__gameId=comprehensivePCGame
 	/// \return Formatted string
-	static RakNet::RakString FormatForGET(const char* uri, const char* extraHeaders="");
+	static SLNet::RakString FormatForGET(const char* uri, const char* extraHeaders="");
 
 	/// Format as a DELETE command that can be sent to a webserver
 	/// \param[in] uri For example, masterserver2.raknet.com/testServer?__gameId=comprehensivePCGame&__rowId=1
 	/// \return Formatted string
-	static RakNet::RakString FormatForDELETE(const char* uri, const char* extraHeaders="");
+	static SLNet::RakString FormatForDELETE(const char* uri, const char* extraHeaders="");
 
 	/// Fix to be a file path, ending with /
-	RakNet::RakString& MakeFilePath(void);
+	SLNet::RakString& MakeFilePath(void);
 
 	/// RakString uses a freeList of old no-longer used strings
 	/// Call this function to clear this memory on shutdown
@@ -334,7 +339,7 @@ public:
 	static void UnlockMutex(void);
 
 protected:
-	static RakNet::RakString FormatForPUTOrPost(const char* type, const char* uri, const char* contentType, const char* body, const char* extraHeaders);
+	static SLNet::RakString FormatForPUTOrPost(const char* type, const char* uri, const char* contentType, const char* body, const char* extraHeaders);
 	void Allocate(size_t len);
 	void Assign(const char *str);
 	void Assign(const char *str, va_list ap);
@@ -343,12 +348,12 @@ protected:
 	void Free(void);
 	unsigned char ToLower(unsigned char c);
 	unsigned char ToUpper(unsigned char c);
-	void Realloc(SharedString *sharedString, size_t bytes);
+	void Realloc(SharedString *inSharedString, size_t bytes);
 };
 
 }
 
-const RakNet::RakString RAK_DLL_EXPORT operator+(const RakNet::RakString &lhs, const RakNet::RakString &rhs);
+const SLNet::RakString RAK_DLL_EXPORT operator+(const SLNet::RakString &lhs, const SLNet::RakString &rhs);
 
 
 #endif

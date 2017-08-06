@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file DS_WeightedGraph.h
@@ -23,8 +28,8 @@
 #include "DS_Heap.h"
 #include "DS_Queue.h"
 #include "DS_Tree.h"
-#include "RakAssert.h"
-#include "RakMemoryOverride.h"
+#include "assert.h"
+#include "memoryoverride.h"
 #ifdef _DEBUG
 #include <stdio.h>
 #endif
@@ -108,8 +113,8 @@ namespace DataStructures
 		{
 			rootNode=original_copy.rootNode;
 			costMatrixIndices=original_copy.costMatrixIndices;
-			costMatrix = RakNet::OP_NEW_ARRAY<weight_type>(costMatrixIndices.Size() * costMatrixIndices.Size(), _FILE_AND_LINE_ );
-			leastNodeArray = RakNet::OP_NEW_ARRAY<node_type>(costMatrixIndices.Size(), _FILE_AND_LINE_ );
+			costMatrix = SLNet::OP_NEW_ARRAY<weight_type>(costMatrixIndices.Size() * costMatrixIndices.Size(), _FILE_AND_LINE_ );
+			leastNodeArray = SLNet::OP_NEW_ARRAY<node_type>(costMatrixIndices.Size(), _FILE_AND_LINE_ );
 			memcpy(costMatrix, original_copy.costMatrix, costMatrixIndices.Size() * costMatrixIndices.Size() * sizeof(weight_type));
 			memcpy(leastNodeArray, original_copy.leastNodeArray, costMatrixIndices.Size() * sizeof(weight_type));
 		}
@@ -125,8 +130,8 @@ namespace DataStructures
 		{
 			rootNode=original_copy.rootNode;
 			costMatrixIndices=original_copy.costMatrixIndices;
-			costMatrix = RakNet::OP_NEW_ARRAY<weight_type>(costMatrixIndices.Size() * costMatrixIndices.Size(), _FILE_AND_LINE_ );
-			leastNodeArray = RakNet::OP_NEW_ARRAY<node_type>(costMatrixIndices.Size(), _FILE_AND_LINE_ );
+			costMatrix = SLNet::OP_NEW_ARRAY<weight_type>(costMatrixIndices.Size() * costMatrixIndices.Size(), _FILE_AND_LINE_ );
+			leastNodeArray = SLNet::OP_NEW_ARRAY<node_type>(costMatrixIndices.Size(), _FILE_AND_LINE_ );
 			memcpy(costMatrix, original_copy.costMatrix, costMatrixIndices.Size() * costMatrixIndices.Size() * sizeof(weight_type));
 			memcpy(leastNodeArray, original_copy.leastNodeArray, costMatrixIndices.Size() * sizeof(weight_type));
 		}
@@ -137,7 +142,7 @@ namespace DataStructures
 	template <class node_type, class weight_type, bool allow_unlinkedNodes>
 		void WeightedGraph<node_type, weight_type, allow_unlinkedNodes>::AddNode(const node_type &node)
 	{
-		adjacencyLists.SetNew(node, RakNet::OP_NEW<DataStructures::Map<node_type, weight_type> >( _FILE_AND_LINE_) );
+		adjacencyLists.SetNew(node, SLNet::OP_NEW<DataStructures::Map<node_type, weight_type> >( _FILE_AND_LINE_) );
 	}
 
 	template <class node_type, class weight_type, bool allow_unlinkedNodes>
@@ -149,7 +154,7 @@ namespace DataStructures
 		removeNodeQueue.Push(node, _FILE_AND_LINE_ );
 		while (removeNodeQueue.Size())
 		{
-			RakNet::OP_DELETE(adjacencyLists.Pop(removeNodeQueue.Pop()), _FILE_AND_LINE_);
+			SLNet::OP_DELETE(adjacencyLists.Pop(removeNodeQueue.Pop()), _FILE_AND_LINE_);
 
 			// Remove this node from all of the other lists as well
 			for (i=0; i < adjacencyLists.Size(); i++)
@@ -216,7 +221,7 @@ namespace DataStructures
 	{
 		unsigned i;
 		for (i=0; i < adjacencyLists.Size(); i++)
-			RakNet::OP_DELETE(adjacencyLists[i], _FILE_AND_LINE_);
+			SLNet::OP_DELETE(adjacencyLists[i], _FILE_AND_LINE_);
 		adjacencyLists.Clear();
 
 		ClearDijkstra();
@@ -270,17 +275,14 @@ namespace DataStructures
 		vertex=endNode;
 		outputQueue.PushAtHead(vertex, 0, _FILE_AND_LINE_);
 		row--;
-#ifdef _MSC_VER
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-		while (1)
+		for(;;)
 		{
 			while (costMatrix[row*adjacencyLists.Size() + col] == currentWeight)
 			{
 				if (row==0)
 				{
 					path.Insert(startNode, _FILE_AND_LINE_);
-					while (!outputQueue.Empty())
+					while(!outputQueue.IsEmpty())
 						path.Insert(outputQueue.Pop(), _FILE_AND_LINE_);
 					return true;
 				}
@@ -296,7 +298,7 @@ namespace DataStructures
 		}
 
 		path.Insert(startNode, _FILE_AND_LINE_);
-		while (!outputQueue.Empty())
+		while(!outputQueue.IsEmpty())
 			path.Insert(outputQueue.Pop(), _FILE_AND_LINE_);
 		return true;
 	}
@@ -362,7 +364,7 @@ namespace DataStructures
 
 		for (i=0; i < adjacencyList->Size(); i++)
 		{
-			nap2.node=RakNet::OP_NEW<DataStructures::Tree<node_type> >( _FILE_AND_LINE_ );
+			nap2.node= SLNet::OP_NEW<DataStructures::Tree<node_type> >( _FILE_AND_LINE_ );
 			nap2.node->data=adjacencyList->GetKeyAtIndex(i);
 			nap2.parent=current;
 			nodesToProcess.Push(nap2, _FILE_AND_LINE_ );
@@ -380,7 +382,7 @@ namespace DataStructures
 				key=adjacencyList->GetKeyAtIndex(i);
 				if (key!=nap.parent->data)
 				{
-					nap2.node=RakNet::OP_NEW<DataStructures::Tree<node_type> >( _FILE_AND_LINE_ );
+					nap2.node= SLNet::OP_NEW<DataStructures::Tree<node_type> >( _FILE_AND_LINE_ );
 					nap2.node->data=key;
 					nap2.parent=current;
 					nodesToProcess.Push(nap2, _FILE_AND_LINE_ );
@@ -398,8 +400,8 @@ namespace DataStructures
 		if (adjacencyLists.Size()==0)
 			return;
 
-		costMatrix = RakNet::OP_NEW_ARRAY<weight_type>(adjacencyLists.Size() * adjacencyLists.Size(), _FILE_AND_LINE_ );
-		leastNodeArray = RakNet::OP_NEW_ARRAY<node_type>(adjacencyLists.Size(), _FILE_AND_LINE_ );
+		costMatrix = SLNet::OP_NEW_ARRAY<weight_type>(adjacencyLists.Size() * adjacencyLists.Size(), _FILE_AND_LINE_ );
+		leastNodeArray = SLNet::OP_NEW_ARRAY<node_type>(adjacencyLists.Size(), _FILE_AND_LINE_ );
 
 		node_type currentNode;
 		unsigned col, row, row2, openSetIndex;
@@ -506,8 +508,8 @@ namespace DataStructures
 		if (isValidPath)
 		{
 			isValidPath=false;
-			RakNet::OP_DELETE_ARRAY(costMatrix, _FILE_AND_LINE_);
-			RakNet::OP_DELETE_ARRAY(leastNodeArray, _FILE_AND_LINE_);
+			SLNet::OP_DELETE_ARRAY(costMatrix, _FILE_AND_LINE_);
+			SLNet::OP_DELETE_ARRAY(leastNodeArray, _FILE_AND_LINE_);
 			costMatrixIndices.Clear(false, _FILE_AND_LINE_);
 		}
 	}

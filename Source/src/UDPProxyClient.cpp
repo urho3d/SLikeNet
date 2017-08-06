@@ -1,24 +1,29 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_UDPProxyClient==1
 
-#include "UDPProxyClient.h"
-#include "BitStream.h"
-#include "UDPProxyCommon.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
+#include "slikenet/UDPProxyClient.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/UDPProxyCommon.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 static const int DEFAULT_UNRESPONSIVE_PING_TIME_COORDINATOR=1000;
 
 // bool operator<( const DataStructures::MLKeyRef<UDPProxyClient::ServerWithPing> &inputKey, const UDPProxyClient::ServerWithPing &cls ) {return inputKey.Get().serverAddress < cls.serverAddress;}
@@ -39,7 +44,7 @@ void UDPProxyClient::SetResultHandler(UDPProxyClientResultHandler *rh)
 {
 	resultHandler=rh;
 }
-bool UDPProxyClient::RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, RakNetGUID targetGuid, RakNet::TimeMS timeoutOnNoDataMS, RakNet::BitStream *serverSelectionBitstream)
+bool UDPProxyClient::RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, RakNetGUID targetGuid, SLNet::TimeMS timeoutOnNoDataMS, SLNet::BitStream *serverSelectionBitstream)
 {
 	// Return false if not connected 
 	ConnectionState cs = rakPeerInterface->GetConnectionState(proxyCoordinator);
@@ -71,7 +76,7 @@ bool UDPProxyClient::RequestForwarding(SystemAddress proxyCoordinator, SystemAdd
 
 	return true;
 }
-bool UDPProxyClient::RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddressAsSeenFromCoordinator, RakNet::TimeMS timeoutOnNoDataMS, RakNet::BitStream *serverSelectionBitstream)
+bool UDPProxyClient::RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddressAsSeenFromCoordinator, SLNet::TimeMS timeoutOnNoDataMS, SLNet::BitStream *serverSelectionBitstream)
 {
 	// Return false if not connected 
 	ConnectionState cs = rakPeerInterface->GetConnectionState(proxyCoordinator);
@@ -111,12 +116,12 @@ void UDPProxyClient::Update(void)
 		PingServerGroup *psg = pingServerGroups[idx1];
 
 		if (psg->serversToPing.Size() > 0 && 
-			RakNet::GetTimeMS() > psg->startPingTime+DEFAULT_UNRESPONSIVE_PING_TIME_COORDINATOR)
+			SLNet::GetTimeMS() > psg->startPingTime+DEFAULT_UNRESPONSIVE_PING_TIME_COORDINATOR)
 		{
 			// If they didn't reply within DEFAULT_UNRESPONSIVE_PING_TIME_COORDINATOR, just give up on them
 			psg->SendPingedServersToCoordinator(rakPeerInterface);
 
-			RakNet::OP_DELETE(psg,_FILE_AND_LINE_);
+			SLNet::OP_DELETE(psg,_FILE_AND_LINE_);
 			pingServerGroups.RemoveAtIndex(idx1);
 		}
 		else
@@ -137,11 +142,11 @@ PluginReceiveResult UDPProxyClient::OnReceive(Packet *packet)
 			{
 				if (psg->serversToPing[idx2].serverAddress==packet->systemAddress)
 				{
-					RakNet::BitStream bsIn(packet->data,packet->length,false);
+					SLNet::BitStream bsIn(packet->data,packet->length,false);
 					bsIn.IgnoreBytes(sizeof(MessageID));
-					RakNet::TimeMS sentTime;
+					SLNet::TimeMS sentTime;
 					bsIn.Read(sentTime);
-					RakNet::TimeMS curTime=RakNet::GetTimeMS();
+					SLNet::TimeMS curTime = SLNet::GetTimeMS();
 					int ping;
 					if (curTime>sentTime)
 						ping=(int) (curTime-sentTime);
@@ -153,7 +158,7 @@ PluginReceiveResult UDPProxyClient::OnReceive(Packet *packet)
 					if (psg->AreAllServersPinged())
 					{
 						psg->SendPingedServersToCoordinator(rakPeerInterface);
-						RakNet::OP_DELETE(psg,_FILE_AND_LINE_);
+						SLNet::OP_DELETE(psg,_FILE_AND_LINE_);
 						pingServerGroups.RemoveAtIndex(idx1);
 					}
 
@@ -181,7 +186,7 @@ PluginReceiveResult UDPProxyClient::OnReceive(Packet *packet)
 			{
 				RakNetGUID targetGuid;
 				SystemAddress senderAddress, targetAddress;
-				RakNet::BitStream incomingBs(packet->data, packet->length, false);
+				SLNet::BitStream incomingBs(packet->data, packet->length, false);
 				incomingBs.IgnoreBytes(sizeof(MessageID)*2);
 				incomingBs.Read(senderAddress);
 				incomingBs.Read(targetAddress);
@@ -194,7 +199,7 @@ PluginReceiveResult UDPProxyClient::OnReceive(Packet *packet)
 				case ID_UDP_PROXY_IN_PROGRESS:
 					{
 						unsigned short forwardingPort;
-						RakNet::RakString serverIP;
+						SLNet::RakString serverIP;
 						incomingBs.Read(serverIP);
 						incomingBs.Read(forwardingPort);
 						if (packet->data[1]==ID_UDP_PROXY_FORWARDING_SUCCEEDED)
@@ -247,15 +252,19 @@ void UDPProxyClient::OnRakPeerShutdown(void)
 }
 void UDPProxyClient::OnPingServers(Packet *packet)
 {
-	RakNet::BitStream incomingBs(packet->data, packet->length, false);
+	SLNet::BitStream incomingBs(packet->data, packet->length, false);
 	incomingBs.IgnoreBytes(2);
 
-	PingServerGroup *psg = RakNet::OP_NEW<PingServerGroup>(_FILE_AND_LINE_);
+	PingServerGroup *psg = SLNet::OP_NEW<PingServerGroup>(_FILE_AND_LINE_);
 	
 	ServerWithPing swp;
 	incomingBs.Read(psg->sata.senderClientAddress);
 	incomingBs.Read(psg->sata.targetClientAddress);
-	psg->startPingTime=RakNet::GetTimeMS();
+	// #med - might be possible to drop - see pull request 35 - however kept as is to ensure ABI
+	// compatibility to RakNet in MaxNet 0.x - see #39
+	RakNetGUID targetGuid;
+	incomingBs.Read(targetGuid);
+	psg->startPingTime= SLNet::GetTimeMS();
 	psg->coordinatorAddressForPings=packet->systemAddress;
 	unsigned short serverListSize;
 	incomingBs.Read(serverListSize);
@@ -267,7 +276,7 @@ void UDPProxyClient::OnPingServers(Packet *packet)
 		incomingBs.Read(swp.serverAddress);
 		swp.ping=DEFAULT_UNRESPONSIVE_PING_TIME_COORDINATOR;
 		psg->serversToPing.Push(swp, _FILE_AND_LINE_ );
-		swp.serverAddress.ToString(false,ipStr);
+		swp.serverAddress.ToString(false,ipStr,64);
 		rakPeerInterface->Ping(ipStr,swp.serverAddress.GetPort(),false,0);
 	}
 	pingServerGroups.Push(psg,_FILE_AND_LINE_);
@@ -284,7 +293,7 @@ bool UDPProxyClient::PingServerGroup::AreAllServersPinged(void) const
 	return true;
 }
 
-void UDPProxyClient::PingServerGroup::SendPingedServersToCoordinator(RakPeerInterface *rakPeerInterface)
+void UDPProxyClient::PingServerGroup::SendPingedServersToCoordinator(RakPeerInterface *rakPeer)
 {
 	BitStream outgoingBs;
 	outgoingBs.Write((MessageID)ID_UDP_PROXY_GENERAL);
@@ -299,12 +308,12 @@ void UDPProxyClient::PingServerGroup::SendPingedServersToCoordinator(RakPeerInte
 		outgoingBs.Write(serversToPing[serversToPingIndex].serverAddress);
 		outgoingBs.Write(serversToPing[serversToPingIndex].ping);
 	}
-	rakPeerInterface->Send(&outgoingBs, MEDIUM_PRIORITY, RELIABLE_ORDERED, 0, coordinatorAddressForPings, false);
+	rakPeer->Send(&outgoingBs, MEDIUM_PRIORITY, RELIABLE_ORDERED, 0, coordinatorAddressForPings, false);
 }
 void UDPProxyClient::Clear(void)
 {
 	for (unsigned int i=0; i < pingServerGroups.Size(); i++)
-		RakNet::OP_DELETE(pingServerGroups[i],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(pingServerGroups[i],_FILE_AND_LINE_);
 	pingServerGroups.Clear(false, _FILE_AND_LINE_);
 }
 

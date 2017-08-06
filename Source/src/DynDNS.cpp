@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_DynDNS==1 && _RAKNET_SUPPORT_TCPInterface==1
 
-#include "TCPInterface.h"
-#include "RakNetSocket2.h"
-#include "DynDNS.h"
-#include "GetTime.h"
-#include "Base64Encoder.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/socket2.h"
+#include "slikenet/DynDNS.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Base64Encoder.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 struct DynDnsResult
 {
@@ -51,13 +56,13 @@ DynDNS::DynDNS()
 DynDNS::~DynDNS()
 {
 	if (tcp)
-		RakNet::OP_DELETE(tcp, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(tcp, _FILE_AND_LINE_);
 }
 void DynDNS::Stop(void)
 {
 	tcp->Stop();
 	connectPhase = CP_IDLE;
-	RakNet::OP_DELETE(tcp, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(tcp, _FILE_AND_LINE_);
 	tcp=0;
 }
 
@@ -68,7 +73,7 @@ void DynDNS::UpdateHostIPAsynch(const char *dnsHost, const char *newIPAddress, c
 	myIPStr[0]=0;
 
 	if (tcp==0)
-		tcp = RakNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
+		tcp = SLNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
 	connectPhase = CP_IDLE;
 	host = dnsHost;
 
@@ -123,16 +128,16 @@ void DynDNS::Update(void)
 			connectPhase = CP_WAITING_FOR_DYNDNS_RESPONSE;
 			tcp->Send(getString.C_String(), (unsigned int) getString.GetLength(), serverAddress, false);
 		}
-		phaseTimeout=RakNet::GetTime()+1000;
+		phaseTimeout= SLNet::GetTime()+1000;
 	}
 
-	if (connectPhase==CP_WAITING_FOR_CHECKIP_RESPONSE && RakNet::GetTime()>phaseTimeout)
+	if (connectPhase==CP_WAITING_FOR_CHECKIP_RESPONSE && SLNet::GetTime()>phaseTimeout)
 	{
 		connectPhase = CP_CONNECTING_TO_DYNDNS;
 		tcp->CloseConnection(checkIpAddress);
 		tcp->Connect("members.dyndns.org", 80, false);
 	}
-	else if (connectPhase==CP_WAITING_FOR_DYNDNS_RESPONSE && RakNet::GetTime()>phaseTimeout)
+	else if (connectPhase==CP_WAITING_FOR_DYNDNS_RESPONSE && SLNet::GetTime()>phaseTimeout)
 	{
 		SetCompleted(RC_DYNDNS_TIMEOUT, "DynDNS did not respond");
 		return;
@@ -145,28 +150,28 @@ void DynDNS::Update(void)
 		{
 			unsigned int i;
 
-			char *result;
-			result=strstr((char*) packet->data, "Connection: close");
-			if (result!=0)
+			char *curResult;
+			curResult=strstr((char*) packet->data, "Connection: close");
+			if (curResult!=0)
 			{
-				result+=strlen("Connection: close");
-				while (*result && ((*result=='\r') || (*result=='\n') || (*result==' ')) )
-					result++;
+				curResult+=strlen("Connection: close");
+				while (*curResult && ((*curResult=='\r') || (*curResult=='\n') || (*curResult==' ')) )
+					curResult++;
 				for (i=0; i < 13; i++)
 				{
-					if (strncmp(resultTable[i].code, result, strlen(resultTable[i].code))==0)
+					if (strncmp(resultTable[i].code, curResult, strlen(resultTable[i].code))==0)
 					{
 						if (resultTable[i].resultCode==RC_SUCCESS)
 						{
 							// Read my external IP into myIPStr
 							// Advance until we hit a number
-							while (*result && ((*result<'0') || (*result>'9')) )
-								result++;
-							if (*result)
+							while (*curResult && ((*curResult<'0') || (*curResult>'9')) )
+								curResult++;
+							if (*curResult)
 							{
 								SystemAddress parser;
-								parser.FromString(result);
-								parser.ToString(false, myIPStr);
+								parser.FromString(curResult);
+								parser.ToString(false, myIPStr, 32);
 							}
 						}
 						tcp->DeallocatePacket(packet);
@@ -206,20 +211,20 @@ void DynDNS::Update(void)
 			Connection to host lost.
 			*/
 
-			char *result;
-			result=strstr((char*) packet->data, "Current IP Address: ");
-			if (result!=0)
+			char *curResult;
+			curResult=strstr((char*) packet->data, "Current IP Address: ");
+			if (curResult!=0)
 			{
-				result+=strlen("Current IP Address: ");
+				curResult+=strlen("Current IP Address: ");
 				SystemAddress myIp;
-				myIp.FromString(result);
-				myIp.ToString(false, myIPStr);
+				myIp.FromString(curResult);
+				myIp.ToString(false, myIPStr, 32);
 
 				char existingHost[65];
 				existingHost[0]=0;
 				// Resolve DNS we are setting. If equal to current then abort
 				RakNetSocket2::DomainNameToIP(host.C_String(), existingHost);
-				if (existingHost && strcmp(existingHost, myIPStr)==0)
+				if (strcmp(existingHost, myIPStr)==0)
 				{
 					// DynDNS considers setting the IP to what it is already set abuse
 					tcp->DeallocatePacket(packet);

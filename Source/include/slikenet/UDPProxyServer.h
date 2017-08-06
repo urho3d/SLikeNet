@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -20,12 +25,12 @@
 #define __UDP_PROXY_SERVER_H
 
 #include "Export.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PluginInterface2.h"
 #include "UDPForwarder.h"
-#include "RakString.h"
+#include "string.h"
 
-namespace RakNet
+namespace SLNet
 {
 class UDPProxyServer;
 
@@ -39,23 +44,23 @@ struct UDPProxyServerResultHandler
 	/// Called when our login succeeds
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnLoginSuccess(RakNet::RakString usedPassword, RakNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnLoginSuccess(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
 
 	/// We are already logged in.
 	/// This login failed, but the system is operational as if it succeeded
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnAlreadyLoggedIn(RakNet::RakString usedPassword, RakNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnAlreadyLoggedIn(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
 
 	/// The coordinator operator forgot to call UDPProxyCoordinator::SetRemoteLoginPassword()
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnNoPasswordSet(RakNet::RakString usedPassword, RakNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnNoPasswordSet(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
 
 	/// The coordinator operator set a different password in UDPProxyCoordinator::SetRemoteLoginPassword() than what we passed
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
-	virtual void OnWrongPassword(RakNet::RakString usedPassword, RakNet::UDPProxyServer *proxyServerPlugin)=0;
+	virtual void OnWrongPassword(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)=0;
 };
 
 /// \brief UDPProxyServer to control our instance of UDPForwarder
@@ -85,7 +90,7 @@ public:
 	/// \pre Must be connected to the coordinator
 	/// \pre Coordinator must have set a password with UDPProxyCoordinator::SetRemoteLoginPassword()
 	/// \returns false if already logged in, or logging in. Returns true otherwise
-	bool LoginToCoordinator(RakNet::RakString password, SystemAddress coordinatorAddress);
+	bool LoginToCoordinator(SLNet::RakString password, SystemAddress coordinatorAddress);
 
 	/// \brief The server IP reported to the client is the IP address from the server to the coordinator.
 	/// If the server and coordinator are on the same LAN, you need to call SetServerPublicIP() to tell the client what address to connect to

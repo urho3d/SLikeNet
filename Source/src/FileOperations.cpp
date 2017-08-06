@@ -1,17 +1,22 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "FileOperations.h"
+#include "slikenet/FileOperations.h"
 #if _RAKNET_SUPPORT_FileOperations==1
-#include "RakMemoryOverride.h"
-#include "_FindFirst.h" // For linux
+#include "slikenet/memoryoverride.h"
+#include "slikenet/_FindFirst.h" // For linux
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32 
@@ -21,21 +26,16 @@
 #else
 #include <sys/stat.h>
 #include <unistd.h>
-#include "_FindFirst.h"
+#include "slikenet/_FindFirst.h"
 #endif
 #include "errno.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-#ifdef _MSC_VER
-#pragma warning( disable : 4996 ) // mkdir declared deprecated by Microsoft in order to make it harder to be cross platform.  I don't agree it's deprecated.
-#endif
 bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength )
 {
 	int index;
@@ -46,7 +46,7 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 	if ( path == 0 || path[ 0 ] == 0 )
 		return false;
 
-	strcpy( pathCopy, path );
+	strcpy_s( pathCopy, path );
 
 	// Ignore first / if there is one
 	if (pathCopy[0])
@@ -78,9 +78,7 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 
 	if (data)
 	{
-		fp = fopen( path, "wb" );
-
-		if ( fp == 0 )
+		if ( fopen_s( &fp, path, "wb" ) != 0 )
 		{
 			return false;
 		}
@@ -92,7 +90,6 @@ bool WriteFileWithDirectories( const char *path, char *data, unsigned dataLength
 	else
 	{
 #ifdef _WIN32
-#pragma warning( disable : 4996 ) // mkdir declared deprecated by Microsoft in order to make it harder to be cross platform.  I don't agree it's deprecated.
 		res = _mkdir( pathCopy );
 #else
 		res = mkdir( pathCopy, 0744 );
@@ -130,9 +127,9 @@ bool DirectoryExists(const char *directory)
 	_finddata_t fileInfo;
 	intptr_t dir;
 	char baseDirWithStars[560];
-	strcpy(baseDirWithStars, directory);
+	strcpy_s(baseDirWithStars, directory);
 	AddSlash(baseDirWithStars);
-	strcat(baseDirWithStars, "*.*");
+	strcat_s(baseDirWithStars, "*.*");
 	dir=_findfirst(baseDirWithStars, &fileInfo );
 	if (dir==-1)
 		return false;
@@ -162,8 +159,8 @@ void QuoteIfSpaces(char *str)
 }
 unsigned int GetFileLength(const char *path)
 {
-	FILE *fp = fopen(path, "rb");
-	if (fp==0) return 0;
+	FILE *fp;
+	if (fopen_s(&fp, path, "rb")!=0) return 0;
 	fseek(fp, 0, SEEK_END);
 	unsigned int fileLength = ftell(fp);
 	fclose(fp);
@@ -171,9 +168,4 @@ unsigned int GetFileLength(const char *path)
 
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-
 #endif // _RAKNET_SUPPORT_FileOperations
-

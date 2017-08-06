@@ -1,29 +1,30 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_ReadyEvent==1
 
-#include "ReadyEvent.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "RakAssert.h"
+#include "slikenet/ReadyEvent.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/assert.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
-using namespace RakNet;
-
-int RakNet::ReadyEvent::RemoteSystemCompByGuid( const RakNetGUID &key, const RemoteSystem &data )
+int SLNet::ReadyEvent::RemoteSystemCompByGuid( const RakNetGUID &key, const RemoteSystem &data )
 {
 	if (key < data.rakNetGuid)
 		return -1;
@@ -33,7 +34,7 @@ int RakNet::ReadyEvent::RemoteSystemCompByGuid( const RakNetGUID &key, const Rem
 		return 1;
 }
 
-int RakNet::ReadyEvent::ReadyEventNodeComp( const int &key, ReadyEvent::ReadyEventNode * const &data )
+int SLNet::ReadyEvent::ReadyEventNodeComp( const int &key, ReadyEvent::ReadyEventNode * const &data )
 {
 	if (key < data->eventId)
 		return -1;
@@ -92,7 +93,7 @@ bool ReadyEvent::DeleteEvent(int eventId)
 	unsigned eventIndex = readyEventNodeList.GetIndexFromKey(eventId, &objectExists);
 	if (objectExists)
 	{
-		RakNet::OP_DELETE(readyEventNodeList[eventIndex], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(readyEventNodeList[eventIndex], _FILE_AND_LINE_);
 		readyEventNodeList.RemoveAtIndex(eventIndex);
 		return true;
 	}
@@ -324,7 +325,7 @@ bool ReadyEvent::AddToWaitListInternal(unsigned eventIndex, RakNetGUID guid)
 }
 void ReadyEvent::OnReadyEventForceAllSet(Packet *packet)
 {
-	RakNet::BitStream incomingBitStream(packet->data, packet->length, false);
+	SLNet::BitStream incomingBitStream(packet->data, packet->length, false);
 	incomingBitStream.IgnoreBits(8);
 	int eventId;
 	incomingBitStream.Read(eventId);
@@ -342,7 +343,7 @@ void ReadyEvent::OnReadyEventForceAllSet(Packet *packet)
 }
 void ReadyEvent::OnReadyEventPacketUpdate(Packet *packet)
 {
-	RakNet::BitStream incomingBitStream(packet->data, packet->length, false);
+	SLNet::BitStream incomingBitStream(packet->data, packet->length, false);
 	incomingBitStream.IgnoreBits(8);
 	int eventId;
 	incomingBitStream.Read(eventId);
@@ -372,7 +373,7 @@ void ReadyEvent::OnReadyEventPacketUpdate(Packet *packet)
 }
 void ReadyEvent::OnReadyEventQuery(Packet *packet)
 {
-	RakNet::BitStream incomingBitStream(packet->data, packet->length, false);
+	SLNet::BitStream incomingBitStream(packet->data, packet->length, false);
 	incomingBitStream.IgnoreBits(8);
 	int eventId;
 	incomingBitStream.Read(eventId);
@@ -444,14 +445,14 @@ void ReadyEvent::Clear(void)
 	unsigned i;
 	for (i=0; i < readyEventNodeList.Size(); i++)
 	{
-		RakNet::OP_DELETE(readyEventNodeList[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(readyEventNodeList[i], _FILE_AND_LINE_);
 	}
 	readyEventNodeList.Clear(false, _FILE_AND_LINE_);
 }
 
 unsigned ReadyEvent::CreateNewEvent(int eventId, bool isReady)
 {
-	ReadyEventNode *ren = RakNet::OP_NEW<ReadyEventNode>( _FILE_AND_LINE_ );
+	ReadyEventNode *ren = SLNet::OP_NEW<ReadyEventNode>( _FILE_AND_LINE_ );
 	ren->eventId=eventId;
 	if (isReady==false)
 		ren->eventStatus=ID_READY_EVENT_UNSET;
@@ -503,7 +504,7 @@ void ReadyEvent::UpdateReadyStatus(unsigned eventIndex)
 void ReadyEvent::SendReadyUpdate(unsigned eventIndex, unsigned systemIndex, bool forceIfNotDefault)
 {
 	ReadyEventNode *ren = readyEventNodeList[eventIndex];
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	// I do this rather than write true or false, so users that do not use BitStreams can still read the data
 	if ((ren->eventStatus!=ren->systemList[systemIndex].lastSentStatus) ||
 		(forceIfNotDefault && ren->eventStatus!=ID_READY_EVENT_UNSET))
@@ -527,7 +528,7 @@ void ReadyEvent::BroadcastReadyUpdate(unsigned eventIndex, bool forceIfNotDefaul
 }
 void ReadyEvent::SendReadyStateQuery(unsigned eventId, RakNetGUID guid)
 {
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	bs.Write((MessageID)ID_READY_EVENT_QUERY);
 	bs.Write(eventId);
 	SendUnified(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, channel, guid, false);
@@ -558,15 +559,12 @@ void ReadyEvent::PushCompletionPacket(unsigned eventId)
 	/*
 	// Pass a packet to the user that we are now completed, as setting ourselves to signaled was the last thing being waited on
 	Packet *p = AllocatePacketUnified(sizeof(MessageID)+sizeof(int));
-	RakNet::BitStream bs(p->data, sizeof(MessageID)+sizeof(int), false);
+	SLNet::BitStream bs(p->data, sizeof(MessageID)+sizeof(int), false);
 	bs.SetWriteOffset(0);
 	bs.Write((MessageID)ID_READY_EVENT_ALL_SET);
 	bs.Write(eventId);
 	rakPeerInterface->PushBackPacket(p, false);
 	*/
 }
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

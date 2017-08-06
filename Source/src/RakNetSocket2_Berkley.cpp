@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "EmptyHeader.h"
+#include "slikenet/EmptyHeader.h"
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
@@ -18,7 +23,7 @@
 // Every platform except windows store 8 and native client supports Berkley sockets
 #if !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
 
-#include "Itoa.h"
+#include "slikenet/Itoa.h"
 
 void RNS2_Berkley::SetSocketOptions(void)
 {
@@ -95,8 +100,7 @@ void RNS2_Berkley::GetSystemAddressIPV4 ( RNS2Socket rns2Socket, SystemAddress *
 
 
 
-
-			systemAddressOut->address.addr4.sin_addr.s_addr=inet_addr__("127.0.0.1");
+		inet_pton(AF_INET, "127.0.0.1", &systemAddressOut->address.addr4.sin_addr.s_addr);
 
 	}
 }
@@ -117,7 +121,7 @@ void RNS2_Berkley::GetSystemAddressIPV4And6 ( RNS2Socket rns2Socket, SystemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer));
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -156,9 +160,6 @@ void RNS2_Berkley::GetSystemAddressIPV4And6 ( RNS2Socket rns2Socket, SystemAddre
 #endif
 }
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4702 ) // warning C4702: unreachable code
-#endif
 RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindParameters, const char *file, unsigned int line ) {
 
 	(void) file;
@@ -190,7 +191,7 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 
 
-		boundAddress.address.addr4.sin_addr.s_addr = inet_addr__( bindParameters->hostAddress );
+		inet_pton(AF_INET, bindParameters->hostAddress, &boundAddress.address.addr4.sin_addr.s_addr);
 
 	}
 	else
@@ -253,9 +254,9 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		default:
 			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", ret); break;
 		}
-#endif
-	
+
 		return BR_FAILED_TO_BIND_SOCKET;
+#endif
 	}
 
 	GetSystemAddressIPV4(rns2Socket, &boundAddress );
@@ -388,14 +389,14 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 	if (recvFromStruct->bytesRead==-1)
 	{
 		DWORD dwIOError = GetLastError();
-		if (dwIoError != 10035)
+		if (dwIOError != 10035)
 		{
 			LPVOID messageBuffer;
 			FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// I see this hit on XP with IPV6 for some reason
-			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer) );
 			LocalFree( messageBuffer );
 		}
 	}	
@@ -412,7 +413,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 
 	if (recvFromStruct->bytesRead<=0)
 		return;
-	recvFromStruct->timeRead=RakNet::GetTimeUS();
+	recvFromStruct->timeRead= SLNet::GetTimeUS();
 
 
 
@@ -509,7 +510,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// something has gone wrong here...
-			RAKNET_DEBUG_PRINTF( "sendto failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_PRINTF( "sendto failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer) );
 
 			//Free the buffer.
 			LocalFree( messageBuffer );
@@ -519,7 +520,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 
 		return;
 	}
-	recvFromStruct->timeRead=RakNet::GetTimeUS();
+	recvFromStruct->timeRead= SLNet::GetTimeUS();
 
 
 

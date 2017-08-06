@@ -1,20 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakWString.h"
-#include "BitStream.h"
+#include "slikenet/wstring.h"
+#include "slikenet/BitStream.h"
 #include <string.h>
 #include <wchar.h>
 #include <stdlib.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // From http://www.joelonsoftware.com/articles/Unicode.html
 // Only code points 128 and above are stored using 2, 3, in fact, up to 6 bytes.
@@ -89,7 +96,7 @@ RakWString& RakWString::operator = ( const wchar_t * const str )
 		notifyOutOfMemory(_FILE_AND_LINE_);
 		return *this;
 	}
-	wcscpy(c_str,str);
+	wcscpy_s(c_str,c_strCharLength+1,str);
 
 	return *this;
 }
@@ -109,7 +116,7 @@ RakWString& RakWString::operator = ( const char * const str )
 	if (str[0]==0)
 		return *this;
 
-	c_strCharLength = mbstowcs(NULL, str, 0);
+	mbstowcs_s(&c_strCharLength, NULL, 0, str, 0);
 	c_str = (wchar_t *) rakMalloc_Ex( (c_strCharLength + 1) * MAX_BYTES_PER_UNICODE_CHAR, _FILE_AND_LINE_);
 	if (!c_str)
 	{
@@ -118,7 +125,7 @@ RakWString& RakWString::operator = ( const char * const str )
 		return *this;
 	}
 
-	c_strCharLength = mbstowcs(c_str, str, c_strCharLength+1);
+	mbstowcs_s(&c_strCharLength, c_str, c_strCharLength + 1, str, c_strCharLength);
 	if (c_strCharLength == (size_t) (-1))
 	{
 		RAKNET_DEBUG_PRINTF("Couldn't convert string--invalid multibyte character.\n");
@@ -161,7 +168,7 @@ RakWString& RakWString::operator +=( const RakWString& right)
 	}
 	else
 	{
-		wcscat(c_str, right.C_String());
+		wcscat_s(c_str, newCharLength + 1, right.C_String());
 	}
 
 	return *this;
@@ -191,7 +198,7 @@ RakWString& RakWString::operator += ( const wchar_t * const right )
 	}
 	else
 	{
-		wcscat(c_str, right);
+		wcscat_s(c_str, newCharLength + 1, right);
 	}
 
 	return *this;
@@ -327,7 +334,7 @@ bool RakWString::Deserialize(BitStream *bs)
 		}
 		multiByteBuffer[mbByteLength]=0;
 		c_str = (wchar_t *) rakMalloc_Ex( (mbByteLength + 1) * MAX_BYTES_PER_UNICODE_CHAR, _FILE_AND_LINE_);
-		c_strCharLength = mbstowcs(c_str, multiByteBuffer, mbByteLength);
+		mbstowcs_s(&c_strCharLength, c_str, mbByteLength + 1, multiByteBuffer, mbByteLength);
 		rakFree_Ex(multiByteBuffer, _FILE_AND_LINE_);
 		c_str[c_strCharLength]=0;
 #else
@@ -349,7 +356,7 @@ bool RakWString::Deserialize(BitStream *bs)
 		return true;
 	}
 }
-bool RakWString::Deserialize(wchar_t *str, BitStream *bs)
+bool RakWString::Deserialize(wchar_t *str, size_t strLength, BitStream *bs)
 {
 	size_t mbByteLength;
 	bs->ReadCasted<unsigned short>(mbByteLength);
@@ -365,7 +372,8 @@ bool RakWString::Deserialize(wchar_t *str, BitStream *bs)
 			return false;
 		}
 		multiByteBuffer[mbByteLength]=0;
-		size_t c_strCharLength = mbstowcs(str, multiByteBuffer, mbByteLength);
+		size_t c_strCharLength;
+		mbstowcs_s(&c_strCharLength, str, strLength, multiByteBuffer, mbByteLength);
 		rakFree_Ex(multiByteBuffer, _FILE_AND_LINE_);
 		str[c_strCharLength]=0;
 #else
@@ -382,29 +390,29 @@ bool RakWString::Deserialize(wchar_t *str, BitStream *bs)
 	}
 	else
 	{
-		wcscpy(str,L"");
+		wcscpy_s(str,strLength,L"");
 	}
 	return true;
 }
 
 /*
-RakNet::BitStream bsTest;
-RakNet::RakWString testString("cat"), testString2;
+SLNet::BitStream bsTest;
+SLNet::RakWString testString("cat"), testString2;
 testString = "Hllo";
 testString = L"Hello";
 testString += L" world";
 testString2 += testString2;
-RakNet::RakWString ts3(L" from here");
+SLNet::RakWString ts3(L" from here");
 testString2+=ts3;
-RakNet::RakWString ts4(L" 222");
+SLNet::RakWString ts4(L" 222");
 testString2=ts4;
-RakNet::RakString rs("rakstring");
+SLNet::RakString rs("rakstring");
 testString2+=rs;
 testString2=rs;
 bsTest.Write(L"one");
 bsTest.Write(testString2);
 bsTest.SetReadOffset(0);
-RakNet::RakWString ts5, ts6;
+SLNet::RakWString ts5, ts6;
 wchar_t buff[99];
 wchar_t *wptr = (wchar_t*)buff;
 bsTest.Read(wptr);

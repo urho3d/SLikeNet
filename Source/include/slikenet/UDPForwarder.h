@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -21,18 +26,18 @@
 #define __UDP_FORWARDER_H
 
 #include "Export.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "SocketIncludes.h"
 #include "UDPProxyCommon.h"
 #include "SimpleMutex.h"
-#include "RakString.h"
-#include "RakThread.h"
+#include "string.h"
+#include "thread.h"
 #include "DS_Queue.h"
 #include "DS_OrderedList.h"
 #include "LocklessTypes.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 enum UDPForwarderResult
@@ -85,7 +90,7 @@ public:
 	/// \param[out] forwardingSocket New opened socket for forwarding
 	/// \return UDPForwarderResult
 	UDPForwarderResult StartForwarding(
-		SystemAddress source, SystemAddress destination, RakNet::TimeMS timeoutOnNoDataMS,
+		SystemAddress source, SystemAddress destination, SLNet::TimeMS timeoutOnNoDataMS,
 		const char *forceHostAddress, unsigned short socketFamily,
 		unsigned short *forwardingPort, __UDPSOCKET__ *forwardingSocket);
 
@@ -100,9 +105,9 @@ public:
 		ForwardEntry();
 		~ForwardEntry();
 		SystemAddress addr1Unconfirmed, addr2Unconfirmed, addr1Confirmed, addr2Confirmed;
-		RakNet::TimeMS timeLastDatagramForwarded;
+		SLNet::TimeMS timeLastDatagramForwarded;
 		__UDPSOCKET__ socket;
-		RakNet::TimeMS timeoutOnNoDataMS;
+		SLNet::TimeMS timeoutOnNoDataMS;
 		short socketFamily;
 	};
 
@@ -111,13 +116,13 @@ protected:
 	friend RAK_THREAD_DECLARATION(UpdateUDPForwarderGlobal);
 
 	void UpdateUDPForwarder(void);
-	void RecvFrom(RakNet::TimeMS curTime, ForwardEntry *forwardEntry);
+	void RecvFrom(SLNet::TimeMS curTime, ForwardEntry *forwardEntry);
 
 	struct StartForwardingInputStruct
 	{
 		SystemAddress source;
 		SystemAddress destination;
-		RakNet::TimeMS timeoutOnNoDataMS;
+		SLNet::TimeMS timeoutOnNoDataMS;
 		RakString forceHostAddress;
 		unsigned short socketFamily;
 		unsigned int inputId;
@@ -148,7 +153,7 @@ protected:
 //	SimpleMutex forwardListNotUpdatedMutex;
 
 	unsigned short maxForwardEntries;
-	RakNet::LocklessUint32_t isRunning, threadRunning;
+	SLNet::LocklessUint32_t isRunning, threadRunning;
 
 };
 

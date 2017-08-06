@@ -1,32 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_DirectoryDeltaTransfer==1 && _RAKNET_SUPPORT_FileOperations==1
 
-#include "DirectoryDeltaTransfer.h"
-#include "FileList.h"
-#include "StringCompressor.h"
-#include "RakPeerInterface.h"
-#include "FileListTransfer.h"
-#include "FileListTransferCBInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "FileOperations.h"
-#include "IncrementalReadInterface.h"
+#include "slikenet/DirectoryDeltaTransfer.h"
+#include "slikenet/FileList.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/IncrementalReadInterface.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
 class DDTCallback : public FileListTransferCBInterface
 {
@@ -42,10 +45,10 @@ public:
 	{
 		char fullPathToDir[1024];
 
-		if (onFileStruct->fileName && onFileStruct->fileData && subdirLen < strlen(onFileStruct->fileName))
+		if (onFileStruct->fileData && subdirLen < strlen(onFileStruct->fileName))
 		{
-			strcpy(fullPathToDir, outputSubdir);
-			strcat(fullPathToDir, onFileStruct->fileName+subdirLen);
+			strcpy_s(fullPathToDir, outputSubdir);
+			strcat_s(fullPathToDir, onFileStruct->fileName+subdirLen);
 			WriteFileWithDirectories(fullPathToDir, (char*)onFileStruct->fileData, (unsigned int ) onFileStruct->byteLengthOfThisFile);
 		}
 		else
@@ -58,10 +61,10 @@ public:
 	{
 		char fullPathToDir[1024];
 
-		if (fps->onFileStruct->fileName && subdirLen < strlen(fps->onFileStruct->fileName))
+		if (subdirLen < strlen(fps->onFileStruct->fileName))
 		{
-			strcpy(fullPathToDir, outputSubdir);
-			strcat(fullPathToDir, fps->onFileStruct->fileName+subdirLen);
+			strcpy_s(fullPathToDir, outputSubdir);
+			strcat_s(fullPathToDir, fps->onFileStruct->fileName+subdirLen);
 		}
 		else
 			fullPathToDir[0]=0;
@@ -80,14 +83,14 @@ DirectoryDeltaTransfer::DirectoryDeltaTransfer()
 {
 	applicationDirectory[0]=0;
 	fileListTransfer=0;
-	availableUploads = RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+	availableUploads = SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
 	priority=HIGH_PRIORITY;
 	orderingChannel=0;
 	incrementalReadInterface=0;
 }
 DirectoryDeltaTransfer::~DirectoryDeltaTransfer()
 {
-	RakNet::OP_DELETE(availableUploads, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(availableUploads, _FILE_AND_LINE_);
 }
 void DirectoryDeltaTransfer::SetFileListTransferPlugin(FileListTransfer *flt)
 {
@@ -121,9 +124,9 @@ void DirectoryDeltaTransfer::SetApplicationDirectory(const char *pathToApplicati
 		applicationDirectory[0]=0;
 	else
 	{
-		strncpy(applicationDirectory, pathToApplication, 510);
+		strncpy_s(applicationDirectory, pathToApplication, 510);
 		if (applicationDirectory[strlen(applicationDirectory)-1]!='/' && applicationDirectory[strlen(applicationDirectory)-1]!='\\')
-			strcat(applicationDirectory, "/");
+			strcat_s(applicationDirectory, "/");
 		applicationDirectory[511]=0;
 	}
 }
@@ -145,7 +148,7 @@ unsigned short DirectoryDeltaTransfer::DownloadFromSubdirectory(FileList &localF
 	localFiles.AddCallback(cb);
 
 	// Prepare the callback data
-	transferCallback = RakNet::OP_NEW<DDTCallback>( _FILE_AND_LINE_ );
+	transferCallback = SLNet::OP_NEW<DDTCallback>( _FILE_AND_LINE_ );
 	if (subdir && subdir[0])
 	{
 		transferCallback->subdirLen=(unsigned int)strlen(subdir);
@@ -155,20 +158,20 @@ unsigned short DirectoryDeltaTransfer::DownloadFromSubdirectory(FileList &localF
 	else
 		transferCallback->subdirLen=0;
 	if (prependAppDirToOutputSubdir)
-		strcpy(transferCallback->outputSubdir, applicationDirectory);
+		strcpy_s(transferCallback->outputSubdir, applicationDirectory);
 	else
 		transferCallback->outputSubdir[0]=0;
 	if (outputSubdir)
-		strcat(transferCallback->outputSubdir, outputSubdir);
+		strcat_s(transferCallback->outputSubdir, outputSubdir);
 	if (transferCallback->outputSubdir[strlen(transferCallback->outputSubdir)-1]!='/' && transferCallback->outputSubdir[strlen(transferCallback->outputSubdir)-1]!='\\')
-		strcat(transferCallback->outputSubdir, "/");
+		strcat_s(transferCallback->outputSubdir, "/");
 	transferCallback->onFileCallback=onFileCallback;
 
 	// Setup the transfer plugin to get the response to this download request
 	unsigned short setId = fileListTransfer->SetupReceive(transferCallback, true, host);
 
 	// Send to the host, telling it to process this request
-	RakNet::BitStream outBitstream;
+	SLNet::BitStream outBitstream;
 	outBitstream.Write((MessageID)ID_DDT_DOWNLOAD_REQUEST);
 	outBitstream.Write(setId);
 	StringCompressor::Instance()->EncodeString(subdir, 256, &outBitstream);
@@ -197,7 +200,7 @@ void DirectoryDeltaTransfer::OnDownloadRequest(Packet *packet)
 {
 	char subdir[256];
 	char remoteSubdir[256];
-	RakNet::BitStream inBitstream(packet->data, packet->length, false);
+	SLNet::BitStream inBitstream(packet->data, packet->length, false);
 	FileList remoteFileHash;
 	FileList delta;
 	unsigned short setId;
@@ -244,9 +247,5 @@ void DirectoryDeltaTransfer::SetDownloadRequestIncrementalReadInterface(Incremen
 	incrementalReadInterface=_incrementalReadInterface;
 	chunkSize=_chunkSize;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_StatisticsHistory==1
 
-#include "StatisticsHistory.h"
-#include "GetTime.h"
-#include "RakNetStatistics.h"
-#include "RakPeerInterface.h"
+#include "slikenet/StatisticsHistory.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/statistics.h"
+#include "slikenet/peerinterface.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(StatisticsHistory,StatisticsHistory);
 STATIC_FACTORY_DEFINITIONS(StatisticsHistoryPlugin,StatisticsHistoryPlugin);
@@ -75,7 +80,7 @@ bool StatisticsHistory::AddObject(TrackedObjectData tod)
 	unsigned int idx = objects.GetIndexFromKey(tod.objectId, &objectExists);
 	if (objectExists)
 		return false;
-	TrackedObject *to = RakNet::OP_NEW<TrackedObject>(_FILE_AND_LINE_);
+	TrackedObject *to = SLNet::OP_NEW<TrackedObject>(_FILE_AND_LINE_);
 	to->trackedObjectData=tod;
 	objects.InsertAtIndex(to,idx,_FILE_AND_LINE_);
 	return true;
@@ -94,13 +99,13 @@ void StatisticsHistory::RemoveObjectAtIndex(unsigned int index)
 {
 	TrackedObject *to = objects[index];
 	objects.RemoveAtIndex(index);
-	RakNet::OP_DELETE(to, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(to, _FILE_AND_LINE_);
 }
 void StatisticsHistory::Clear(void)
 {
 	for (unsigned int idx=0; idx < objects.Size(); idx++)
 	{
-		RakNet::OP_DELETE(objects[idx], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(objects[idx], _FILE_AND_LINE_);
 	}
 	objects.Clear(false, _FILE_AND_LINE_);
 }
@@ -121,7 +126,7 @@ void StatisticsHistory::AddValueByIndex(unsigned int index, RakString key, SHVal
 	DataStructures::HashIndex hi = to->dataQueues.GetIndexOf(key);
 	if (hi.IsInvalid())
 	{
-		queue = RakNet::OP_NEW<TimeAndValueQueue>(_FILE_AND_LINE_);
+		queue = SLNet::OP_NEW<TimeAndValueQueue>(_FILE_AND_LINE_);
 		queue->key=key;
 		queue->timeToTrackValues = timeToTrack;
 		to->dataQueues.Push(key, queue, _FILE_AND_LINE_);
@@ -257,7 +262,7 @@ void StatisticsHistory::GetUniqueKeyList(DataStructures::List<RakString> &keys)
 	{
 		TrackedObject *to = objects[idx];
 		DataStructures::List<TimeAndValueQueue*> itemList;
-		DataStructures::List<RakNet::RakString> keyList;
+		DataStructures::List<SLNet::RakString> keyList;
 		to->dataQueues.GetAsList(itemList, keyList, _FILE_AND_LINE_);
 		for (unsigned int k=0; k < keyList.Size(); k++)
 		{
@@ -697,7 +702,7 @@ StatisticsHistory::TrackedObject::~TrackedObject()
 	DataStructures::List<StatisticsHistory::TimeAndValueQueue*> itemList;
 	DataStructures::List<RakString> keyList;
 	for (unsigned int idx=0; idx < itemList.Size(); idx++)
-		RakNet::OP_DELETE(itemList[idx], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(itemList[idx], _FILE_AND_LINE_);
 }
 unsigned int StatisticsHistory::GetObjectIndex(uint64_t objectId) const
 {

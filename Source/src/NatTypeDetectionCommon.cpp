@@ -1,24 +1,29 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NatTypeDetectionCommon.h"
+#include "slikenet/NatTypeDetectionCommon.h"
 
 #if _RAKNET_SUPPORT_NatTypeDetectionServer==1 || _RAKNET_SUPPORT_NatTypeDetectionClient==1
 
-#include "SocketLayer.h"
-#include "SocketIncludes.h"
-#include "SocketDefines.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/SocketIncludes.h"
+#include "slikenet/SocketDefines.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
-bool RakNet::CanConnect(NATTypeDetectionResult type1, NATTypeDetectionResult type2)
+bool SLNet::CanConnect(NATTypeDetectionResult type1, NATTypeDetectionResult type2)
 {
 	/// If one system is NAT_TYPE_SYMMETRIC, the other must be NAT_TYPE_ADDRESS_RESTRICTED or less
 	/// If one system is NAT_TYPE_PORT_RESTRICTED, the other must be NAT_TYPE_PORT_RESTRICTED or less
@@ -38,7 +43,7 @@ bool RakNet::CanConnect(NATTypeDetectionResult type1, NATTypeDetectionResult typ
 	return connectionGraph[(int) type1][(int) type2];
 }
 
-const char *RakNet::NATTypeDetectionResultToString(NATTypeDetectionResult type)
+const char *SLNet::NATTypeDetectionResultToString(NATTypeDetectionResult type)
 {
 	switch (type)
 	{
@@ -67,7 +72,7 @@ const char *RakNet::NATTypeDetectionResultToString(NATTypeDetectionResult type)
 // None and relaxed can connect to anything
 // Moderate can connect to moderate or less
 // Strict can connect to relaxed or less
-const char *RakNet::NATTypeDetectionResultToStringFriendly(NATTypeDetectionResult type)
+const char *SLNet::NATTypeDetectionResultToStringFriendly(NATTypeDetectionResult type)
 {
 	switch (type)
 	{
@@ -94,7 +99,7 @@ const char *RakNet::NATTypeDetectionResultToStringFriendly(NATTypeDetectionResul
 }
 
 
-RakNetSocket2* RakNet::CreateNonblockingBoundSocket(const char *bindAddr
+RakNetSocket2* SLNet::CreateNonblockingBoundSocket(const char *bindAddr
 #ifdef __native_client__
 											,_PP_Instance_ chromeInstance
 #endif
@@ -179,7 +184,7 @@ RakNetSocket2* RakNet::CreateNonblockingBoundSocket(const char *bindAddr
 }
 
 /*
-int RakNet::NatTypeRecvFrom(char *data, RakNetSocket2* socket, SystemAddress &sender, RNS2EventHandler *eventHandler)
+int SLNet::NatTypeRecvFrom(char *data, RakNetSocket2* socket, SystemAddress &sender, RNS2EventHandler *eventHandler)
 {
 #if defined(__native_client__)
 	RakAssert("TODO" && 0);

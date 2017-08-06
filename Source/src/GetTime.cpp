@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,7 +18,7 @@
 
 
 #if defined(_WIN32)
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 
  #if !defined(WINDOWS_PHONE_8)
 		// To call timeGetTime
@@ -23,7 +28,7 @@
 
 #endif
 
-#include "GetTime.h"
+#include "slikenet/GetTime.h"
 
 
 
@@ -44,22 +49,22 @@
 #else
 #include <sys/time.h>
 #include <unistd.h>
-RakNet::TimeUS initialTime;
+SLNet::TimeUS initialTime;
 #endif
 
 static bool initialized=false;
 
 #if defined(GET_TIME_SPIKE_LIMIT) && GET_TIME_SPIKE_LIMIT>0
-#include "SimpleMutex.h"
-RakNet::TimeUS lastNormalizedReturnedValue=0;
-RakNet::TimeUS lastNormalizedInputValue=0;
+#include "slikenet/SimpleMutex.h"
+SLNet::TimeUS lastNormalizedReturnedValue=0;
+SLNet::TimeUS lastNormalizedInputValue=0;
 /// This constraints timer forward jumps to 1 second, and does not let it jump backwards
 /// See http://support.microsoft.com/kb/274323 where the timer can sometimes jump forward by hours or days
 /// This also has the effect where debugging a sending system won't treat the time spent halted past 1 second as elapsed network time
-RakNet::TimeUS NormalizeTime(RakNet::TimeUS timeIn)
+SLNet::TimeUS NormalizeTime(SLNet::TimeUS timeIn)
 {
-	RakNet::TimeUS diff, lastNormalizedReturnedValueCopy;
-	static RakNet::SimpleMutex mutex;
+	SLNet::TimeUS diff, lastNormalizedReturnedValueCopy;
+	static SLNet::SimpleMutex mutex;
 	
 	mutex.Lock();
 	if (timeIn>=lastNormalizedInputValue)
@@ -80,13 +85,13 @@ RakNet::TimeUS NormalizeTime(RakNet::TimeUS timeIn)
 	return lastNormalizedReturnedValueCopy;
 }
 #endif // #if defined(GET_TIME_SPIKE_LIMIT) && GET_TIME_SPIKE_LIMIT>0
-RakNet::Time RakNet::GetTime( void )
+SLNet::Time SLNet::GetTime( void )
 {
-	return (RakNet::Time)(GetTimeUS()/1000);
+	return (SLNet::Time)(GetTimeUS()/1000);
 }
-RakNet::TimeMS RakNet::GetTimeMS( void )
+SLNet::TimeMS SLNet::GetTimeMS( void )
 {
-	return (RakNet::TimeMS)(GetTimeUS()/1000);
+	return (SLNet::TimeMS)(GetTimeUS()/1000);
 }
 
 
@@ -137,7 +142,7 @@ RakNet::TimeMS RakNet::GetTimeMS( void )
 
 
 #if   defined(_WIN32)
-RakNet::TimeUS GetTimeUS_Windows( void )
+SLNet::TimeUS GetTimeUS_Windows( void )
 {
 	if ( initialized == false)
 	{
@@ -148,7 +153,7 @@ RakNet::TimeUS GetTimeUS_Windows( void )
 //		HANDLE mProc = GetCurrentProcess();
 
 		// Get the current Affinity
-#if _MSC_VER >= 1400 && defined (_M_X64)
+#if defined (_M_X64)
 //		GetProcessAffinityMask(mProc, (PDWORD_PTR)&mProcMask, (PDWORD_PTR)&mSysMask);
 #else
 //		GetProcessAffinityMask(mProc, &mProcMask, &mSysMask);
@@ -159,7 +164,7 @@ RakNet::TimeUS GetTimeUS_Windows( void )
 	}	
 
 	// 9/26/2010 In China running LuDaShi, QueryPerformanceFrequency has to be called every time because CPU clock speeds can be different
-	RakNet::TimeUS curTime;
+	SLNet::TimeUS curTime;
 	LARGE_INTEGER PerfVal;
 	LARGE_INTEGER yo1;
 
@@ -169,7 +174,7 @@ RakNet::TimeUS GetTimeUS_Windows( void )
 	__int64 quotient, remainder;
 	quotient=((PerfVal.QuadPart) / yo1.QuadPart);
 	remainder=((PerfVal.QuadPart) % yo1.QuadPart);
-	curTime = (RakNet::TimeUS) quotient*(RakNet::TimeUS)1000000 + (remainder*(RakNet::TimeUS)1000000 / yo1.QuadPart);
+	curTime = (SLNet::TimeUS) quotient*(SLNet::TimeUS)1000000 + (remainder*(SLNet::TimeUS)1000000 / yo1.QuadPart);
 
 #if defined(GET_TIME_SPIKE_LIMIT) && GET_TIME_SPIKE_LIMIT>0
 	return NormalizeTime(curTime);
@@ -178,22 +183,22 @@ RakNet::TimeUS GetTimeUS_Windows( void )
 #endif // #if defined(GET_TIME_SPIKE_LIMIT) && GET_TIME_SPIKE_LIMIT>0
 }
 #elif defined(__GNUC__)  || defined(__GCCXML__) || defined(__S3E__)
-RakNet::TimeUS GetTimeUS_Linux( void )
+SLNet::TimeUS GetTimeUS_Linux( void )
 {
 	timeval tp;
 	if ( initialized == false)
 	{
 		gettimeofday( &tp, 0 );
 		initialized=true;
-		// I do this because otherwise RakNet::Time in milliseconds won't work as it will underflow when dividing by 1000 to do the conversion
-		initialTime = ( tp.tv_sec ) * (RakNet::TimeUS) 1000000 + ( tp.tv_usec );
+		// I do this because otherwise SLNet::Time in milliseconds won't work as it will underflow when dividing by 1000 to do the conversion
+		initialTime = ( tp.tv_sec ) * (SLNet::TimeUS) 1000000 + ( tp.tv_usec );
 	}
 
 	// GCC
-	RakNet::TimeUS curTime;
+	SLNet::TimeUS curTime;
 	gettimeofday( &tp, 0 );
 
-	curTime = ( tp.tv_sec ) * (RakNet::TimeUS) 1000000 + ( tp.tv_usec );
+	curTime = ( tp.tv_sec ) * (SLNet::TimeUS) 1000000 + ( tp.tv_usec );
 
 #if defined(GET_TIME_SPIKE_LIMIT) && GET_TIME_SPIKE_LIMIT>0
 	return NormalizeTime(curTime - initialTime);
@@ -203,7 +208,7 @@ RakNet::TimeUS GetTimeUS_Linux( void )
 }
 #endif
 
-RakNet::TimeUS RakNet::GetTimeUS( void )
+SLNet::TimeUS SLNet::GetTimeUS( void )
 {
 
 
@@ -217,15 +222,15 @@ RakNet::TimeUS RakNet::GetTimeUS( void )
 	return GetTimeUS_Linux();
 #endif
 }
-bool RakNet::GreaterThan(RakNet::Time a, RakNet::Time b)
+bool SLNet::GreaterThan(SLNet::Time a, SLNet::Time b)
 {
 	// a > b?
-	const RakNet::Time halfSpan =(RakNet::Time) (((RakNet::Time)(const RakNet::Time)-1)/(RakNet::Time)2);
+	const SLNet::Time halfSpan =(SLNet::Time) (((SLNet::Time)(const SLNet::Time)-1)/(SLNet::Time)2);
 	return b!=a && b-a>halfSpan;
 }
-bool RakNet::LessThan(RakNet::Time a, RakNet::Time b)
+bool SLNet::LessThan(SLNet::Time a, SLNet::Time b)
 {
 	// a < b?
-	const RakNet::Time halfSpan = ((RakNet::Time)(const RakNet::Time)-1)/(RakNet::Time)2;
+	const SLNet::Time halfSpan = ((SLNet::Time)(const SLNet::Time)-1)/(SLNet::Time)2;
 	return b!=a && b-a<halfSpan;
 }

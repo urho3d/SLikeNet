@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __RAKNET_SOCKET_2_H
 #define __RAKNET_SOCKET_2_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "MTUSize.h"
 #include "LocklessTypes.h"
-#include "RakThread.h"
+#include "thread.h"
 #include "DS_ThreadsafeAllocatingQueue.h"
 #include "Export.h"
 
@@ -34,13 +39,18 @@
 typedef int PP_Resource;
 #endif
 
-namespace RakNet
+namespace SLNet
 {
 
 class RakNetSocket2;
 struct RNS2_BerkleyBindParameters;
 struct RNS2_SendParameters;
+#ifdef WIN32
+typedef SOCKET RNS2Socket;
+#else
+// #low determine whether we cannot use SOCKET on all platforms...
 typedef int RNS2Socket;
+#endif
 
 enum RNS2BindResult
 {
@@ -83,7 +93,7 @@ struct RNS2RecvStruct
 
 	int bytesRead;
 	SystemAddress systemAddress;
-	RakNet::TimeUS timeRead;
+	SLNet::TimeUS timeRead;
 	RakNetSocket2 *socket;
 };
 
@@ -217,7 +227,7 @@ public:
 	//
 	// Example:
 	// 
-	// DataStructures::List< RakNet::RakNetSocket2* > sockets;
+	// DataStructures::List< SLNet::RakNetSocket2* > sockets;
 	// rakPeerInterface->GetSockets(sockets);
 	// for (unsigned int i=0; i < sockets.Size(); i++)
 	// {
@@ -316,7 +326,7 @@ protected:
 	RNS2_BerkleyBindParameters binding;
 
 	unsigned RecvFromLoopInt(void);
-	RakNet::LocklessUint32_t isRecvFromLoopThreadActive;
+	SLNet::LocklessUint32_t isRecvFromLoopThreadActive;
 	volatile bool endThreads;
 	// Constructor not called!
 
@@ -448,6 +458,6 @@ protected:
 
 #endif // #elif !defined(WINDOWS_STORE_RT)
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __RAKNET_SOCKET_2_H

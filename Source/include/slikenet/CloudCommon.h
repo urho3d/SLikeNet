@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "NativeFeatureIncludes.h"
@@ -14,10 +19,10 @@
 #ifndef __CLOUD_COMMON_H
 #define __CLOUD_COMMON_H
 
-#include "RakNetTypes.h"
-#include "RakString.h"
+#include "types.h"
+#include "string.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 class BitStream;
@@ -46,12 +51,12 @@ public:
 struct RAK_DLL_EXPORT CloudKey
 {
 	CloudKey() {}
-	CloudKey(RakNet::RakString _primaryKey, uint32_t _secondaryKey) : primaryKey(_primaryKey), secondaryKey(_secondaryKey) {}
+	CloudKey(SLNet::RakString _primaryKey, uint32_t _secondaryKey) : primaryKey(_primaryKey), secondaryKey(_secondaryKey) {}
 	~CloudKey() {}
 
 	/// Identifies the primary key. This is intended to be a major category, such as the name of the application
 	/// Must be non-empty
-	RakNet::RakString primaryKey;
+	SLNet::RakString primaryKey;
 
 	/// Identifies the secondary key. This is intended to be a subcategory enumeration, such as PLAYER_LIST or RUNNING_SCORES
 	uint32_t secondaryKey;
@@ -143,7 +148,7 @@ struct RAK_DLL_EXPORT CloudQueryResult
 	void SerializeCloudQueryRows(bool writeToBitstream, uint32_t &numRows, BitStream *bitStream, CloudAllocator *allocator);
 };
 
-} // Namespace RakNet
+} // Namespace SLikeNet
 
 #endif // __CLOUD_COMMON_H
 

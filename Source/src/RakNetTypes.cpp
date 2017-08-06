@@ -1,32 +1,37 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 ///
 
 
-#include "RakNetTypes.h"
-#include "RakAssert.h"
+#include "slikenet/types.h"
+#include "slikenet/assert.h"
 #include <string.h>
 #include <stdio.h>
-#include "WindowsIncludes.h"
-#include "WSAStartupSingleton.h"
-#include "SocketDefines.h"
-#include "RakNetSocket2.h"
+#include "slikenet/WindowsIncludes.h"
+#include "slikenet/WSAStartupSingleton.h"
+#include "slikenet/SocketDefines.h"
+#include "slikenet/socket2.h"
 
 
 #if   defined(_WIN32)
 // extern __int64 _strtoui64(const char*, char**, int); // needed for Code::Blocks. Does not compile on Visual Studio 2010
 // IP_DONTFRAGMENT is different between winsock 1 and winsock 2.  Therefore, Winsock2.h must be linked againt Ws2_32.lib
 // winsock.h must be linked against WSock32.lib.  If these two are mixed up the flag won't work correctly
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 
 #else
 #include <sys/socket.h>
@@ -35,12 +40,14 @@
 #endif
 
 #include <string.h> // strncasecmp
-#include "Itoa.h"
-#include "SocketLayer.h"
-#include "SuperFastHash.h"
+#include "slikenet/Itoa.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/SuperFastHash.h"
 #include <stdlib.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 const char *IPV6_LOOPBACK="::1";
 const char *IPV4_LOOPBACK="127.0.0.1";
@@ -63,13 +70,13 @@ const char *AddressOrGUID::ToString(bool writePort) const
 		return rakNetGuid.ToString();
 	return systemAddress.ToString(writePort);
 }
-void AddressOrGUID::ToString(bool writePort, char *dest) const
+void AddressOrGUID::ToString(bool writePort, char *dest, size_t destLength) const
 {
 	if (rakNetGuid!=UNASSIGNED_RAKNET_GUID)
-		return rakNetGuid.ToString(dest);
-	return systemAddress.ToString(writePort,dest);
+		return rakNetGuid.ToString(dest,destLength);
+	return systemAddress.ToString(writePort,dest,destLength);
 }
-bool RakNet::NonNumericHostString( const char *host )
+bool SLNet::NonNumericHostString( const char *host )
 {
 	// Return false if IP address. Return true if domain
 	unsigned int i=0;
@@ -102,7 +109,7 @@ SocketDescriptor::SocketDescriptor(unsigned short _port, const char *_hostAddres
 	remotePortRakNetWasStartedOn_PS3_PSP2=0;
 	port=_port;
 	if (_hostAddress)
-		strcpy(hostAddress, _hostAddress);
+		strcpy_s(hostAddress, _hostAddress);
 	else
 		hostAddress[0]=0;
 	extraSocketOptions=0;
@@ -259,11 +266,11 @@ bool SystemAddress::IsLoopback(void) const
 #endif
 	return false;
 }
-void SystemAddress::ToString_Old(bool writePort, char *dest, char portDelineator) const
+void SystemAddress::ToString_Old(bool writePort, char *dest, size_t destLength, char portDelineator) const
 {
 	if (*this==UNASSIGNED_SYSTEM_ADDRESS)
 	{
-		strcpy(dest, "UNASSIGNED_SYSTEM_ADDRESS");
+		strcpy_s(dest, destLength, "UNASSIGNED_SYSTEM_ADDRESS");
 		return;
 	}
 
@@ -292,11 +299,10 @@ void SystemAddress::ToString_Old(bool writePort, char *dest, char portDelineator
 
 	in_addr in;
 	in.s_addr = address.addr4.sin_addr.s_addr;
-	const char *ntoaStr = inet_ntoa( in );
-	strcpy(dest, ntoaStr);
+	inet_ntop(AF_INET, &in, dest, destLength);
 	if (writePort)
 	{
-		strcat(dest, portStr);
+		strcat_s(dest, destLength, portStr);
 		Itoa(GetPort(), dest+strlen(dest), 10);
 	}
 
@@ -305,25 +311,26 @@ const char *SystemAddress::ToString(bool writePort, char portDelineator) const
 {
 	static unsigned char strIndex=0;
 #if RAKNET_SUPPORT_IPV6==1
-	static char str[8][INET6_ADDRSTRLEN+5+1];
+	static const size_t strLength=INET6_ADDRSTRLEN+5+1;
 #else
-	static char str[8][22+5+1];
+	static const size_t strLength=22+5+1;
 #endif
+	static char str[8][strLength];
 
 	unsigned char lastStrIndex=strIndex;
 	strIndex++;
-	ToString(writePort, str[lastStrIndex&7], portDelineator);
+	ToString(writePort, str[lastStrIndex&7], strLength, portDelineator);
 	return (char*) str[lastStrIndex&7];
 }
 #if RAKNET_SUPPORT_IPV6==1
-void SystemAddress::ToString_New(bool writePort, char *dest, char portDelineator) const
+void SystemAddress::ToString_New(bool writePort, char *dest, size_t destLength, char portDelineator) const
 {
 	int ret;
 	(void) ret;
 
 	if (*this==UNASSIGNED_SYSTEM_ADDRESS)
 	{
-		strcpy(dest, "UNASSIGNED_SYSTEM_ADDRESS");
+		strcpy_s(dest, destLength, "UNASSIGNED_SYSTEM_ADDRESS");
 		return;
 	}
 
@@ -360,19 +367,19 @@ void SystemAddress::ToString_New(bool writePort, char *dest, char portDelineator
 		unsigned char ch[2];
 		ch[0]=portDelineator;
 		ch[1]=0;
-		strcat(dest, (const char*) ch);
+		strcat_s(dest, destLength, (const char*) ch);
 		Itoa(ntohs(address.addr4.sin_port), dest+strlen(dest), 10);
 	}
 
 }
 #endif // #if RAKNET_SUPPORT_IPV6!=1
-void SystemAddress::ToString(bool writePort, char *dest, char portDelineator) const
+void SystemAddress::ToString(bool writePort, char *dest, size_t destLength, char portDelineator) const
 {
 
 #if RAKNET_SUPPORT_IPV6!=1
-	ToString_Old(writePort,dest,portDelineator);
+	ToString_Old(writePort,dest,destLength,portDelineator);
 #else
-	ToString_New(writePort,dest,portDelineator);
+	ToString_New(writePort,dest,destLength,portDelineator);
 #endif // #if RAKNET_SUPPORT_IPV6!=1
 }
 SystemAddress::SystemAddress()
@@ -434,13 +441,10 @@ SystemAddress::SystemAddress(const char *str, unsigned short port)
 
 
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4996 )  // The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strnicmp. See online help for details.
-#endif
 void SystemAddress::FixForIPVersion(const SystemAddress &boundAddressToSocket)
 {
 	char str[128];
-	ToString(false,str);
+	ToString(false,str,128);
 	// TODO - what about 255.255.255.255?
 	if (strcmp(str, IPV6_LOOPBACK)==0)
 	{
@@ -490,7 +494,7 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 
 
 
-			address.addr4.sin_addr.s_addr=inet_addr__("127.0.0.1");
+			inet_pton(AF_INET, "127.0.0.1", &address.addr4.sin_addr.s_addr);
 
 			if (str[9])
 			{
@@ -510,7 +514,7 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 
 
 
-			address.addr4.sin_addr.s_addr=inet_addr__(ip);
+			inet_pton(AF_INET, ip, &address.addr4.sin_addr.s_addr);
 
 		}
 		else
@@ -571,7 +575,7 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 
 
 
-			address.addr4.sin_addr.s_addr=inet_addr__(IPPart);
+			inet_pton(AF_INET, IPPart, &address.addr4.sin_addr.s_addr);
 
 		}
 
@@ -586,9 +590,6 @@ bool SystemAddress::SetBinaryAddress(const char *str, char portDelineator)
 	return true;
 }
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4702 ) // warning C4702: unreachable code
-#endif
 bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersion)
 {
 #if RAKNET_SUPPORT_IPV6!=1
@@ -612,12 +613,12 @@ bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersi
 	// TODO - what about 255.255.255.255?
 	if (ipVersion==4 && strcmp(str, IPV6_LOOPBACK)==0)
 	{
-		strcpy(ipPart,IPV4_LOOPBACK);
+		strcpy_s(ipPart,IPV4_LOOPBACK);
 	}
 	else if (ipVersion==6 && strcmp(str, IPV4_LOOPBACK)==0)
 	{
 		address.addr4.sin_family=AF_INET6;
-		strcpy(ipPart,IPV6_LOOPBACK);
+		strcpy_s(ipPart,IPV6_LOOPBACK);
 	}
 	else if (NonNumericHostString(str)==false)
 	{
@@ -632,7 +633,7 @@ bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersi
 	}
 	else
 	{
-		strncpy(ipPart,str,sizeof(ipPart));
+		strncpy_s(ipPart,str,sizeof(ipPart));
 		ipPart[sizeof(ipPart)-1]=0;
 	}
 
@@ -727,9 +728,9 @@ bool SystemAddress::FromString(const char *str, char portDelineator, int ipVersi
 	{
 		address.addr4.sin_port=oldPort;
 	}
-#endif // #if RAKNET_SUPPORT_IPV6!=1
 
 	return true;
+#endif // #if RAKNET_SUPPORT_IPV6!=1
 }
 bool SystemAddress::FromStringExplicitPort(const char *str, unsigned short port, int ipVersion)
 {
@@ -776,17 +777,17 @@ const char *RakNetGUID::ToString(void) const
 
 	unsigned char lastStrIndex=strIndex;
 	strIndex++;
-	ToString(str[lastStrIndex&7]);
+	ToString(str[lastStrIndex&7], 64);
 	return (char*) str[lastStrIndex&7];
 }
-void RakNetGUID::ToString(char *dest) const
+void RakNetGUID::ToString(char *dest, size_t destLength) const
 {
 	if (*this==UNASSIGNED_RAKNET_GUID)
-		strcpy(dest, "UNASSIGNED_RAKNET_GUID");
+		strcpy_s(dest, destLength, "UNASSIGNED_RAKNET_GUID");
 	else
-		//sprintf(dest, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
-		sprintf(dest, "%" PRINTF_64_BIT_MODIFIER "u", (long long unsigned int) g);
-		// sprintf(dest, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
+		//sprintf_s(dest, destLength, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
+		sprintf_s(dest, destLength, "%" PRINTF_64_BIT_MODIFIER "u", (long long unsigned int) g);
+		// sprintf_s(dest, destLength, "%u.%u.%u.%u.%u.%u", g[0], g[1], g[2], g[3], g[4], g[5]);
 }
 bool RakNetGUID::FromString(const char *source)
 {

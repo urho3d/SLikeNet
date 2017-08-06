@@ -1,21 +1,26 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_CloudServer==1
 
-#include "CloudServer.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "RakPeerInterface.h"
+#include "slikenet/CloudServer.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/peerinterface.h"
 
 enum ServerToServerCommands
 {
@@ -29,7 +34,7 @@ enum ServerToServerCommands
 	STSC_DATA_CHANGED,
 };
 
-using namespace RakNet;
+using namespace SLNet;
 
 int CloudServer::RemoteServerComp(const RakNetGUID &key, RemoteServer* const &data )
 {
@@ -126,7 +131,7 @@ void CloudServer::GetRequest::Clear(CloudAllocator *allocator)
 	for (i=0; i < remoteServerResponses.Size(); i++)
 	{
 		remoteServerResponses[i]->Clear(allocator);
-		RakNet::OP_DELETE(remoteServerResponses[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteServerResponses[i], _FILE_AND_LINE_);
 	}
 	remoteServerResponses.Clear(false, _FILE_AND_LINE_);
 }
@@ -162,7 +167,7 @@ void CloudServer::SetMaxBytesPerDownload(uint64_t bytes)
 void CloudServer::Update(void)
 {
 	// Timeout getRequests
-	RakNet::Time time = RakNet::Time();
+	SLNet::Time time = SLNet::Time();
 	if (time > nextGetRequestsCheck)
 	{
 		nextGetRequestsCheck=time+1000;
@@ -175,7 +180,7 @@ void CloudServer::Update(void)
 				// Remote server is not responding, just send back data with whoever did respond
 				ProcessAndTransmitGetRequest(getRequests[i]);
 				getRequests[i]->Clear(this);
-				RakNet::OP_DELETE(getRequests[i],_FILE_AND_LINE_);
+				SLNet::OP_DELETE(getRequests[i],_FILE_AND_LINE_);
 				getRequests.RemoveAtIndex(i);
 			}
 			else
@@ -238,7 +243,7 @@ PluginReceiveResult CloudServer::OnReceive(Packet *packet)
 }
 void CloudServer::OnPostRequest(Packet *packet)
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 	CloudKey key;
 	key.Serialize(false,&bsIn);
@@ -273,7 +278,7 @@ void CloudServer::OnPostRequest(Packet *packet)
 	RemoteCloudClient *remoteCloudClient;
 	if (remoteSystemsHashIndex.IsInvalid())
 	{
-		remoteCloudClient = RakNet::OP_NEW<RemoteCloudClient>(_FILE_AND_LINE_);
+		remoteCloudClient = SLNet::OP_NEW<RemoteCloudClient>(_FILE_AND_LINE_);
 		remoteCloudClient->uploadedKeys.Insert(key,key,true,_FILE_AND_LINE_);
 		remoteCloudClient->uploadedBytes=0;
 		remoteSystems.Push(packet->guid, remoteCloudClient, _FILE_AND_LINE_);
@@ -315,13 +320,13 @@ void CloudServer::OnPostRequest(Packet *packet)
 			// Undo prior insertion of cloudDataList into cloudData if needed
 			if (keyDataListExists==false)
 			{
-				RakNet::OP_DELETE(cloudDataList,_FILE_AND_LINE_);
+				SLNet::OP_DELETE(cloudDataList,_FILE_AND_LINE_);
 				dataRepository.RemoveAtIndex(dataRepositoryIndex);
 			}
 
 			if (remoteCloudClient->IsUnused())
 			{
-				RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 				remoteSystems.Remove(packet->guid, _FILE_AND_LINE_);
 			}
 
@@ -331,7 +336,7 @@ void CloudServer::OnPostRequest(Packet *packet)
 			return;
 		}
 
-		cloudData = RakNet::OP_NEW<CloudData>(_FILE_AND_LINE_);
+		cloudData = SLNet::OP_NEW<CloudData>(_FILE_AND_LINE_);
 		cloudData->dataLengthBytes=dataLengthBytes;
 		cloudData->isUploaded=true;
 		if (forceAddress!=UNASSIGNED_SYSTEM_ADDRESS)
@@ -384,7 +389,7 @@ void CloudServer::OnPostRequest(Packet *packet)
 			// Undo prior insertion of cloudDataList into cloudData if needed
 			if (dataRepositoryExists==false)
 			{
-				RakNet::OP_DELETE(cloudDataList,_FILE_AND_LINE_);
+				SLNet::OP_DELETE(cloudDataList,_FILE_AND_LINE_);
 				dataRepository.RemoveAtIndex(dataRepositoryIndex);
 			}
 			return;
@@ -436,7 +441,7 @@ void CloudServer::OnPostRequest(Packet *packet)
 }
 void CloudServer::OnReleaseRequest(Packet *packet)
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 
 	uint16_t keyCount;
@@ -501,7 +506,7 @@ void CloudServer::OnReleaseRequest(Packet *packet)
 
 			if (cloudData->IsUnused())
 			{
-				RakNet::OP_DELETE(cloudData, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(cloudData, _FILE_AND_LINE_);
 				cloudDataList->keyData.RemoveAtIndex(keyDataListIndex);
 				if (cloudDataList->IsNotUploaded())
 				{
@@ -511,14 +516,14 @@ void CloudServer::OnReleaseRequest(Packet *packet)
 
 				if (cloudDataList->IsUnused())
 				{
-					RakNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
+					SLNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
 					dataRepository.RemoveAtIndex(dataRepositoryIndex);
 				}
 			}
 
 			if (remoteCloudClient->IsUnused())
 			{
-				RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 				remoteSystems.RemoveAtIndex(remoteSystemIndex, _FILE_AND_LINE_);
 				break;
 			}
@@ -527,14 +532,14 @@ void CloudServer::OnReleaseRequest(Packet *packet)
 }
 void CloudServer::OnGetRequest(Packet *packet)
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 	uint16_t specificSystemsCount;
 	CloudKey cloudKey;
 
 	// Create a new GetRequest
 	GetRequest *getRequest;
-	getRequest = RakNet::OP_NEW<GetRequest>(_FILE_AND_LINE_);
+	getRequest = SLNet::OP_NEW<GetRequest>(_FILE_AND_LINE_);
 	getRequest->cloudQueryWithAddresses.cloudQuery.Serialize(false, &bsIn);
 	getRequest->requestingClient=packet->guid;
 
@@ -548,7 +553,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 
 	if (getRequest->cloudQueryWithAddresses.cloudQuery.keys.Size()==0)
 	{
-		RakNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
 		return;
 	}
 
@@ -558,7 +563,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 			return;
 	}
 
-	getRequest->requestStartTime=RakNet::GetTime();
+	getRequest->requestStartTime= SLNet::GetTime();
 	getRequest->requestId=nextGetRequestId++;
 
 	// Send request to servers that have this data
@@ -571,7 +576,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 	}
 	else
 	{
-		RakNet::BitStream bsOut;
+		SLNet::BitStream bsOut;
 		bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 		bsOut.Write((MessageID)STSC_PROCESS_GET_REQUEST);
 		getRequest->cloudQueryWithAddresses.Serialize(true, &bsOut);
@@ -579,7 +584,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 
 		for (unsigned int remoteServerIndex=0; remoteServerIndex < remoteServersWithData.Size(); remoteServerIndex++)
 		{
-			BufferedGetResponseFromServer* bufferedGetResponseFromServer = RakNet::OP_NEW<BufferedGetResponseFromServer>(_FILE_AND_LINE_);
+			BufferedGetResponseFromServer* bufferedGetResponseFromServer = SLNet::OP_NEW<BufferedGetResponseFromServer>(_FILE_AND_LINE_);
 			bufferedGetResponseFromServer->serverAddress=remoteServersWithData[remoteServerIndex]->serverAddress;
 			bufferedGetResponseFromServer->gotResult=false;
 			getRequest->remoteServerResponses.Insert(remoteServersWithData[remoteServerIndex]->serverAddress, bufferedGetResponseFromServer, true, _FILE_AND_LINE_);
@@ -598,7 +603,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 		RemoteCloudClient *remoteCloudClient;
 		if (remoteSystemsHashIndex.IsInvalid())
 		{
-			remoteCloudClient = RakNet::OP_NEW<RemoteCloudClient>(_FILE_AND_LINE_);
+			remoteCloudClient = SLNet::OP_NEW<RemoteCloudClient>(_FILE_AND_LINE_);
 			remoteCloudClient->uploadedBytes=0;
 			remoteSystems.Push(packet->guid, remoteCloudClient, _FILE_AND_LINE_);
 		}
@@ -622,7 +627,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 				UnsubscribeFromKey(remoteCloudClient, packet->guid, keySubscriberIndex, cloudKey, specificSystems);
 			}
 
-			keySubscriberId = RakNet::OP_NEW<KeySubscriberID>(_FILE_AND_LINE_);
+			keySubscriberId = SLNet::OP_NEW<KeySubscriberID>(_FILE_AND_LINE_);
 			keySubscriberId->key=cloudKey;
 
 			unsigned int specificSystemIndex;
@@ -648,7 +653,6 @@ void CloudServer::OnGetRequest(Packet *packet)
 				CloudData *cloudData;
 				bool keyDataListExists;
 
-				unsigned int specificSystemIndex;
 				for (specificSystemIndex=0; specificSystemIndex < getRequest->cloudQueryWithAddresses.specificSystems.Size(); specificSystemIndex++)
 				{
 					RakNetGUID specificSystem = getRequest->cloudQueryWithAddresses.specificSystems[specificSystemIndex];
@@ -656,7 +660,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 					unsigned int keyDataListIndex = cloudDataList->keyData.GetIndexFromKey(specificSystem, &keyDataListExists);
 					if (keyDataListExists==false)
 					{
-						cloudData = RakNet::OP_NEW<CloudData>(_FILE_AND_LINE_);
+						cloudData = SLNet::OP_NEW<CloudData>(_FILE_AND_LINE_);
 						cloudData->dataLengthBytes=0;
 						cloudData->allocatedData=0;
 						cloudData->isUploaded=false;
@@ -687,9 +691,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 				subscribedKeysIndex = remoteCloudClient->subscribedKeys.GetIndexFromKey(cloudDataList->key, &subscribedKeysIndexExists);
 				if (subscribedKeysIndexExists)
 				{
-					KeySubscriberID* keySubscriberId;
 					keySubscriberId = remoteCloudClient->subscribedKeys[subscribedKeysIndex];
-					unsigned int specificSystemIndex;
 					for (specificSystemIndex=0; specificSystemIndex < keySubscriberId->specificSystemsSubscribedTo.Size(); specificSystemIndex++)
 					{
 						bool keyDataExists;
@@ -709,16 +711,16 @@ void CloudServer::OnGetRequest(Packet *packet)
 		{
 			// Didn't do anything
 			remoteSystems.Remove(packet->guid, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 		}
 	}
 
 	if (remoteServersWithData.Size()==0)
-		RakNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
 }
 void CloudServer::OnUnsubscribeRequest(Packet *packet)
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 
 	DataStructures::HashIndex remoteSystemIndex = remoteSystems.GetIndexOf(packet->guid);
@@ -760,7 +762,7 @@ void CloudServer::OnUnsubscribeRequest(Packet *packet)
 
 	for (index=0; index < keyCount; index++)
 	{
-		CloudKey cloudKey = cloudKeys[index];
+		cloudKey = cloudKeys[index];
 
 	//	dataRepositoryIndex = 
 			dataRepository.GetIndexFromKey(cloudKey, &dataRepositoryExists);
@@ -780,7 +782,7 @@ void CloudServer::OnUnsubscribeRequest(Packet *packet)
 
 	if (remoteCloudClient->IsUnused())
 	{
-		RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 		remoteSystems.RemoveAtIndex(remoteSystemIndex, _FILE_AND_LINE_);
 	}
 }
@@ -793,7 +795,7 @@ void CloudServer::OnServerToServerGetRequest(Packet *packet)
 	if (objectExists==false)
 		return;
 
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	CloudQueryWithAddresses cloudQueryWithAddresses;
@@ -805,7 +807,7 @@ void CloudServer::OnServerToServerGetRequest(Packet *packet)
 	DataStructures::List<CloudKey> cloudKeyResultList;
 	ProcessCloudQueryWithAddresses(cloudQueryWithAddresses, cloudDataResultList, cloudKeyResultList);
 
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_PROCESS_GET_RESPONSE);
 	bsOut.Write(requestId);
@@ -824,7 +826,7 @@ void CloudServer::OnServerToServerGetResponse(Packet *packet)
 	if (remoteServer==0)
 		return;
 
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	uint32_t requestId;
@@ -857,7 +859,7 @@ void CloudServer::OnServerToServerGetResponse(Packet *packet)
 		ProcessAndTransmitGetRequest(getRequest);
 
 		getRequest->Clear(this);
-		RakNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
 
 		getRequests.RemoveAtIndex(getRequestIndex);
 	}
@@ -882,14 +884,14 @@ void CloudServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetG
 			if (waitingForThisServer)
 			{
 				getRequest->remoteServerResponses[remoteServerResponsesIndex]->Clear(this);
-				RakNet::OP_DELETE(getRequest->remoteServerResponses[remoteServerResponsesIndex], _FILE_AND_LINE_);
+				SLNet::OP_DELETE(getRequest->remoteServerResponses[remoteServerResponsesIndex], _FILE_AND_LINE_);
 				getRequest->remoteServerResponses.RemoveAtIndex(remoteServerResponsesIndex);
 
 				if (getRequest->AllRemoteServersHaveResponded())
 				{
 					ProcessAndTransmitGetRequest(getRequest);
 					getRequest->Clear(this);
-					RakNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
+					SLNet::OP_DELETE(getRequest, _FILE_AND_LINE_);
 
 					getRequests.RemoveAtIndex(getRequestIndex);
 				}
@@ -900,7 +902,7 @@ void CloudServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetG
 				getRequestIndex++;
 		}
 
-		RakNet::OP_DELETE(remoteServers[remoteServerIndex],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteServers[remoteServerIndex],_FILE_AND_LINE_);
 		remoteServers.RemoveAtIndex(remoteServerIndex);
 	}
 
@@ -932,7 +934,7 @@ void CloudServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetG
 
 					if (cloudData->IsUnused())
 					{
-						RakNet::OP_DELETE(cloudData,_FILE_AND_LINE_);
+						SLNet::OP_DELETE(cloudData,_FILE_AND_LINE_);
 						cloudDataList->keyData.RemoveAtIndex(keyDataIndex);
 
 						if (cloudDataList->IsNotUploaded())
@@ -946,7 +948,7 @@ void CloudServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetG
 							// Tell other servers that this key is no longer uploaded, so they do not request it from us
 							RemoveUploadedKeyFromServers(cloudDataList->key);
 
-							RakNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
+							SLNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
 							dataRepository.RemoveAtIndex(dataRepositoryIndex);
 						}
 					}
@@ -987,11 +989,11 @@ void CloudServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetG
 				}
 			}
 
-			RakNet::OP_DELETE(keySubscriberId, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(keySubscriberId, _FILE_AND_LINE_);
 		}
 
 		// Delete and remove from remoteSystems
-		RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 		remoteSystems.RemoveAtIndex(remoteSystemIndex, _FILE_AND_LINE_);
 	}
 }
@@ -1008,15 +1010,15 @@ void CloudServer::Clear(void)
 		for (j=0; j < cloudDataList->keyData.Size(); j++)
 		{
 			cloudDataList->keyData[j]->Clear();
-			RakNet::OP_DELETE(cloudDataList->keyData[j], _FILE_AND_LINE_);
+			SLNet::OP_DELETE(cloudDataList->keyData[j], _FILE_AND_LINE_);
 		}
-		RakNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
 	}
 	dataRepository.Clear(false, _FILE_AND_LINE_);
 
 	for (i=0; i < remoteServers.Size(); i++)
 	{
-		RakNet::OP_DELETE(remoteServers[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteServers[i], _FILE_AND_LINE_);
 	}
 	remoteServers.Clear(false, _FILE_AND_LINE_);
 
@@ -1024,7 +1026,7 @@ void CloudServer::Clear(void)
 	{
 		GetRequest *getRequest = getRequests[i];
 		getRequest->Clear(this);
-		RakNet::OP_DELETE(getRequests[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(getRequests[i], _FILE_AND_LINE_);
 	}
 	getRequests.Clear(false, _FILE_AND_LINE_);
 
@@ -1036,9 +1038,9 @@ void CloudServer::Clear(void)
 		RemoteCloudClient* remoteCloudClient = itemList[i];
 		for (j=0; j < remoteCloudClient->subscribedKeys.Size(); j++)
 		{
-			RakNet::OP_DELETE(remoteCloudClient->subscribedKeys[j], _FILE_AND_LINE_);
+			SLNet::OP_DELETE(remoteCloudClient->subscribedKeys[j], _FILE_AND_LINE_);
 		}
-		RakNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteCloudClient, _FILE_AND_LINE_);
 	}
 	remoteSystems.Clear(_FILE_AND_LINE_);
 }
@@ -1066,7 +1068,7 @@ void CloudServer::WriteCloudQueryRowFromResultList(unsigned int i, DataStructure
 }
 void CloudServer::NotifyClientSubscribersOfDataChange( CloudData *cloudData, CloudKey &key, DataStructures::OrderedList<RakNetGUID, RakNetGUID> &subscribers, bool wasUpdated )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID) ID_CLOUD_SUBSCRIPTION_NOTIFICATION);
 	bsOut.Write(wasUpdated);
 	CloudQueryRow row;
@@ -1087,7 +1089,7 @@ void CloudServer::NotifyClientSubscribersOfDataChange( CloudData *cloudData, Clo
 }
 void CloudServer::NotifyClientSubscribersOfDataChange( CloudQueryRow *row, DataStructures::OrderedList<RakNetGUID, RakNetGUID> &subscribers, bool wasUpdated )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID) ID_CLOUD_SUBSCRIPTION_NOTIFICATION);
 	bsOut.Write(wasUpdated);
 	row->Serialize(true,&bsOut,0);
@@ -1102,7 +1104,7 @@ void CloudServer::NotifyServerSubscribersOfDataChange( CloudData *cloudData, Clo
 {
 	// Find every server that has subscribed
 	// Send them change notifications
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_DATA_CHANGED);
 	bsOut.Write(wasUpdated);
@@ -1134,7 +1136,7 @@ void CloudServer::AddServer(RakNetGUID systemIdentifier)
 	unsigned int index = remoteServers.GetIndexFromKey(systemIdentifier,&objectExists);
 	if (objectExists==false)
 	{
-		RemoteServer *remoteServer = RakNet::OP_NEW<RemoteServer>(_FILE_AND_LINE_);
+		RemoteServer *remoteServer = SLNet::OP_NEW<RemoteServer>(_FILE_AND_LINE_);
 		remoteServer->gotSubscribedAndUploadedKeys=false;
 		remoteServer->serverAddress=systemIdentifier;
 		remoteServers.InsertAtIndex(remoteServer, index, _FILE_AND_LINE_);
@@ -1148,7 +1150,7 @@ void CloudServer::RemoveServer(RakNetGUID systemAddress)
 	unsigned int index = remoteServers.GetIndexFromKey(systemAddress,&objectExists);
 	if (objectExists==true)
 	{
-		RakNet::OP_DELETE(remoteServers[index],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteServers[index],_FILE_AND_LINE_);
 		remoteServers.RemoveAtIndex(index);
 	}
 }
@@ -1164,7 +1166,7 @@ void CloudServer::GetRemoteServers(DataStructures::List<RakNetGUID> &remoteServe
 }
 void CloudServer::ProcessAndTransmitGetRequest(GetRequest *getRequest)
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID) ID_CLOUD_GET_RESPONSE);
 
 	//	BufferedGetResponseFromServer getResponse;
@@ -1299,7 +1301,7 @@ void CloudServer::ProcessCloudQueryWithAddresses( CloudServer::CloudQueryWithAdd
 }
 void CloudServer::SendUploadedAndSubscribedKeysToServer( RakNetGUID systemAddress )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_ADD_UPLOADED_AND_SUBSCRIBED_KEYS);
 	bsOut.WriteCasted<uint16_t>(dataRepository.Size());
@@ -1328,7 +1330,7 @@ void CloudServer::SendUploadedAndSubscribedKeysToServer( RakNetGUID systemAddres
 }
 void CloudServer::SendUploadedKeyToServers( CloudKey &cloudKey )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_ADD_UPLOADED_KEY);
 	cloudKey.Serialize(true, &bsOut);
@@ -1337,7 +1339,7 @@ void CloudServer::SendUploadedKeyToServers( CloudKey &cloudKey )
 }
 void CloudServer::SendSubscribedKeyToServers( CloudKey &cloudKey )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_ADD_SUBSCRIBED_KEY);
 	cloudKey.Serialize(true, &bsOut);
@@ -1346,7 +1348,7 @@ void CloudServer::SendSubscribedKeyToServers( CloudKey &cloudKey )
 }
 void CloudServer::RemoveUploadedKeyFromServers( CloudKey &cloudKey )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_REMOVE_UPLOADED_KEY);
 	cloudKey.Serialize(true, &bsOut);
@@ -1355,7 +1357,7 @@ void CloudServer::RemoveUploadedKeyFromServers( CloudKey &cloudKey )
 }
 void CloudServer::RemoveSubscribedKeyFromServers( CloudKey &cloudKey )
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_CLOUD_SERVER_TO_SERVER_COMMAND);
 	bsOut.Write((MessageID)STSC_REMOVE_SUBSCRIBED_KEY);
 	cloudKey.Serialize(true, &bsOut);
@@ -1364,7 +1366,7 @@ void CloudServer::RemoveSubscribedKeyFromServers( CloudKey &cloudKey )
 }
 void CloudServer::OnSendUploadedAndSubscribedKeysToServer( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1407,7 +1409,7 @@ void CloudServer::OnSendUploadedAndSubscribedKeysToServer( Packet *packet )
 }
 void CloudServer::OnSendUploadedKeyToServers( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1426,7 +1428,7 @@ void CloudServer::OnSendUploadedKeyToServers( Packet *packet )
 }
 void CloudServer::OnSendSubscribedKeyToServers( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1447,7 +1449,7 @@ void CloudServer::OnSendSubscribedKeyToServers( Packet *packet )
 }
 void CloudServer::OnRemoveUploadedKeyFromServers( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1465,7 +1467,7 @@ void CloudServer::OnRemoveUploadedKeyFromServers( Packet *packet )
 }
 void CloudServer::OnRemoveSubscribedKeyFromServers( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1483,7 +1485,7 @@ void CloudServer::OnRemoveSubscribedKeyFromServers( Packet *packet )
 }
 void CloudServer::OnServerDataChanged( Packet *packet )
 {
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
 	bool objectExists;
@@ -1565,7 +1567,7 @@ CloudServer::CloudDataList *CloudServer::GetOrAllocateCloudDataList(CloudKey key
 	dataRepositoryIndex = dataRepository.GetIndexFromKey(key, dataRepositoryExists);
 	if (*dataRepositoryExists==false)
 	{
-		cloudDataList = RakNet::OP_NEW<CloudDataList>(_FILE_AND_LINE_);
+		cloudDataList = SLNet::OP_NEW<CloudDataList>(_FILE_AND_LINE_);
 		cloudDataList->key=key;
 		cloudDataList->uploaderCount=0;
 		cloudDataList->subscriberCount=0;
@@ -1625,7 +1627,7 @@ void CloudServer::UnsubscribeFromKey(RemoteCloudClient *remoteCloudClient, RakNe
 
 	if (keySubscriberId->specificSystemsSubscribedTo.Size()==0)
 	{
-		RakNet::OP_DELETE(keySubscriberId, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(keySubscriberId, _FILE_AND_LINE_);
 		remoteCloudClient->subscribedKeys.RemoveAtIndex(keySubscriberIndex);
 	}
 
@@ -1634,7 +1636,7 @@ void CloudServer::UnsubscribeFromKey(RemoteCloudClient *remoteCloudClient, RakNe
 
 	if (cloudDataList->IsUnused())
 	{
-		RakNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(cloudDataList, _FILE_AND_LINE_);
 		dataRepository.RemoveAtIndex(dataRepositoryIndex);
 	}
 }
@@ -1654,7 +1656,7 @@ void CloudServer::RemoveSpecificSubscriber(RakNetGUID specificSubscriber, CloudD
 
 		if (cloudData->IsUnused())
 		{
-			RakNet::OP_DELETE(cloudData, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(cloudData, _FILE_AND_LINE_);
 			cloudDataList->keyData.RemoveAtIndex(keyDataListIndex);
 		}
 	}

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -20,9 +25,9 @@
 
 
 
-#include "RakNetDefines.h"
+#include "defines.h"
 #include "NativeTypes.h"
-#include "RakNetTime.h"
+#include "time.h"
 #include "Export.h"
 #include "WindowsIncludes.h"
 #include "XBox360Includes.h"
@@ -32,7 +37,7 @@
 
 
 
-namespace RakNet {
+namespace SLNet {
 /// Forward declarations
 class RakPeerInterface;
 class BitStream;
@@ -100,11 +105,7 @@ typedef unsigned char MessageID;
 
 typedef uint32_t BitSize_t;
 
-#if defined(_MSC_VER) && _MSC_VER > 0
-#define PRINTF_64_BIT_MODIFIER "I64"
-#else
 #define PRINTF_64_BIT_MODIFIER "ll"
-#endif
 
 /// Used with the PublicKey structure
 enum PublicKeyMode
@@ -255,7 +256,7 @@ struct RAK_DLL_EXPORT SystemAddress
 	// dest must be large enough to hold the output
 	// portDelineator should not be '.', ':', '%', '-', '/', a number, or a-f
 	// THREADSAFE
-	void ToString(bool writePort, char *dest, char portDelineator='|') const;
+	void ToString(bool writePort, char *dest, size_t destLength, char portDelineator='|') const;
 
 	/// Set the system address from a printable IP string, for example "192.0.2.1" or "2001:db8:63b3:1::3490"
 	/// You can write the port as well, using the portDelineator, for example "192.0.2.1|1234"
@@ -291,7 +292,7 @@ struct RAK_DLL_EXPORT SystemAddress
 	/// Old version, for crap platforms that don't support newer socket functions
 	bool SetBinaryAddress(const char *str, char portDelineator=':');
 	/// Old version, for crap platforms that don't support newer socket functions
-	void ToString_Old(bool writePort, char *dest, char portDelineator=':') const;
+	void ToString_Old(bool writePort, char *dest, size_t destLength, char portDelineator=':') const;
 
 	/// \internal sockaddr_in6 requires extra data beyond just the IP and port. Copy that extra data from an existing SystemAddress that already has it
 	void FixForIPVersion(const SystemAddress &boundAddressToSocket);
@@ -310,7 +311,7 @@ struct RAK_DLL_EXPORT SystemAddress
 	private:
 
 #if RAKNET_SUPPORT_IPV6==1
-		void ToString_New(bool writePort, char *dest, char portDelineator) const;
+		void ToString_New(bool writePort, char *dest, size_t destLength, char portDelineator) const;
 #endif
 };
 
@@ -331,7 +332,7 @@ struct RAK_DLL_EXPORT RakNetGUID
 	// Return the GUID as a string
 	// dest must be large enough to hold the output
 	// THREADSAFE
-	void ToString(char *dest) const;
+	void ToString(char *dest, size_t destSize) const;
 
 	bool FromString(const char *source);
 
@@ -379,7 +380,7 @@ struct RAK_DLL_EXPORT AddressOrGUID
 	void SetUndefined(void) {rakNetGuid=UNASSIGNED_RAKNET_GUID; systemAddress=UNASSIGNED_SYSTEM_ADDRESS;}
 	static unsigned long ToInteger( const AddressOrGUID &aog );
 	const char *ToString(bool writePort=true) const;
-	void ToString(bool writePort, char *dest) const;
+	void ToString(bool writePort, char *dest, size_t destLength) const;
 
 	AddressOrGUID() {}
 	AddressOrGUID( const AddressOrGUID& input )
@@ -502,6 +503,6 @@ struct RAK_DLL_EXPORT uint24_t
 	inline const uint24_t operator*( const uint32_t &other ) const { return uint24_t(val*other); }
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __VARIABLE_DELTA_SERIALIZER_H
@@ -18,7 +23,7 @@
 #include "PacketPriority.h"
 #include "DS_OrderedList.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 /// \brief Class to compare memory values of variables in a current state to a prior state
@@ -244,7 +249,7 @@ protected:
 	DataStructures::MemoryPool<ChangedVariablesList> updatedVariablesMemoryPool;
 
 	bool didComparisonThisTick;
-	RakNet::BitStream identicalSerializationBs;
+	SLNet::BitStream identicalSerializationBs;
 
 	void FreeVarsAssociatedWithReceipt(RakNetGUID guid, uint32_t receiptId);
 	void DirtyAndFreeVarsAssociatedWithReceipt(RakNetGUID guid, uint32_t receiptId);

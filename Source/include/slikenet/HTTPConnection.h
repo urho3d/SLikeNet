@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file HTTPConnection.h
@@ -20,12 +25,12 @@
 #define __HTTP_CONNECTION
 
 #include "Export.h"
-#include "RakString.h"
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
+#include "string.h"
+#include "memoryoverride.h"
+#include "types.h"
 #include "DS_Queue.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class TCPInterface;
@@ -70,7 +75,7 @@ public:
 
     /// Get one result from the server
 	/// \pre HasResult must return true
-    RakNet::RakString Read(void);
+	SLNet::RakString Read(void);
 
 	/// Call periodically to do time-based updates
 	void Update(void);
@@ -105,12 +110,12 @@ public:
 
 		operator int () const { return code; }
 
-		RakNet::RakString data;
+		SLNet::RakString data;
 		int code;  // ResponseCodes
     };
 
     /// Queued events of failed exchanges with the HTTP server
-    bool HasBadResponse(int *code, RakNet::RakString *data);
+    bool HasBadResponse(int *code, SLNet::RakString *data);
 
 	/// Returns false if the connection is not doing anything else
 	bool IsBusy(void) const;
@@ -120,9 +125,9 @@ public:
 
 	struct OutgoingCommand
 	{
-		RakNet::RakString remotePath;
-		RakNet::RakString data;
-		RakNet::RakString contentType;
+		SLNet::RakString remotePath;
+		SLNet::RakString data;
+		SLNet::RakString contentType;
 		bool isPost;
 	};
 
@@ -132,7 +137,7 @@ public:
 private:
     SystemAddress server;
     TCPInterface *tcp;
-	RakNet::RakString host;
+	SLNet::RakString host;
 	unsigned short port;
 	DataStructures::Queue<BadResponse> badResponses;
 
@@ -145,8 +150,8 @@ private:
 		CS_PROCESSING,
 	} connectionState;
 
-	RakNet::RakString incomingData;
-	DataStructures::Queue<RakNet::RakString> results;
+	SLNet::RakString incomingData;
+	DataStructures::Queue<SLNet::RakString> results;
 
 	void CloseConnection();
 	
@@ -158,7 +163,7 @@ private:
 		RAK_HTTP_REQUEST_SENT,
 		RAK_HTTP_IDLE } state;
 
-    RakNet::RakString outgoing, incoming, path, contentType;
+    SLNet::RakString outgoing, incoming, path, contentType;
     void Process(Packet *packet); // the workhorse
     
     // this helps check the various status lists in TCPInterface
@@ -168,7 +173,7 @@ private:
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

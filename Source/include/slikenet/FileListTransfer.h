@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file FileListTransfer.h
@@ -19,19 +24,19 @@
 #ifndef __FILE_LIST_TRANFER_H
 #define __FILE_LIST_TRANFER_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "Export.h"
 #include "PluginInterface2.h"
 #include "DS_Map.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PacketPriority.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "FileList.h"
 #include "DS_Queue.h"
 #include "SimpleMutex.h"
 #include "ThreadPool.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class IncrementalReadInterface;
@@ -85,19 +90,19 @@ public:
 	/// \param[in] orderingChannel Passed to RakPeerInterface::Send()
 	/// \param[in] _incrementalReadInterface If a file in \a fileList has no data, _incrementalReadInterface will be used to read the file in chunks of size \a chunkSize
 	/// \param[in] _chunkSize How large of a block of a file to read/send at once. Large values use more memory but transfer slightly faster.
-	void Send(FileList *fileList, RakNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface=0, unsigned int _chunkSize=262144*4*16);
+	void Send(FileList *fileList, SLNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface=0, unsigned int _chunkSize=262144*4*16);
 
 	/// Return number of files waiting to go out to a particular address
 	unsigned int GetPendingFilesToAddress(SystemAddress recipient);
 
 	/// \brief Stop a download.
-	void CancelReceive(unsigned short setId);
+	void CancelReceive(unsigned short inSetId);
 
 	/// \brief Remove all handlers associated with a particular system address.
 	void RemoveReceiver(SystemAddress systemAddress);
 
 	/// \brief Is a handler passed to SetupReceive still running?
-	bool IsHandlerActive(unsigned short setId);
+	bool IsHandlerActive(unsigned short inSetId);
 
 	/// \brief Adds a callback to get progress reports about what the file list instances do.
 	/// \param[in] cb A pointer to an externally defined instance of FileListProgress. This pointer is held internally, so should remain valid as long as this class is valid.
@@ -131,7 +136,7 @@ protected:
 
 	void OnReferencePush(Packet *packet, bool fullFile);
 	void OnReferencePushAck(Packet *packet);
-	void SendIRIToAddress(SystemAddress systemAddress, unsigned short setId);
+	void SendIRIToAddress(SystemAddress systemAddress, unsigned short inSetId);
 
 	DataStructures::Map<unsigned short, FileListReceiver*> fileListReceivers;
 	unsigned short setId;
@@ -178,7 +183,7 @@ protected:
 	friend int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutput, void* perThreadData);
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

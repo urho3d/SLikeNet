@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,15 +24,15 @@
 #ifndef __NAT_PUNCHTHROUGH_SERVER_H
 #define __NAT_PUNCHTHROUGH_SERVER_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "Export.h"
 #include "PluginInterface2.h"
 #include "PacketPriority.h"
 #include "SocketIncludes.h"
 #include "DS_OrderedList.h"
-#include "RakString.h"
+#include "string.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -108,7 +113,7 @@ public:
 		ConnectionAttempt() {sender=0; recipient=0; startTime=0; attemptPhase=NAT_ATTEMPT_PHASE_NOT_STARTED;}
 		User *sender, *recipient;
 		uint16_t sessionId;
-		RakNet::Time startTime;
+		SLNet::Time startTime;
 		enum
 		{
 			NAT_ATTEMPT_PHASE_NOT_STARTED,
@@ -127,9 +132,9 @@ public:
 		bool HasConnectionAttemptToUser(User *user);
 		void DerefConnectionAttempt(ConnectionAttempt *ca);
 		void DeleteConnectionAttempt(ConnectionAttempt *ca);
-		void LogConnectionAttempts(RakNet::RakString &rs);
+		void LogConnectionAttempts(SLNet::RakString &rs);
 	};
-	RakNet::Time lastUpdate;
+	SLNet::Time lastUpdate;
 	static int NatPunchthroughUserComp( const RakNetGUID &key, User * const &data );
 protected:
 	void OnNATPunchthroughRequest(Packet *packet);
@@ -149,7 +154,7 @@ protected:
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

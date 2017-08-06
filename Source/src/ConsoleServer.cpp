@@ -1,28 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_ConsoleServer==1
 
-#include "ConsoleServer.h"
-#include "TransportInterface.h"
-#include "CommandParserInterface.h"
+#include "slikenet/ConsoleServer.h"
+#include "slikenet/TransportInterface.h"
+#include "slikenet/CommandParserInterface.h"
 #include <string.h>
 #include <stdlib.h>
 
 #define COMMAND_DELINATOR ' '
 #define COMMAND_DELINATOR_TOGGLE '"'
 
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(ConsoleServer,ConsoleServer);
 
@@ -104,9 +111,9 @@ void ConsoleServer::Update(void)
 	unsigned i;
 	char *parameterList[20]; // Up to 20 parameters
 	unsigned numParameters;
-	RakNet::SystemAddress newOrLostConnectionId;
-	RakNet::Packet *p;
-	RakNet::RegisteredCommand rc;
+	SLNet::SystemAddress newOrLostConnectionId;
+	SLNet::Packet *p;
+	SLNet::RegisteredCommand rc;
 
 	p = transport->Receive();
 	newOrLostConnectionId=transport->HasNewIncomingConnection();
@@ -136,7 +143,7 @@ void ConsoleServer::Update(void)
 		char copy[REMOTE_MAX_TEXT_INPUT];
 		memcpy(copy, p->data, p->length);
 		copy[p->length]=0;
-		RakNet::CommandParserInterface::ParseConsoleString((char*)p->data, COMMAND_DELINATOR, COMMAND_DELINATOR_TOGGLE, &numParameters, parameterList, 20); // Up to 20 parameters
+		SLNet::CommandParserInterface::ParseConsoleString((char*)p->data, COMMAND_DELINATOR, COMMAND_DELINATOR_TOGGLE, &numParameters, parameterList, 20); // Up to 20 parameters
 		if (numParameters==0)
 		{
 			transport->DeallocatePacket(p);
@@ -181,15 +188,15 @@ void ConsoleServer::Update(void)
 				if (commandParsed==false)
 				{
 					// Try again, for all commands for all parsers.
-					RakNet::RegisteredCommand rc;
+					SLNet::RegisteredCommand rc2;
 					for (i=0; i < commandParserList.Size(); i++)
 					{
-						if (commandParserList[i]->GetRegisteredCommand(parameterList[1], &rc))
+						if (commandParserList[i]->GetRegisteredCommand(parameterList[1], &rc2))
 						{
-							if (rc.parameterCount==RakNet::CommandParserInterface::VARIABLE_NUMBER_OF_PARAMETERS)
-								transport->Send(p->systemAddress, "(Variable parms): %s %s\r\n", rc.command, rc.commandHelp);
+							if (rc2.parameterCount== SLNet::CommandParserInterface::VARIABLE_NUMBER_OF_PARAMETERS)
+								transport->Send(p->systemAddress, "(Variable parms): %s %s\r\n", rc2.command, rc2.commandHelp);
 							else
-								transport->Send(p->systemAddress, "(%i parms): %s %s\r\n", rc.parameterCount, rc.command, rc.commandHelp);
+								transport->Send(p->systemAddress, "(%i parms): %s %s\r\n", rc2.parameterCount, rc2.command, rc2.commandHelp);
 							commandParsed=true;
 							break;
 						}
@@ -312,7 +319,7 @@ void ConsoleServer::SetPrompt(const char *_prompt)
 	{
 		size_t len = strlen(_prompt);
 		prompt = (char*) rakMalloc_Ex(len+1,_FILE_AND_LINE_);
-		strcpy(prompt,_prompt);
+		strcpy_s(prompt,len+1,_prompt);
 	}
 	else
 		prompt=0;

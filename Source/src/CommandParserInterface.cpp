@@ -1,17 +1,22 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "CommandParserInterface.h"
-#include "TransportInterface.h"
+#include "slikenet/CommandParserInterface.h"
+#include "slikenet/TransportInterface.h"
 #include <string.h>
-#include "RakAssert.h"
+#include "slikenet/assert.h"
 #include <stdio.h>
 
 
@@ -27,17 +32,13 @@
 #include <arpa/inet.h>
 #endif
 
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
 
-using namespace RakNet;
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
 const unsigned char CommandParserInterface::VARIABLE_NUMBER_OF_PARAMETERS=255;
 
-int RakNet::RegisteredCommandComp( const char* const & key, const RegisteredCommand &data )
+int SLNet::RegisteredCommandComp( const char* const & key, const RegisteredCommand &data )
 {
 	return _stricmp(key,data.command);
 }
@@ -160,13 +161,8 @@ void CommandParserInterface::ReturnResult(char *res, const char *command, Transp
 void CommandParserInterface::ReturnResult(SystemAddress res, const char *command, TransportInterface *transport, const SystemAddress &systemAddress)
 {
 	char addr[128];
-	systemAddress.ToString(false,addr);
+	systemAddress.ToString(false,addr,128);
 	char addr2[128];
-	res.ToString(false,addr2);
+	res.ToString(false,addr2,128);
 	transport->Send(systemAddress, "%s returned %s %s:%i\r\n", command,addr,addr2,res.GetPort());
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
-

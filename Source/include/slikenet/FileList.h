@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file FileList.h
@@ -20,21 +25,17 @@
 
 #include "Export.h"
 #include "DS_List.h"
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
+#include "memoryoverride.h"
+#include "types.h"
 #include "FileListNodeContext.h"
-#include "RakString.h"
+#include "string.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-namespace RakNet
+namespace SLNet
 {
 	class BitStream;
 }
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -45,10 +46,10 @@ class FileList;
 struct FileListNode
 {
 	/// Name of the file
-	RakNet::RakString filename;
+	SLNet::RakString filename;
 
 	/// Full path to the file, which may be different than filename
-	RakNet::RakString fullPathToFile;
+	SLNet::RakString fullPathToFile;
 
 	/// File data (may be null if not ready)
 	char *data;
@@ -173,10 +174,10 @@ public:
 	void Clear(void);
 
 	/// Write all encoded data into a bitstream
-	void Serialize(RakNet::BitStream *outBitStream);
+	void Serialize(SLNet::BitStream *outBitStream);
 
 	/// Read all encoded data from a bitstream. Clear() is called before deserializing.
-	bool Deserialize(RakNet::BitStream *inBitStream);
+	bool Deserialize(SLNet::BitStream *inBitStream);
 
 	/// \brief Given the existing set of files, search applicationDirectory for the same files.
 	/// \details For each file that is missing or different, add that file to \a missingOrChangedFiles. Note: the file contents are not written, and only the hash if written if \a alwaysWriteHash is true
@@ -250,16 +251,12 @@ public:
 	// Here so you can read it, but don't modify it
 	DataStructures::List<FileListNode> fileList;
 
-	static bool FixEndingSlash(char *str);
+	static bool FixEndingSlash(char *str, size_t strLength);
 protected:
 	DataStructures::List<FileListProgress*> fileListProgressCallbacks;
 };
 
-} // namespace RakNet
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+} // namespace SLNet
 
 #endif
 

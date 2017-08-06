@@ -1,35 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_FileListTransfer==1 && _RAKNET_SUPPORT_FileOperations==1
 
-#include "FileListTransfer.h"
-#include "DS_HuffmanEncodingTree.h"
-#include "FileListTransferCBInterface.h"
-#include "StringCompressor.h"
-#include "FileList.h"
-#include "DS_Queue.h"
-#include "MessageIdentifiers.h"
-#include "RakNetTypes.h"
-#include "RakPeerInterface.h"
-#include "RakNetStatistics.h"
-#include "IncrementalReadInterface.h"
-#include "RakAssert.h"
-#include "RakAlloca.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/DS_HuffmanEncodingTree.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/FileList.h"
+#include "slikenet/DS_Queue.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/types.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/statistics.h"
+#include "slikenet/IncrementalReadInterface.h"
+#include "slikenet/assert.h"
+#include "slikenet/alloca.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-namespace RakNet
+namespace SLNet
 {
 
 struct FLR_MemoryBlock
@@ -59,9 +60,9 @@ struct FileListReceiver
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
-using namespace RakNet;
+using namespace SLNet;
 
 FileListReceiver::FileListReceiver() {filesReceived=0; setTotalDownloadedLength=0; partLength=1; DataStructures::Map<unsigned int, FLR_MemoryBlock>::IMPLEMENT_DEFAULT_COMPARISON();}
 FileListReceiver::~FileListReceiver() {
@@ -76,9 +77,9 @@ void FileListTransfer::FileToPushRecipient::DeleteThis(void)
 {
 ////	filesToPushMutex.Lock();
 	for (unsigned int j=0; j < filesToPush.Size(); j++)
-		RakNet::OP_DELETE(filesToPush[j],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(filesToPush[j],_FILE_AND_LINE_);
 ////	filesToPushMutex.Unlock();
-	RakNet::OP_DELETE(this,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(this,_FILE_AND_LINE_);
 }
 void FileListTransfer::FileToPushRecipient::AddRef(void)
 {
@@ -125,13 +126,13 @@ unsigned short FileListTransfer::SetupReceive(FileListTransferCBInterface *handl
 		receiver=fileListReceivers.Get(setId);
 		receiver->downloadHandler->OnDereference();
 		if (receiver->deleteDownloadHandler)
-			RakNet::OP_DELETE(receiver->downloadHandler, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(receiver, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(receiver->downloadHandler, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(receiver, _FILE_AND_LINE_);
 		fileListReceivers.Delete(setId);
 	}
 
 	unsigned short oldId;
-	receiver = RakNet::OP_NEW<FileListReceiver>( _FILE_AND_LINE_ );
+	receiver = SLNet::OP_NEW<FileListReceiver>( _FILE_AND_LINE_ );
 	RakAssert(handler);
 	receiver->downloadHandler=handler;
 	receiver->allowedSender=allowedSender;
@@ -145,13 +146,13 @@ unsigned short FileListTransfer::SetupReceive(FileListTransferCBInterface *handl
 	return oldId;
 }
 
-void FileListTransfer::Send(FileList *fileList, RakNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface, unsigned int _chunkSize)
+void FileListTransfer::Send(FileList *fileList, SLNet::RakPeerInterface *rakPeer, SystemAddress recipient, unsigned short setID, PacketPriority priority, char orderingChannel, IncrementalReadInterface *_incrementalReadInterface, unsigned int _chunkSize)
 {
 	for (unsigned int flpcIndex=0; flpcIndex < fileListProgressCallbacks.Size(); flpcIndex++)
 		fileList->AddCallback(fileListProgressCallbacks[flpcIndex]);
 
 	unsigned int i, totalLength;
-	RakNet::BitStream outBitstream;
+	SLNet::BitStream outBitstream;
 	bool sendReference;
 	const char *dataBlocks[2];
 	int lengths[2];
@@ -185,7 +186,7 @@ void FileListTransfer::Send(FileList *fileList, RakNet::RakPeerInterface *rakPee
 			sendReference = fileList->fileList[i].isAReference && _incrementalReadInterface!=0;
 			if (sendReference)
 			{
-				FileToPush *fileToPush = RakNet::OP_NEW<FileToPush>(_FILE_AND_LINE_);
+				FileToPush *fileToPush = SLNet::OP_NEW<FileToPush>(_FILE_AND_LINE_);
 				fileToPush->fileListNode.context=fileList->fileList[i].context;
 				fileToPush->setIndex=i;
 				fileToPush->fileListNode.filename=fileList->fileList[i].filename;
@@ -228,7 +229,7 @@ void FileListTransfer::Send(FileList *fileList, RakNet::RakPeerInterface *rakPee
 			FileToPushRecipient *ftpr;
 
 			fileToPushRecipientListMutex.Lock();
-			for (unsigned int i=0; i < fileToPushRecipientList.Size(); i++)
+			for (i=0; i < fileToPushRecipientList.Size(); i++)
 			{
 				if (fileToPushRecipientList[i]->systemAddress==recipient && fileToPushRecipientList[i]->setId==setId)
 				{
@@ -242,7 +243,7 @@ void FileListTransfer::Send(FileList *fileList, RakNet::RakPeerInterface *rakPee
 
 			//if (ftpr==0)
 			//{
-				ftpr = RakNet::OP_NEW<FileToPushRecipient>(_FILE_AND_LINE_);
+				ftpr = SLNet::OP_NEW<FileToPushRecipient>(_FILE_AND_LINE_);
 				ftpr->systemAddress=recipient;
 				ftpr->setId=setID;
 				ftpr->refCount=2; // Allocated and in the list
@@ -281,7 +282,7 @@ bool FileListTransfer::DecodeSetHeader(Packet *packet)
 {
 	bool anythingToWrite=false;
 	unsigned short setID;
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
 	inBitStream.Read(setID);
 	FileListReceiver *fileListReceiver;
@@ -333,8 +334,8 @@ bool FileListTransfer::DecodeSetHeader(Packet *packet)
 			fileListReceiver->downloadHandler->OnDereference();
 			fileListReceivers.Delete(setID);
 			if (fileListReceiver->deleteDownloadHandler)
-				RakNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
 		}
 
 		return true;
@@ -346,7 +347,7 @@ bool FileListTransfer::DecodeSetHeader(Packet *packet)
 bool FileListTransfer::DecodeFile(Packet *packet, bool isTheFullFile)
 {
 	FileListTransferCBInterface::OnFileStruct onFileStruct;
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
 
 	onFileStruct.senderSystemAddress=packet->systemAddress;
@@ -454,9 +455,9 @@ bool FileListTransfer::DecodeFile(Packet *packet, bool isTheFullFile)
 			{
 				fileListReceiver->downloadHandler->OnDereference();
 				if (fileListReceiver->deleteDownloadHandler)
-					RakNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
+					SLNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
 				fileListReceivers.Delete(onFileStruct.setID);
-				RakNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
 			}
 		}
 
@@ -537,13 +538,13 @@ void FileListTransfer::Clear(void)
 	{
 		fileListReceivers[i]->downloadHandler->OnDereference();
 		if (fileListReceivers[i]->deleteDownloadHandler)
-			RakNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
+			SLNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
 	}
 	fileListReceivers.Clear();
 
 	fileToPushRecipientListMutex.Lock();
-	for (unsigned int i=0; i < fileToPushRecipientList.Size(); i++)
+	for (i=0; i < fileToPushRecipientList.Size(); i++)
 	{
 		FileToPushRecipient *ftpr = fileToPushRecipientList[i];
 		// Taken out of the list
@@ -561,21 +562,21 @@ void FileListTransfer::OnClosedConnection(const SystemAddress &systemAddress, Ra
 
 	RemoveReceiver(systemAddress);
 }
-void FileListTransfer::CancelReceive(unsigned short setId)
+void FileListTransfer::CancelReceive(unsigned short inSetId)
 {
-	if (fileListReceivers.Has(setId)==false)
+	if (fileListReceivers.Has(inSetId)==false)
 	{
 #ifdef _DEBUG
 		RakAssert(0);
 #endif
 		return;
 	}
-	FileListReceiver *fileListReceiver=fileListReceivers.Get(setId);
+	FileListReceiver *fileListReceiver=fileListReceivers.Get(inSetId);
 	fileListReceiver->downloadHandler->OnDereference();
 	if (fileListReceiver->deleteDownloadHandler)
-		RakNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
-	RakNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
-	fileListReceivers.Delete(setId);
+		SLNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
+	fileListReceivers.Delete(inSetId);
 }
 void FileListTransfer::RemoveReceiver(SystemAddress systemAddress)
 {
@@ -600,8 +601,8 @@ void FileListTransfer::RemoveReceiver(SystemAddress systemAddress)
 		{
 			fileListReceivers[i]->downloadHandler->OnDereference();
 			if (fileListReceivers[i]->deleteDownloadHandler)
-				RakNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
 			fileListReceivers.RemoveAtIndex(i);
 		}
 		else
@@ -631,9 +632,9 @@ void FileListTransfer::RemoveReceiver(SystemAddress systemAddress)
 	}
 	fileToPushRecipientListMutex.Unlock();
 }
-bool FileListTransfer::IsHandlerActive(unsigned short setId)
+bool FileListTransfer::IsHandlerActive(unsigned short inSetId)
 {
-	return fileListReceivers.Has(setId);
+	return fileListReceivers.Has(inSetId);
 }
 void FileListTransfer::AddCallback(FileListProgress *cb)
 {
@@ -668,8 +669,8 @@ void FileListTransfer::Update(void)
 		{
 			fileListReceivers[i]->downloadHandler->OnDereference();
 			if (fileListReceivers[i]->deleteDownloadHandler)
-				RakNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fileListReceivers[i]->downloadHandler, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(fileListReceivers[i], _FILE_AND_LINE_);
 			fileListReceivers.RemoveAtIndex(i);
 		}
 		else
@@ -678,7 +679,7 @@ void FileListTransfer::Update(void)
 }
 void FileListTransfer::OnReferencePush(Packet *packet, bool isTheFullFile)
 {
-	RakNet::BitStream refPushAck;
+	SLNet::BitStream refPushAck;
 	if (isTheFullFile==false)
 	{
 		// 12/23/09 Why do I care about ID_DOWNLOAD_PROGRESS for reference pushes?
@@ -687,7 +688,7 @@ void FileListTransfer::OnReferencePush(Packet *packet, bool isTheFullFile)
 	}
 
 	FileListTransferCBInterface::OnFileStruct onFileStruct;
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
 
 	unsigned int partCount=0;
@@ -868,8 +869,8 @@ void FileListTransfer::OnReferencePush(Packet *packet, bool isTheFullFile)
 				fileListReceiver->downloadHandler->OnDereference();
 				fileListReceivers.Delete(onFileStruct.setID);
 				if (fileListReceiver->deleteDownloadHandler)
-					RakNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
-				RakNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
+					SLNet::OP_DELETE(fileListReceiver->downloadHandler, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(fileListReceiver, _FILE_AND_LINE_);
 			}
 		}
 	}
@@ -913,7 +914,7 @@ void FileListTransfer::OnReferencePush(Packet *packet, bool isTheFullFile)
 
 	return;
 }
-namespace RakNet
+namespace SLNet
 {
 
 /*
@@ -947,7 +948,7 @@ int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutp
 	const char *dataBlocks[2];
 	int lengths[2];
 	unsigned int smallFileTotalSize=0;
-	RakNet::BitStream outBitstream;
+	SLNet::BitStream outBitstream;
 	unsigned int ftpIndex;
 
 	fileListTransfer->fileToPushRecipientListMutex.Lock();
@@ -1013,7 +1014,7 @@ int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutp
 
 				// LWS : fixed freed pointer reference
 //				unsigned int chunkSize = ftp->chunkSize;
-				RakNet::OP_DELETE(ftp,_FILE_AND_LINE_);
+				SLNet::OP_DELETE(ftp,_FILE_AND_LINE_);
 				smallFileTotalSize+=bytesRead;
 				//done = bytesRead!=ftp->chunkSize;
 				////ftpr->filesToPushMutex.Lock();
@@ -1054,7 +1055,7 @@ int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutp
 			{
 				// Done
 				//unsigned short setId = ftp->setID;
-				RakNet::OP_DELETE(ftp,_FILE_AND_LINE_);
+				SLNet::OP_DELETE(ftp,_FILE_AND_LINE_);
 
 				////ftpr->filesToPushMutex.Lock();
 				if (ftpr->filesToPush.Size()==0)
@@ -1100,12 +1101,12 @@ int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutp
 	return 0;
 }
 }
-void FileListTransfer::SendIRIToAddress(SystemAddress systemAddress, unsigned short setId)
+void FileListTransfer::SendIRIToAddress(SystemAddress systemAddress, unsigned short inSetId)
 {
 	ThreadData threadData;
 	threadData.fileListTransfer=this;
 	threadData.systemAddress=systemAddress;
-	threadData.setId=setId;
+	threadData.setId= inSetId;
 
 	if (threadPool.WasStarted())
 	{
@@ -1119,11 +1120,11 @@ void FileListTransfer::SendIRIToAddress(SystemAddress systemAddress, unsigned sh
 }
 void FileListTransfer::OnReferencePushAck(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
-	unsigned short setId;
-	inBitStream.Read(setId);
-	SendIRIToAddress(packet->systemAddress, setId);
+	unsigned short curSetId;
+	inBitStream.Read(curSetId);
+	SendIRIToAddress(packet->systemAddress, curSetId);
 }
 void FileListTransfer::RemoveFromList(FileToPushRecipient *ftpr)
 {
@@ -1157,9 +1158,5 @@ unsigned int FileListTransfer::GetPendingFilesToAddress(SystemAddress recipient)
 	
 	return 0;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

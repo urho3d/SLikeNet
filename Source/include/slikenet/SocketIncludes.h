@@ -1,3 +1,13 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 #ifndef RAKNET_SOCKETINCLUDES_H
 #define RAKNET_SOCKETINCLUDES_H
 
@@ -87,7 +97,7 @@
 		typedef PP_Resource __UDPSOCKET__;
 		typedef PP_Resource __TCPSOCKET__;
 	#else
-		//#include "RakMemoryOverride.h"
+		//#include "memoryoverride.h"
 		/// Unix/Linux uses ints for sockets
 		typedef int __UDPSOCKET__;
 		typedef int __TCPSOCKET__;

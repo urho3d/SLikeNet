@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __NATIVE_TYPES_H
@@ -20,13 +25,8 @@
 	typedef signed char         int8_t;
 	typedef signed short        int16_t;
 	typedef __int32				int32_t;
-	#if defined(_MSC_VER) && _MSC_VER < 1300
-		typedef unsigned __int64    uint64_t;
-		typedef signed __int64   	int64_t;
-	#else
-		typedef unsigned long long int    uint64_t;
-		typedef signed long long   	int64_t;
-	#endif
+	typedef unsigned long long int    uint64_t;
+	typedef signed long long   	int64_t;
 #endif
 
 

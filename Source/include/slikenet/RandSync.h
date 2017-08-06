@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -22,7 +27,7 @@
 #include "DS_Queue.h"
 #include "NativeTypes.h"
 
-namespace RakNet {
+namespace SLNet {
 
 class BitStream;
 
@@ -39,10 +44,10 @@ public:
 	uint32_t GetCallCount( void ) const;
 	void SetCallCount( uint32_t i );
 
-	virtual void SerializeConstruction(RakNet::BitStream *constructionBitstream);
-	virtual bool DeserializeConstruction(RakNet::BitStream *constructionBitstream);
-	virtual void Serialize(RakNet::BitStream *outputBitstream);
-	virtual void Deserialize(RakNet::BitStream *outputBitstream);
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream);
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream);
+	virtual void Serialize(SLNet::BitStream *outputBitstream);
+	virtual void Deserialize(SLNet::BitStream *outputBitstream);
 
 protected:
 	void Skip( uint32_t count );
@@ -52,7 +57,7 @@ protected:
 	uint32_t usedValueBufferCount;
 	RakNetRandom rnr;
 };
-} // namespace RakNet
+} // namespace SLNet
 
 
 #endif

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,11 +22,11 @@
 #ifndef __SINGLE_PRODUCER_CONSUMER_H
 #define __SINGLE_PRODUCER_CONSUMER_H
 
-#include "RakAssert.h"
+#include "assert.h"
 
 static const int MINIMUM_LIST_SIZE=8;
 
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "Export.h"
 
 /// The namespace DataStructures was only added to avoid compiler errors for commonly named data structures
@@ -100,9 +105,9 @@ namespace DataStructures
 		SingleProducerConsumer<SingleProducerConsumerType>::SingleProducerConsumer()
 	{
 		// Preallocate
-		readPointer = RakNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
+		readPointer = SLNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
 		writePointer=readPointer;
-		readPointer->next = RakNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
+		readPointer->next = SLNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
 		int listSize;
 #ifdef _DEBUG
 		RakAssert(MINIMUM_LIST_SIZE>=3);
@@ -110,7 +115,7 @@ namespace DataStructures
 		for (listSize=2; listSize < MINIMUM_LIST_SIZE; listSize++)
 		{
 			readPointer=readPointer->next;
-			readPointer->next = RakNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
+			readPointer->next = SLNet::OP_NEW<DataPlusPtr>( _FILE_AND_LINE_ );
 		}
 		readPointer->next->next=writePointer; // last to next = start
 		readPointer=writePointer;
@@ -127,10 +132,10 @@ namespace DataStructures
 		while (readPointer!=writeAheadPointer)
 		{
 			next=readPointer->next;
-			RakNet::OP_DELETE((char*) readPointer, _FILE_AND_LINE_);
+			SLNet::OP_DELETE((char*) readPointer, _FILE_AND_LINE_);
 			readPointer=next;
 		}
-		RakNet::OP_DELETE((char*) readPointer, _FILE_AND_LINE_);
+		SLNet::OP_DELETE((char*) readPointer, _FILE_AND_LINE_);
 	}
 
 	template <class SingleProducerConsumerType>
@@ -140,7 +145,7 @@ namespace DataStructures
 			writeAheadPointer->next->readyToRead==true)
 		{
 			volatile DataPlusPtr *originalNext=writeAheadPointer->next;
-			writeAheadPointer->next=RakNet::OP_NEW<DataPlusPtr>(_FILE_AND_LINE_);
+			writeAheadPointer->next= SLNet::OP_NEW<DataPlusPtr>(_FILE_AND_LINE_);
 			RakAssert(writeAheadPointer->next);
 			writeAheadPointer->next->next=originalNext;
 		}
@@ -233,7 +238,7 @@ namespace DataStructures
 #ifdef _DEBUG
 			RakAssert(writePointer!=readPointer);
 #endif
-			RakNet::OP_DELETE((char*) writePointer, _FILE_AND_LINE_);
+			SLNet::OP_DELETE((char*) writePointer, _FILE_AND_LINE_);
 			writePointer=next;
 		}
 

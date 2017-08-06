@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,18 +18,28 @@
 ///
 
 
-#include "SocketLayer.h"
-#include "RakAssert.h"
-#include "RakNetTypes.h"
-#include "RakPeer.h"
-#include "GetTime.h"
-#include "LinuxStrings.h"
-#include "SocketDefines.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/assert.h"
+#include "slikenet/types.h"
+#include "slikenet/peer.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/SocketDefines.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 #if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(__WIN32__)
 #include <netdb.h>
 #endif
 
-using namespace RakNet;
+#ifdef _WIN32
+#include <tchar.h>
+#else
+#ifndef _T
+#define _T(x) (x)
+#endif
+#endif
+
+using namespace SLNet;
 
 /*
 #if defined(__native_client__)
@@ -33,9 +48,9 @@ using namespace pp;
 */
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL!=1
-#include "CCRakNetUDT.h"
+#include "slikenet/CCRakNetUDT.h"
 #else
-#include "CCRakNetSlidingWindow.h"
+#include "slikenet/CCRakNetSlidingWindow.h"
 #endif
 
 //SocketLayerOverride *SocketLayer::slo=0;
@@ -72,25 +87,21 @@ using namespace pp;
 
 
 #if   defined(_WIN32)
-#include "WSAStartupSingleton.h"
-#include "WindowsIncludes.h"
+#include "slikenet/WSAStartupSingleton.h"
+#include "slikenet/WindowsIncludes.h"
 
 #else
 #include <unistd.h>
 #endif
 
-#include "RakSleep.h"
+#include "slikenet/sleep.h"
 #include <stdio.h>
-#include "Itoa.h"
+#include "slikenet/Itoa.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-namespace RakNet
+namespace SLNet
 {
-	extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNet::TimeUS timeRead );
-	//extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket* rakNetSocket, RakNet::TimeUS timeRead );
+	extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, SLNet::TimeUS timeRead );
+	//extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket* rakNetSocket, SLNet::TimeUS timeRead );
 }
 
 #ifdef _DEBUG
@@ -162,12 +173,12 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 			// See http://support.microsoft.com/kb/819124
 			// http://blogs.msdn.com/wndp/archive/2007/03/19/winsock-so-exclusiveaddruse-on-vista.aspx
 			// http://msdn.microsoft.com/en-us/library/ms740621(VS.85).aspx
-			LPVOID messageBuffer;
+			LPTSTR messageBuffer;
 			FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// something has gone wrong here...
-			RAKNET_DEBUG_PRINTF( "setsockopt__(SO_BROADCAST) failed:Error code - %d\n%s", dwIOError, messageBuffer );
+			RAKNET_DEBUG_TPRINTF( _T("setsockopt__(SO_BROADCAST) failed:Error code - %lu\n%s"), dwIOError, messageBuffer );
 			//Free the buffer.
 			LocalFree( messageBuffer );
 #endif
@@ -181,10 +192,10 @@ void SocketLayer::SetSocketOptions( __UDPSOCKET__ listenSocket, bool blockingSoc
 }
  
 
-RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, RakNet::RakString inIpString)
+SLNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, SLNet::RakString inIpString)
 {
-	RakNet::RakString netMaskString;
-	RakNet::RakString ipString;
+	SLNet::RakString netMaskString;
+	SLNet::RakString ipString;
 
 
 
@@ -207,12 +218,16 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 	{
 		sockaddr_in *pAddress;
 		pAddress = (sockaddr_in *) & (InterfaceList[i].iiAddress);
-		ipString=inet_ntoa(pAddress->sin_addr);
+		char ip[65];
+		inet_ntop(pAddress->sin_family, &pAddress->sin_addr, ip, 65);
+		ipString = ip;
 
 		if (inIpString==ipString)
 		{
 			pAddress = (sockaddr_in *) & (InterfaceList[i].iiNetmask);
-			netMaskString=inet_ntoa(pAddress->sin_addr);
+			char netmaskIP[65];
+			inet_ntop(pAddress->sin_family, &pAddress->sin_addr, netmaskIP, 65);
+			netMaskString=netmaskIP;
 			return netMaskString;
 		}
 	}
@@ -241,7 +256,9 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 	int intNum = ifc.ifc_len / sizeof(struct ifreq);
 	for(int i = 0; i < intNum; i++)
 	{
-		ipString=inet_ntoa(((struct sockaddr_in *)&ifr[i].ifr_addr)->sin_addr);
+		char ip[65];
+		inet_ntop(AF_INET, &((struct sockaddr_in *)&ifr[i].ifr_addr)->sin_addr, ip, 65);
+		ipString = ip;
 
 		if (inIpString==ipString)
 		{
@@ -253,13 +270,14 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 			}
 			ifr2.ifr_addr.sa_family = AF_INET;
 
-			strncpy(ifr2.ifr_name, ifr[i].ifr_name, IFNAMSIZ-1);
+			strncpy_s(ifr2.ifr_name, IFNAMSIZ, ifr[i].ifr_name, IFNAMSIZ-1);
 
 			ioctl(fd, SIOCGIFNETMASK, &ifr2);
 
 			close(fd);
 			close(fd2);
-			netMaskString=inet_ntoa(((struct sockaddr_in *)&ifr2.ifr_addr)->sin_addr);
+			inet_ntop(AF_INET, &((struct sockaddr_in *)&ifr2.ifr_addr)->sin_addr, ip, 65);
+			netMaskString=ip;
 
 			return netMaskString;
 		}
@@ -363,18 +381,17 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 	{
  #if defined(_WIN32) && !defined(WINDOWS_PHONE_8)
 		DWORD dwIOError = GetLastError();
-		LPVOID messageBuffer;
+		LPTSTR messageBuffer;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "gethostname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_TPRINTF( _T("gethostname failed:Error code - %lu\n%s"), dwIOError, messageBuffer );
 		//Free the buffer.
 		LocalFree( messageBuffer );
 		#endif
 		return ;
 	}
-
 
 #if RAKNET_SUPPORT_IPV6==1
 	struct addrinfo hints;
@@ -399,32 +416,34 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 
 	freeaddrinfo(servinfo); // free the linked-list
 #else
-	struct hostent *phe = gethostbyname( ac );
+	struct addrinfo *curAddress = NULL;
+	int err = getaddrinfo(ac, NULL, NULL, &curAddress);
 
-	if ( phe == 0 )
+	if ( err != 0 )
 	{
- #if defined(_WIN32) && !defined(WINDOWS_PHONE_8)
-		DWORD dwIOError = GetLastError();
-		LPVOID messageBuffer;
+	#if defined(_WIN32) && !defined(WINDOWS_PHONE_8)
+		int wsaError = WSAGetLastError();
+		LPTSTR messageBuffer;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
+			NULL, wsaError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "gethostbyname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_TPRINTF( _T("getaddrinfo failed:Error code - %d\n%s"), wsaError, messageBuffer );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
 	#endif
 		return ;
 	}
-	for ( idx = 0; idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS; ++idx )
+	while (curAddress != NULL && idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS)
 	{
-		if (phe->h_addr_list[ idx ] == 0)
-			break;
-
-		memcpy(&addresses[idx].address.addr4.sin_addr,phe->h_addr_list[ idx ],sizeof(struct in_addr));
-
+		if (curAddress->ai_family == AF_INET) {
+			addresses[idx].address.addr4 = *((struct sockaddr_in *)curAddress->ai_addr);
+			++idx;
+		}
+		curAddress = curAddress->ai_next;
 	}
+
 #endif // else RAKNET_SUPPORT_IPV6==1
 
 	while (idx < MAXIMUM_NUMBER_OF_INTERNAL_IDS)
@@ -482,12 +501,12 @@ void SocketLayer::GetSystemAddress_Old ( __UDPSOCKET__ s, SystemAddress *systemA
 	{
 #if defined(_WIN32) && defined(_DEBUG) && !defined(WINDOWS_PHONE_8)
 		DWORD dwIOError = GetLastError();
-		LPVOID messageBuffer;
+		LPTSTR messageBuffer;
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_TPRINTF( _T("getsockname failed:Error code - %lu\n%s"), dwIOError, messageBuffer );
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -524,7 +543,7 @@ void SocketLayer::GetSystemAddress ( __UDPSOCKET__ s, SystemAddress *systemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, messageBuffer );
+		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer));
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -578,7 +597,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 	if (ipProto==AF_UNSPEC)
 
 	{
-		ipList[0].ToString(false,firstBindable);
+		ipList[0].ToString(false,firstBindable,128);
 		return true;
 	}		
 
@@ -602,12 +621,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 // 		((char*)(&ipList[l].address.addr4.sin_addr.s_addr))[2],
 // 		((char*)(&ipList[l].address.addr4.sin_addr.s_addr))[3]
 // 	);
-	ipList[l].ToString(false,firstBindable);
+	ipList[l].ToString(false,firstBindable,128);
 	return true;
 
 }
-
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

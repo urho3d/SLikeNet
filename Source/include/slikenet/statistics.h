@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,9 +24,9 @@
 
 #include "PacketPriority.h"
 #include "Export.h"
-#include "RakNetTypes.h"
+#include "types.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 enum RNSPerSecondMetrics
@@ -64,8 +69,8 @@ struct RAK_DLL_EXPORT RakNetStatistics
 	uint64_t runningTotal[RNS_PER_SECOND_METRICS_COUNT];
 	
 	/// When did the connection start?
-	/// \sa RakNet::GetTimeUS()
-	RakNet::TimeUS connectionStartTime;
+	/// \sa SLNet::GetTimeUS()
+	SLNet::TimeUS connectionStartTime;
 
 	/// Is our current send rate throttled by congestion control?
 	/// This value should be true if you send more data per second than your bandwidth capacity
@@ -121,13 +126,14 @@ struct RAK_DLL_EXPORT RakNetStatistics
 /// Verbosity level currently supports 0 (low), 1 (medium), 2 (high)
 /// \param[in] s The Statistical information to format out
 /// \param[in] buffer The buffer containing a formated report
+/// \param[in] bufferLength The size (in characters) of the buffer
 /// \param[in] verbosityLevel 
 /// 0 low
 /// 1 medium 
 /// 2 high 
 /// 3 debugging congestion control
-void RAK_DLL_EXPORT StatisticsToString( RakNetStatistics *s, char *buffer, int verbosityLevel );
+void RAK_DLL_EXPORT StatisticsToString( RakNetStatistics *s, char *buffer, size_t bufferLength, int verbosityLevel );
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

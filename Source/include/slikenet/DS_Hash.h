@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \internal
@@ -16,11 +21,11 @@
 #ifndef __HASH_H
 #define __HASH_H 
 
-#include "RakAssert.h"
+#include "assert.h"
 #include <string.h> // memmove
 #include "Export.h"
-#include "RakMemoryOverride.h"
-#include "RakString.h"
+#include "memoryoverride.h"
+#include "string.h"
 
 /// The namespace DataStructures was only added to avoid compiler errors for commonly named data structures
 /// As these data structures are stand-alone, you can use them outside of RakNet for your own projects if you wish.
@@ -94,11 +99,11 @@ namespace DataStructures
 		unsigned long hashIndex = (*hashFunction)(key) % HASH_SIZE;
 		if (nodeList==0)
 		{
-			nodeList=RakNet::OP_NEW_ARRAY<Node *>(HASH_SIZE,file,line);
+			nodeList= SLNet::OP_NEW_ARRAY<Node *>(HASH_SIZE,file,line);
 			memset(nodeList,0,sizeof(Node *)*HASH_SIZE);
 		}
 
-		Node *newNode=RakNet::OP_NEW_2<Node>(file,line,key,input);
+		Node *newNode= SLNet::OP_NEW_2<Node>(file,line,key,input);
 		newNode->next=nodeList[hashIndex];
 		nodeList[hashIndex]=newNode;
 
@@ -153,7 +158,7 @@ namespace DataStructures
 			// First item does match, but more than one item
 			out=node->data;
 			nodeList[hashIndex]=node->next;
-			RakNet::OP_DELETE(node,file,line);
+			SLNet::OP_DELETE(node,file,line);
 			size--;
 			return true;
 		}
@@ -170,7 +175,7 @@ namespace DataStructures
 				// Skip over subsequent item
 				last->next=node->next;
 				// Delete existing item
-				RakNet::OP_DELETE(node,file,line);
+				SLNet::OP_DELETE(node,file,line);
 				size--;
 				return true;
 			}
@@ -199,7 +204,7 @@ namespace DataStructures
 		{
 			// First item does match, but more than one item
 			nodeList[index.primaryIndex]=node->next;
-			RakNet::OP_DELETE(node,file,line);
+			SLNet::OP_DELETE(node,file,line);
 			size--;
 			return true;
 		}
@@ -218,7 +223,7 @@ namespace DataStructures
 		// Skip over subsequent item
 		last->next=node->next;
 		// Delete existing item
-		RakNet::OP_DELETE(node,file,line);
+		SLNet::OP_DELETE(node,file,line);
 		size--;
 		return true;
 	}
@@ -303,7 +308,7 @@ namespace DataStructures
 			unsigned int i;
 			for (i=0; i < HASH_SIZE; i++)
 				ClearIndex(i,file,line);
-			RakNet::OP_DELETE_ARRAY(nodeList,file,line);
+			SLNet::OP_DELETE_ARRAY(nodeList,file,line);
 			nodeList=0;
 			size=0;
 		}
@@ -317,7 +322,7 @@ namespace DataStructures
 		while (node)
 		{
 			next=node->next;
-			RakNet::OP_DELETE(node,file,line);
+			SLNet::OP_DELETE(node,file,line);
 			node=next;
 			size--;
 		}

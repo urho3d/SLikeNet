@@ -1,21 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "FormatString.h"
-#include "EpochTimeToString.h"
+#include "slikenet/FormatString.h"
+#include "slikenet/EpochTimeToString.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 // localtime
 #include <time.h>
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 char * EpochTimeToString(long long time)
 {
@@ -25,10 +32,10 @@ char * EpochTimeToString(long long time)
 	if (++textIndex==4)
 		textIndex=0;
 
-	struct tm * timeinfo;
+	struct tm timeinfo;
 	time_t t = time;
-	timeinfo = localtime ( &t );
-	strftime (text[textIndex],64,"%c.",timeinfo);
+	localtime_s ( &timeinfo, &t );
+	strftime (text[textIndex],64,"%c.",&timeinfo);
 
 	/*
 	time_t

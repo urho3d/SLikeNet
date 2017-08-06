@@ -102,11 +102,21 @@
     C4609560 A108A0C6 26AA7F2B 38A65566 739353C5
 */
 
+/*
+ * This file was taken from RakNet 4.082.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications in this file are put under the public domain.
+ * Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The
+ * license can be found in the license.txt file in the root directory of this source tree.
+ */
+
 #ifndef SHA1_H_A545E61D43E9404E8D736869AB3CBFE7
 #define SHA1_H_A545E61D43E9404E8D736869AB3CBFE7
 
 // KevinJ:
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include <stdio.h> // Needed for file access
 
 #include <memory.h> // Needed for memset and memcpy

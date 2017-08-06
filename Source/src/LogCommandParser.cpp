@@ -1,18 +1,23 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_LogCommandParser==1
 
-#include "LogCommandParser.h"
-#include "TransportInterface.h"
+#include "slikenet/LogCommandParser.h"
+#include "slikenet/TransportInterface.h"
 
 #include <memory.h>
 
@@ -20,13 +25,11 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(LogCommandParser,LogCommandParser);
 
@@ -143,9 +146,8 @@ void LogCommandParser::WriteLog(const char *channelName, const char *format, ...
 	char text[REMOTE_MAX_TEXT_INPUT];
 	va_list ap;
 	va_start(ap, format);
-	_vsnprintf(text, REMOTE_MAX_TEXT_INPUT, format, ap);
+	vsnprintf_s(text, REMOTE_MAX_TEXT_INPUT-1, format, ap);
 	va_end(ap);
-	text[REMOTE_MAX_TEXT_INPUT-1]=0;
 
 	// Make sure that text ends in \r\n
 	int textLen;
@@ -157,7 +159,7 @@ void LogCommandParser::WriteLog(const char *channelName, const char *format, ...
 		text[textLen-1]=0;
 	}
 	if (textLen < REMOTE_MAX_TEXT_INPUT-4)
-		strcat(text, "\r\n");
+		strcat_s(text, "\r\n");
 	else
 	{
 		text[textLen-3]='\r';
@@ -281,9 +283,5 @@ void LogCommandParser::OnTransportChange(TransportInterface *transport)
 	// I don't want users to have to pass TransportInterface *transport to Log.
 	trans=transport;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

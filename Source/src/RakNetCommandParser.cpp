@@ -1,30 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_RakNetCommandParser==1
 
-#include "RakNetCommandParser.h"
-#include "TransportInterface.h"
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "RakAssert.h"
+#include "slikenet/commandparser.h"
+#include "slikenet/TransportInterface.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/assert.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(RakNetCommandParser,RakNetCommandParser);
 
@@ -46,7 +47,7 @@ RakNetCommandParser::RakNetCommandParser()
 	RegisterCommand(2,"IsConnected","( );");
 	RegisterCommand(1,"GetIndexFromSystemAddress","( const SystemAddress systemAddress );");
 	RegisterCommand(1,"GetSystemAddressFromIndex","( unsigned int index );");
-	RegisterCommand(2,"AddToBanList","( const char *IP, RakNet::TimeMS milliseconds=0 );");
+	RegisterCommand(2,"AddToBanList","( const char *IP, SLNet::TimeMS milliseconds=0 );");
 	RegisterCommand(1,"RemoveFromBanList","( const char *IP );");
 	RegisterCommand(0,"ClearBanList","( void );");
 	RegisterCommand(1,"IsBanned","( const char *IP );");
@@ -59,7 +60,7 @@ RakNetCommandParser::RakNetCommandParser()
 	RegisterCommand(2,"SetOfflinePingResponse","( const char *data, const unsigned int length );");
 	RegisterCommand(0,"GetInternalID","( void ) const;");
 	RegisterCommand(1,"GetExternalID","( const SystemAddress target ) const;");
-	RegisterCommand(2,"SetTimeoutTime","( RakNet::TimeMS timeMS, const SystemAddress target );");
+	RegisterCommand(2,"SetTimeoutTime","( SLNet::TimeMS timeMS, const SystemAddress target );");
 //	RegisterCommand(1,"SetMTUSize","( int size );");
 	RegisterCommand(0,"GetMTUSize","( void ) const;");
 	RegisterCommand(0,"GetNumberOfAddresses","( void );");
@@ -73,7 +74,7 @@ RakNetCommandParser::RakNetCommandParser()
 RakNetCommandParser::~RakNetCommandParser()
 {
 }
-void RakNetCommandParser::SetRakPeerInterface(RakNet::RakPeerInterface *rakPeer)
+void RakNetCommandParser::SetRakPeerInterface(SLNet::RakPeerInterface *rakPeer)
 {
 	peer=rakPeer;
 }
@@ -87,7 +88,7 @@ bool RakNetCommandParser::OnCommand(const char *command, unsigned numParameters,
 
 	if (strcmp(command, "Startup")==0)
 	{
-		RakNet::SocketDescriptor socketDescriptor((unsigned short)atoi(parameterList[1]), parameterList[2]);
+		SLNet::SocketDescriptor socketDescriptor((unsigned short)atoi(parameterList[1]), parameterList[2]);
 		ReturnResult(peer->Startup((unsigned short)atoi(parameterList[0]), &socketDescriptor, 1), command, transport, systemAddress);
 	}
 	else if (strcmp(command, "InitializeSecurity")==0)
@@ -124,7 +125,7 @@ bool RakNetCommandParser::OnCommand(const char *command, unsigned numParameters,
 	}
 	else if (strcmp(command, "Connect")==0)
 	{
-		ReturnResult(peer->Connect(parameterList[0], (unsigned short)atoi(parameterList[1]),parameterList[2],atoi(parameterList[3]))==RakNet::CONNECTION_ATTEMPT_STARTED, command, transport, systemAddress);
+		ReturnResult(peer->Connect(parameterList[0], (unsigned short)atoi(parameterList[1]),parameterList[2],atoi(parameterList[3]))== SLNet::CONNECTION_ATTEMPT_STARTED, command, transport, systemAddress);
 	}
 	else if (strcmp(command, "Disconnect")==0)
 	{
@@ -152,7 +153,7 @@ bool RakNetCommandParser::OnCommand(const char *command, unsigned numParameters,
 				for (i=0; i < count; i++)
 				{
 					char str1[64];
-					remoteSystems[i].ToString(true, str1);
+					remoteSystems[i].ToString(true, str1, 64);
 					transport->Send(systemAddress, "%i %s\r\n", i, str1);
 				}
 			}
@@ -304,9 +305,5 @@ void RakNetCommandParser::SendHelp(TransportInterface *transport, const SystemAd
 		transport->Send(systemAddress, "Parser not active.  Call SetRakPeerInterface.\r\n");
 	}
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

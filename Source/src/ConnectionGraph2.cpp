@@ -1,26 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_ConnectionGraph2==1
 
-#include "ConnectionGraph2.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "slikenet/ConnectionGraph2.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(ConnectionGraph2,ConnectionGraph2)
 
-int RakNet::ConnectionGraph2::RemoteSystemComp( const RakNetGUID &key, RemoteSystem * const &data )
+int SLNet::ConnectionGraph2::RemoteSystemComp( const RakNetGUID &key, RemoteSystem * const &data )
 {
 	if (key < data->guid)
 		return -1;
@@ -29,7 +34,7 @@ int RakNet::ConnectionGraph2::RemoteSystemComp( const RakNetGUID &key, RemoteSys
 	return 0;
 }
 
-int RakNet::ConnectionGraph2::SystemAddressAndGuidComp( const SystemAddressAndGuid &key, const SystemAddressAndGuid &data )
+int SLNet::ConnectionGraph2::SystemAddressAndGuidComp( const SystemAddressAndGuid &key, const SystemAddressAndGuid &data )
 {
 	if (key.guid<data.guid)
 		return -1;
@@ -172,7 +177,7 @@ RakNetGUID ConnectionGraph2::GetLowestAveragePingSystem(void) const
 void ConnectionGraph2::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
 	// Send notice to all existing connections
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	if (lostConnectionReason==LCR_CONNECTION_LOST)
 		bs.Write((MessageID)ID_REMOTE_CONNECTION_LOST);
 	else
@@ -185,7 +190,7 @@ void ConnectionGraph2::OnClosedConnection(const SystemAddress &systemAddress, Ra
 	unsigned int idx = remoteSystems.GetIndexFromKey(rakNetGUID, &objectExists);
 	if (objectExists)
 	{
-		RakNet::OP_DELETE(remoteSystems[idx],_FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteSystems[idx],_FILE_AND_LINE_);
 		remoteSystems.RemoveAtIndex(idx);
 	}
 }
@@ -200,7 +205,7 @@ bool ConnectionGraph2::GetAutoProcessNewConnections(void) const
 void ConnectionGraph2::AddParticipant(const SystemAddress &systemAddress, RakNetGUID rakNetGUID)
 {
 	// Relay the new connection to other systems.
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	bs.Write((MessageID)ID_REMOTE_NEW_INCOMING_CONNECTION);
 	bs.Write((uint32_t)1);
 	bs.Write(systemAddress);
@@ -243,7 +248,7 @@ void ConnectionGraph2::AddParticipant(const SystemAddress &systemAddress, RakNet
 	unsigned int ii = remoteSystems.GetIndexFromKey(rakNetGUID, &objectExists);
 	if (objectExists==false)
 	{
-		RemoteSystem* remoteSystem = RakNet::OP_NEW<RemoteSystem>(_FILE_AND_LINE_);
+		RemoteSystem* remoteSystem = SLNet::OP_NEW<RemoteSystem>(_FILE_AND_LINE_);
 		remoteSystem->guid=rakNetGUID;
 		remoteSystems.InsertAtIndex(remoteSystem,ii,_FILE_AND_LINE_);
 	}
@@ -269,7 +274,7 @@ PluginReceiveResult ConnectionGraph2::OnReceive(Packet *packet)
 		unsigned idx = remoteSystems.GetIndexFromKey(packet->guid, &objectExists);
 		if (objectExists)
 		{
-			RakNet::BitStream bs(packet->data,packet->length,false);
+			SLNet::BitStream bs(packet->data,packet->length,false);
 			bs.IgnoreBytes(1);
 			SystemAddressAndGuid saag;
 			bs.Read(saag.systemAddress);
@@ -286,7 +291,7 @@ PluginReceiveResult ConnectionGraph2::OnReceive(Packet *packet)
 		if (objectExists)
 		{
 			uint32_t numAddresses;
-			RakNet::BitStream bs(packet->data,packet->length,false);
+			SLNet::BitStream bs(packet->data,packet->length,false);
 			bs.IgnoreBytes(1);
 			bs.Read(numAddresses);
 			for (unsigned int idx2=0; idx2 < numAddresses; idx2++)
@@ -295,7 +300,6 @@ PluginReceiveResult ConnectionGraph2::OnReceive(Packet *packet)
 				bs.Read(saag.systemAddress);
 				bs.Read(saag.guid);
 				bs.Read(saag.sendersPingToThatSystem);
-				bool objectExists;
 				unsigned int ii = remoteSystems[idx]->remoteConnections.GetIndexFromKey(saag, &objectExists);
 				if (objectExists==false)
 					remoteSystems[idx]->remoteConnections.InsertAtIndex(saag,ii,_FILE_AND_LINE_);

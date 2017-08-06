@@ -1,14 +1,19 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "EmptyHeader.h"
+#include "slikenet/EmptyHeader.h"
 
 #ifdef RAKNET_SOCKET_2_INLINE_FUNCTIONS
 
@@ -18,11 +23,11 @@
 // Every platform except windows store 8 and native client supports Berkley sockets
 #if !defined(WINDOWS_STORE_RT)
 
-#include "Itoa.h"
+#include "slikenet/Itoa.h"
 
 // Shared on most platforms, but excluded from the listed
 
-
+// #low - maybe change to char (&ip)[65] - then we can also use sizeof again
 void DomainNameToIP_Berkley_IPV4And6( const char *domainName, char ip[65] )
 {
 #if RAKNET_SUPPORT_IPV6==1
@@ -48,7 +53,7 @@ void DomainNameToIP_Berkley_IPV4And6( const char *domainName, char ip[65] )
 		{
 			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
 			addr = &(ipv4->sin_addr);
-			strcpy(ip, inet_ntoa( ipv4->sin_addr ));
+			inet_ntop(AF_INET, &ipv4->sin_addr, ip, 65);
 		} 
 		else
 		{
@@ -70,27 +75,32 @@ void DomainNameToIP_Berkley_IPV4And6( const char *domainName, char ip[65] )
 
 void DomainNameToIP_Berkley_IPV4( const char *domainName, char ip[65] )
 {
-	static struct in_addr addr;
-	memset(&addr,0,sizeof(in_addr));
-	
 	// Use inet_addr instead? What is the difference?
-	struct hostent * phe = gethostbyname( domainName );
+	struct addrinfo *addressinfo = NULL;
+	int error = getaddrinfo(domainName, NULL, NULL, &addressinfo);
 
-	if ( phe == 0 || phe->h_addr_list[ 0 ] == 0 )
+	if ( error != 0 || addressinfo == 0 )
 	{
 		//cerr << "Yow! Bad host lookup." << endl;
 		memset(ip,0,65*sizeof(char));
 		return;
 	}
 
-	if (phe->h_addr_list[ 0 ]==0)
-	{
-		memset(ip,0,65*sizeof(char));
+	// get the (first) IPv4 address
+	while (addressinfo != NULL) {
+		if (addressinfo->ai_family == AF_INET) {
+			break; // found an IPv4 address
+		}
+		addressinfo = addressinfo->ai_next;
+	}
+
+	if (addressinfo == NULL) {
 		return;
 	}
 
-	memcpy( &addr, phe->h_addr_list[ 0 ], sizeof( struct in_addr ) );
-	strcpy(ip, inet_ntoa( addr ));
+	struct sockaddr_in  *sockaddr_ipv4 = (struct sockaddr_in *) addressinfo->ai_addr;
+
+	inet_ntop(AF_INET, &sockaddr_ipv4->sin_addr, ip, 65);
 }
 
 

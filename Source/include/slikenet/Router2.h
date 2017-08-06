@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,7 +24,7 @@
 #ifndef __ROUTER_2_PLUGIN_H
 #define __ROUTER_2_PLUGIN_H
 
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PluginInterface2.h"
 #include "PacketPriority.h"
 #include "Export.h"
@@ -28,7 +33,7 @@
 #include "DS_List.h"
 #include "SimpleMutex.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -70,7 +75,7 @@ public:
 	///
 	/// On ID_ROUTER_2_FORWARDING_ESTABLISHED, EstablishRouting as follows:
 	///
-	/// RakNet::BitStream bs(packet->data, packet->length, false);
+	/// SLNet::BitStream bs(packet->data, packet->length, false);
 	/// bs.IgnoreBytes(sizeof(MessageID));
 	/// RakNetGUID endpointGuid;
 	/// bs.Read(endpointGuid);
@@ -125,7 +130,7 @@ public:
 		DataStructures::List<ConnectionRequestSystem> connectionRequestSystems;
 		SimpleMutex connectionRequestSystemsMutex;
 		Router2RequestStates requestState;
-		RakNet::TimeMS pingTimeout;
+		SLNet::TimeMS pingTimeout;
 		RakNetGUID endpointGuid;
 		RakNetGUID lastRequestedForwardingSystem;
 		bool returnConnectionLostOnFailure;
@@ -142,8 +147,8 @@ public:
 		RakNetGUID sourceGuid;
 		SystemAddress sourceAddress;
 		bool gotReplyFromSource;
-		RakNet::TimeMS timeout;
-		RakNet::TimeMS nextAction;
+		SLNet::TimeMS timeout;
+		SLNet::TimeMS nextAction;
 		unsigned short forwardingPort;
 		__UDPSOCKET__ forwardingSocket;
 	};

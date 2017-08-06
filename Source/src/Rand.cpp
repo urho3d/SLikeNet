@@ -37,10 +37,17 @@
 * It would be nice to CC: <Cokus@math.washington.edu> when you write.
 */
 
+/*
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Rand.h"
+#include "slikenet/Rand.h"
 
 //
 // uint32 must be an unsigned integer type capable of holding at least 32
@@ -62,7 +69,7 @@ static unsigned int _state[ N + 1 ];     // state vector + 1 extra to not violat
 static unsigned int *_next;        // next random value is computed from here
 static int _left = -1; // can *next++ this many times before reloading
 
-using namespace RakNet;
+using namespace SLNet;
 
 void seedMT( unsigned int seed, unsigned int *state, unsigned int *&next, int &left );
 unsigned int reloadMT( unsigned int *state, unsigned int *&next, int &left );
@@ -142,8 +149,8 @@ void seedMT( unsigned int seed, unsigned int *state, unsigned int *&next, int &l
 	// so-- that's why the only change I made is to restrict to odd seeds.
 	//
 
-	register unsigned int x = ( seed | 1U ) & 0xFFFFFFFFU, *s = state;
-	register int j;
+	unsigned int x = ( seed | 1U ) & 0xFFFFFFFFU, *s = state;
+	int j;
 
 	for ( left = 0, *s++ = x, j = N; --j;
 		*s++ = ( x *= 69069U ) & 0xFFFFFFFFU )
@@ -154,8 +161,8 @@ void seedMT( unsigned int seed, unsigned int *state, unsigned int *&next, int &l
 
 unsigned int reloadMT( unsigned int *state, unsigned int *&next, int &left )
 {
-	register unsigned int * p0 = state, *p2 = state + 2, *pM = state + M, s0, s1;
-	register int j;
+	unsigned int * p0 = state, *p2 = state + 2, *pM = state + M, s0, s1;
+	int j;
 
 	if ( left < -1 )
 		seedMT( 4357U );

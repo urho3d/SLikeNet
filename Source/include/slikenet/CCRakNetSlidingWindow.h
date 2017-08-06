@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /*
@@ -35,7 +40,7 @@ else use congestion avoidance
 
 */
 
-#include "RakNetDefines.h"
+#include "defines.h"
 
 #if USE_SLIDING_WINDOW_CONGESTION_CONTROL==1
 
@@ -43,8 +48,8 @@ else use congestion avoidance
 #define __CONGESTION_CONTROL_SLIDING_WINDOW_H
 
 #include "NativeTypes.h"
-#include "RakNetTime.h"
-#include "RakNetTypes.h"
+#include "time.h"
+#include "types.h"
 #include "DS_Queue.h"
 
 /// Sizeof an UDP header in byte
@@ -65,17 +70,17 @@ else use congestion avoidance
 #define CC_TIME_TYPE_BYTES 8
 
 #if CC_TIME_TYPE_BYTES==8
-typedef RakNet::TimeUS CCTimeType;
+typedef SLNet::TimeUS CCTimeType;
 #else
-typedef RakNet::TimeMS CCTimeType;
+typedef SLNet::TimeMS CCTimeType;
 #endif
 
-typedef RakNet::uint24_t DatagramSequenceNumberType;
+typedef SLNet::uint24_t DatagramSequenceNumberType;
 typedef double BytesPerMicrosecond;
 typedef double BytesPerSecond;
 typedef double MicrosecondsPerByte;
 
-namespace RakNet
+namespace SLNet
 {
 
 class CCRakNetSlidingWindow
@@ -122,7 +127,7 @@ class CCRakNetSlidingWindow
 
 	/// Call when you get a NAK, with the sequence number of the lost message
 	/// Affects the congestion control
-	void OnResend(CCTimeType curTime, RakNet::TimeUS nextActionTime);
+	void OnResend(CCTimeType curTime, SLNet::TimeUS nextActionTime);
 	void OnNAK(CCTimeType curTime, DatagramSequenceNumberType nakSequenceNumber);
 
 	/// Call this when an ACK arrives.

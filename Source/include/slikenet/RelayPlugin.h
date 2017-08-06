@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -20,18 +25,14 @@
 #define __RELAY_PLUGIN_H
 
 #include "PluginInterface2.h"
-#include "RakString.h"
+#include "string.h"
 #include "DS_Hash.h"
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
 
 /// \defgroup RELAY_PLUGIN_GROUP RelayPlugin
 /// \brief A simple class to relay messages from one system to another through an intermediary
 /// \ingroup PLUGINS_GROUP
 
-namespace RakNet
+namespace SLNet
 {
 
 /// Forward declarations
@@ -148,8 +149,8 @@ protected:
 	void OnJoinGroupRequestFromClient(Packet *packet);
 	void OnLeaveGroupRequestFromClient(Packet *packet);
 
-	DataStructures::Hash<RakString, StrAndGuidAndRoom*, 8096, RakNet::RakString::ToInteger> strToGuidHash;
-	DataStructures::Hash<RakNetGUID, StrAndGuidAndRoom*, 8096, RakNet::RakNetGUID::ToUint32> guidToStrHash;
+	DataStructures::Hash<RakString, StrAndGuidAndRoom*, 8096, SLNet::RakString::ToInteger> strToGuidHash;
+	DataStructures::Hash<RakNetGUID, StrAndGuidAndRoom*, 8096, SLNet::RakNetGUID::ToUint32> guidToStrHash;
 	DataStructures::List<RP_Group*> chatRooms;
 	bool acceptAddParticipantRequests;
 
@@ -157,10 +158,6 @@ protected:
 
 } // End namespace
 
-#endif
-
-#ifdef _MSC_VER
-#pragma warning( pop )
 #endif
 
 #endif // _RAKNET_SUPPORT_*

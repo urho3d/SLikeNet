@@ -6,10 +6,18 @@
   See header file for version history and test vectors.
 */
 
+/*
+ * Modified work : Copyright(c) 2016-2017, SLikeSoft UG(haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications in this file are put under the public domain.
+ * Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The
+ * license can be found in the license.txt file in the root directory of this source tree.
+ */
+
 // If compiling with MFC, you might want to add #include "StdAfx.h"
 
 #define _CRT_SECURE_NO_WARNINGS
-#include "DR_SHA1.h"
+#include "slikenet/DR_SHA1.h"
 #include <stdlib.h>
 
 #define SHA1_MAX_FILE_BUFFER (32 * 20 * 820)
@@ -39,10 +47,6 @@
 #define S_R2(v,w,x,y,z,i) {z+=(w^x^y)+SHABLK(i)+0x6ED9EBA1+ROL32(v,5);w=ROL32(w,30);}
 #define S_R3(v,w,x,y,z,i) {z+=(((w|x)&y)|(w&x))+SHABLK(i)+0x8F1BBCDC+ROL32(v,5);w=ROL32(w,30);}
 #define S_R4(v,w,x,y,z,i) {z+=(w^x^y)+SHABLK(i)+0xCA62C1D6+ROL32(v,5);w=ROL32(w,30);}
-
-#pragma warning(push)
-// Disable compiler warning 'Conditional expression is constant'
-#pragma warning(disable: 4127)
 
 CSHA1::CSHA1()
 {
@@ -151,7 +155,7 @@ bool CSHA1::HashFile(const TCHAR* tszFileName)
 	if(pbData == NULL) { fclose(fpIn); return false; }
 
 	bool bSuccess = true;
-	while(true)
+	for(;;)
 	{
 		const size_t uRead = fread(pbData, 1, SHA1_MAX_FILE_BUFFER, fpIn);
 
@@ -308,5 +312,3 @@ void CSHA1::HMAC(unsigned char *sharedKey, int sharedKeyLength, unsigned char *d
 	// 	memset(report,0,128);
 	// 	secondHash.ReportHash( report, 0 );
 }
-
-#pragma warning(pop)

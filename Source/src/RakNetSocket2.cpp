@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakNetSocket2.h"
-#include "RakMemoryOverride.h"
-#include "RakAssert.h"
-#include "RakSleep.h"
-#include "SocketDefines.h"
-#include "GetTime.h"
+#include "slikenet/socket2.h"
+#include "slikenet/memoryoverride.h"
+#include "slikenet/assert.h"
+#include "slikenet/sleep.h"
+#include "slikenet/SocketDefines.h"
+#include "slikenet/GetTime.h"
 #include <stdio.h>
 #include <string.h> // memcpy
 
-using namespace RakNet;
+using namespace SLNet;
 
 #ifdef _WIN32
 #else
@@ -56,7 +61,7 @@ using namespace RakNet;
 #define INVALID_SOCKET -1
 #endif
 
-void RakNetSocket2Allocator::DeallocRNS2(RakNetSocket2 *s) {RakNet::OP_DELETE(s,_FILE_AND_LINE_);}
+void RakNetSocket2Allocator::DeallocRNS2(RakNetSocket2 *s) { SLNet::OP_DELETE(s,_FILE_AND_LINE_);}
 RakNetSocket2::RakNetSocket2() {eventHandler=0;}
 RakNetSocket2::~RakNetSocket2() {}
 void RakNetSocket2::SetRecvEventHandler(RNS2EventHandler *_eventHandler) {eventHandler=_eventHandler;}
@@ -71,7 +76,7 @@ RakNetSocket2* RakNetSocket2Allocator::AllocRNS2(void)
 {
 	RakNetSocket2* s2;
 #if defined(WINDOWS_STORE_RT)
-	s2 = RakNet::OP_NEW<RNS2_WindowsStore8>(_FILE_AND_LINE_);
+	s2 = SLNet::OP_NEW<RNS2_WindowsStore8>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_WINDOWS_STORE_8);
 
 
@@ -80,7 +85,7 @@ RakNetSocket2* RakNetSocket2Allocator::AllocRNS2(void)
 
 
 #elif defined(__native_client__)
-	s2 = RakNet::OP_NEW<RNS2_NativeClient>(_FILE_AND_LINE_);
+	s2 = SLNet::OP_NEW<RNS2_NativeClient>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_CHROME);
 
 
@@ -92,10 +97,10 @@ RakNetSocket2* RakNetSocket2Allocator::AllocRNS2(void)
 
 
 #elif defined(_WIN32)
-	s2 = RakNet::OP_NEW<RNS2_Windows>(_FILE_AND_LINE_);
+	s2 = SLNet::OP_NEW<RNS2_Windows>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_WINDOWS);
 #else
-	s2 = RakNet::OP_NEW<RNS2_Linux>(_FILE_AND_LINE_);
+	s2 = SLNet::OP_NEW<RNS2_Linux>(_FILE_AND_LINE_);
 	s2->SetSocketType(RNS2T_LINUX);
 #endif
 	return s2;
@@ -156,7 +161,7 @@ RNS2_NativeClient::~RNS2_NativeClient()
 {
 	bufferedSendsMutex.Lock();
 	while (bufferedSends.Size())
-		RakNet::OP_DELETE(bufferedSends.Pop(), _FILE_AND_LINE_);
+		SLNet::OP_DELETE(bufferedSends.Pop(), _FILE_AND_LINE_);
 	bufferedSendsMutex.Unlock();
 }
 void RNS2_NativeClient::onSocketBound(void* pData, int32_t dataSize)
@@ -213,11 +218,11 @@ void RNS2_NativeClient::ProcessBufferedSend(void)
 void RNS2_NativeClient::DeallocSP(RNS2_SendParameters_NativeClient *sp)
 {
 	rakFree_Ex(sp->data, _FILE_AND_LINE_);
-	RakNet::OP_DELETE(sp, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(sp, _FILE_AND_LINE_);
 }
 RNS2_SendParameters_NativeClient* RNS2_NativeClient::CloneSP(RNS2_SendParameters *sp, RNS2_NativeClient *socket2, const char *file, unsigned int line)
 {
-	RNS2_SendParameters_NativeClient *spNew = RakNet::OP_NEW<RNS2_SendParameters_NativeClient>(file, line);
+	RNS2_SendParameters_NativeClient *spNew = SLNet::OP_NEW<RNS2_SendParameters_NativeClient>(file, line);
 	spNew->data=(char*) rakMalloc(sp->length);
 	memcpy(spNew->data,sp->data,sp->length);
 	spNew->length = sp->length;
@@ -403,7 +408,7 @@ int RNS2_Berkley::CreateRecvPollingThread(int threadPriority)
 
 
 
-	int errorCode = RakNet::RakThread::Create(RecvFromLoop, this, threadPriority);
+	int errorCode = SLNet::RakThread::Create(RecvFromLoop, this, threadPriority);
 
 	return errorCode;
 }
@@ -424,8 +429,8 @@ void RNS2_Berkley::BlockOnStopRecvPollingThread(void)
 	bsp.ttl=0;
 	Send(&bsp, _FILE_AND_LINE_);
 
-	RakNet::TimeMS timeout = RakNet::GetTimeMS()+1000;
-	while ( isRecvFromLoopThreadActive.GetValue()>0 && RakNet::GetTimeMS()<timeout )
+	SLNet::TimeMS timeout = SLNet::GetTimeMS()+1000;
+	while ( isRecvFromLoopThreadActive.GetValue()>0 && SLNet::GetTimeMS()<timeout )
 	{
 		// Get recvfrom to unblock
 		Send(&bsp, _FILE_AND_LINE_);

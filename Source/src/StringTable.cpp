@@ -1,26 +1,33 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "StringTable.h"
+#include "slikenet/StringTable.h"
 #include <string.h>
-#include "RakAssert.h"
+#include "slikenet/assert.h"
 #include <stdio.h>
-#include "BitStream.h"
-#include "StringCompressor.h"
-using namespace RakNet;
+#include "slikenet/BitStream.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
+using namespace SLNet;
 
 StringTable* StringTable::instance=0;
 int StringTable::referenceCount=0;
 
 
-int RakNet::StrAndBoolComp( char *const &key, const StrAndBool &data )
+int SLNet::StrAndBoolComp( char *const &key, const StrAndBool &data )
 {
 	return strcmp(key,(const char*)data.str);
 }
@@ -44,7 +51,7 @@ void StringTable::AddReference(void)
 {
 	if (++referenceCount==1)
 	{
-		instance = RakNet::OP_NEW<StringTable>( _FILE_AND_LINE_ );
+		instance = SLNet::OP_NEW<StringTable>( _FILE_AND_LINE_ );
 	}
 }
 void StringTable::RemoveReference(void)
@@ -55,7 +62,7 @@ void StringTable::RemoveReference(void)
 	{
 		if (--referenceCount==0)
 		{
-			RakNet::OP_DELETE(instance, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(instance, _FILE_AND_LINE_);
 			instance=0;
 		}
 	}
@@ -73,7 +80,7 @@ void StringTable::AddString(const char *str, bool copyString)
 	if (copyString)
 	{
 		sab.str = (char*) rakMalloc_Ex( strlen(str)+1, _FILE_AND_LINE_ );
-		strcpy(sab.str, str);
+		strcpy_s(sab.str, strlen(str)+1, str);
 	}
 	else
 	{
@@ -87,7 +94,7 @@ void StringTable::AddString(const char *str, bool copyString)
 	RakAssert(orderedStringList.Size() < (StringTableType)-1);	
 	
 }
-void StringTable::EncodeString( const char *input, int maxCharsToWrite, RakNet::BitStream *output )
+void StringTable::EncodeString( const char *input, int maxCharsToWrite, SLNet::BitStream *output )
 {
 	unsigned index;
 	bool objectExists;
@@ -106,7 +113,7 @@ void StringTable::EncodeString( const char *input, int maxCharsToWrite, RakNet::
 	}
 }
 
-bool StringTable::DecodeString( char *output, int maxCharsToWrite, RakNet::BitStream *input )
+bool StringTable::DecodeString( char *output, int maxCharsToWrite, SLNet::BitStream *input )
 {
 	bool hasIndex=false;
 	RakAssert(maxCharsToWrite>0);
@@ -134,7 +141,7 @@ bool StringTable::DecodeString( char *output, int maxCharsToWrite, RakNet::BitSt
 			return false;
 		}
 		
-		strncpy(output, orderedStringList[index].str, maxCharsToWrite);
+		strncpy_s(output, maxCharsToWrite, orderedStringList[index].str, maxCharsToWrite);
 		output[maxCharsToWrite-1]=0;
 	}
 

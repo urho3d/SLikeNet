@@ -1,32 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_TelnetTransport==1 && _RAKNET_SUPPORT_TCPInterface==1
 
-#include "TelnetTransport.h"
-#include "TCPInterface.h"
+#include "slikenet/TelnetTransport.h"
+#include "slikenet/TCPInterface.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // #define _PRINTF_DEBUG
 
 #define ECHO_INPUT
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(TelnetTransport,TelnetTransport);
 
@@ -57,9 +60,9 @@ void TelnetTransport::Stop(void)
 	tcpInterface->Stop();
 	unsigned i;
 	for (i=0; i < remoteClients.Size(); i++)
-		RakNet::OP_DELETE(remoteClients[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(remoteClients[i], _FILE_AND_LINE_);
 	remoteClients.Clear(false, _FILE_AND_LINE_);
-	RakNet::OP_DELETE(tcpInterface, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(tcpInterface, _FILE_AND_LINE_);
 	tcpInterface=0;
 }
 void TelnetTransport::Send(  SystemAddress systemAddress, const char *data,... )
@@ -73,7 +76,7 @@ void TelnetTransport::Send(  SystemAddress systemAddress, const char *data,... )
 	size_t prefixLength;
 	if (sendPrefix)
 	{
-		strcpy(text, sendPrefix);
+		strcpy_s(text, sendPrefix);
 		prefixLength = strlen(sendPrefix);
 	}
 	else
@@ -83,15 +86,14 @@ void TelnetTransport::Send(  SystemAddress systemAddress, const char *data,... )
 	}
 	va_list ap;
 	va_start(ap, data);
-	_vsnprintf(text+prefixLength, REMOTE_MAX_TEXT_INPUT-prefixLength, data, ap);
+	vsnprintf_s(text+prefixLength, REMOTE_MAX_TEXT_INPUT-prefixLength, REMOTE_MAX_TEXT_INPUT-prefixLength-1, data, ap);
 	va_end(ap);
-	text[REMOTE_MAX_TEXT_INPUT-1]=0;
 
 	if (sendSuffix)
 	{
 		size_t length = strlen(text);
 		size_t availableChars = REMOTE_MAX_TEXT_INPUT-length-1;
-		strncat(text, sendSuffix, availableChars);
+		strncat_s(text, sendSuffix, availableChars);
 	}
 
 	tcpInterface->Send(text, (unsigned int) strlen(text), systemAddress, false);
@@ -142,11 +144,11 @@ Packet* TelnetTransport::Receive( void )
 		if (remoteClient->lastSentTextInput[0])
 		{
 			// Up arrow, return last string
-			for (int i=0; remoteClient->textInput[i]; i++)
+			for (i=0; remoteClient->textInput[i]; i++)
 				remoteClient->textInput[i]=8;
-			strcat(remoteClient->textInput, remoteClient->lastSentTextInput);
+			strcat_s(remoteClient->textInput, remoteClient->lastSentTextInput);
 			tcpInterface->Send((const char *)remoteClient->textInput, (unsigned int) strlen(remoteClient->textInput), p->systemAddress, false);
-			strcpy(remoteClient->textInput,remoteClient->lastSentTextInput);
+			strcpy_s(remoteClient->textInput,remoteClient->lastSentTextInput);
 			remoteClient->cursorPosition=(unsigned int) strlen(remoteClient->textInput);
 		}
 		
@@ -290,7 +292,7 @@ SystemAddress TelnetTransport::HasLostConnection(void)
 		{
 			if (remoteClients[i]->systemAddress==systemAddress)
 			{
-				RakNet::OP_DELETE(remoteClients[i], _FILE_AND_LINE_);
+				SLNet::OP_DELETE(remoteClients[i], _FILE_AND_LINE_);
 				remoteClients[i]=remoteClients[remoteClients.Size()-1];
 				remoteClients.RemoveFromEnd();
 			}
@@ -312,7 +314,7 @@ void TelnetTransport::SetSendSuffix(const char *suffix)
 	if (suffix)
 	{
 		sendSuffix = (char*) rakMalloc_Ex(strlen(suffix)+1, _FILE_AND_LINE_);
-		strcpy(sendSuffix, suffix);
+		strcpy_s(sendSuffix, strlen(suffix)+1, suffix);
 	}
 }
 void TelnetTransport::SetSendPrefix(const char *prefix)
@@ -325,7 +327,7 @@ void TelnetTransport::SetSendPrefix(const char *prefix)
 	if (prefix)
 	{
 		sendPrefix = (char*) rakMalloc_Ex(strlen(prefix)+1, _FILE_AND_LINE_);
-		strcpy(sendPrefix, prefix);
+		strcpy_s(sendPrefix, strlen(prefix)+1, prefix);
 	}
 }
 void TelnetTransport::AutoAllocate(void)
@@ -366,9 +368,5 @@ bool TelnetTransport::ReassembleLine(TelnetTransport::TelnetClient* remoteClient
 	}
 	return false;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif // _RAKNET_SUPPORT_*

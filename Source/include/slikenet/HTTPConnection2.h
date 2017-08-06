@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file HTTPConnection2.h
@@ -19,15 +24,15 @@
 #define __HTTP_CONNECTION_2
 
 #include "Export.h"
-#include "RakString.h"
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
+#include "string.h"
+#include "memoryoverride.h"
+#include "types.h"
 #include "DS_List.h"
 #include "DS_Queue.h"
 #include "PluginInterface2.h"
 #include "SimpleMutex.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class TCPInterface;
@@ -50,7 +55,7 @@ public:
 	/// \param[in] stringToTransmit What string to transmit. See RakString::FormatForPOST(), RakString::FormatForGET(), RakString::FormatForDELETE()
 	/// \param[in] host The IP address to connect to
 	/// \param[in] port The port to connect to
-	/// \param[in] useSSL If to use SSL to connect. OPEN_SSL_CLIENT_SUPPORT must be defined to 1 in RakNetDefines.h or RakNetDefinesOverrides.h
+	/// \param[in] useSSL If to use SSL to connect. OPEN_SSL_CLIENT_SUPPORT must be defined to 1 in defines.h or defineoverrides.h
 	/// \param[in] ipVersion 4 for IPV4, 6 for IPV6
 	/// \param[in] useAddress Assume we are connected to this address and send to it, rather than do a lookup
 	/// \param[in] userData
@@ -68,8 +73,8 @@ public:
 	/// \param[out] contentOffset The offset from the start of responseReceived to the data body. Equivalent to searching for \r\n\r\n in responseReceived.
 	/// \param[out] userData Whatever you passed to TransmitRequest
 	/// \return true if there was a response. false if not.
-	bool GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, int &contentOffset, void **userData );
-	bool GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, int &contentOffset );
+	bool GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, ptrdiff_t &contentOffset, void **userData );
+	bool GetResponse( RakString &stringTransmitted, RakString &hostTransmitted, RakString &responseReceived, SystemAddress &hostReceived, ptrdiff_t &contentOffset );
 
 	/// \brief Return if any requests are pending
 	bool IsBusy(void) const;
@@ -86,7 +91,7 @@ public:
 		SystemAddress hostCompletedAddress;
 		unsigned short port;
 		bool useSSL;
-		int contentOffset;
+		ptrdiff_t contentOffset;
 		int contentLength;
 		int ipVersion;
 		void *userData;
@@ -117,7 +122,7 @@ protected:
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif
 

@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,7 +24,7 @@
 #define __UDP_PROXY_CLIENT_H
 
 #include "Export.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "PluginInterface2.h"
 #include "DS_List.h"
 
@@ -28,7 +33,7 @@
 /// \details Used when NatPunchthroughClient fails
 /// \ingroup PLUGINS_GROUP
 
-namespace RakNet
+namespace SLNet
 {
 class UDPProxyClient;
 
@@ -48,7 +53,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
 	virtual void OnForwardingSuccess(const char *proxyIPAddress, unsigned short proxyPort,
-		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 
 	/// Called when another system has setup forwarding, with our system as the target address.
 	/// Plugin automatically sends a datagram to proxyIPAddress before this callback, to open our router if necessary.
@@ -60,7 +65,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
 	virtual void OnForwardingNotification(const char *proxyIPAddress, unsigned short proxyPort,
-		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 
 	/// Called when our forwarding request failed, because no UDPProxyServers are connected to UDPProxyCoordinator
 	/// \param[out] proxyCoordinator \a proxyCoordinator parameter originally passed to UDPProxyClient::RequestForwarding
@@ -68,7 +73,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetAddress \a targetAddress parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
-	virtual void OnNoServersOnline(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+	virtual void OnNoServersOnline(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 
 	/// Called when our forwarding request failed, because no UDPProxyServers are connected to UDPProxyCoordinator
 	/// \param[out] proxyCoordinator \a proxyCoordinator parameter originally passed to UDPProxyClient::RequestForwarding
@@ -76,7 +81,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetAddress \a targetAddress parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
-	virtual void OnRecipientNotConnected(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+	virtual void OnRecipientNotConnected(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 
 	/// Called when our forwarding request failed, because all UDPProxyServers that are connected to UDPProxyCoordinator are at their capacity
 	/// Either add more servers, or increase capacity via UDPForwarder::SetMaxForwardEntries()
@@ -85,7 +90,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetAddress \a targetAddress parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
-	virtual void OnAllServersBusy(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+	virtual void OnAllServersBusy(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 
 	/// Called when our forwarding request is already in progress on the \a proxyCoordinator.
 	/// This can be ignored, but indicates an unneeded second request
@@ -96,7 +101,7 @@ struct UDPProxyClientResultHandler
 	/// \param[out] targetAddress \a targetAddress parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] targetGuid \a targetGuid parameter originally passed to UDPProxyClient::RequestForwarding
 	/// \param[out] proxyClient The plugin that is calling this callback
-	virtual void OnForwardingInProgress(const char *proxyIPAddress, unsigned short proxyPort, SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, RakNet::UDPProxyClient *proxyClientPlugin)=0;
+	virtual void OnForwardingInProgress(const char *proxyIPAddress, unsigned short proxyPort, SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)=0;
 };
 
 
@@ -133,11 +138,11 @@ public:
 	/// \param[in] timeoutOnNoData If no data is sent by the forwarded systems, how long before removing the forward entry from UDPForwarder? UDP_FORWARDER_MAXIMUM_TIMEOUT is the maximum value. Recommended 10 seconds.
 	/// \param[in] serverSelectionBitstream If you want to send data to UDPProxyCoordinator::GetBestServer(), write it here
 	/// \return true if the request was sent, false if we are not connected to proxyCoordinator
-	bool RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddressAsSeenFromCoordinator, RakNet::TimeMS timeoutOnNoDataMS, RakNet::BitStream *serverSelectionBitstream=0);
+	bool RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddressAsSeenFromCoordinator, SLNet::TimeMS timeoutOnNoDataMS, SLNet::BitStream *serverSelectionBitstream=0);
 
 	/// Same as above, but specify the target with a GUID, in case you don't know what its address is to the coordinator
 	/// If requesting forwarding to a RakNet enabled system, then it is easier to use targetGuid instead of targetAddressAsSeenFromCoordinator
-	bool RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, RakNetGUID targetGuid, RakNet::TimeMS timeoutOnNoDataMS, RakNet::BitStream *serverSelectionBitstream=0);
+	bool RequestForwarding(SystemAddress proxyCoordinator, SystemAddress sourceAddress, RakNetGUID targetGuid, SLNet::TimeMS timeoutOnNoDataMS, SLNet::BitStream *serverSelectionBitstream=0);
 
 	/// \internal
 	virtual void Update(void);
@@ -157,12 +162,12 @@ public:
 	struct PingServerGroup
 	{
 		SenderAndTargetAddress sata;
-		RakNet::TimeMS startPingTime;
+		SLNet::TimeMS startPingTime;
 		SystemAddress coordinatorAddressForPings;
 		//DataStructures::Multilist<ML_UNORDERED_LIST, ServerWithPing> serversToPing;
 		DataStructures::List<ServerWithPing> serversToPing;
 		bool AreAllServersPinged(void) const;
-		void SendPingedServersToCoordinator(RakPeerInterface *rakPeerInterface);
+		void SendPingedServersToCoordinator(RakPeerInterface *rakPeer);
 	};
 	//DataStructures::Multilist<ML_UNORDERED_LIST, PingServerGroup*> pingServerGroups;
 	DataStructures::List<PingServerGroup*> pingServerGroups;

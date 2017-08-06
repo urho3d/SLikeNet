@@ -1,29 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_NatTypeDetectionServer==1
 
-#include "NatTypeDetectionServer.h"
-#include "SocketLayer.h"
-#include "RakNetSmartPtr.h"
-#include "SocketIncludes.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
-#include "BitStream.h"
-#include "SocketDefines.h"
+#include "slikenet/NatTypeDetectionServer.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/smartptr.h"
+#include "slikenet/SocketIncludes.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/SocketDefines.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // #define NTDS_VERBOSE
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(NatTypeDetectionServer,NatTypeDetectionServer);
 
@@ -47,7 +54,7 @@ void NatTypeDetectionServer::Startup(
 	DataStructures::List<RakNetSocket2* > sockets;
 	rakPeerInterface->GetSockets(sockets);
 	char str[64];
-	sockets[0]->GetBoundAddress().ToString(false,str);
+	sockets[0]->GetBoundAddress().ToString(false,str,64);
 	s1p2=
 		CreateNonblockingBoundSocket(str,
 #ifdef __native_client__
@@ -77,7 +84,7 @@ void NatTypeDetectionServer::Startup(
 #endif
 		this);
 
-	strcpy(s3p4Address, nonRakNetIP3);
+	strcpy_s(s3p4Address, nonRakNetIP3);
 
 
 	#if !defined(__native_client__) && !defined(WINDOWS_STORE_RT)
@@ -89,12 +96,12 @@ void NatTypeDetectionServer::Shutdown()
 {
 	if (s1p2!=0)
 	{
-		RakNet::OP_DELETE(s1p2,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(s1p2,_FILE_AND_LINE_);
 		s1p2=0;
 	}
 	if (s2p3!=0)
 	{
-		RakNet::OP_DELETE(s2p3,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(s2p3,_FILE_AND_LINE_);
 		s2p3=0;
 	}
 	if (s3p4!=0)
@@ -104,24 +111,24 @@ void NatTypeDetectionServer::Shutdown()
 			((RNS2_Berkley *)s3p4)->BlockOnStopRecvPollingThread();
 #endif
 
-		RakNet::OP_DELETE(s3p4,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(s3p4,_FILE_AND_LINE_);
 		s3p4=0;
 	}
 	if (s4p5!=0)
 	{
-		RakNet::OP_DELETE(s4p5,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(s4p5,_FILE_AND_LINE_);
 		s4p5=0;
 	}
 	bufferedPacketsMutex.Lock();
 	while (bufferedPackets.Size())
-		RakNet::OP_DELETE(bufferedPackets.Pop(), _FILE_AND_LINE_);
+		SLNet::OP_DELETE(bufferedPackets.Pop(), _FILE_AND_LINE_);
 	bufferedPacketsMutex.Unlock();
 }
 void NatTypeDetectionServer::Update(void)
 {
 	int i=0;
-	RakNet::TimeMS time = RakNet::GetTimeMS();
-	RakNet::BitStream bs;
+	SLNet::TimeMS time = SLNet::GetTimeMS();
+	SLNet::BitStream bs;
 	SystemAddress boundAddress;
 
 	RNS2RecvStruct *recvStruct;
@@ -137,20 +144,20 @@ void NatTypeDetectionServer::Update(void)
 		char *data = recvStruct->data;
 		if (data[0]==NAT_TYPE_PORT_RESTRICTED && recvStruct->socket==s3p4)
 		{
-			RakNet::BitStream bsIn((unsigned char*) data,recvStruct->bytesRead,false);
+			SLNet::BitStream bsIn((unsigned char*) data,recvStruct->bytesRead,false);
 			RakNetGUID senderGuid;
 			bsIn.IgnoreBytes(sizeof(MessageID));
 			bool readSuccess = bsIn.Read(senderGuid);
 			RakAssert(readSuccess);
 			if (readSuccess)
 			{
-				unsigned int i = GetDetectionAttemptIndex(senderGuid);
-				if (i!=(unsigned int)-1)
+				unsigned int j = GetDetectionAttemptIndex(senderGuid);
+				if (j!=(unsigned int)-1)
 				{
 					bs.Reset();
 					bs.Write((unsigned char) ID_NAT_TYPE_DETECTION_RESULT);
 					// If different, then symmetric
-					if (senderAddr!=natDetectionAttempts[i].systemAddress)
+					if (senderAddr!=natDetectionAttempts[j].systemAddress)
 					{
 
 #ifdef NTDS_VERBOSE
@@ -168,14 +175,14 @@ void NatTypeDetectionServer::Update(void)
 						bs.Write((unsigned char) NAT_TYPE_PORT_RESTRICTED);
 					}
 
-					rakPeerInterface->Send(&bs,HIGH_PRIORITY,RELIABLE,0,natDetectionAttempts[i].systemAddress,false);
+					rakPeerInterface->Send(&bs,HIGH_PRIORITY,RELIABLE,0,natDetectionAttempts[j].systemAddress,false);
 
 					// Done
-					natDetectionAttempts.RemoveAtIndexFast(i);
+					natDetectionAttempts.RemoveAtIndexFast(j);
 				}
 				else
 				{
-					//		RakAssert("i==0 in Update when looking up GUID in NatTypeDetectionServer.cpp. Either a bug or a late resend" && 0);
+					//		RakAssert("j==0 in Update when looking up GUID in NatTypeDetectionServer.cpp. Either a bug or a late resend" && 0);
 				}
 			}
 			else
@@ -203,7 +210,7 @@ void NatTypeDetectionServer::Update(void)
 	// Client is asking us if this is port restricted. Only client requests of this type come in on s3p4
 	while (len>0 && data[0]==NAT_TYPE_PORT_RESTRICTED)
 	{
-		RakNet::BitStream bsIn((unsigned char*) data,len,false);
+		SLNet::BitStream bsIn((unsigned char*) data,len,false);
 		RakNetGUID senderGuid;
 		bsIn.IgnoreBytes(sizeof(MessageID));
 		bool readSuccess = bsIn.Read(senderGuid);
@@ -371,7 +378,7 @@ void NatTypeDetectionServer::OnDetectionRequest(Packet *packet)
 {
 	unsigned int i = GetDetectionAttemptIndex(packet->systemAddress);
 
-	RakNet::BitStream bsIn(packet->data, packet->length, false);
+	SLNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(1);
 	bool isRequest=false;
 	bsIn.Read(isRequest);
@@ -420,12 +427,12 @@ unsigned int NatTypeDetectionServer::GetDetectionAttemptIndex(RakNetGUID guid)
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void NatTypeDetectionServer::DeallocRNS2RecvStruct(RNS2RecvStruct *s, const char *file, unsigned int line)
 {
-	RakNet::OP_DELETE(s, file, line);
+	SLNet::OP_DELETE(s, file, line);
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 RNS2RecvStruct *NatTypeDetectionServer::AllocRNS2RecvStruct(const char *file, unsigned int line)
 {
-	return RakNet::OP_NEW<RNS2RecvStruct>(file,line);
+	return SLNet::OP_NEW<RNS2RecvStruct>(file,line);
 }
 
 void NatTypeDetectionServer::OnRNS2Recv(RNS2RecvStruct *recvStruct)

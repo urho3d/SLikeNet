@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // TODO: optimize the list of teams and team members to be O(1). Store in hashes, use linked lists to get ordered traversal
@@ -26,14 +31,14 @@
 #define __TEAM_MANAGER_H
 
 #include "PluginInterface2.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "NativeTypes.h"
 #include "DS_List.h"
-#include "RakNetTypes.h"
+#include "types.h"
 #include "DS_Hash.h"
 #include "DS_OrderedList.h"
 
-namespace RakNet
+namespace SLNet
 {
 /// Forward declarations
 class RakPeerInterface;
@@ -194,7 +199,7 @@ public:
 	/// \Details Leaves all teams you are on, and sets \a noTeamSubcategory
 	/// \note This is the same as and just calls RequestTeam(TeamSelection::NoTeam(noTeamSubcategory));
 	/// \return false On invalid or unnecessary operation. Otherwise returns true
-	bool LeaveAllTeams(NoTeamId noTeamSubcategory);
+	bool LeaveAllTeams(NoTeamId inNoTeamSubcategory);
 	
 	/// \return Get the first team we are on, or 0 if we are not on a team.
 	TM_Team* GetCurrentTeam(void) const;
@@ -256,7 +261,7 @@ public:
 	/// \internal
 	struct RequestedTeam
 	{
-		RakNet::Time whenRequested;
+		SLNet::Time whenRequested;
 		unsigned int requestIndex;
 		TM_Team *requested;
 		bool isTeamSwitch;
@@ -277,7 +282,7 @@ protected:
 	JoinTeamType joinTeamType;
 	// Set by StoreLastTeams()
 	DataStructures::List<TM_Team*> lastTeams;
-	RakNet::Time whenJoinAnyRequested;
+	SLNet::Time whenJoinAnyRequested;
 	unsigned int joinAnyRequestIndex;
 	void *owner;
 
@@ -543,7 +548,7 @@ public:
 	/// \internal
 	struct JoinRequestHelper
 	{
-		RakNet::Time whenRequestMade;
+		SLNet::Time whenRequestMade;
 		unsigned int teamMemberIndex;
 		unsigned int indexIntoTeamsRequested;
 		unsigned int requestIndex;
@@ -565,7 +570,7 @@ protected:
 
 
 	// Send a message to all participants
-	void BroadcastToParticipants(RakNet::BitStream *bsOut, RakNetGUID exclusionGuid);
+	void BroadcastToParticipants(SLNet::BitStream *bsOut, RakNetGUID exclusionGuid);
 	void BroadcastToParticipants(unsigned char *data, const int length, RakNetGUID exclusionGuid);
 
 	// 1. If can join a team:
@@ -700,18 +705,18 @@ protected:
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	virtual void OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
 	virtual void OnNewConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
-	void Send( const RakNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast );
+	void Send( const SLNet::BitStream * bitStream, const AddressOrGUID systemIdentifier, bool broadcast );
 
-	void EncodeTeamFullOrLocked(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
-	void DecomposeTeamFullOrLocked(RakNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, TM_Team **team,
+	void EncodeTeamFullOrLocked(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
+	void DecomposeTeamFullOrLocked(SLNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, TM_Team **team,
 		uint16_t &currentMembers, uint16_t &memberLimitIncludingBalancing, bool &balancingIsActive, JoinPermissions &joinPermissions);
-	void ProcessTeamAssigned(RakNet::BitStream *bsIn);
+	void ProcessTeamAssigned(SLNet::BitStream *bsIn);
 
-	void EncodeTeamAssigned(RakNet::BitStream *bitStream, TM_TeamMember *teamMember);
+	void EncodeTeamAssigned(SLNet::BitStream *bitStream, TM_TeamMember *teamMember);
 	void RemoveFromTeamsRequestedAndAddTeam(TM_TeamMember *teamMember, TM_Team *team, bool isTeamSwitch, TM_Team *teamToLeave);
 
 	void PushTeamAssigned(TM_TeamMember *teamMember);
-	void PushBitStream(RakNet::BitStream *bitStream);
+	void PushBitStream(SLNet::BitStream *bitStream);
 	void OnUpdateListsToNoTeam(Packet *packet, TM_World *world);
 	void OnUpdateTeamsRequestedToAny(Packet *packet, TM_World *world);
 	void OnJoinAnyTeam(Packet *packet, TM_World *world);
@@ -727,13 +732,13 @@ protected:
 	void OnSetBalanceTeamsInitial(Packet *packet, TM_World *world);
 
 
-	void EncodeTeamFull(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
-	void EncodeTeamLocked(RakNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
+	void EncodeTeamFull(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
+	void EncodeTeamLocked(SLNet::BitStream *bitStream, TM_TeamMember *teamMember, TM_Team *team);
 
 	/// \brief When you get ID_TEAM_BALANCER_TEAM_ASSIGNED, pass the packet to this function to read out parameters
 	/// \param[in] A packet where packet->data[0]==ID_TEAM_BALANCER_TEAM_ASSIGNED
 	/// \return true on success, false on read error
-	void DecodeTeamAssigned(RakNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, NoTeamId &noTeamSubcategory,
+	void DecodeTeamAssigned(SLNet::BitStream *bsIn, TM_World **world, TM_TeamMember **teamMember, NoTeamId &noTeamSubcategory,
 		JoinTeamType &joinTeamType, DataStructures::List<TM_Team *> &newTeam,
 		DataStructures::List<TM_Team *> &teamsLeft, DataStructures::List<TM_Team *> &teamsJoined);
 
@@ -749,7 +754,7 @@ protected:
 	friend class TM_Team;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __TEAM_MANAGER_H
 

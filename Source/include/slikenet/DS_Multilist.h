@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file DS_Multilist.h
@@ -16,18 +21,12 @@
 #ifndef __MULTILIST_H
 #define __MULTILIST_H 
 
-#include "RakAssert.h"
+#include "assert.h"
 #include <string.h> // memmove
 #include "Export.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 #include "NativeTypes.h"
 
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#pragma warning( disable : 4512 ) // warning C4512: assignment operator could not be generated
-#endif
 
 /// What algorithm to use to store the data for the Multilist
 enum MultilistType
@@ -51,7 +50,7 @@ namespace DataStructures
 	/// Can be used with Multilist::ForEach
 	/// Assuming the Multilist holds pointers, will delete those pointers
 	template <class templateType>
-	void DeletePtr_RakNet(templateType &ptr, const char *file, unsigned int line ) {RakNet::OP_DELETE(ptr, file, line);}
+	void DeletePtr_RakNet(templateType &ptr, const char *file, unsigned int line ) { SLNet::OP_DELETE(ptr, file, line);}
 
 	/// Can be used with Multilist::ForEach
 	/// Assuming the Multilist holds pointers, will delete those pointers
@@ -74,6 +73,9 @@ namespace DataStructures
 		bool operator==( const templateType &right ) {return val == right;}
 	protected:
 		const templateType &val;
+	private:
+		// MLKeyRef is not copy-assignable
+		MLKeyRef& operator=(const MLKeyRef& master);
 	};
 
 	/// For the Multilist, when _DataType != _KeyType, you must define the comparison operators between the key and the data
@@ -159,11 +161,11 @@ namespace DataStructures
 		/// unless \a deallocateSmallBlocks is true
 		void Clear( bool deallocateSmallBlocks=true, const char *file=__FILE__, unsigned int line=__LINE__ );
 
-		/// \brief Empties the list, first calling RakNet::OP_Delete on all items.
+		/// \brief Empties the list, first calling SLNet::OP_Delete on all items.
 		/// \details The list is not deallocated if it is small, unless \a deallocateSmallBlocks is true
 		void ClearPointers( bool deallocateSmallBlocks=true, const char *file=__FILE__, unsigned int line=__LINE__ );
 
-		/// \brief Empty one item from the list, first calling RakNet::OP_Delete on that item.
+		/// \brief Empty one item from the list, first calling SLNet::OP_Delete on that item.
 		void ClearPointer( _KeyType key, const char *file=__FILE__, unsigned int line=__LINE__ );
 
 		/// \brief Reverses the elements in the list, and flips the sort order 
@@ -269,6 +271,8 @@ namespace DataStructures
 		queueTail=0;
 		preallocationSize=0;
 
+#pragma warning( push )
+#pragma warning(disable:4127)	// conditional expression is constant
 		if (_MultilistType==ML_ORDERED_LIST)
 			sortState=ML_SORTED_ASCENDING;
 		else
@@ -276,13 +280,14 @@ namespace DataStructures
 
 		if (_MultilistType==ML_VARIABLE_DURING_RUNTIME)
 			variableMultilistType=ML_UNORDERED_LIST;
+#pragma warning( pop )
 	}
 
 	template <const MultilistType _MultilistType, class _DataType, class _KeyType, class _IndexType>
 	Multilist<_MultilistType, _DataType, _KeyType, _IndexType>::~Multilist()
 	{
 		if (data!=0)
-			RakNet::OP_DELETE_ARRAY(data, _FILE_AND_LINE_);
+			SLNet::OP_DELETE_ARRAY(data, _FILE_AND_LINE_);
 	}
 
 	template <const MultilistType _MultilistType, class _DataType, class _KeyType, class _IndexType>
@@ -317,7 +322,7 @@ namespace DataStructures
 		else
 		{
 			allocationSize=dataSize;
-			data = RakNet::OP_NEW_ARRAY<_DataType>(dataSize,_FILE_AND_LINE_);
+			data = SLNet::OP_NEW_ARRAY<_DataType>(dataSize,_FILE_AND_LINE_);
 			_IndexType i;
 			for (i=0; i < dataSize; i++)
 				data[i]=source[i];
@@ -791,7 +796,7 @@ namespace DataStructures
 
 		if (deallocateSmallBlocks && allocationSize < 128 && data)
 		{
-			RakNet::OP_DELETE_ARRAY(data,file,line);
+			SLNet::OP_DELETE_ARRAY(data,file,line);
 			data=0;
 			allocationSize=0;
 		}
@@ -802,7 +807,7 @@ namespace DataStructures
 	{
 		_IndexType i;
 		for (i=0; i < dataSize; i++)
-			RakNet::OP_DELETE(operator[](i), file, line);
+			SLNet::OP_DELETE(operator[](i), file, line);
 		Clear(deallocateSmallBlocks, file, line);
 	}
 
@@ -813,7 +818,7 @@ namespace DataStructures
 		i = GetIndexOf(key);
 		if (i!=-1)
 		{
-			RakNet::OP_DELETE(operator[](i), file, line);
+			SLNet::OP_DELETE(operator[](i), file, line);
 			RemoveAtIndex(i);
 		}
 	}
@@ -989,7 +994,10 @@ namespace DataStructures
 	template <const MultilistType _MultilistType, class _DataType, class _KeyType, class _IndexType>
 	MultilistType Multilist<_MultilistType, _DataType, _KeyType, _IndexType>::GetMultilistType(void) const
 	{
+#pragma warning( push )
+#pragma warning(disable:4127)	// conditional expression is constant
 		if (_MultilistType==ML_VARIABLE_DURING_RUNTIME)
+#pragma warning( pop )
 			return variableMultilistType;
 		return _MultilistType;
 	}
@@ -1178,13 +1186,13 @@ namespace DataStructures
 	template <const MultilistType _MultilistType, class _DataType, class _KeyType, class _IndexType>
 	void Multilist<_MultilistType, _DataType, _KeyType, _IndexType>::ReallocToSize(_IndexType newAllocationSize, const char *file, unsigned int line)
 	{
-		_DataType* newData = RakNet::OP_NEW_ARRAY<_DataType>(newAllocationSize,file,line);
+		_DataType* newData = SLNet::OP_NEW_ARRAY<_DataType>(newAllocationSize,file,line);
 		_IndexType i;
 		for (i=0; i < dataSize; i++)
 			newData[i]=operator[](i);
 		if (dataSize>0)
 		{
-			RakNet::OP_DELETE_ARRAY(data,file,line);
+			SLNet::OP_DELETE_ARRAY(data,file,line);
 			if (GetMultilistType()==ML_QUEUE)
 			{
 				queueHead=0;
@@ -1253,10 +1261,7 @@ namespace DataStructures
 		lowerBound=0;
 		index = dataSize/2;
 
-#ifdef _MSC_VER
-	#pragma warning( disable : 4127 ) // warning C4127: conditional expression is constant
-#endif
-		while (1)
+		for(;;)
 		{
 			if (MLKeyRef<_KeyType>(key) > operator[](index) )
 			{
@@ -1642,9 +1647,6 @@ void MultilistUnitTest(void)
 	RakAssert(ml6.Peek()==1);
 }
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 */
 
 #endif

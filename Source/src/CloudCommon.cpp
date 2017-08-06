@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_CloudClient==1 || _RAKNET_SUPPORT_CloudServer==1
 
-#include "CloudCommon.h"
-#include "BitStream.h"
+#include "slikenet/CloudCommon.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
-int RakNet::CloudKeyComp(const CloudKey &key, const CloudKey &data)
+int SLNet::CloudKeyComp(const CloudKey &key, const CloudKey &data)
 {
 	if (key.primaryKey < data.primaryKey)
 		return -1;
@@ -31,11 +36,11 @@ int RakNet::CloudKeyComp(const CloudKey &key, const CloudKey &data)
 
 CloudQueryRow* CloudAllocator::AllocateCloudQueryRow(void)
 {
-	return RakNet::OP_NEW<CloudQueryRow>(_FILE_AND_LINE_);
+	return SLNet::OP_NEW<CloudQueryRow>(_FILE_AND_LINE_);
 }
 void CloudAllocator::DeallocateCloudQueryRow(CloudQueryRow *row)
 {
-	RakNet::OP_DELETE(row,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(row,_FILE_AND_LINE_);
 }
 unsigned char *CloudAllocator::AllocateRowData(uint32_t bytesNeededForData)
 {

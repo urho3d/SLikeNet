@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file FileListNodeContext.h
@@ -31,7 +36,7 @@ struct FileListNodeContext
 	unsigned int dataLength;
 };
 
-inline RakNet::BitStream& operator<<(RakNet::BitStream& out, FileListNodeContext& in)
+inline SLNet::BitStream& operator<<(SLNet::BitStream& out, FileListNodeContext& in)
 {
 	out.Write(in.op);
 	out.Write(in.flnc_extraData1);
@@ -39,7 +44,7 @@ inline RakNet::BitStream& operator<<(RakNet::BitStream& out, FileListNodeContext
 	out.Write(in.flnc_extraData3);
 	return out;
 }
-inline RakNet::BitStream& operator>>(RakNet::BitStream& in, FileListNodeContext& out)
+inline SLNet::BitStream& operator>>(SLNet::BitStream& in, FileListNodeContext& out)
 {
 	in.Read(out.op);
 	bool success = in.Read(out.flnc_extraData1);

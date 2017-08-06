@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -19,10 +24,10 @@
 
 #include "DS_OrderedList.h"
 #include "Export.h"
-#include "RakMemoryOverride.h"
+#include "memoryoverride.h"
 
 /// Forward declaration
-namespace RakNet
+namespace SLNet
 {
 	class BitStream;
 };
@@ -37,7 +42,7 @@ struct StrAndBool
 	bool b;
 };
 
-namespace RakNet
+namespace SLNet
 {
 	int RAK_DLL_EXPORT StrAndBoolComp( char *const &key, const StrAndBool &data );
 
@@ -69,14 +74,14 @@ namespace RakNet
 		/// \param[in] input Pointer to an ASCII string
 		/// \param[in] maxCharsToWrite The size of \a input 
 		/// \param[out] output The bitstream to write the compressed string to
-		void EncodeString( const char *input, int maxCharsToWrite, RakNet::BitStream *output );
+		void EncodeString( const char *input, int maxCharsToWrite, SLNet::BitStream *output );
 
 		/// Writes input to output, uncompressed.  Takes care of the null terminator for you.
 		/// Relies on the StringCompressor class, which is automatically reference counted in the constructor and destructor in RakPeer.  You can call the reference counting functions yourself if you wish too.
 		/// \param[out] output A block of bytes to receive the output
 		/// \param[in] maxCharsToWrite Size, in bytes, of \a output .  A NULL terminator will always be appended to the output string.  If the maxCharsToWrite is not large enough, the string will be truncated.
 		/// \param[in] input The bitstream containing the compressed string
-		bool DecodeString( char *output, int maxCharsToWrite, RakNet::BitStream *input );
+		bool DecodeString( char *output, int maxCharsToWrite, SLNet::BitStream *input );
 
 		/// Used so I can allocate and deallocate this singleton at runtime
 		static void AddReference(void);
