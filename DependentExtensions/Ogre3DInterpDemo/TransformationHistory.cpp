@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakAssert.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/assert.h"
+#include "slikenet/memoryoverride.h"
 #include "TransformationHistory.h"
 
 TransformationHistoryCell::TransformationHistoryCell()
 {
 
 }
-TransformationHistoryCell::TransformationHistoryCell(RakNet::TimeMS t, const Ogre::Vector3& pos, const Ogre::Vector3& vel, const Ogre::Quaternion& quat  ) :
+TransformationHistoryCell::TransformationHistoryCell(SLNet::TimeMS t, const Ogre::Vector3& pos, const Ogre::Vector3& vel, const Ogre::Quaternion& quat  ) :
 time(t),
 velocity(vel),
 position(pos),
@@ -24,14 +29,14 @@ orientation(quat)
 {
 }
 
-void TransformationHistory::Init(RakNet::TimeMS maxWriteInterval, RakNet::TimeMS maxHistoryTime)
+void TransformationHistory::Init(SLNet::TimeMS maxWriteInterval, SLNet::TimeMS maxHistoryTime)
 {
 	writeInterval=maxWriteInterval;
 	maxHistoryLength = maxHistoryTime/maxWriteInterval+1;
 	history.ClearAndForceAllocation(maxHistoryLength+1, _FILE_AND_LINE_ );
 	RakAssert(writeInterval>0);
 }
-void TransformationHistory::Write(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, RakNet::TimeMS curTimeMS)
+void TransformationHistory::Write(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, SLNet::TimeMS curTimeMS)
 {
 	if (history.Size()==0)
 	{
@@ -48,7 +53,7 @@ void TransformationHistory::Write(const Ogre::Vector3 &position, const Ogre::Vec
 		}
 	}	
 }
-void TransformationHistory::Overwrite(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, RakNet::TimeMS when)
+void TransformationHistory::Overwrite(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, SLNet::TimeMS when)
 {
 	int historySize = history.Size();
 	if (historySize==0)
@@ -83,7 +88,7 @@ void TransformationHistory::Overwrite(const Ogre::Vector3 &position, const Ogre:
 	}	
 }
 TransformationHistory::ReadResult TransformationHistory::Read(Ogre::Vector3 *position, Ogre::Vector3 *velocity, Ogre::Quaternion *orientation,
-								 RakNet::TimeMS when, RakNet::TimeMS curTime)
+	SLNet::TimeMS when, SLNet::TimeMS curTime)
 {
 	int historySize = history.Size();
 	if (historySize==0)

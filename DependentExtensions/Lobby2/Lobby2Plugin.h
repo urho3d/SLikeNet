@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_PLUGIN_H
 #define __LOBBY_2_PLUGIN_H
 
 #include "Lobby2Message.h"
-#include "PluginInterface2.h"
-#include "PacketPriority.h"
-#include "RakPeerInterface.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/peerinterface.h"
 
 /// \defgroup LOBBY_2_GROUP Lobby2Plugin
 /// \brief SQL based lobby system, with support for users, friends, clans, emails, ranking, and a message board
@@ -42,7 +47,7 @@
 /// \ingroup LOBBY_2_GROUP
 
 
-namespace RakNet
+namespace SLNet
 {
 
 /// \ingroup LOBBY_2_GROUP
@@ -104,6 +109,6 @@ protected:
 	DataStructures::List<Lobby2Callbacks*> callbacks;
 };
 
-}; // namespace RakNet
+}; // namespace SLNet
 
 #endif

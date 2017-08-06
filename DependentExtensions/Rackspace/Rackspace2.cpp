@@ -1,18 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Rackspace2.h"
-#include "TCPInterface.h"
-#include "HTTPConnection2.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/HTTPConnection2.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 Rackspace2::Rackspace2()
 {
@@ -53,12 +60,14 @@ void Rackspace2::Update(void)
 	}
 
 	SystemAddress hostReceived;
-	int contentOffset;
+	ptrdiff_t contentOffset;
 	if (httpConnection2->GetResponse(stringTransmitted, hostTransmitted, responseReceived, hostReceived, contentOffset))
 	{
 		if (responseReceived.IsEmpty()==false)
 		{
-			static FILE *fp = fopen("responses.txt", "wt");
+			static FILE *fp = NULL;
+			if (fp == NULL)
+				fopen_s(&fp, "responses.txt", "wt");
 			fprintf(fp, responseReceived.C_String());
 			fprintf(fp, "\n");
 			if (contentOffset==-1)
@@ -80,20 +89,20 @@ void Rackspace2::Update(void)
 				{
 					void *iter = json_object_iter(root);
 					const char *firstKey = json_object_iter_key(iter);
-					if (stricmp(firstKey, "unauthorized")==0)
+					if (_stricmp(firstKey, "unauthorized")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_UNAUTHORIZED, responseReceived, contentOffset);					
 					}
-					else if (stricmp(firstKey, "itemNotFound")==0)
+					else if (_stricmp(firstKey, "itemNotFound")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_404_NOT_FOUND, responseReceived, contentOffset);					
 					}
-					else if (stricmp(firstKey, "access")==0)
+					else if (_stricmp(firstKey, "access")==0)
 					{
 						json_t *valAuthToken = json_object_get(json_object_get(json_object_get(root, "access"), "token"), "id");
-						strcpy(X_Auth_Token, json_string_value(valAuthToken));
+						strcpy_s(X_Auth_Token, json_string_value(valAuthToken));
 
 						json_t *valAccountNumber = json_object_get(json_object_get(json_object_get(json_object_get(root, "access"), "token"), "tenant"), "id");
 						cloudAccountNumber = atoi(json_string_value(valAccountNumber));	
@@ -112,27 +121,27 @@ void Rackspace2::Update(void)
 						}
 
 					}
-					else if (stricmp(firstKey, "domains")==0)
+					else if (_stricmp(firstKey, "domains")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_GOT_DOMAINS, responseReceived, contentOffset);
 					}
-					else if (stricmp(firstKey, "records")==0)
+					else if (_stricmp(firstKey, "records")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_GOT_RECORDS, responseReceived, contentOffset);
 					}
-					else if (stricmp(firstKey, "servers")==0)
+					else if (_stricmp(firstKey, "servers")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_GOT_SERVERS, responseReceived, contentOffset);
 					}
-					else if (stricmp(firstKey, "images")==0)
+					else if (_stricmp(firstKey, "images")==0)
 					{
 						if (eventCallback)
 							eventCallback->OnResponse(R2RC_GOT_IMAGES, responseReceived, contentOffset);
 					}
-					else if (stricmp(firstKey, "message")==0)
+					else if (_stricmp(firstKey, "message")==0)
 					{
 						const char *message = json_string_value(json_object_iter_value(iter));
 
@@ -205,11 +214,11 @@ void Rackspace2::Authenticate(const char *authenticationURL, const char *rackspa
 	lastApiAccessKey=apiAccessKey;
 	AuthenticateInt(authenticationURL, rackspaceCloudUsername,apiAccessKey);
 }
-void Rackspace2::AddOperation(RakNet::RakString URL, OpType opType, json_t *data, bool setAuthToken)
+void Rackspace2::AddOperation(SLNet::RakString URL, OpType opType, json_t *data, bool setAuthToken)
 {
 	if (tcp==0)
 	{
-		tcp = RakNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
+		tcp = SLNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
 
 		if (tcp->Start(0, 0, 8)==false)
 		{
@@ -217,7 +226,7 @@ void Rackspace2::AddOperation(RakNet::RakString URL, OpType opType, json_t *data
 				eventCallback->OnTCPFailure();
 		}
 
-		httpConnection2 = RakNet::OP_NEW<HTTPConnection2>(_FILE_AND_LINE_);
+		httpConnection2 = SLNet::OP_NEW<HTTPConnection2>(_FILE_AND_LINE_);
 
 		tcp->AttachPlugin(httpConnection2);
 	}
@@ -233,7 +242,7 @@ void Rackspace2::AddOperation(RakNet::RakString URL, OpType opType, json_t *data
 	{
 		RakAssert(X_Auth_Token[0]);
 		// Test expired token
-		//strcpy(X_Auth_Token, "fd6ad67c-fbd3-4b35-94e2-059b6090998e");
+		//strcpy_s(X_Auth_Token, "fd6ad67c-fbd3-4b35-94e2-059b6090998e");
 		extraBody.Set("Accept: application/json\r\nX-Auth-Token: %s", X_Auth_Token);
 
 		__addOpLast_URL = URL;

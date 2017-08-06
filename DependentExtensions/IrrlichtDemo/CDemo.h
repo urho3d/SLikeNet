@@ -1,6 +1,17 @@
 // This is a Demo of the Irrlicht Engine (c) 2006 by N.Gebhardt.
 // This file is not documented.
 
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ * Alternatively you are permitted to license the modifications under the zlib/libpng license.
+ */
+
 #ifndef __C_DEMO_H_INCLUDED__
 #define __C_DEMO_H_INCLUDED__
 
@@ -17,7 +28,7 @@
 #define IRRLICHT_MEDIA_PATH "IrrlichtMedia/"
 
 #ifdef _WIN32__
-#include "WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
+#include "slikenet/WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
 #include <windows.h>
 #endif
 
@@ -47,11 +58,11 @@ const float CAMERA_HEIGHT=50.0f;
 const float SHOT_SPEED=.6f;
 const float BALL_DIAMETER=25.0f;
 
-// RakNet
-#include "RakNetStuff.h"
-#include "DS_Multilist.h"
-#include "RakString.h"
-#include "RakNetTime.h"
+// SLikeNet
+#include "slikenetstuff.h"
+#include "slikenet/DS_Multilist.h"
+#include "slikenet/string.h"
+#include "slikenet/time.h"
 
 class CDemo : public IEventReceiver
 {
@@ -72,7 +83,7 @@ public:
 	bool IsKeyDown(EKEY_CODE keyCode) const;
 	bool IsMovementKeyDown(void) const;
 	// RakNet: Decouple the origin of the shot from the camera, so the network code can use this same graphical effect
-	RakNet::TimeMS shootFromOrigin(core::vector3df camPosition, core::vector3df camAt);
+	SLNet::TimeMS shootFromOrigin(core::vector3df camPosition, core::vector3df camAt);
 	const core::aabbox3df& GetSyndeyBoundingBox(void) const;
 	void PlayDeathSound(core::vector3df position);
 	void EnableInput(bool enabled);
@@ -143,9 +154,9 @@ private:
 	// Per-tick game update for RakNet
 	void UpdateRakNet(void);
 	// Holds output messages
-	DataStructures::Multilist<ML_QUEUE, RakNet::RakString> outputMessages;
-	RakNet::TimeMS whenOutputMessageStarted;
-	void PushMessage(RakNet::RakString rs);
+	DataStructures::Multilist<ML_QUEUE, SLNet::RakString> outputMessages;
+	SLNet::TimeMS whenOutputMessageStarted;
+	void PushMessage(SLNet::RakString rs);
 	const char *GetCurrentMessage(void);
 	// We use this array to store the current state of each key
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];

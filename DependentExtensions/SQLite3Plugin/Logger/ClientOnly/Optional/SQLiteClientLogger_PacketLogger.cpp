@@ -1,10 +1,20 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 #include "SQLiteClientLogger_PacketLogger.h"
 #include "SQLiteClientLoggerPlugin.h"
-#include "RakPeerInterface.h"
-#include "InternalPacket.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/InternalPacket.h"
+#include "slikenet/MessageIdentifiers.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 static const char *DEFAULT_PACKET_LOGGER_TABLE="PacketLogger";
 
@@ -18,10 +28,10 @@ void SQLiteClientLogger_PacketLogger::OnDirectSocketSend(const char *data, const
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1);
-	rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2);
-	remoteSystemAddress.ToString(true, str3);
-	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4);
+	localSystemAddress.ToString(true, str1, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
+	remoteSystemAddress.ToString(true, str3, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
@@ -31,28 +41,28 @@ void SQLiteClientLogger_PacketLogger::OnDirectSocketReceive(const char *data, co
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1);
-	rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2);
-	remoteSystemAddress.ToString(true, str3);
-	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4);
+	localSystemAddress.ToString(true, str1, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
+	remoteSystemAddress.ToString(true, str3, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
 		     ("Rcv", "Raw", "",         "",         IDTOString(data[0]),bitsUsed, str1, str2, str3, str4, "","","","","") );
 }
-void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, RakNet::TimeMS time, bool isSend)
+void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time, bool isSend)
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1);
-	rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2);
-	remoteSystemAddress.ToString(true, str3);
-	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4);
+	localSystemAddress.ToString(true, str1, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
+	remoteSystemAddress.ToString(true, str3, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	unsigned char typeByte;
 	char *typeStr;
-	if (internalPacket->data[0]==ID_TIMESTAMP && BITS_TO_BYTES(internalPacket->dataBitLength)>sizeof(RakNet::TimeMS)+1)
+	if (internalPacket->data[0]==ID_TIMESTAMP && BITS_TO_BYTES(internalPacket->dataBitLength)>sizeof(SLNet::TimeMS)+1)
 	{
-		typeByte=internalPacket->data[1+sizeof(RakNet::TimeMS)];
+		typeByte=internalPacket->data[1+sizeof(SLNet::TimeMS)];
 		typeStr="Timestamp";
 	}
 	else
@@ -66,14 +76,14 @@ void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalP
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
 		     (sendType, typeStr, internalPacket->reliableMessageNumber, frameNumber, IDTOString(typeByte), internalPacket->dataBitLength, str1, str2, str3, str4, internalPacket->splitPacketId, internalPacket->splitPacketIndex, internalPacket->splitPacketCount, internalPacket->orderingIndex,"") );
 }
-void SQLiteClientLogger_PacketLogger::OnAck(unsigned int messageNumber, SystemAddress remoteSystemAddress, RakNet::TimeMS time)
+void SQLiteClientLogger_PacketLogger::OnAck(unsigned int messageNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time)
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1);
-	rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2);
-	remoteSystemAddress.ToString(true, str3);
-	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4);
+	localSystemAddress.ToString(true, str1, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
+	remoteSystemAddress.ToString(true, str3, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
 		          ("Rcv", "Ack",messageNumber, "", "", "", str1, str2, str3, str4, "","","","","") );
@@ -82,10 +92,10 @@ void SQLiteClientLogger_PacketLogger::OnPushBackPacket(const char *data, const B
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1);
-	rakPeerInterface->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2);
-	remoteSystemAddress.ToString(true, str3);
-	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4);
+	localSystemAddress.ToString(true, str1, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
+	remoteSystemAddress.ToString(true, str3, 64);
+	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
 		          ("Local", "PushBackPacket","",  "", IDTOString(data[0]), bitsUsed, str1, str2, str3, str4, "","","","","") );

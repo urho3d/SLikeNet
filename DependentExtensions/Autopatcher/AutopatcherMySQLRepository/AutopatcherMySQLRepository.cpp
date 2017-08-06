@@ -1,19 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakString.h"
+#include "slikenet/string.h"
 #include "AutopatcherMySQLRepository.h"
-#include "AutopatcherPatchContext.h"
-#include "FileList.h"
-#include "RakAssert.h"
-#include "DS_List.h"
+#include "slikenet/AutopatcherPatchContext.h"
+#include "slikenet/FileList.h"
+#include "slikenet/assert.h"
+#include "slikenet/DS_List.h"
 // ntohl
 #ifdef _WIN32
 #include <Winsock2.h>
@@ -24,18 +29,20 @@
 // If you get fatal error C1083: Cannot open include file: 'mysql.h' then you need to install MySQL. See readme.txt in this sample directory.
 #include "mysql.h"
 #include "CreatePatch.h"
-#include "AutopatcherPatchContext.h"
-// #include "DR_SHA1.h"
+#include "slikenet/AutopatcherPatchContext.h"
+// #include "slikenet/DR_SHA1.h"
 #include <stdlib.h>
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 static const unsigned HASH_LENGTH=sizeof(unsigned int);
 
 struct FileInfo
 {	
-	RakNet::RakString filename;
+	SLNet::RakString filename;
 	char contentHash [HASH_LENGTH];
 	bool createFile;
 };
@@ -147,7 +154,7 @@ bool AutopatcherMySQLRepository::AddApplication(const char *applicationName, con
 	// mysql_real_escape_string
 
 	char query[512];
-	sprintf(query, "INSERT INTO Applications (applicationName, userName) VALUES ('%s', '%s');", GetEscapedString(applicationName).C_String(), GetEscapedString(userName).C_String());
+	sprintf_s(query, "INSERT INTO Applications (applicationName, userName) VALUES ('%s', '%s');", GetEscapedString(applicationName).C_String(), GetEscapedString(userName).C_String());
 	//sqlCommandMutex.Lock();
 	bool b = ExecuteBlockingCommand(query);
 	//sqlCommandMutex.Unlock();
@@ -156,7 +163,7 @@ bool AutopatcherMySQLRepository::AddApplication(const char *applicationName, con
 bool AutopatcherMySQLRepository::RemoveApplication(const char *applicationName)
 {
 	char query[512];	
-	sprintf(query, "DELETE FROM Applications WHERE applicationName='%s';", GetEscapedString(applicationName).C_String());
+	sprintf_s(query, "DELETE FROM Applications WHERE applicationName='%s';", GetEscapedString(applicationName).C_String());
 	//sqlCommandMutex.Lock();
 	bool b = ExecuteBlockingCommand(query);
 	//sqlCommandMutex.Unlock();
@@ -166,8 +173,8 @@ bool AutopatcherMySQLRepository::RemoveApplication(const char *applicationName)
 bool AutopatcherMySQLRepository::GetChangelistSinceDate(const char *applicationName, FileList *addedOrModifiedFilesWithHashData, FileList *deletedFiles, double sinceDate)
 {
 	char query[512];
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 
 	int applicationID;
 	//sqlCommandMutex.Lock();
@@ -175,19 +182,19 @@ bool AutopatcherMySQLRepository::GetChangelistSinceDate(const char *applicationN
 	{
 		// This message covers the lost connection to the SQL server
 		//sqlCommandMutex.Unlock();
-		//sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",escapedApplicationName.C_String());
+		//sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",escapedApplicationName.C_String());
 		return false;
 	}
 	//sqlCommandMutex.Unlock();
 
 	if (sinceDate!=0)
-		sprintf(query,
+		sprintf_s(query,
 		"SELECT filename, fileLength, contentHash, createFile, fileId FROM FileVersionHistory "
 		"JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i AND modificationDate > %f GROUP BY fileName) MaxId "
 		"ON FileVersionHistory.fileId = MaxId.maxId "
 		"ORDER BY filename DESC;", applicationID,sinceDate);
 	else
-		sprintf(query,
+		sprintf_s(query,
 		"SELECT filename, fileLength, contentHash, createFile, fileId FROM FileVersionHistory "
 		"JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i GROUP BY fileName) MaxId "
 		"ON FileVersionHistory.fileId = MaxId.maxId "
@@ -211,11 +218,11 @@ bool AutopatcherMySQLRepository::GetChangelistSinceDate(const char *applicationN
 		{
 			const char * hardDriveHash = row [2]; 
 			int fileLength = atoi (row [1]);
-			addedFiles->AddFile(hardDriveFilename, hardDriveFilename, hardDriveHash, HASH_LENGTH, fileLength, FileListNodeContext(0,0), false);
+			addedOrModifiedFilesWithHashData->AddFile(hardDriveFilename, hardDriveFilename, hardDriveHash, HASH_LENGTH, fileLength, FileListNodeContext(), false);
 		}
 		else
 		{
-			deletedFiles->AddFile(hardDriveFilename,hardDriveFilename,0,0,0,FileListNodeContext(0,0), false);
+			deletedFiles->AddFile(hardDriveFilename,hardDriveFilename,0,0,0,FileListNodeContext(), false);
 		}
 	}
 	mysql_free_result (result);
@@ -226,14 +233,14 @@ bool AutopatcherMySQLRepository::GetChangelistSinceDate(const char *applicationN
 int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList *input, bool allowDownloadOfOriginalUnmodifiedFiles, FileList *patchList)
 {
 	char query[512];
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	int applicationID;
 	//sqlCommandMutex.Lock();
 	if (!ExecuteQueryReadInt (query, &applicationID))
 	{
 		//sqlCommandMutex.Unlock();
-	    sprintf(lastError,"ERROR: %s not found in GetPatches\n",applicationName);
+	    sprintf_s(lastError,"ERROR: %s not found in GetPatches\n",applicationName);
 	    return false;
 	}
 	//sqlCommandMutex.Unlock();
@@ -250,12 +257,12 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 		if (userHash==0)
 		{
 			// If the user does not have a hash in the input list, get the contents of latest version of this named file and write it to the patch list
-		//	sprintf(query, "SELECT content FROM FileVersionHistory "
+		//	sprintf_s(query, "SELECT content FROM FileVersionHistory "
 		//	               "JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i AND filename='%s') MaxId "
 		//	               "ON FileVersionHistory.fileId = MaxId.maxId", 
 		//		applicationID, fn);
 
-			sprintf(query, "SELECT fileId, fileLength, changeSetID FROM FileVersionHistory "
+			sprintf_s(query, "SELECT fileId, fileLength, changeSetID FROM FileVersionHistory "
 				"JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i AND filename='%s') MaxId "
 				"ON FileVersionHistory.fileId = MaxId.maxId", 
 				applicationID, fn);
@@ -281,13 +288,13 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 				const int changeSetID = atoi (row [2]); 
 				if (allowDownloadOfOriginalUnmodifiedFiles==false && changeSetID==0)
 				{
-					printf("Failure: allowDownloadOfOriginalUnmodifiedFiles==false for %s length %i\n", userFilename.C_String(), fileLength);
+					printf("Failure: allowDownloadOfOriginalUnmodifiedFiles==false for %s length %i\n", userFilename, fileLength);
 
 					mysql_free_result(result);
 					return false;
 				}
 
-				patchList->AddFile(userFilename,userFilename, 0, fileLength, fileLength, FileListNodeContext(PC_WRITE_FILE,fileId), true);
+				patchList->AddFile(userFilename,userFilename, 0, fileLength, fileLength, FileListNodeContext(PC_WRITE_FILE,fileId,0,0), true);
 			}
 			mysql_free_result(result);
 		}
@@ -300,7 +307,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 			}
 
 			// Get the hash and ID of the latest version of this file, by filename.
-			sprintf(query, 
+			sprintf_s(query, 
 				"SELECT contentHash, fileId, fileLength FROM FileVersionHistory "
 				"JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i AND filename='%s') MaxId "
 				"ON FileVersionHistory.fileId = MaxId.maxId",
@@ -328,7 +335,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 					char buf [2 * HASH_LENGTH + 1];
 					mysql_real_escape_string(mySqlConnection, buf, userHash, HASH_LENGTH);
 					
-					sprintf(query, "SELECT patch FROM FileVersionHistory WHERE applicationId=%i AND filename='%s' AND contentHash='%s'; ", applicationID, fn, buf);
+					sprintf_s(query, "SELECT patch FROM FileVersionHistory WHERE applicationId=%i AND filename='%s' AND contentHash='%s'; ", applicationID, fn, buf);
                     MYSQL_RES * patchResult = 0;
 					//sqlCommandMutex.Lock();
                     if (!ExecuteBlockingCommand (query, &patchResult))
@@ -346,7 +353,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 						// Get the contents of latest version of this named file by fileId and return it.
 
 						/*
-						sprintf(query, "SELECT content FROM FileVersionHistory WHERE fileId=%d;", fileId);
+						sprintf_s(query, "SELECT content FROM FileVersionHistory WHERE fileId=%d;", fileId);
 
 						if (mysql_query (mySqlConnection, query) != 0)
 						{
@@ -363,7 +370,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 						patchList->AddFile(userFilename, file, fileLength, contentLength, FileListNodeContext(PC_WRITE_FILE,0));
 						mysql_free_result(substrresult);
 						*/
-						patchList->AddFile(userFilename,userFilename, 0, fileLength, fileLength, FileListNodeContext(PC_WRITE_FILE,fileId), true);
+						patchList->AddFile(userFilename,userFilename, 0, fileLength, fileLength, FileListNodeContext(PC_WRITE_FILE,fileId,0,0), true);
 					}
 					else
 					{
@@ -376,7 +383,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 						memcpy(temp, contentHash, HASH_LENGTH);
 						memcpy(temp+HASH_LENGTH, patch, patchLength);
 
-						patchList->AddFile(userFilename,userFilename, temp, HASH_LENGTH+patchLength, fileLength, FileListNodeContext(PC_HASH_1_WITH_PATCH,0) );
+						patchList->AddFile(userFilename,userFilename, temp, HASH_LENGTH+patchLength, fileLength, FileListNodeContext(PC_HASH_1_WITH_PATCH,0,0,0) );
 						delete [] temp;
 					}
 
@@ -401,7 +408,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 	return true;
 }
 
-bool AutopatcherMySQLRepository::GetMostRecentChangelistWithPatches(RakNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
+bool AutopatcherMySQLRepository::GetMostRecentChangelistWithPatches(SLNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
 {
 	// Not yet implemented
 	return false;
@@ -416,22 +423,22 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 	filesOnHarddrive.AddCallback(cb);
 	int prepareResult;
 	my_bool falseVar=false;
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	filesOnHarddrive.AddFilesFromDirectory(applicationDirectory,"", true, true, true, FileListNodeContext(0,0));
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	filesOnHarddrive.AddFilesFromDirectory(applicationDirectory,"", true, true, true, FileListNodeContext());
 	if (filesOnHarddrive.fileList.Size()==0)
 	{
-		sprintf(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
+		sprintf_s(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
 		return false;
 	}
 
-	sprintf(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	sprintf_s(query, "SELECT applicationID FROM Applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	int applicationID;
 
 	//sqlCommandMutex.Lock();
 	if (!ExecuteQueryReadInt(query, &applicationID))
 	{
 		//sqlCommandMutex.Unlock();
-		sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",escapedApplicationName.C_String());
+		sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",escapedApplicationName.C_String());
 		return false;
 	}
 
@@ -442,7 +449,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 	}
 	//sqlCommandMutex.Unlock();
 
-	sprintf(query, "UPDATE Applications SET changeSetId = changeSetId + 1 where applicationID=%i;", applicationID);
+	sprintf_s(query, "UPDATE Applications SET changeSetId = changeSetId + 1 where applicationID=%i;", applicationID);
 	//sqlCommandMutex.Lock();
 	if (!ExecuteBlockingCommand(query))
 	{
@@ -452,7 +459,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 	}
 	//sqlCommandMutex.Unlock();
 	int changeSetId = 0;
-	sprintf(query, "SELECT changeSetId FROM Applications WHERE applicationID=%i;", applicationID);
+	sprintf_s(query, "SELECT changeSetId FROM Applications WHERE applicationID=%i;", applicationID);
 	//sqlCommandMutex.Lock();
 	if (!ExecuteQueryReadInt(query, &changeSetId))
 	{
@@ -466,7 +473,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 	changeSetId--;
 
 	// Gets all newest files
-	sprintf(query, "SELECT filename, contentHash, createFile FROM FileVersionHistory "
+	sprintf_s(query, "SELECT filename, contentHash, createFile FROM FileVersionHistory "
 	               "JOIN (SELECT max(fileId) maxId FROM FileVersionHistory WHERE applicationId=%i GROUP BY fileName) MaxId "
 	               "ON FileVersionHistory.fileId = MaxId.maxId "
 	               "ORDER BY filename DESC;", applicationID);
@@ -528,7 +535,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 		// Unless set to false, file does not exist in query result or is different.
 		if (addFile)
 		{
-			newFiles.AddFile(hardDriveFilename,hardDriveFilename, filesOnHarddrive.fileList[fileListIndex].data, filesOnHarddrive.fileList[fileListIndex].dataLengthBytes, filesOnHarddrive.fileList[fileListIndex].fileLengthBytes, FileListNodeContext(0,0), false, true);
+			newFiles.AddFile(hardDriveFilename,hardDriveFilename, filesOnHarddrive.fileList[fileListIndex].data, filesOnHarddrive.fileList[fileListIndex].dataLengthBytes, filesOnHarddrive.fileList[fileListIndex].fileLengthBytes, FileListNodeContext(), false, true);
 			filesOnHarddrive.fileList[fileListIndex].data=0;
 		}
 	}
@@ -556,7 +563,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 		}
 
 		if (!fileOnHarddrive)
-			deletedFiles.AddFile(fi.filename,fi.filename,0,0,0,FileListNodeContext(0,0), false);
+			deletedFiles.AddFile(fi.filename,fi.filename,0,0,0,FileListNodeContext(), false);
 	}
 
 	// files on harddrive no longer needed.  Free this memory since generating all the patches is memory intensive.
@@ -568,7 +575,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 		if (fileListIndex%10==0)
 			printf("Tagging deleted files %i/%i\n", fileListIndex+1, deletedFiles.fileList.Size());
 
-		sprintf(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, '%s', FALSE,%i,'%s');", 
+		sprintf_s(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, '%s', FALSE,%i,'%s');", 
 			applicationID, GetEscapedString(deletedFiles.fileList[fileListIndex].filename).C_String(), changeSetId, GetEscapedString(userName).C_String());
 		
 		//sqlCommandMutex.Lock();
@@ -596,7 +603,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 		const char * hardDriveHash=newFiles.fileList[fileListIndex].data;
 		unsigned     hardDriveDataLength=newFiles.fileList[fileListIndex].fileLengthBytes;
 
-		sprintf( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename='%s' AND createFile=TRUE;", applicationID, GetEscapedString(hardDriveFilename).C_String() );
+		sprintf_s( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename='%s' AND createFile=TRUE;", applicationID, GetEscapedString(hardDriveFilename).C_String() );
 
 		MYSQL_RES * res = 0;
 		//sqlCommandMutex.Lock();
@@ -617,7 +624,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 			const char * fileID = row [0];
 			
 			// The last query handled all the relevant comparisons
-			sprintf(query, "SELECT content from FileVersionHistory WHERE fileID=%s", fileID );
+			sprintf_s(query, "SELECT content from FileVersionHistory WHERE fileID=%s", fileID );
 			MYSQL_RES * queryResult = 0;
 			//sqlCommandMutex.Lock();
 			if (!ExecuteBlockingCommand (query, &queryResult))
@@ -639,7 +646,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 			unsigned patchLength;	
 			if (!CreatePatch(content, contentLength, (char *) hardDriveData, hardDriveDataLength, &patch, &patchLength))
 			{
-				strcpy(lastError,"CreatePatch failed.\n");
+				strcpy_s(lastError,"CreatePatch failed.\n");
 				Rollback();
 
 				newFiles.Clear();
@@ -699,7 +706,7 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
          mysql_free_result(res);
 
 		 stmt = mysql_stmt_init(mySqlConnection);
-		 sprintf(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, content, contentHash, createFile, changeSetID, userName) "
+		 sprintf_s(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, content, contentHash, createFile, changeSetID, userName) "
 			 "VALUES (%i, ?, %i,?,?, TRUE, %i, '%s' );", 
 			 applicationID, hardDriveDataLength, changeSetId, GetEscapedString(userName).C_String());
 
@@ -775,7 +782,7 @@ const char *AutopatcherMySQLRepository::GetLastError(void) const
 unsigned int AutopatcherMySQLRepository::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
 {
 	char query[512];
-	sprintf(query, "SELECT substring(content from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead,context.flnc_extraData);
+	sprintf_s(query, "SELECT substring(content from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead,context.flnc_extraData1);
 
 	// CREATE NEW CONNECTION JUST FOR THIS QUERY
 	// This is because the autopatcher is sharing this class, but this is called from multiple threads and mysql is not threadsafe

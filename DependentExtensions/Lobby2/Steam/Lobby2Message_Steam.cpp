@@ -1,20 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Message_Steam.h"
+#pragma warning( push )
+#pragma warning(disable:4127)	// conditional expression is constant (with Steamworks 1.23a)
 #include "steam_api.h"
+#pragma warning( pop )
 #include "Lobby2Client_Steam_Impl.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
-bool Client_Login_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Client_Login_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	(void) client;
 
@@ -24,7 +32,7 @@ bool Client_Login_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
 		resultCode=L2RC_SUCCESS;
 	return true; // Done immediately
 }
-bool Client_Logoff_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Client_Logoff_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	Lobby2Client_Steam_Impl *steam = (Lobby2Client_Steam_Impl *)client;
 	steam->NotifyLeaveRoom();
@@ -36,22 +44,22 @@ bool Client_Logoff_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
 }
 Console_SearchRooms_Steam::Console_SearchRooms_Steam()
 {
-	m_SteamCallResultLobbyMatchList = RakNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t> > (_FILE_AND_LINE_);
+	m_SteamCallResultLobbyMatchList = SLNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t> > (_FILE_AND_LINE_);
 }
 Console_SearchRooms_Steam::~Console_SearchRooms_Steam()
 {
 	// Cast to make sure destructor gets called
-	RakNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t>*)m_SteamCallResultLobbyMatchList, _FILE_AND_LINE_);
+	SLNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t>*)m_SteamCallResultLobbyMatchList, _FILE_AND_LINE_);
 }
-bool Console_SearchRooms_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_SearchRooms_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	(void) client;
 
 	requestId = SteamMatchmaking()->RequestLobbyList();
-	((CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t>*)m_SteamCallResultLobbyMatchList)->Set( requestId, (RakNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyMatchListCallback );
+	((CCallResult<Lobby2Client_Steam_Impl, LobbyMatchList_t>*)m_SteamCallResultLobbyMatchList)->Set( requestId, (SLNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyMatchListCallback );
 	return false; // Asynch
 }
-void Console_SearchRooms_Steam::DebugMsg(RakNet::RakString &out) const
+void Console_SearchRooms_Steam::DebugMsg(SLNet::RakString &out) const
 {
 	if (resultCode!=L2RC_SUCCESS)
 	{
@@ -61,10 +69,10 @@ void Console_SearchRooms_Steam::DebugMsg(RakNet::RakString &out) const
 	out.Set("%i rooms found", roomNames.GetSize());
 	for (DataStructures::DefaultIndexType i=0; i < roomNames.GetSize(); i++)
 	{
-		out += RakNet::RakString("\n%i. %s. ID=%" PRINTF_64_BIT_MODIFIER "u", i+1, roomNames[i].C_String(), roomIds[i]);
+		out += SLNet::RakString("\n%i. %s. ID=%" PRINTF_64_BIT_MODIFIER "u", i+1, roomNames[i].C_String(), roomIds[i]);
 	}
 }
-bool Console_GetRoomDetails_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_GetRoomDetails_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	(void) client;
 
@@ -74,14 +82,14 @@ bool Console_GetRoomDetails_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
 }
 Console_CreateRoom_Steam::Console_CreateRoom_Steam()
 {
-	m_SteamCallResultLobbyCreated = RakNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t> >(_FILE_AND_LINE_);
+	m_SteamCallResultLobbyCreated = SLNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t> >(_FILE_AND_LINE_);
 }
 Console_CreateRoom_Steam::~Console_CreateRoom_Steam()
 {
 	// Cast to make sure destructor gets called
-	RakNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t>*)m_SteamCallResultLobbyCreated, _FILE_AND_LINE_);
+	SLNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t>*)m_SteamCallResultLobbyCreated, _FILE_AND_LINE_);
 }
-bool Console_CreateRoom_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_CreateRoom_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	if (roomIsPublic)
 		requestId = SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, publicSlots  );
@@ -89,29 +97,29 @@ bool Console_CreateRoom_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
 		requestId = SteamMatchmaking()->CreateLobby( k_ELobbyTypeFriendsOnly, publicSlots  );
 
 	// set the function to call when this completes
-	((CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t>*)m_SteamCallResultLobbyCreated)->Set( requestId, (RakNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyCreated );
+	((CCallResult<Lobby2Client_Steam_Impl, LobbyCreated_t>*)m_SteamCallResultLobbyCreated)->Set( requestId, (SLNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyCreated );
 
 	return false; // Asynch
 }
 Console_JoinRoom_Steam::Console_JoinRoom_Steam()
 {
-	m_SteamCallResultLobbyEntered = RakNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t> > (_FILE_AND_LINE_);
+	m_SteamCallResultLobbyEntered = SLNet::OP_NEW<CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t> > (_FILE_AND_LINE_);
 }
 Console_JoinRoom_Steam::~Console_JoinRoom_Steam()
 {
 	// Cast to make sure destructor gets called
-	RakNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t>*)m_SteamCallResultLobbyEntered, _FILE_AND_LINE_);
+	SLNet::OP_DELETE((CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t>*)m_SteamCallResultLobbyEntered, _FILE_AND_LINE_);
 }
-bool Console_JoinRoom_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_JoinRoom_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	requestId = SteamMatchmaking()->JoinLobby( roomId  );
 
 	// set the function to call when this completes
-	((CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t>*)m_SteamCallResultLobbyEntered)->Set( requestId, (RakNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyJoined );
+	((CCallResult<Lobby2Client_Steam_Impl, LobbyEnter_t>*)m_SteamCallResultLobbyEntered)->Set( requestId, (SLNet::Lobby2Client_Steam_Impl*) client, &Lobby2Client_Steam_Impl::OnLobbyJoined );
 
 	return false; // Asynch
 }
-bool Console_LeaveRoom_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_LeaveRoom_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	SteamMatchmaking()->LeaveLobby( roomId );
 
@@ -121,7 +129,7 @@ bool Console_LeaveRoom_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
 	resultCode=L2RC_SUCCESS;
 	return true; // Synchronous
 }
-bool Console_SendRoomChatMessage_Steam::ClientImpl( RakNet::Lobby2Plugin *client)
+bool Console_SendRoomChatMessage_Steam::ClientImpl(SLNet::Lobby2Plugin *client)
 {
 	(void) client;
 

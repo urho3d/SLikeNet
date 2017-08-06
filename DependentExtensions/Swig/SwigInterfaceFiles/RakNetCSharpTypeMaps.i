@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //------------------------------TypeMaps--------------------------
 //Swig typemaps help to either convert a C++ type into a C# type or tell it which types are the same
 //Swig typemaps also can modify the postprocessed C++ file as well as the postprocessed C# files

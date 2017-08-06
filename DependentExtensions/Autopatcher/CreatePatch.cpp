@@ -24,6 +24,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ * Alternatively you are permitted to license the modifications under the Simplified BSD License.
+ */
+
+#define NOMINMAX
 #include "MemoryCompressor.h"
 
 #if 0
@@ -36,6 +48,8 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05
 #ifndef _WIN32
 #include <err.h>
 #include <unistd.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 #else
 // KevinJ - Windows compatibility
 typedef int ssize_t;
@@ -58,6 +72,8 @@ static void errx(int i, ...)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits>		// used for std::numeric_limits
+#include <algorithm>	// used for std::max
 
 #ifndef MIN
 #define MIN(x,y) (((x)<(y)) ? (x) : (y))
@@ -239,7 +255,7 @@ static void offtout(off_t x,u_char *buf)
 // This function modifies the main() function included in bsdiff.c of bsdiff-4.3 found at http://www.daemonology.net/bsdiff/
 // It is changed to be a standalone function, to work entirely in memory, and to use my class MemoryCompressor as an interface to BZip
 // Up to the caller to delete out
-bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int newsize, char **out, unsigned *outSize)
+static bool CreatePatchInternal(const char *old, off_t oldsize, char *_new, off_t newsize, char **out, unsigned *outSize)
 {
 //	int fd;
 //	u_char *old,*new;
@@ -267,12 +283,12 @@ bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int new
 	/* Allocate oldsize+1 bytes instead of oldsize bytes to ensure
 		that we never try to malloc(0) and get a NULL pointer */
 	/*
-	if(((fd=open(argv[1],O_RDONLY | _O_BINARY ,0))<0) ||
-		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[1],O_RDONLY | _O_BINARY ,0))<0) ||
+		((oldsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((old=malloc(oldsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,oldsize)!=oldsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[1]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,old,oldsize)!=oldsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[1]);
 		*/
 
 	if(((I=(off_t*)malloc((oldsize+1)*sizeof(off_t)))==NULL) ||
@@ -287,12 +303,12 @@ bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int new
 	/* Allocate newsize+1 bytes instead of newsize bytes to ensure
 		that we never try to malloc(0) and get a NULL pointer */
 	/*
-	if(((fd=open(argv[2],O_RDONLY | _O_BINARY ,0))<0) ||
-		((newsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[2],O_RDONLY | _O_BINARY ,0))<0) ||
+		((newsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((new=malloc(newsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,new,newsize)!=newsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[2]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,new,newsize)!=newsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[2]);
 
 		*/
 
@@ -308,7 +324,7 @@ bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int new
 	eblen=0;
 
 	/* Create the patch file */
-//	if ((pf = fopen(argv[3], "wb")) == NULL)
+//	if (fopen_s(&pf, argv[3], "wb") !=0)
 //		err(1, "%s", argv[3]);
 
 	/* Header is
@@ -541,6 +557,51 @@ bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int new
 	return true;
 }
 
+// #med - deprecate/remove this overload (alongside the other overloads except for the off_t version)
+// Note: overloads provided, so to ensure we are API-wise backwards compatible with RakNet 4.082
+// (i.e. for callers passing int rather than off_t types which due to the added unsigned overload would
+// now trigger compile errors due to the ambiguous parameters)
+bool CreatePatch(const char *old, unsigned oldsize, char *_new, unsigned int newsize, char **out, unsigned *outSize)
+{
+	// we must ensure that we don't pass >= off_t-max values to CreatePatch since otherwise the behavior is undefined due to
+	// internal integer overflows when processing the pointers (in certain cases)
+	// hence test the values first and simply error out if we get too large values (effectively limiting this function to work
+	// with file sizes of 2 GB on Windows and 32-bit Linux/OSx (Linux/OSx 64-bit: will remain working with  4GB sized files as RakNet did
+	// due to off_t being 64-bit)
+	if (std::max(oldsize, newsize) > static_cast<unsigned long>(std::numeric_limits<off_t>::max())) {
+		return false;
+	}
+
+	return CreatePatchInternal(old, static_cast<off_t>(oldsize), _new, static_cast<off_t>(newsize), out, outSize);
+}
+
+bool CreatePatch(const char *old, int oldsize, char *_new, int newsize, char **out, unsigned *outSize)
+{
+	return CreatePatchInternal(old, static_cast<off_t>(oldsize), _new, static_cast<off_t>(newsize), out, outSize);
+}
+
+bool CreatePatch(const char *old, int oldsize, char *_new, unsigned int newsize, char **out, unsigned *outSize)
+{
+	if (newsize > static_cast<unsigned long>(std::numeric_limits<off_t>::max())) {
+		return false;
+	}
+
+	return CreatePatchInternal(old, static_cast<off_t>(oldsize), _new, static_cast<off_t>(newsize), out, outSize);
+}
+
+bool CreatePatch(const char *old, unsigned oldsize, char *_new, int newsize, char **out, unsigned *outSize)
+{
+	if (oldsize > static_cast<unsigned long>(std::numeric_limits<off_t>::max())) {
+		return false;
+	}
+
+	return CreatePatchInternal(old, static_cast<off_t>(oldsize), _new, static_cast<off_t>(newsize), out, outSize);
+}
+
+bool CreatePatch(const char *old, off_t oldsize, char *_new, off_t newsize, char **out, unsigned *outSize)
+{
+	return CreatePatchInternal(old, oldsize, _new, newsize, out, outSize);
+}
 
 int TestDiffInMemory(int argc,char *argv[])
 {
@@ -554,24 +615,24 @@ int TestDiffInMemory(int argc,char *argv[])
 	int fd;
 	FILE * pf;
 
-	if(((fd=open(argv[1],O_RDONLY | _O_BINARY ,0))<0) ||
-		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[1],O_RDONLY | _O_BINARY ,0))<0) ||
+		((oldsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((old=(char*)malloc(oldsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,oldsize)!=oldsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[1]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,old,oldsize)!=oldsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[1]);
 
-	if(((fd=open(argv[2],O_RDONLY | _O_BINARY ,0))<0) ||
-		((newsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[2],O_RDONLY | _O_BINARY ,0))<0) ||
+		((newsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((_new=(char*)malloc(newsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,_new,newsize)!=newsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[2]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,_new,newsize)!=newsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[2]);
 
 
 	int res = CreatePatch(old, oldsize, _new, newsize, &out, &outSize);
 
-	if ((pf = fopen(argv[3], "wb")) == NULL)
+	if (fopen_s(&pf, argv[3], "wb") != 0)
 		err(1, "%s", argv[3]);
 	fwrite(out,outSize,1,pf);
 	fclose(pf);
@@ -606,12 +667,12 @@ int DIFF_main(int argc,char *argv[])
 
 	/* Allocate oldsize+1 bytes instead of oldsize bytes to ensure
 	that we never try to malloc(0) and get a NULL pointer */
-	if(((fd=open(argv[1],O_RDONLY|O_BINARY,0))<0) ||
-		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[1],O_RDONLY|O_BINARY,0))<0) ||
+		((oldsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((old=(u_char*)malloc(oldsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,oldsize)!=oldsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[1]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,old,oldsize)!=oldsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[1]);
 
 	if(((I=(off_t*)malloc((oldsize+1)*sizeof(off_t)))==NULL) ||
 		((V=(off_t*)malloc((oldsize+1)*sizeof(off_t)))==NULL)) err(1,NULL);
@@ -622,12 +683,12 @@ int DIFF_main(int argc,char *argv[])
 
 	/* Allocate newsize+1 bytes instead of newsize bytes to ensure
 	that we never try to malloc(0) and get a NULL pointer */
-	if(((fd=open(argv[2],O_RDONLY|O_BINARY,0))<0) ||
-		((newsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[2],O_RDONLY|O_BINARY,0))<0) ||
+		((newsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((_new=(u_char*)malloc(newsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,_new,newsize)!=newsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[2]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,_new,newsize)!=newsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[2]);
 
 	if(((db=(u_char*)malloc(newsize+1))==NULL) ||
 		((eb=(u_char*)malloc(newsize+1))==NULL)) err(1,NULL);
@@ -635,7 +696,7 @@ int DIFF_main(int argc,char *argv[])
 	eblen=0;
 
 	/* Create the patch file */
-	if ((pf = fopen(argv[3], "wb")) == NULL)
+	if (fopen_s(&pf, argv[3], "wb") != 0)
 		err(1, "%s", argv[3]);
 
 	/* Header is

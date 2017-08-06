@@ -1,18 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "MySQLInterface.h"
-#include "RakAssert.h"
-#include "BitStream.h"
-#include "FormatString.h"
-#include "LinuxStrings.h"
+#include "slikenet/assert.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/FormatString.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 #include <errmsg.h>
 
 
@@ -116,7 +123,7 @@ char *MySQLInterface::GetLocalTimestamp(void)
 	{
 	    MYSQL_ROW row = mysql_fetch_row (result);
 	    if (row [0])
-			sprintf(resultString,"%s\n", row [0]);
+			sprintf_s(resultString,"%s\n", row [0]);
 		else
 			resultString[0]=0;
 
@@ -157,12 +164,12 @@ const char* MySQLInterface::GetLastError(void) const
     return lastError;
 }
 
-RakNet::RakString MySQLInterface::GetEscapedString(const char *input) const
+SLNet::RakString MySQLInterface::GetEscapedString(const char *input) const
 {
 	unsigned long len = (unsigned long) strlen(input);
 	char *fn = new char [len*2+1];
 	mysql_real_escape_string(mySqlConnection, fn, input, len);
-	RakNet::RakString output;
+	SLNet::RakString output;
 	// Use assignment so it doesn't parse printf escape strings
 	output = fn;
 	delete [] fn;

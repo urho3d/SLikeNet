@@ -1,26 +1,29 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "App3D.h"
 
 #include "Ogre.h"
-#include "RakAssert.h"
-#include "FormatString.h"
+#include "slikenet/assert.h"
+#include "slikenet/FormatString.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include "OgreRenderSystemCapabilities.h"
-
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 static const char *defaultCameraName = "DefaultCamera";
 static const char *defaultSceneManagerName = "DefaultSceneManager";
@@ -65,7 +68,7 @@ void App3D::Render(AppTime curTimeMS)
 			}
 #ifdef _DEBUG
 		}
-		catch (Ogre::Exception &e)
+		catch (Ogre::Exception &)
 		{
 			RakAssert(0 && "Something has happened to the Ogre rendering state. Recovery is possible. The cause needs to be fixed.");
 		}
@@ -132,7 +135,7 @@ bool App3D::Configure(void)
 			return false;
 		}
 	}
-	catch (Ogre::InvalidParametersException &e)
+	catch (Ogre::InvalidParametersException &)
 	{
 		return false;
 		
@@ -215,7 +218,7 @@ void App3D::InitCamera(Ogre::Camera *cam)
 	else
 		camera = sceneManager->createCamera(defaultCameraName);
 
-	camera->setFOVy(Ogre::Radian(3.1415927/4.0f));
+	camera->setFOVy(Ogre::Radian(3.1415927f/4.0f));
 
 }
 void App3D::InitViewport(Ogre::Viewport *vp)
@@ -260,7 +263,7 @@ Ogre::SceneManager* App3D::GetSceneManager(void) const
 {
 	return sceneManager;
 }
-const char* App3D::GetWorkingDirectory(void) const
+const TCHAR* App3D::GetWorkingDirectory(void) const
 {
 	return workingDirectory;
 }
@@ -272,9 +275,10 @@ const char * App3D::TakeScreenshot(const char *prefix, const char *suffix)
 {
 	time_t aclock;
 	time( &aclock );   // Get time in seconds
-	tm *newtime = localtime( &aclock );   // Convert time to struct tm form 
+	tm newtime;
+	localtime_s( &newtime, &aclock );   // Convert time to struct tm form 
 	char text[1024];
-	strcpy(text, asctime( newtime ));
+	strcpy_s(text, asctime( &newtime ));
 	text[strlen(text)-1]=0;
 
 	// ':' character is not allowed for file names

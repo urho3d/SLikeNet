@@ -1,30 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file Rackspace.h
 /// \brief Helper to class to manage Rackspace servers
 
-#include "NativeFeatureIncludes.h"
+#include "slikenet/NativeFeatureIncludes.h"
 
 #if  _RAKNET_SUPPORT_TCPInterface==1
 
-#include "Export.h"
-#include "RakNetTypes.h"
-#include "DS_Queue.h"
-#include "RakString.h"
+#include "slikenet/Export.h"
+#include "slikenet/types.h"
+#include "slikenet/DS_Queue.h"
+#include "slikenet/string.h"
 #include "jansson.h"
 
 #ifndef __RACKSPACE_2_H
 #define __RACKSPACE_2_H
 
-namespace RakNet
+namespace SLNet
 {
 	class TCPInterface;
 	class HTTPConnection2;
@@ -50,9 +55,9 @@ namespace RakNet
 	public:
 		virtual void OnTCPFailure(void)=0;
 		virtual void OnTransmissionFailed(HTTPConnection2 *httpConnection2, RakString postStr, RakString authURLDomain)=0;
-		virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, int contentOffset)=0;
+		virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, ptrdiff_t contentOffset)=0;
 		virtual void OnEmptyResponse(RakString stringTransmitted)=0;
-		virtual void OnMessage(const char *message, RakString responseReceived, RakString stringTransmitted, int contentOffset)=0;
+		virtual void OnMessage(const char *message, RakString responseReceived, RakString stringTransmitted, ptrdiff_t contentOffset)=0;
 	};
 
 	/// \brief Version 2 of the code that uses the TCPInterface class to communicate with the Rackspace API servers
@@ -95,11 +100,11 @@ namespace RakNet
 		/// \param[in] opType Type of operation to perform
 		/// \param[in] data If the operation requires data, put it here
 		/// \param[in] setAuthToken true to automatically set the auth token for the operation. I believe this should be true for everything except authentication itself
-		void AddOperation(RakNet::RakString URL, OpType opType, json_t *data, bool setAuthToken);
+		void AddOperation(SLNet::RakString URL, OpType opType, json_t *data, bool setAuthToken);
 
 		struct Operation
 		{
-			RakNet::RakString URL;
+			SLNet::RakString URL;
 			bool isPost;
 			json_t *data;
 		};
@@ -126,7 +131,7 @@ namespace RakNet
 
 	};
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __RACKSPACE_API_H
 

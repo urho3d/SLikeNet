@@ -5,18 +5,9 @@
  * This is a basic XML parser written in ANSI C++ for portability.
  * It works by using recursion and a node tree for breaking
  * down the elements of an XML document.
- *
- * @version     V2.41
- * @author      Frank Vanden Berghen
- *
- * The following license terms apply to projects that are in some way related to
- * the "RakNet project", including applications
- * using "RakNet project" and tools developed
- * for enhancing "RakNet project". All other projects
- * (not related to "RakNet project") have to use this
- * code under the Aladdin Free Public License (AFPL)
- * See the file "AFPL-license.txt" for more informations about the AFPL license.
- * (see http://www.artifex.com/downloads/doc/Public.htm for detailed AFPL terms)
+ * The following license terms applies to projects developped by "SLikeSoft UG" only:
+ * (all other projects are under the Aladdin Free Public License (AFPL) -
+ *  see the file "AFPL-license.txt" for more informations about this license)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,10 +20,10 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY Business-Insight ``AS IS'' AND ANY
+ * THIS SOFTWARE IS PROVIDED BY Frank Vanden Berghen ``AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Business-Insight BE LIABLE FOR ANY
+ * DISCLAIMED. IN NO EVENT SHALL Frank Vanden Berghen BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -40,9 +31,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright (c) 2002, Business-Insight
- * <a href="http://www.Business-Insight.com">Business-Insight</a>
- * All rights reserved.
+ * Copyright (c) 2013, Frank Vanden Berghen - All rights reserved.<br/>
+ *
  *
  * \section tutorial First Tutorial
  * You can follow a simple <a href="../../xmlParser.html">Tutorial</a> to know the basics...
@@ -88,27 +78,27 @@
  *
  * \subsection debugwin Debugging under WINDOWS
  *
- * 	Inside Visual C++, the "debug versions" of the memory allocation functions are
- * 	very slow: Do not forget to compile in "release mode" to get maximum speed.
- * 	When I had to debug a software that was using the XMLParser Library, it was usually
- * 	a nightmare because the library was sooOOOoooo slow in debug mode (because of the
- *  slow memory allocations in Debug mode). To solve this
- * 	problem, during all the debugging session, I am now using a very fast DLL version of the
- * 	XMLParser Library (the DLL is compiled in release mode). Using the DLL version of
- * 	the XMLParser Library allows me to have lightening XML parsing speed even in debug!
- * 	Other than that, the DLL version is useless: In the release version of my tool,
- * 	I always use the normal, ".cpp"-based, XMLParser Library (I simply include the
+ * Inside Visual C++, the "debug versions" of the memory allocation functions are
+ * very slow: Do not forget to compile in "release mode" to get maximum speed.
+ * When I had to debug a software that was using the XMLParser Library, it was usually
+ * a nightmare because the library was sooOOOoooo slow in debug mode (because of the
+ * slow memory allocations in Debug mode). To solve this
+ * problem, during all the debugging session, I am now using a very fast DLL version of the
+ * XMLParser Library (the DLL is compiled in release mode). Using the DLL version of
+ * the XMLParser Library allows me to have lightening XML parsing speed even in debug!
+ * Other than that, the DLL version is useless: In the release version of my tool,
+ * I always use the normal, ".cpp"-based, XMLParser Library (I simply include the
  * <a href="../../xmlParser.cpp">xmlParser.cpp</a> and
  * <a href="../../xmlParser.h">xmlParser.h</a> files into the project).
  *
- * 	The file <a href="../../XMLNodeAutoexp.txt">XMLNodeAutoexp.txt</a> contains some
+ * The file <a href="../../XMLNodeAutoexp.txt">XMLNodeAutoexp.txt</a> contains some
  * "tweaks" that improve substancially the display of the content of the XMLNode objects
  * inside the Visual Studio Debugger. Believe me, once you have seen inside the debugger
  * the "smooth" display of the XMLNode objects, you cannot live without it anymore!
  *
  * \subsection debuglinux Debugging under LINUX/UNIX
  *
- * 	The speed of the debug version of the XMLParser library is tolerable so no extra
+ * The speed of the debug version of the XMLParser library is tolerable so no extra
  * work.has been done.
  *
  ****************************************************************************/
@@ -118,7 +108,7 @@
 
 #include <stdlib.h>
 
-#ifdef _UNICODE
+#if defined(UNICODE) || defined(_UNICODE)
 // If you comment the next "define" line then the library will never "switch to" _UNICODE (wchar_t*) mode (16/32 bits per characters).
 // This is useful when you get error messages like:
 //    'XMLNode::openFileHelper' : cannot convert parameter 2 from 'const char [5]' to 'const wchar_t *'
@@ -663,12 +653,12 @@ XMLDLLENTRY void freeXMLString(XMLSTR t); // {free(t);}
  * delete them without any trouble.
  *
  * @{ */
-XMLDLLENTRY char    xmltob(XMLCSTR xmlString,char   defautValue=0);
-XMLDLLENTRY int     xmltoi(XMLCSTR xmlString,int    defautValue=0);
-XMLDLLENTRY long    xmltol(XMLCSTR xmlString,long   defautValue=0);
-XMLDLLENTRY double  xmltof(XMLCSTR xmlString,double defautValue=.0);
-XMLDLLENTRY XMLCSTR xmltoa(XMLCSTR xmlString,XMLCSTR defautValue=_CXML(""));
-XMLDLLENTRY XMLCHAR xmltoc(XMLCSTR xmlString,const XMLCHAR defautValue=_CXML('\0'));
+XMLDLLENTRY char      xmltob(XMLCSTR xmlString,char defautValue=0);
+XMLDLLENTRY int       xmltoi(XMLCSTR xmlString,int defautValue=0);
+XMLDLLENTRY long long xmltol(XMLCSTR xmlString,long long defautValue=0);
+XMLDLLENTRY double    xmltof(XMLCSTR xmlString,double defautValue=.0);
+XMLDLLENTRY XMLCSTR   xmltoa(XMLCSTR xmlString,XMLCSTR defautValue=_CXML(""));
+XMLDLLENTRY XMLCHAR   xmltoc(XMLCSTR xmlString,const XMLCHAR defautValue=_CXML('\0'));
 /** @} */
 
 /** @defgroup ToXMLStringTool Helper class to create XML files using "printf", "fprintf", "cout",... functions.

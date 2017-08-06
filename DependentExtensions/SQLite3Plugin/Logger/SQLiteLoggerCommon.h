@@ -1,10 +1,21 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 #ifndef _SQLITE_LOGGER_COMMON_H
 #define _SQLITE_LOGGER_COMMON_H
 
 #include <string.h>
-#include "NativeTypes.h"
+#include "slikenet/defines.h"
+#include "slikenet/NativeTypes.h"
 
-namespace RakNet
+namespace SLNet
 {
 	class BitStream;
 
@@ -145,9 +156,9 @@ struct LogParameter
 	unsigned char compressionMode;
 	bool sourceFormatIsBGRA;
 
-	void Serialize(RakNet::BitStream *bs) const;
+	void Serialize(SLNet::BitStream *bs) const;
 	// Don't forget to deallocate after calling Deserialize
-	bool Deserialize(RakNet::BitStream *bs);
+	bool Deserialize(SLNet::BitStream *bs);
 	void DoNotFree(void);
 	void Free(void);
 	static void Free(void *v);

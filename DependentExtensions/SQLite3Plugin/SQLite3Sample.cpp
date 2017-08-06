@@ -1,27 +1,32 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 /// \brief A sample for the SQLite3Plugin, that creates a table to track connections on the server
 /// The SQLite3Plugin is used with SQLite version 3 to transmit over the network calls to sqlite3_exec
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 #include "SQLite3ServerPlugin.h"
 #include "SQLite3ClientPlugin.h"
-#include "BitStream.h"
-#include "RakSleep.h"
-#include "Gets.h"
-#include "Kbhit.h"
-#include "GetTime.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/sleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 /// A sample derived implementation that will automatically update the table with all connected systems
 class ConnectionStatePlugin : public SQLite3ServerPlugin
@@ -31,7 +36,7 @@ public:
 
 	// Custom function to create the table we want
 	// Assumes the database was already added with AddDBHandle
-	bool CreateConnectionStateTable(RakNet::RakString dbIdentifier)
+	bool CreateConnectionStateTable(SLNet::RakString dbIdentifier)
 	{
 		// dbHandles is a member variable of SQLite3Plugin and contains the mappings of identifiers to sql database pointers
 		unsigned int idx = dbHandles.GetIndexOf(dbIdentifier);
@@ -69,9 +74,9 @@ public:
 
 		// Remove dropped system by primary key system address
 		char systemAddressString[64];
-		systemAddress.ToString(true,systemAddressString);
-		RakNet::RakString query("DELETE FROM connectionState WHERE systemAddress='%s';",
-			RakNet::RakString(systemAddressString).SQLEscape().C_String());
+		systemAddress.ToString(true,systemAddressString,64);
+		SLNet::RakString query("DELETE FROM connectionState WHERE systemAddress='%s';",
+			SLNet::RakString(systemAddressString).SQLEscape().C_String());
 		sqlite3_exec(dbHandles[idx].dbHandle,query.C_String(),0,0,0);
 	}
 
@@ -88,13 +93,13 @@ public:
 
 		// Store new system's system address and guid. rowCreationTime column is created automatically
 		char systemAddressString[64];
-		systemAddress.ToString(true,systemAddressString);
+		systemAddress.ToString(true,systemAddressString,64);
 		char guidString[128];
-		rakNetGUID.ToString(guidString);
-		RakNet::RakString query(
+		rakNetGUID.ToString(guidString, 64);
+		SLNet::RakString query(
 			"INSERT INTO connectionState (systemAddress,rakNetGUID) VALUES ('%s','%s');",
-			RakNet::RakString(systemAddressString).SQLEscape().C_String(),
-			RakNet::RakString(guidString).SQLEscape().C_String());
+			SLNet::RakString(systemAddressString).SQLEscape().C_String(),
+			SLNet::RakString(guidString).SQLEscape().C_String());
 		sqlite3_exec(dbHandles[idx].dbHandle,query.C_String(),0,0,0);
 	}
 
@@ -106,7 +111,7 @@ public:
 		SQLite3Plugin::Update();
 
 		// Once a second, remove all rows whose timestamp has not been updated in the last 30 seconds
-		RakNet::TimeMS curTime=RakNet::GetTimeMS();
+		SLNet::TimeMS curTime=SLNet::GetTimeMS();
 		if (curTime > lastTimeRemovedDeadRows+1000 || curTime < lastTimeRemovedDeadRows) // < is to check overflow
 		{
 			lastTimeRemovedDeadRows = curTime;
@@ -121,8 +126,8 @@ public:
 	}
 	*/
 
-	RakNet::RakString connectionStateIdentifier;
-	RakNet::TimeMS lastTimeRemovedDeadRows;
+	SLNet::RakString connectionStateIdentifier;
+	SLNet::TimeMS lastTimeRemovedDeadRows;
 };
 
 int main(void)
@@ -132,10 +137,10 @@ int main(void)
 	printf("System is a basis from which to add more functionality (security, etc.)\n");
 	printf("Difficulty: Intermediate\n\n");
 
-	RakNet::RakPeerInterface *rakClient=RakNet::RakPeerInterface::GetInstance();
-	RakNet::RakPeerInterface *rakServer=RakNet::RakPeerInterface::GetInstance();
+	SLNet::RakPeerInterface *rakClient= SLNet::RakPeerInterface::GetInstance();
+	SLNet::RakPeerInterface *rakServer= SLNet::RakPeerInterface::GetInstance();
 	// Client just needs the base class to do sends
-	RakNet::SQLite3ClientPlugin sqlite3ClientPlugin;
+	SLNet::SQLite3ClientPlugin sqlite3ClientPlugin;
 	// Server uses our sample derived class to track logins
 	ConnectionStatePlugin sqlite3ServerPlugin;
 	// Default result handler to print what happens on the client
@@ -156,7 +161,7 @@ int main(void)
 	sqlite3ServerPlugin.CreateConnectionStateTable(DATABASE_IDENTIFIER);
 
 	// Start and connect RakNet as usual
-	RakNet::SocketDescriptor socketDescriptor(10000,0);
+	SLNet::SocketDescriptor socketDescriptor(10000,0);
 	if (rakServer->Startup(1,&socketDescriptor, 1)!=RAKNET_STARTED)
 	{
 		printf("Start call failed!\n");
@@ -165,7 +170,7 @@ int main(void)
 	rakServer->SetMaximumIncomingConnections(1);
 	socketDescriptor.port=0;
 	rakClient->Startup(1, &socketDescriptor, 1);
-	if (rakClient->Connect("127.0.0.1", 10000, 0, 0)!=RakNet::CONNECTION_ATTEMPT_STARTED)
+	if (rakClient->Connect("127.0.0.1", 10000, 0, 0)!= SLNet::CONNECTION_ATTEMPT_STARTED)
 	{
 		printf("Connect call failed\n");
 		return 0;
@@ -176,14 +181,14 @@ int main(void)
 
 	
 	printf("Enter QUIT to quit, anything else is sent as a query.\n");
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
 			printf("Enter query: ");
 			char query[512];
 			Gets(query,sizeof(query));
-			if (stricmp(query, "QUIT")==0)
+			if (_stricmp(query, "QUIT")==0)
 			{
 				printf("Bye\n");
 				break;
@@ -206,8 +211,8 @@ int main(void)
 	rakClient->Shutdown(100,0);
 	rakServer->Shutdown(100,0);
 	
-	RakNet::RakPeerInterface::DestroyInstance(rakClient);
-	RakNet::RakPeerInterface::DestroyInstance(rakServer);
+	SLNet::RakPeerInterface::DestroyInstance(rakClient);
+	SLNet::RakPeerInterface::DestroyInstance(rakServer);
 
 	sqlite3_close(database);
 

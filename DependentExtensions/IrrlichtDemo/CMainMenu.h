@@ -1,12 +1,22 @@
 // This is a Demo of the Irrlicht Engine (c) 2005 by N.Gebhardt.
 // This file is not documentated.
 
+/*
+ * This file was taken from RakNet 4.082.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ * Alternatively you are permitted to license the modifications under the zlib/libpng license.
+ */
+
 #ifndef __C_MAIN_MENU_H_INCLUDED__
 #define __C_MAIN_MENU_H_INCLUDED__
 
 #include <irrlicht.h>
 #ifdef _WIN32__
-#include "WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
+#include "slikenet/WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
 #endif
 #include "IGUIEditBox.h"
 

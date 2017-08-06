@@ -1,17 +1,22 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Message.h"
 #include "Lobby2Client.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 uint32_t Lobby2Callbacks::nextCallbackId=0;
 
@@ -296,7 +301,7 @@ bool Lobby2Message::ValidateEmailAddress( RakString *text )
 	return true;
 }
 bool Lobby2Message::PrevalidateInput(void) {return true;}
-bool Lobby2Message::ClientImpl( RakNet::Lobby2Plugin *client) { (void)client; return true; }
+bool Lobby2Message::ClientImpl(SLNet::Lobby2Plugin *client) { (void)client; return true; }
 bool Lobby2Message::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; return false; }
 void Lobby2Message::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; }
 bool Lobby2Message::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface ) { (void)command; (void)databaseInterface; resultCode=L2RC_COUNT; return true; }
@@ -714,7 +719,7 @@ bool System_SetEmailAddressValidated::PrevalidateInput( void )
 	if (!ValidateHandle(&userName)) return false;
 	return true;
 }
-void Client_ValidateHandle::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void Client_ValidateHandle::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream,userName);
@@ -2126,19 +2131,19 @@ bool Clans_GetPosts::PrevalidateInput( void )
 	
 	return true;
 }
-void RakNet::Notification_Client_RemoteLogin::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Client_RemoteLogin::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, handle);
 }
-void RakNet::Notification_Client_IgnoreStatus::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Client_IgnoreStatus::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, nowIgnored);
 	bitStream->Serialize(writeToBitstream, otherHandle);
 }
 
-void RakNet::Notification_Friends_StatusChange::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Friends_StatusChange::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, op);
@@ -2148,27 +2153,27 @@ void RakNet::Notification_Friends_StatusChange::Serialize( bool writeToBitstream
 	presence.Serialize(bitStream,writeToBitstream);
 }
 
-void RakNet::Notification_Friends_PresenceUpdate::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Friends_PresenceUpdate::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	newPresence.Serialize(bitStream,writeToBitstream);
 	bitStream->Serialize(writeToBitstream, otherHandle);
 }
-void RakNet::Notification_User_ChangedHandle::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_User_ChangedHandle::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, oldHandle);
 	bitStream->Serialize(writeToBitstream, newHandle);
 }
 
-void RakNet::Notification_Friends_CreatedClan::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Friends_CreatedClan::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, otherHandle);
 	bitStream->Serialize(writeToBitstream, clanName);
 }
 
-void RakNet::Notification_Emails_Received::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Emails_Received::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, sender);
@@ -2176,7 +2181,7 @@ void RakNet::Notification_Emails_Received::Serialize( bool writeToBitstream, boo
 	bitStream->Serialize(writeToBitstream, emailId);
 }
 
-void RakNet::Notification_Clans_GrantLeader::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_GrantLeader::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2184,7 +2189,7 @@ void RakNet::Notification_Clans_GrantLeader::Serialize( bool writeToBitstream, b
 	bitStream->Serialize(writeToBitstream, oldLeader);
 }
 
-void RakNet::Notification_Clans_SetSubleaderStatus::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_SetSubleaderStatus::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2193,7 +2198,7 @@ void RakNet::Notification_Clans_SetSubleaderStatus::Serialize( bool writeToBitst
 	bitStream->Serialize(writeToBitstream, setToSubleader);
 }
 
-void RakNet::Notification_Clans_SetMemberRank::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_SetMemberRank::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2202,7 +2207,7 @@ void RakNet::Notification_Clans_SetMemberRank::Serialize( bool writeToBitstream,
 	bitStream->Serialize(writeToBitstream, newRank);
 }
 
-void RakNet::Notification_Clans_ChangeHandle::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_ChangeHandle::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, oldClanHandle);
@@ -2210,14 +2215,14 @@ void RakNet::Notification_Clans_ChangeHandle::Serialize( bool writeToBitstream, 
 	bitStream->Serialize(writeToBitstream, leaderHandle);
 }
 
-void RakNet::Notification_Clans_Leave::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_Leave::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
 	bitStream->Serialize(writeToBitstream, targetHandle);
 }
 
-void RakNet::Notification_Clans_PendingJoinStatus::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_PendingJoinStatus::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2232,14 +2237,14 @@ void RakNet::Notification_Clans_PendingJoinStatus::Serialize( bool writeToBitstr
 	minorOp=(Notification_Clans_PendingJoinStatus::MinorOp) c2;
 }
 
-void RakNet::Notification_Clans_NewClanMember::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_NewClanMember::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
 	bitStream->Serialize(writeToBitstream, targetHandle);
 }
 
-void RakNet::Notification_Clans_KickAndBlacklistUser::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_KickAndBlacklistUser::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2249,7 +2254,7 @@ void RakNet::Notification_Clans_KickAndBlacklistUser::Serialize( bool writeToBit
 	bitStream->Serialize(writeToBitstream, reason);
 }
 
-void RakNet::Notification_Clans_UnblacklistUser::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_UnblacklistUser::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, clanHandle);
@@ -2257,7 +2262,7 @@ void RakNet::Notification_Clans_UnblacklistUser::Serialize( bool writeToBitstrea
 	bitStream->Serialize(writeToBitstream, unblacklistingUserHandle);
 }
 
-void RakNet::Notification_Clans_Destroyed::Serialize( bool writeToBitstream, bool serializeOutput, RakNet::BitStream *bitStream )
+void SLNet::Notification_Clans_Destroyed::Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream )
 {
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	bitStream->Serialize(writeToBitstream, oldClanLeader);
@@ -2265,7 +2270,7 @@ void RakNet::Notification_Clans_Destroyed::Serialize( bool writeToBitstream, boo
 }
 
 
-bool RakNet::Client_StartIgnore::ClientImpl( RakNet::Lobby2Plugin *client )
+bool SLNet::Client_StartIgnore::ClientImpl(SLNet::Lobby2Plugin *client )
 {
 	(void)client;
 //	if (resultCode==L2RC_SUCCESS)
@@ -2273,7 +2278,7 @@ bool RakNet::Client_StartIgnore::ClientImpl( RakNet::Lobby2Plugin *client )
 	return true;
 }
 
-bool RakNet::Client_StopIgnore::ClientImpl( RakNet::Lobby2Plugin *client )
+bool SLNet::Client_StopIgnore::ClientImpl(SLNet::Lobby2Plugin *client )
 {
 	(void)client;
 //	if (resultCode==L2RC_SUCCESS)
@@ -2281,7 +2286,7 @@ bool RakNet::Client_StopIgnore::ClientImpl( RakNet::Lobby2Plugin *client )
 	return true;
 }
 
-bool RakNet::Client_GetIgnoreList::ClientImpl( RakNet::Lobby2Plugin *client )
+bool SLNet::Client_GetIgnoreList::ClientImpl(SLNet::Lobby2Plugin *client )
 {
 	(void)client;
 //	if (resultCode==L2RC_SUCCESS)

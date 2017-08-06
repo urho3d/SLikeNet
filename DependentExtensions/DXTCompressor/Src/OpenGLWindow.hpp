@@ -6,7 +6,13 @@
 *		Visit My Site At nehe.gamedev.net
 */
 
+/*
+ * This file was taken from RakNet 4.082 without any modifications.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ */
+
 #include <windows.h>		// Header File For Windows
+#include <tchar.h>			// Header File For Unicode conversion support
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
 #include <gl\glu.h>			// Header File For The GLu32 Library
 
@@ -98,7 +104,7 @@ GLvoid KillGLWindow(GLvoid)								// Properly Kill The Window
 		hWnd=NULL;										// Set hWnd To NULL
 	}
 
-	if (!UnregisterClass((LPCWSTR)L"OpenGL",hInstance))			// Are We Able To Unregister Class
+	if (!UnregisterClass(_T("OpenGL"),hInstance))			// Are We Able To Unregister Class
 	{
 		MessageBoxPrivate(NULL,"Could Not Unregister Class.","SHUTDOWN ERROR",MB_OK | MB_ICONINFORMATION);
 		hInstance=NULL;									// Set hInstance To NULL
@@ -136,7 +142,7 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW);			// Load The Arrow Pointer
 	wc.hbrBackground	= NULL;									// No Background Required For GL
 	wc.lpszMenuName		= NULL;									// We Don't Want A Menu
-	wc.lpszClassName	= L"OpenGL";							// Set The Class Name
+	wc.lpszClassName	= _T("OpenGL");							// Set The Class Name
 
 	if (!RegisterClass(&wc))									// Attempt To Register The Window Class
 	{
@@ -190,8 +196,8 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 
 	// Create The Window
 	if (!(hWnd=CreateWindowEx(	dwExStyle,							// Extended Style For The Window
-		L"OpenGL",							// Class Name
-		L"DXTCompress",						// Window Title
+		_T("OpenGL"),							// Class Name
+		_T("DXTCompress"),						// Window Title
 		dwStyle |							// Defined Window Style
 		WS_CLIPSIBLINGS |					// Required Window Style
 		WS_CLIPCHILDREN,					// Required Window Style
@@ -216,7 +222,7 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 		PFD_SUPPORT_OPENGL |						// Format Must Support OpenGL
 		PFD_DOUBLEBUFFER,							// Must Support Double Buffering
 		PFD_TYPE_RGBA,								// Request An RGBA Format
-		bits,										// Select Our Color Depth
+		static_cast<BYTE>(bits),					// Select Our Color Depth
 		0, 0, 0, 0, 0, 0,							// Color Bits Ignored
 		0,											// No Alpha Buffer
 		0,											// Shift Bit Ignored

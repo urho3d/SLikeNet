@@ -1,16 +1,21 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Server.h"
-#include "RakAssert.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/assert.h"
+#include "slikenet/MessageIdentifiers.h"
 
 //#define __INTEGRATE_LOBBY2_WITH_ROOMS_PLUGIN
 
@@ -18,7 +23,7 @@
 #include "RoomsPlugin.h"
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 
 int Lobby2Server::UserCompByUsername( const RakString &key, Lobby2Server::User * const &data )
 {
@@ -42,7 +47,7 @@ Lobby2Server::~Lobby2Server()
 }
 void Lobby2Server::SendMsg(Lobby2Message *msg, const DataStructures::List<SystemAddress> &recipients)
 {
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	bs.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
 	bs.Write((MessageID)msg->GetID());
 	msg->Serialize(true,true,&bs);
@@ -90,7 +95,7 @@ void Lobby2Server::Update(void)
 			}
 
 
-			RakNet::BitStream bs;
+			SLNet::BitStream bs;
 			bs.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
 			bs.Write((MessageID)c.lobby2Message->GetID());
 			c.lobby2Message->Serialize(true,true,&bs);
@@ -117,7 +122,7 @@ void Lobby2Server::Update(void)
 								if (objectExists==false)
 								{
 									if (c.deallocMsgWhenDone)
-										RakNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
+										SLNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
 									return;
 								}
 							}
@@ -150,14 +155,14 @@ void Lobby2Server::Update(void)
 				{
 					// Different user, same IP address. Abort the send.
 					if (c.deallocMsgWhenDone)
-						RakNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
+						SLNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
 					return;
 				}
 			}
 			SendUnifiedToMultiple(&bs,packetPriority, RELIABLE_ORDERED, orderingChannel, c.callerSystemAddresses);
 		}
 		if (c.deallocMsgWhenDone)
-			RakNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
+			SLNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
 	}
 }
 PluginReceiveResult Lobby2Server::OnReceive(Packet *packet)
@@ -217,7 +222,7 @@ void Lobby2Server::OnClosedConnection(const SystemAddress &systemAddress, RakNet
 }
 void Lobby2Server::OnMessage(Packet *packet)
 {
-	RakNet::BitStream bs(packet->data,packet->length,false);
+	SLNet::BitStream bs(packet->data,packet->length,false);
 	bs.IgnoreBytes(1); // ID_LOBBY2_SEND_MESSAGE
 	MessageID msgId;
 	bs.Read(msgId);
@@ -241,7 +246,7 @@ void Lobby2Server::OnMessage(Packet *packet)
 		{
 			if (lobby2Message->RequiresLogin())
 			{
-				RakNet::BitStream bs;
+				SLNet::BitStream bs;
 				bs.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
 				bs.Write((MessageID)lobby2Message->GetID());
 				lobby2Message->resultCode=L2RC_NOT_LOGGED_IN;
@@ -258,7 +263,7 @@ void Lobby2Server::OnMessage(Packet *packet)
 	}
 	else
 	{
-		RakNet::BitStream out;
+		SLNet::BitStream out;
 		out.Write((MessageID)ID_LOBBY2_SERVER_ERROR);
 		out.Write((unsigned char) L2SE_UNKNOWN_MESSAGE_ID);
 		out.Write((unsigned int) msgId);
@@ -281,14 +286,14 @@ void Lobby2Server::Clear(void)
 	{
 		c = threadPool.GetInputAtIndex(i);
 		if (c.deallocMsgWhenDone && c.lobby2Message)
-			RakNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
+			SLNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
 	}
 	threadPool.ClearInput();
 	for (i=0; i < threadPool.OutputSize(); i++)
 	{
 		c = threadPool.GetOutputAtIndex(i);
 		if (c.deallocMsgWhenDone && c.lobby2Message)
-			RakNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
+			SLNet::OP_DELETE(c.lobby2Message, __FILE__, __LINE__);
 	}
 	threadPool.ClearOutput();
 
@@ -348,7 +353,7 @@ void Lobby2Server::ClearRankingAddresses(void)
 }
 void Lobby2Server::ExecuteCommand(Lobby2ServerCommand *command)
 {
-	//RakNet::BitStream out;
+	//SLNet::BitStream out;
 	if (command->lobby2Message->PrevalidateInput()==false)
 	{
 		SendMsg(command->lobby2Message, command->callerSystemAddresses);
@@ -402,7 +407,7 @@ void Lobby2Server::ClearUsers(void)
 {
 	unsigned int i;
 	for (i=0; i < users.Size(); i++)
-		RakNet::OP_DELETE(users[i], __FILE__, __LINE__);
+		SLNet::OP_DELETE(users[i], __FILE__, __LINE__);
 	users.Clear(false, __FILE__, __LINE__);
 }
 void Lobby2Server::LogoffFromRooms(User *user)
@@ -416,14 +421,14 @@ void Lobby2Server::LogoffFromRooms(User *user)
 	}
 	else if (roomsPluginAddress!=UNASSIGNED_SYSTEM_ADDRESS)
 	{
-		RakNet::BitStream bs;
+		SLNet::BitStream bs;
 		RoomsPlugin::SerializeLogoff(user->userName,&bs);
 		SendUnified(&bs,packetPriority, RELIABLE_ORDERED, orderingChannel, roomsPluginAddress, false);
 	}
 #endif
 
 }
-void Lobby2Server::SendRemoteLoginNotification(RakNet::RakString handle, const DataStructures::List<SystemAddress>& recipients)
+void Lobby2Server::SendRemoteLoginNotification(SLNet::RakString handle, const DataStructures::List<SystemAddress>& recipients)
 {
 	Notification_Client_RemoteLogin notification;
 	notification.handle=handle;
@@ -455,7 +460,7 @@ void Lobby2Server::OnLogin(Lobby2ServerCommand *command, bool calledFromThread)
 
 			// Already logged in from this system address.
 			// Delete the existing entry, which will be reinserted.
-			RakNet::OP_DELETE(user,_FILE_AND_LINE_);
+			SLNet::OP_DELETE(user,_FILE_AND_LINE_);
 			users.RemoveAtIndex(insertionIndex);
 		}
 		else
@@ -482,7 +487,7 @@ void Lobby2Server::OnLogin(Lobby2ServerCommand *command, bool calledFromThread)
 			SendRemoteLoginNotification(user->userName, user->systemAddresses);
 			LogoffFromRooms(user);
 
-			RakNet::OP_DELETE(user,__FILE__,__LINE__);
+			SLNet::OP_DELETE(user,__FILE__,__LINE__);
 			users.RemoveAtIndex(idx2);
 
 			insertionIndex = users.GetIndexFromKey(command->callingUserName, &objectExists);
@@ -495,7 +500,7 @@ void Lobby2Server::OnLogin(Lobby2ServerCommand *command, bool calledFromThread)
 			SendRemoteLoginNotification(user->userName, user->systemAddresses);
 			LogoffFromRooms(user);
 
-			RakNet::OP_DELETE(user,__FILE__,__LINE__);
+			SLNet::OP_DELETE(user,__FILE__,__LINE__);
 			users.RemoveAtIndex(idx3);
 
 			insertionIndex = users.GetIndexFromKey(command->callingUserName, &objectExists);
@@ -503,7 +508,7 @@ void Lobby2Server::OnLogin(Lobby2ServerCommand *command, bool calledFromThread)
 	}
 
 
-	User *user = RakNet::OP_NEW<User>( __FILE__, __LINE__ );
+	User *user = SLNet::OP_NEW<User>( __FILE__, __LINE__ );
 	user->userName=command->callingUserName;
 	user->systemAddresses=command->callerSystemAddresses;
 	user->guids=command->callerGuids;
@@ -519,7 +524,7 @@ void Lobby2Server::OnLogin(Lobby2ServerCommand *command, bool calledFromThread)
 	}
 	else if (roomsPluginAddress!=UNASSIGNED_SYSTEM_ADDRESS)
 	{
-		RakNet::BitStream bs;
+		SLNet::BitStream bs;
 		RoomsPlugin::SerializeLogin(user->userName,user->systemAddresses[0], user->guids[0], &bs);
 		SendUnified(&bs,packetPriority, RELIABLE_ORDERED, orderingChannel, roomsPluginAddress, false);
 	}
@@ -553,7 +558,7 @@ void Lobby2Server::OnChangeHandle(Lobby2ServerCommand *command, bool calledFromT
 	}
 
 	unsigned int i;
-	RakNet::RakString oldHandle;
+	SLNet::RakString oldHandle;
 	for (i=0; i < users.Size(); i++)
 	{
 		if (users[i]->callerUserId==command->callerUserId)
@@ -575,7 +580,7 @@ void Lobby2Server::OnChangeHandle(Lobby2ServerCommand *command, bool calledFromT
 	}
 	else if (roomsPluginAddress!=UNASSIGNED_SYSTEM_ADDRESS)
 	{
-		RakNet::BitStream bs;
+		SLNet::BitStream bs;
 		RoomsPlugin::SerializeChangeHandle(oldHandle,command->callingUserName,&bs);
 		SendUnified(&bs,packetPriority, RELIABLE_ORDERED, orderingChannel, roomsPluginAddress, false);
 	}
@@ -614,7 +619,7 @@ void Lobby2Server::RemoveUser(unsigned int index)
 		if (command.lobby2Message->CancelOnDisconnect()&& command.callerSystemAddresses.Size()>0 && user->systemAddresses.GetIndexOf(command.callerSystemAddresses[0])!=(unsigned int)-1)
 		{
 			if (command.deallocMsgWhenDone)
-				RakNet::OP_DELETE(command.lobby2Message, __FILE__, __LINE__);
+				SLNet::OP_DELETE(command.lobby2Message, __FILE__, __LINE__);
 			threadPool.RemoveInputAtIndex(i);
 		}
 		else
@@ -623,7 +628,7 @@ void Lobby2Server::RemoveUser(unsigned int index)
 	threadPool.UnlockInput();
 	LogoffFromRooms(user);
 
-	RakNet::OP_DELETE(user,__FILE__,__LINE__);
+	SLNet::OP_DELETE(user,__FILE__,__LINE__);
 	users.RemoveAtIndex(index);
 
 }
@@ -653,7 +658,7 @@ unsigned int Lobby2Server::GetUserIndexByGUID(RakNetGUID guid) const
 	}
 	return (unsigned int) -1;
 }
-unsigned int Lobby2Server::GetUserIndexByUsername(RakNet::RakString userName) const
+unsigned int Lobby2Server::GetUserIndexByUsername(SLNet::RakString userName) const
 {
 	unsigned int idx;
 	bool objectExists;
@@ -689,7 +694,7 @@ void Lobby2Server::GetUserOnlineStatus(UsernameAndOnlineStatus &userInfo) const
 		userInfo.presence.isVisible=false;
 	}
 }
-void Lobby2Server::SetPresence(const RakNet::Lobby2Presence &presence, RakNet::RakString userHandle)
+void Lobby2Server::SetPresence(const SLNet::Lobby2Presence &presence, SLNet::RakString userHandle)
 {
 	unsigned int index = GetUserIndexByUsername(userHandle);
 
@@ -712,7 +717,7 @@ void Lobby2Server::SetPresence(const RakNet::Lobby2Presence &presence, RakNet::R
 		ExecuteCommand(&command);
 	}
 }
-void Lobby2Server::GetPresence(RakNet::Lobby2Presence &presence, RakNet::RakString userHandle)
+void Lobby2Server::GetPresence(SLNet::Lobby2Presence &presence, SLNet::RakString userHandle)
 {
 	unsigned int userIndex = GetUserIndexByUsername(userHandle);
 	if (userIndex!=-1)
@@ -724,7 +729,7 @@ void Lobby2Server::GetPresence(RakNet::Lobby2Presence &presence, RakNet::RakStri
 		presence.status=Lobby2Presence::NOT_ONLINE;
 	}
 }
-void Lobby2Server::SendUnifiedToMultiple( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses )
+void Lobby2Server::SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses )
 {
 	for (unsigned int i=0; i < systemAddresses.Size(); i++)
 		SendUnified(bitStream,priority,reliability,orderingChannel,systemAddresses[i],false);

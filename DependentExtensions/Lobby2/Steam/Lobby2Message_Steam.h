@@ -1,21 +1,26 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_MESSAGE_STEAM_H
 #define __LOBBY_2_MESSAGE_STEAM_H
 
 #include "Lobby2Message.h"
-#include "DS_Multilist.h"
+#include "slikenet/DS_Multilist.h"
 #include "Lobby2Client_Steam.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 #define __L2_MSG_DB_HEADER(__NAME__,__DB__) \
@@ -23,9 +28,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Client_Login, Steam)
 	{
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -38,9 +43,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Client_Logoff, Steam)
 	{
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -55,13 +60,13 @@ namespace RakNet
 	{
 		Console_SearchRooms_Steam();
 		virtual ~Console_SearchRooms_Steam();
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const;
+		virtual void DebugMsg(SLNet::RakString &out) const;
 
 		// Output
 		// Use CConsoleCommand_GetRoomDetails to get room names for unknown rooms, which will have blank names
-		DataStructures::Multilist<ML_UNORDERED_LIST, RakNet::RakString> roomNames;
+		DataStructures::Multilist<ML_UNORDERED_LIST, SLNet::RakString> roomNames;
 		// Type of uint64_ts is uint64_t
 		DataStructures::Multilist<ML_UNORDERED_LIST, uint64_t> roomIds;
 
@@ -73,9 +78,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Console_GetRoomDetails, Steam)
 	{
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -89,7 +94,7 @@ namespace RakNet
 		uint64_t roomId;
 
 		/// Output
-		RakNet::RakString roomName;
+		SLNet::RakString roomName;
 	};
 
 	__L2_MSG_DB_HEADER(Console_CreateRoom, Steam)
@@ -97,9 +102,9 @@ namespace RakNet
 		Console_CreateRoom_Steam();
 		virtual ~Console_CreateRoom_Steam();
 
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -112,7 +117,7 @@ namespace RakNet
 		/// Input
 		/// If public, anyone can join. Else friends only
 		bool roomIsPublic;
-		RakNet::RakString roomName;
+		SLNet::RakString roomName;
 
 		/// Output
 		uint64_t roomId;
@@ -127,9 +132,9 @@ namespace RakNet
 		Console_JoinRoom_Steam();
 		virtual ~Console_JoinRoom_Steam();
 
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -149,9 +154,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Console_LeaveRoom, Steam)
 	{
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -167,9 +172,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Console_SendRoomChatMessage, Steam)
 	{
-		virtual bool ClientImpl( RakNet::Lobby2Plugin *client);
+		virtual bool ClientImpl(SLNet::Lobby2Plugin *client);
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -181,16 +186,16 @@ namespace RakNet
 
 		/// Input
 		uint64_t roomId;
-		RakNet::RakString message;
+		SLNet::RakString message;
 	};
 
 
 	__L2_MSG_DB_HEADER(Notification_Friends_StatusChange, Steam)
 	{
 		uint64_t friendId;
-		RakNet::RakString friendNewName;
+		SLNet::RakString friendNewName;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -204,9 +209,9 @@ namespace RakNet
 	__L2_MSG_DB_HEADER(Notification_Console_UpdateRoomParameters, Steam)
 	{
 		uint64_t roomId;
-		RakNet::RakString roomNewName;
+		SLNet::RakString roomNewName;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -221,10 +226,10 @@ namespace RakNet
 	{
 		uint64_t roomId;
 		uint64_t srcMemberId;
-		RakNet::RakString memberName;
+		SLNet::RakString memberName;
 		SystemAddress remoteSystem;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -239,10 +244,10 @@ namespace RakNet
 	{
 		uint64_t roomId;
 		uint64_t srcMemberId;
-		RakNet::RakString memberName;
+		SLNet::RakString memberName;
 		SystemAddress remoteSystem;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -255,9 +260,9 @@ namespace RakNet
 
 	__L2_MSG_DB_HEADER(Notification_Console_RoomChatMessage, Steam)
 	{
-		RakNet::RakString message;
+		SLNet::RakString message;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -274,7 +279,7 @@ namespace RakNet
 		bool succeeded;
 		SystemAddress remoteSystem;
 
-		virtual void DebugMsg(RakNet::RakString &out) const
+		virtual void DebugMsg(SLNet::RakString &out) const
 		{
 			if (resultCode!=L2RC_SUCCESS)
 			{
@@ -295,7 +300,7 @@ namespace RakNet
 
 // --------------------------------------------- Database specific factory class for all messages --------------------------------------------
 
-#define __L2_MSG_FACTORY_IMPL(__NAME__,__DB__) {case L2MID_##__NAME__ : Lobby2Message *m = RakNet::OP_NEW< __NAME__##_##__DB__ >(_FILE_AND_LINE_) ; return m;}
+#define __L2_MSG_FACTORY_IMPL(__NAME__,__DB__) {case L2MID_##__NAME__ : Lobby2Message *m = SLNet::OP_NEW< __NAME__##_##__DB__ >(_FILE_AND_LINE_) ; return m;}
 
 	struct Lobby2MessageFactory_Steam : public Lobby2MessageFactory
 	{
@@ -326,6 +331,6 @@ namespace RakNet
 			};
 		};
 	};
-}; // namespace RakNet
+}; // namespace SLNet
 
 #endif

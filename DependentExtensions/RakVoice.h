@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -15,12 +20,12 @@
 #ifndef __RAK_VOICE_H
 #define __RAK_VOICE_H
 
-#include "RakNetTypes.h"
-#include "PluginInterface2.h"
-#include "DS_OrderedList.h"
-#include "NativeTypes.h"
+#include "slikenet/types.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/DS_OrderedList.h"
+#include "slikenet/NativeTypes.h"
 
-namespace RakNet {
+namespace SLNet {
 
 class RakPeerInterface;
 
@@ -55,7 +60,7 @@ struct VoiceChannel
 	unsigned incomingReadIndex, incomingWriteIndex;	// Index in bytes
 	unsigned short incomingMessageNumber;  // The ID_VOICE message number we expect to get.  Used to drop out of order and detect how many missing packets in a sequence
 
-	RakNet::TimeMS lastSend;
+	SLNet::TimeMS lastSend;
 };
 int VoiceChannelComp( const RakNetGUID &key, VoiceChannel * const &data );
 
@@ -168,13 +173,13 @@ public:
 
 	/// How many bytes are on the write buffer, waiting to be passed to a call to RakPeer::Send (internally)
 	/// This should remain at a fairly small near-constant size as outgoing data is sent to the Send function
-	/// \param[in] guid The system to query, or RakNet::UNASSIGNED_SYSTEM_ADDRESS for the sum of all channels.
+	/// \param[in] guid The system to query, or SLNet::UNASSIGNED_SYSTEM_ADDRESS for the sum of all channels.
 	/// \return Number of bytes on the write buffer
 	unsigned GetBufferedBytesToSend(RakNetGUID guid) const;
 
 	/// How many bytes are on the read buffer, waiting to be passed to a call to ReceiveFrame
 	/// This should remain at a fairly small near-constant size as incoming data is read out at the same rate as outgoing data from the remote system
-	/// \param[in] guid The system to query, or RakNet::UNASSIGNED_SYSTEM_ADDRESS for the sum of all channels.
+	/// \param[in] guid The system to query, or SLNet::UNASSIGNED_SYSTEM_ADDRESS for the sum of all channels.
 	/// \return Number of bytes on the read buffer.
 	unsigned GetBufferedBytesToReturn(RakNetGUID guid) const;
 
@@ -218,6 +223,6 @@ protected:
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

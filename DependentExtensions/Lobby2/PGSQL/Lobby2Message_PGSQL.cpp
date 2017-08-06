@@ -1,20 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Message_PGSQL.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(Lobby2MessageFactory_PGSQL,Lobby2MessageFactory_PGSQL);
 
-unsigned int RakNet::GetUserRowFromHandle(RakNet::RakString& userName, PostgreSQLInterface *pgsql)
+unsigned int SLNet::GetUserRowFromHandle(SLNet::RakString& userName, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT userId_pk,handle from lobby2.users WHERE handleLower=lower(%s)", userName.C_String());
 	if (result)
@@ -33,7 +40,7 @@ unsigned int RakNet::GetUserRowFromHandle(RakNet::RakString& userName, PostgreSQ
 	}
 	return 0;
 }
-unsigned int RakNet::GetClanIdFromHandle(RakNet::RakString clanName, PostgreSQLInterface *pgsql)
+unsigned int SLNet::GetClanIdFromHandle(SLNet::RakString clanName, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT clanId_pk from lobby2.clans WHERE clanHandleLower=lower(%s)", clanName.C_String());
 	if (result)
@@ -51,14 +58,14 @@ unsigned int RakNet::GetClanIdFromHandle(RakNet::RakString clanName, PostgreSQLI
 	}
 	return 0;
 }
-bool RakNet::IsClanLeader(RakNet::RakString clanName, unsigned int userId, PostgreSQLInterface *pgsql)
+bool SLNet::IsClanLeader(SLNet::RakString clanName, unsigned int userId, PostgreSQLInterface *pgsql)
 {
 	unsigned int clanId = GetClanIdFromHandle(clanName, pgsql);
 	if (clanId==0)
 		return false;
 	return IsClanLeader(clanId, userId, pgsql);
 }
-unsigned int RakNet::GetClanLeaderId(unsigned int clanId, PostgreSQLInterface *pgsql)
+unsigned int SLNet::GetClanLeaderId(unsigned int clanId, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT leaderUserId_fk FROM lobby2.clans WHERE clanId_pk=%i", clanId);
 	if (result==0)
@@ -74,11 +81,11 @@ unsigned int RakNet::GetClanLeaderId(unsigned int clanId, PostgreSQLInterface *p
 	PQclear(result);
 	return leaderId;
 }
-bool RakNet::IsClanLeader(unsigned int clanId, unsigned int userId, PostgreSQLInterface *pgsql)
+bool SLNet::IsClanLeader(unsigned int clanId, unsigned int userId, PostgreSQLInterface *pgsql)
 {
 	return userId!=0 && GetClanLeaderId(clanId, pgsql)==userId;
 }
-RakNet::ClanMemberState RakNet::GetClanMemberState(unsigned int clanId, unsigned int userId, bool *isSubleader, PostgreSQLInterface *pgsql)
+SLNet::ClanMemberState SLNet::GetClanMemberState(unsigned int clanId, unsigned int userId, bool *isSubleader, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT memberState_fk FROM lobby2.clanMembers WHERE userId_fk=%i AND clanId_fk=%i", userId, clanId);
 	if (result==0)
@@ -95,7 +102,7 @@ RakNet::ClanMemberState RakNet::GetClanMemberState(unsigned int clanId, unsigned
 	PQclear(result);
 	return (ClanMemberState) memberState;
 }
-void RakNet::GetClanMembers(unsigned int clanId, DataStructures::List<ClanMemberDescriptor> &clanMembers, PostgreSQLInterface *pgsql)
+void SLNet::GetClanMembers(unsigned int clanId, DataStructures::List<ClanMemberDescriptor> &clanMembers, PostgreSQLInterface *pgsql)
 {
 	ClanMemberDescriptor cmd;
 
@@ -119,7 +126,7 @@ void RakNet::GetClanMembers(unsigned int clanId, DataStructures::List<ClanMember
 	}
 	PQclear(result);
 }
-bool RakNet::IsTitleInUse(RakNet::RakString titleName, PostgreSQLInterface *pgsql)
+bool SLNet::IsTitleInUse(SLNet::RakString titleName, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT titleName_pk FROM lobby2.titles where titleName_pk=%s", titleName.C_String());
 	if (result==0)
@@ -130,12 +137,12 @@ bool RakNet::IsTitleInUse(RakNet::RakString titleName, PostgreSQLInterface *pgsq
 		return false;
 	return true;
 }
-bool RakNet::StringContainsProfanity(RakNet::RakString string, PostgreSQLInterface *pgsql)
+bool SLNet::StringContainsProfanity(SLNet::RakString string, PostgreSQLInterface *pgsql)
 {
-	RakNet::RakString strLower1 = " " + string;
-	RakNet::RakString strLower2 = string + " ";
-	RakNet::RakString strLower3 = " " + string + " ";
-	RakNet::RakString strLower4 = string;
+	SLNet::RakString strLower1 = " " + string;
+	SLNet::RakString strLower2 = string + " ";
+	SLNet::RakString strLower3 = " " + string + " ";
+	SLNet::RakString strLower4 = string;
 	strLower1.ToLower();
 	strLower2.ToLower();
 	strLower3.ToLower();
@@ -151,7 +158,7 @@ bool RakNet::StringContainsProfanity(RakNet::RakString string, PostgreSQLInterfa
 		return false;
 	return true;
 }
-bool RakNet::IsValidCountry(RakNet::RakString string, bool *countryHasStates, PostgreSQLInterface *pgsql)
+bool SLNet::IsValidCountry(SLNet::RakString string, bool *countryHasStates, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT country_name,country_has_states FROM lobby2.country where lower(country_name)=lower(%s)", string.C_String());
 	if (result==0)
@@ -164,7 +171,7 @@ bool RakNet::IsValidCountry(RakNet::RakString string, bool *countryHasStates, Po
 		return false;
 	return true;
 }
-bool RakNet::IsValidState(RakNet::RakString string, PostgreSQLInterface *pgsql)
+bool SLNet::IsValidState(SLNet::RakString string, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT state_name FROM lobby2.state WHERE lower(state_name)=lower(%s)", string.C_String());
 		if (result==0)
@@ -177,7 +184,7 @@ bool RakNet::IsValidState(RakNet::RakString string, PostgreSQLInterface *pgsql)
 		return false;
 	return true;
 }
-bool RakNet::IsValidRace(RakNet::RakString string, PostgreSQLInterface *pgsql)
+bool SLNet::IsValidRace(SLNet::RakString string, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT race_text FROM lobby2.race WHERE lower(race_text)=lower(%s)", string.C_String());
 		if (result==0)
@@ -190,7 +197,7 @@ bool RakNet::IsValidRace(RakNet::RakString string, PostgreSQLInterface *pgsql)
 		return false;
 	return true;
 }
-void RakNet::GetFriendIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output)
+void SLNet::GetFriendIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT userTwo_fk from lobby2.friends WHERE userOne_fk=%i AND "
 		"actionId_fk=(SELECT actionId_pk from lobby2.friendActions WHERE description='isFriends');", callerUserId);
@@ -207,7 +214,7 @@ void RakNet::GetFriendIDs(unsigned int callerUserId, bool excludeIfIgnored, Post
 	}
 	PQclear(result);
 }
-void RakNet::GetClanMateIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output)
+void SLNet::GetClanMateIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output)
 {
 	PGresult *result = pgsql->QueryVariadic(
 		"select userId_fk from lobby2.clanMembers where clanId_fk="
@@ -228,7 +235,7 @@ void RakNet::GetClanMateIDs(unsigned int callerUserId, bool excludeIfIgnored, Po
 	PQclear(result);
 }
 
-bool RakNet::IsIgnoredByTarget(unsigned int callerUserId, unsigned int targetUserId, PostgreSQLInterface *pgsql)
+bool SLNet::IsIgnoredByTarget(unsigned int callerUserId, unsigned int targetUserId, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic(
 		"select userMe_fk from lobby2.ignore where userMe_fk=%i AND userOther_fk=%i"
@@ -240,7 +247,7 @@ bool RakNet::IsIgnoredByTarget(unsigned int callerUserId, unsigned int targetUse
 	return numRowsReturned>0;
 }
 
-void RakNet::OutputFriendsNotification(RakNet::Notification_Friends_StatusChange::Status notificationType, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
+void SLNet::OutputFriendsNotification(SLNet::Notification_Friends_StatusChange::Status notificationType, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
 {
 	// Tell all friends about this new login
 	DataStructures::List<unsigned int> output;
@@ -258,9 +265,9 @@ void RakNet::OutputFriendsNotification(RakNet::Notification_Friends_StatusChange
 	}
 }
 
-void RakNet::GetFriendInfosByStatus(unsigned int callerUserId, RakNet::RakString status, PostgreSQLInterface *pgsql, DataStructures::List<FriendInfo> &output, bool callerIsUserOne)
+void SLNet::GetFriendInfosByStatus(unsigned int callerUserId, SLNet::RakString status, PostgreSQLInterface *pgsql, DataStructures::List<FriendInfo> &output, bool callerIsUserOne)
 {
-	RakNet::RakString query;
+	SLNet::RakString query;
 	/*
 	if (callerIsUserOne)
 	{
@@ -307,7 +314,7 @@ void RakNet::GetFriendInfosByStatus(unsigned int callerUserId, RakNet::RakString
 	PQclear(result);
 }
 
-void RakNet::SendEmail(DataStructures::List<RakNet::RakString> &recipientNames, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql)
+void SLNet::SendEmail(DataStructures::List<SLNet::RakString> &recipientNames, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql)
 {
 	DataStructures::List<unsigned int> targetUserIds;
 	unsigned int targetUserId;
@@ -319,13 +326,13 @@ void RakNet::SendEmail(DataStructures::List<RakNet::RakString> &recipientNames, 
 	}
 	SendEmail(targetUserIds, senderUserId, senderUserName, server, subject, body, binaryData, status, triggerString, pgsql);
 }
-void RakNet::SendEmail(unsigned int targetUserId, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql)
+void SLNet::SendEmail(unsigned int targetUserId, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql)
 {
 	DataStructures::List<unsigned int> targetUserIds;
 	targetUserIds.Insert(targetUserId, _FILE_AND_LINE_ );
 	SendEmail(targetUserIds, senderUserId, senderUserName, server, subject, body, binaryData, status, triggerString, pgsql);
 }
-void RakNet::SendEmail(DataStructures::List<unsigned int> &targetUserIds, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql)
+void SLNet::SendEmail(DataStructures::List<unsigned int> &targetUserIds, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql)
 {
 	if (targetUserIds.Size()==0)
 		return;
@@ -381,14 +388,14 @@ void RakNet::SendEmail(DataStructures::List<unsigned int> &targetUserIds, unsign
 		server->AddOutputFromThread(notification, targetUserIds[i], "");
 	}
 }
-int RakNet::GetActiveClanCount(unsigned int userId, PostgreSQLInterface *pgsql)
+int SLNet::GetActiveClanCount(unsigned int userId, PostgreSQLInterface *pgsql)
 {
 	PGresult *result = pgsql->QueryVariadic("SELECT clanMemberId_pk FROM lobby2.clanMembers WHERE userId_fk=%i AND memberState_fk=(SELECT stateId_pk FROM lobby2.clanMemberStates WHERE description='ClanMember_Active')", userId);
 	int numRowsReturned = PQntuples(result);
 	PQclear(result);
 	return numRowsReturned;
 }
-bool RakNet::CreateAccountParametersFailed( CreateAccountParameters &createAccountParameters, RakNet::Lobby2ResultCode &resultCode, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
+bool SLNet::CreateAccountParametersFailed( CreateAccountParameters &createAccountParameters, SLNet::Lobby2ResultCode &resultCode, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
 {
 	bool hasStates=true;
 
@@ -447,7 +454,7 @@ bool RakNet::CreateAccountParametersFailed( CreateAccountParameters &createAccou
 	return false;
 
 }
-void RakNet::UpdateAccountFromMissingCreationParameters(CreateAccountParameters &createAccountParameters, unsigned int userPrimaryKey, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
+void SLNet::UpdateAccountFromMissingCreationParameters(CreateAccountParameters &createAccountParameters, unsigned int userPrimaryKey, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql)
 {
 	(void)command;
 
@@ -521,7 +528,7 @@ void RakNet::UpdateAccountFromMissingCreationParameters(CreateAccountParameters 
 	}
 
 }
-bool RakNet::System_CreateDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_CreateDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -532,7 +539,8 @@ bool RakNet::System_CreateDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	PQclear(result);
 	pgsql->ExecuteBlockingCommand("DROP LANGUAGE plpgsql;", &result, false);
 	PQclear(result);
-	FILE *fp = fopen("Lobby2Schema.txt", "rb");
+	FILE *fp;
+	fopen_s(&fp, "Lobby2Schema.txt", "rb");
 	RakAssert(fp && "Can't find Lobby2Schema.txt");
 	fseek( fp, 0, SEEK_END );
 	unsigned int fileSize = ftell( fp );
@@ -557,7 +565,7 @@ bool RakNet::System_CreateDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	return true;
 }
 
-bool RakNet::System_DestroyDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_DestroyDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -573,7 +581,7 @@ bool RakNet::System_DestroyDatabase_PGSQL::ServerDBImpl( Lobby2ServerCommand *co
 	return true;
 }
 
-bool RakNet::System_CreateTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_CreateTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -596,7 +604,7 @@ bool RakNet::System_CreateTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::System_DestroyTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_DestroyTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -615,7 +623,7 @@ bool RakNet::System_DestroyTitle_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::System_GetTitleRequiredAge_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_GetTitleRequiredAge_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -634,7 +642,7 @@ bool RakNet::System_GetTitleRequiredAge_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	return true;
 }
 
-bool RakNet::System_GetTitleBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_GetTitleBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -653,7 +661,7 @@ bool RakNet::System_GetTitleBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 	return true;
 }
 
-bool RakNet::System_RegisterProfanity_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_RegisterProfanity_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -676,7 +684,7 @@ bool RakNet::System_RegisterProfanity_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	return true;
 }
 
-bool RakNet::System_BanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_BanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -706,7 +714,7 @@ bool RakNet::System_BanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, v
 	return true;
 }
 
-bool RakNet::System_UnbanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_UnbanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -734,13 +742,13 @@ bool RakNet::System_UnbanUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command,
 	return true;
 }
 
-bool RakNet::CDKey_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::CDKey_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_CDKey_Add_TITLE_NOT_IN_USE;
 		return true;
@@ -756,13 +764,13 @@ bool RakNet::CDKey_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 	return true;
 }
 
-bool RakNet::CDKey_GetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::CDKey_GetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_CDKey_GetStatus_TITLE_NOT_IN_USE;
 		return true;
@@ -792,13 +800,13 @@ bool RakNet::CDKey_GetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, 
 	return true;
 }
 
-bool RakNet::CDKey_Use_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::CDKey_Use_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_CDKey_Use_TITLE_NOT_IN_USE;
 		return true;
@@ -848,13 +856,13 @@ bool RakNet::CDKey_Use_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 	return true;
 }
 
-bool RakNet::CDKey_FlagStolen_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::CDKey_FlagStolen_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_CDKey_FlagStolen_TITLE_NOT_IN_USE;
 		return true;
@@ -898,7 +906,7 @@ bool RakNet::CDKey_FlagStolen_PGSQL::ServerDBImpl( Lobby2ServerCommand *command,
 	return true;
 }
 
-bool RakNet::Client_Login_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_Login_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -909,7 +917,7 @@ bool RakNet::Client_Login_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, voi
 		return true;
 	}
 	result = pgsql->QueryVariadic("SELECT password FROM lobby2.users WHERE userId_pk=%i", userRow);
-	RakNet::RakString password;
+	SLNet::RakString password;
 	PostgreSQLInterface::PQGetValueFromBinary(&password, result, 0, "password");
 	PQclear(result);
 	if (password!=userPassword)
@@ -931,7 +939,7 @@ bool RakNet::Client_Login_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, voi
 	}
 	if (command->server->GetConfigurationProperties()->requiresTitleToLogin)
 	{
-		RakNet::RakString titleDBSecretKey;
+		SLNet::RakString titleDBSecretKey;
 		result = pgsql->QueryVariadic("SELECT titleSecretKey FROM lobby2.titles where titleName_pk=%s", titleName.C_String());
 		int numRowsReturned = PQntuples(result);
 		if (numRowsReturned==0)
@@ -999,7 +1007,7 @@ bool RakNet::Client_Login_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, voi
 	return true;
 }
 
-bool RakNet::Client_Logoff_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_Logoff_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	if (command->callerUserId==0)
 		return false;
@@ -1019,7 +1027,7 @@ bool RakNet::Client_Logoff_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, vo
 	return true;
 }
 
-bool RakNet::Client_RegisterAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_RegisterAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -1068,7 +1076,7 @@ bool RakNet::Client_RegisterAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *co
 
 		bool usable;
 		bool wasStolen;
-		RakNet::RakString usedBy;
+		SLNet::RakString usedBy;
 		PostgreSQLInterface::PQGetValueFromBinary(&usable, result, 0, "usable");
 		PostgreSQLInterface::PQGetValueFromBinary(&wasStolen, result, 0, "stolen");
 		PQclear(result);
@@ -1134,7 +1142,7 @@ bool RakNet::Client_RegisterAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *co
 	return true;
 }
 
-bool RakNet::System_SetEmailAddressValidated_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_SetEmailAddressValidated_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1154,7 +1162,7 @@ bool RakNet::System_SetEmailAddressValidated_PGSQL::ServerDBImpl( Lobby2ServerCo
 	return true;
 }
 
-bool RakNet::Client_ValidateHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_ValidateHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1174,7 +1182,7 @@ bool RakNet::Client_ValidateHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	return true;
 }
 
-bool RakNet::System_DeleteAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_DeleteAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	unsigned int userRow = GetUserRowFromHandle(userName, pgsql);
@@ -1192,13 +1200,13 @@ bool RakNet::System_DeleteAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 		return true;
 	}
 	int numRowsReturned = PQntuples(result);
-	if (numRowsReturned==0)
+	if (numRowsReturned == 0)
 	{
 		PQclear(result);
-		resultCode=L2RC_DATABASE_CONSTRAINT_FAILURE;
+		resultCode = L2RC_DATABASE_CONSTRAINT_FAILURE;
 		return true;
 	}
-	RakNet::RakString passwordFromDB;
+	SLNet::RakString passwordFromDB;
 	PostgreSQLInterface::PQGetValueFromBinary(&passwordFromDB, result, 0, "password");
 	PQclear(result);
 	if (passwordFromDB!=password)
@@ -1228,7 +1236,7 @@ bool RakNet::System_DeleteAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-bool RakNet::System_PruneAccounts_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::System_PruneAccounts_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result = pgsql->QueryVariadic(
@@ -1254,7 +1262,7 @@ bool RakNet::System_PruneAccounts_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	// Delete all accounts where the user has not logged in deleteAccountsNotLoggedInDays
 	System_DeleteAccount *deleteAccount = (System_DeleteAccount *) command->server->GetMessageFactory()->Alloc(L2MID_System_DeleteAccount);
 
-	RakNet::RakString userName;
+	SLNet::RakString userName;
 	for (int i=0; i < numRowsReturned; i++)
 	{
 		PostgreSQLInterface::PQGetValueFromBinary(&userName, result, i, "handle");
@@ -1267,7 +1275,7 @@ bool RakNet::System_PruneAccounts_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-bool RakNet::Client_GetEmailAddress_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_GetEmailAddress_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1296,7 +1304,7 @@ bool RakNet::Client_GetEmailAddress_PGSQL::ServerDBImpl( Lobby2ServerCommand *co
 	return true;
 }
 
-bool RakNet::Client_GetPasswordRecoveryQuestionByHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_GetPasswordRecoveryQuestionByHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1334,7 +1342,7 @@ bool RakNet::Client_GetPasswordRecoveryQuestionByHandle_PGSQL::ServerDBImpl( Lob
 	return true;
 }
 
-bool RakNet::Client_GetPasswordByPasswordRecoveryAnswer_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_GetPasswordByPasswordRecoveryAnswer_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1370,7 +1378,7 @@ bool RakNet::Client_GetPasswordByPasswordRecoveryAnswer_PGSQL::ServerDBImpl( Lob
 	return true;
 }
 
-bool RakNet::Client_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	unsigned int userRow = GetUserRowFromHandle(userName, pgsql);
@@ -1409,7 +1417,7 @@ bool RakNet::Client_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 			resultCode=L2RC_DATABASE_CONSTRAINT_FAILURE;
 			return true;
 		}
-		RakNet::RakString passwordFromDB;
+		SLNet::RakString passwordFromDB;
 		PostgreSQLInterface::PQGetValueFromBinary(&passwordFromDB, result, 0, "password");
 		PQclear(result);
 		if (passwordFromDB!=password)
@@ -1446,7 +1454,7 @@ bool RakNet::Client_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Client_UpdateAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_UpdateAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -1481,7 +1489,7 @@ bool RakNet::Client_UpdateAccount_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_GetAccountDetails_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_GetAccountDetails_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -1547,7 +1555,7 @@ bool RakNet::Client_GetAccountDetails_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_StartIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_StartIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	unsigned int targetUserId = GetUserRowFromHandle(targetHandle, pgsql);
@@ -1583,7 +1591,7 @@ bool RakNet::Client_StartIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::Client_GetIgnoreList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_GetIgnoreList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result = pgsql->QueryVariadic("SELECT handle FROM lobby2.users WHERE userId_pk="
@@ -1595,7 +1603,7 @@ bool RakNet::Client_GetIgnoreList_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 		return true;
 	}
 
-	RakNet::RakString handle;
+	SLNet::RakString handle;
 	ignoredHandles.Clear(false, _FILE_AND_LINE_);
 	int numRowsReturned = PQntuples(result);
 	int i;
@@ -1609,7 +1617,7 @@ bool RakNet::Client_GetIgnoreList_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Write( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleIntegerStorage_PGSQL::Write( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PGresult *result=0;
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
@@ -1672,7 +1680,7 @@ bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Write( Lobby2ServerCommand *co
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Read( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleIntegerStorage_PGSQL::Read( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PGresult *result=0;
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
@@ -1692,7 +1700,7 @@ bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Read( Lobby2ServerCommand *com
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Delete( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleIntegerStorage_PGSQL::Delete( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PGresult *result=0;
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
@@ -1702,7 +1710,7 @@ bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Delete( Lobby2ServerCommand *c
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Add( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleIntegerStorage_PGSQL::Add( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	// In MySQL I think you can do this:
 	// INSERT INTO lobby2.perTitlePerUserIntegerStorage (titleName_fk,slotIndex,value) VALUES ('tn',1,2) ON DUPLICATE KEY UPDATE titleName_fk='tn2', slotIndex=2, value=3;
@@ -1764,7 +1772,7 @@ bool RakNet::Client_PerTitleIntegerStorage_PGSQL::Add( Lobby2ServerCommand *comm
 	return true;
 
 }
-bool RakNet::Client_PerTitleIntegerStorage_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleIntegerStorage_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1794,7 +1802,7 @@ bool RakNet::Client_PerTitleIntegerStorage_PGSQL::ServerDBImpl( Lobby2ServerComm
 	
 	return true;
 }
-bool RakNet::Client_PerTitleBinaryStorage_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_PerTitleBinaryStorage_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -1855,19 +1863,19 @@ bool RakNet::Client_PerTitleBinaryStorage_PGSQL::ServerDBImpl( Lobby2ServerComma
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_SetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+bool SLNet::Client_SetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
 {
 	server->SetPresence( presence, userHandle );
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_GetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+bool SLNet::Client_GetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
 {
 	server->GetPresence( presence, userHandle );
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Client_StopIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Client_StopIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	unsigned int targetUserId = GetUserRowFromHandle(targetHandle, pgsql);
@@ -1896,7 +1904,7 @@ bool RakNet::Client_StopIgnore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Friends_SendInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_SendInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -1928,7 +1936,7 @@ bool RakNet::Friends_SendInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	int numRowsReturned = PQntuples(result);
 	if (numRowsReturned!=0)
 	{
-		RakNet::RakString description;
+		SLNet::RakString description;
 		PostgreSQLInterface::PQGetValueFromBinary(&description, result, 0, "description");
 		if (description=="sentInvite")
 			resultCode=L2RC_Friends_SendInvite_ALREADY_SENT_INVITE;
@@ -1970,7 +1978,7 @@ bool RakNet::Friends_SendInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::Friends_AcceptInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_AcceptInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2003,10 +2011,10 @@ bool RakNet::Friends_AcceptInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	int numRowsReturned = PQntuples(result);
 	if (numRowsReturned!=0)
 	{
-		RakNet::RakString description;
+		SLNet::RakString description;
 		PostgreSQLInterface::PQGetValueFromBinary(&description, result, 0, "description");
 		PQclear(result);
-		if (description!=RakNet::RakString("sentInvite"))
+		if (description!= SLNet::RakString("sentInvite"))
 		{
 			resultCode=L2RC_Friends_AcceptInvite_NO_INVITE;
 			return true;
@@ -2055,12 +2063,12 @@ bool RakNet::Friends_AcceptInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-void RakNet::Friends_AcceptInvite_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+void SLNet::Friends_AcceptInvite_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
 {
 	(void)userHandle;
 	server->GetPresence(presence,targetHandle);
 }
-bool RakNet::Friends_RejectInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_RejectInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2093,10 +2101,10 @@ bool RakNet::Friends_RejectInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	int numRowsReturned = PQntuples(result);
 	if (numRowsReturned!=0)
 	{
-		RakNet::RakString description;
+		SLNet::RakString description;
 		PostgreSQLInterface::PQGetValueFromBinary(&description, result, 0, "description");
 		PQclear(result);
-		if (description!=RakNet::RakString("sentInvite"))
+		if (description!= SLNet::RakString("sentInvite"))
 		{
 			resultCode=L2RC_Friends_RejectInvite_NO_INVITE;
 			return true;
@@ -2135,7 +2143,7 @@ bool RakNet::Friends_RejectInvite_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-bool RakNet::Friends_GetInvites_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_GetInvites_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	GetFriendInfosByStatus(command->callerUserId, "sentInvite", pgsql, invitesSent, true);
@@ -2143,7 +2151,7 @@ bool RakNet::Friends_GetInvites_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-void RakNet::Friends_GetInvites_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+void SLNet::Friends_GetInvites_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
 {
 	(void)userHandle;
 
@@ -2153,21 +2161,21 @@ void RakNet::Friends_GetInvites_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *ser
 		server->GetUserOnlineStatus(invitesReceived[i].usernameAndStatus);
 }
 
-bool RakNet::Friends_GetFriends_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_GetFriends_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	GetFriendInfosByStatus(command->callerUserId, "isFriends", pgsql, myFriends, true);
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-void RakNet::Friends_GetFriends_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+void SLNet::Friends_GetFriends_PGSQL::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
 {
 	(void)userHandle;
 
 	for (unsigned int i=0; i < myFriends.Size(); i++)
 		server->GetUserOnlineStatus(myFriends[i].usernameAndStatus);
 }
-bool RakNet::Friends_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Friends_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2221,7 +2229,7 @@ bool RakNet::Friends_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, v
 	return true;
 }
 
-bool RakNet::BookmarkedUsers_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::BookmarkedUsers_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2252,7 +2260,7 @@ bool RakNet::BookmarkedUsers_Add_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::BookmarkedUsers_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::BookmarkedUsers_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2283,7 +2291,7 @@ bool RakNet::BookmarkedUsers_Remove_PGSQL::ServerDBImpl( Lobby2ServerCommand *co
 	return true;
 }
 
-bool RakNet::BookmarkedUsers_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::BookmarkedUsers_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2314,14 +2322,14 @@ bool RakNet::BookmarkedUsers_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Emails_Send_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Emails_Send_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	SendEmail(recipients, command->callerUserId, command->callingUserName, command->server, subject, body, binaryData, status, "Emails_Send", (PostgreSQLInterface *) databaseInterface);
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
 
-bool RakNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result;
@@ -2388,8 +2396,8 @@ bool RakNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void 
 	for (i=0; i < numRowsReturned; i++)
 	{
 		EmailResult emailResult;
-		RakNet::RakString otherHandle;
-		RakNet::RakString myHandle = command->callingUserName;
+		SLNet::RakString otherHandle;
+		SLNet::RakString myHandle = command->callingUserName;
 		// 4/6/2011 emailTarget_pk is correct, this is used by Emails_Delete and Emails_SetStatus
 		// 11/4/2010 - I think this was a copy/paste error
 		PostgreSQLInterface::PQGetValueFromBinary(&emailResult.emailID, result, i, "emailTarget_pk");
@@ -2442,7 +2450,7 @@ bool RakNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void 
 	return true;
 }
 
-bool RakNet::Emails_Delete_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Emails_Delete_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2481,7 +2489,7 @@ bool RakNet::Emails_Delete_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, vo
 	return true;
 }
 
-bool RakNet::Emails_SetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Emails_SetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2533,7 +2541,7 @@ bool RakNet::Emails_SetStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command,
 	return true;
 }
 
-bool RakNet::Ranking_SubmitMatch_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_SubmitMatch_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2581,7 +2589,7 @@ bool RakNet::Ranking_SubmitMatch_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Ranking_GetMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_GetMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2632,7 +2640,7 @@ bool RakNet::Ranking_GetMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::Ranking_GetMatchBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_GetMatchBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2658,7 +2666,7 @@ bool RakNet::Ranking_GetMatchBinaryData_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	return true;
 }
 
-bool RakNet::Ranking_GetTotalScore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_GetTotalScore_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2700,7 +2708,7 @@ bool RakNet::Ranking_GetTotalScore_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	return true;
 }
 
-bool RakNet::Ranking_WipeScoresForPlayer_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_WipeScoresForPlayer_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2734,7 +2742,7 @@ bool RakNet::Ranking_WipeScoresForPlayer_PGSQL::ServerDBImpl( Lobby2ServerComman
 	return true;
 }
 
-bool RakNet::Ranking_WipeMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_WipeMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2760,7 +2768,7 @@ bool RakNet::Ranking_WipeMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Ranking_PruneMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_PruneMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2778,14 +2786,14 @@ bool RakNet::Ranking_PruneMatches_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-bool RakNet::Ranking_UpdateRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_UpdateRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
 
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_Ranking_UpdateRating_TITLE_NOT_IN_USE;
 		return true;
@@ -2810,7 +2818,7 @@ bool RakNet::Ranking_UpdateRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *comm
 	return true;
 }
 
-bool RakNet::Ranking_WipeRatings_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_WipeRatings_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -2836,14 +2844,14 @@ bool RakNet::Ranking_WipeRatings_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Ranking_GetRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Ranking_GetRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
 
-	if (RakNet::IsTitleInUse(titleName, pgsql)==false)
+	if (SLNet::IsTitleInUse(titleName, pgsql)==false)
 	{
 		resultCode=L2RC_Ranking_GetRating_TITLE_NOT_IN_USE;
 		return true;
@@ -2879,7 +2887,7 @@ bool RakNet::Ranking_GetRating_PGSQL::ServerDBImpl( Lobby2ServerCommand *command
 	return true;
 }
 
-bool RakNet::Clans_Create_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_Create_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2956,7 +2964,7 @@ bool RakNet::Clans_Create_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, voi
 	return true;
 }
 
-bool RakNet::Clans_SetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -2986,7 +2994,7 @@ bool RakNet::Clans_SetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Clans_GetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -3015,7 +3023,7 @@ bool RakNet::Clans_GetProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Clans_SetMyMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SetMyMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3028,7 +3036,7 @@ bool RakNet::Clans_SetMyMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerComman
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_SetMyMemberProperties_NOT_IN_CLAN;
@@ -3047,7 +3055,7 @@ bool RakNet::Clans_SetMyMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerComman
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 
@@ -3093,7 +3101,7 @@ bool RakNet::Clans_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 			clanId, leaderId);
 
 		int numRowsReturned2 = PQntuples(result2);
-		RakNet::RakString memberHandle;
+		SLNet::RakString memberHandle;
 		for (int j=0; j < numRowsReturned2; j++)
 		{
 			PostgreSQLInterface::PQGetValueFromBinary(&memberHandle, result2, j, "handle");
@@ -3111,7 +3119,7 @@ bool RakNet::Clans_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 	return true;
 
 };
-bool RakNet::Clans_GrantLeader_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GrantLeader_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3143,7 +3151,7 @@ bool RakNet::Clans_GrantLeader_PGSQL::ServerDBImpl( Lobby2ServerCommand *command
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_GrantLeader_TARGET_NOT_IN_CLAN;
@@ -3182,7 +3190,7 @@ bool RakNet::Clans_GrantLeader_PGSQL::ServerDBImpl( Lobby2ServerCommand *command
 	return true;
 }
 
-bool RakNet::Clans_SetSubleaderStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SetSubleaderStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3214,7 +3222,7 @@ bool RakNet::Clans_SetSubleaderStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_SetSubleaderStatus_TARGET_NOT_IN_CLAN;
@@ -3254,7 +3262,7 @@ bool RakNet::Clans_SetSubleaderStatus_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	return true;
 }
 
-bool RakNet::Clans_SetMemberRank_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SetMemberRank_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3286,7 +3294,7 @@ bool RakNet::Clans_SetMemberRank_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_SetMemberRank_TARGET_NOT_IN_CLAN;
@@ -3326,7 +3334,7 @@ bool RakNet::Clans_SetMemberRank_PGSQL::ServerDBImpl( Lobby2ServerCommand *comma
 	return true;
 }
 
-bool RakNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -3344,7 +3352,7 @@ bool RakNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 		resultCode=L2RC_Clans_GetMemberProperties_UNKNOWN_TARGET_HANDLE;
 		return true;
 	}
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
 	if (clanMemberState==CMD_UNDEFINED)
 	{
 		resultCode=L2RC_Clans_GetMemberProperties_TARGET_NOT_IN_CLAN;
@@ -3373,7 +3381,7 @@ bool RakNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 	return true;
 }
 
-bool RakNet::Clans_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3423,7 +3431,7 @@ bool RakNet::Clans_ChangeHandle_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::Clans_Leave_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_Leave_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3584,7 +3592,7 @@ bool RakNet::Clans_Leave_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void
 	return true;
 }
 
-bool RakNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3597,7 +3605,7 @@ bool RakNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_SendJoinInvitation_NOT_IN_CLAN;
@@ -3613,7 +3621,7 @@ bool RakNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	}
 
 	// Does target already have an entry?
-	unsigned int targetId = RakNet::GetUserRowFromHandle(targetHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(targetHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_SendJoinInvitation_UNKNOWN_TARGET_HANDLE;
@@ -3627,7 +3635,7 @@ bool RakNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	}
 
 	bool isTargetSubleader;
-	RakNet::ClanMemberState targetClanMemberState = GetClanMemberState(clanId, targetId, &isTargetSubleader, pgsql);
+	SLNet::ClanMemberState targetClanMemberState = GetClanMemberState(clanId, targetId, &isTargetSubleader, pgsql);
 	if (targetClanMemberState==CMD_ACTIVE)
 	{
 		// active member
@@ -3698,7 +3706,7 @@ bool RakNet::Clans_SendJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_WithdrawJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_WithdrawJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3711,7 +3719,7 @@ bool RakNet::Clans_WithdrawJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerComma
 	}
 
 	// Does target already have an entry?
-	unsigned int targetId = RakNet::GetUserRowFromHandle(targetHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(targetHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_WithdrawJoinInvitation_UNKNOWN_TARGET_HANDLE;
@@ -3725,7 +3733,7 @@ bool RakNet::Clans_WithdrawJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerComma
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_JOIN_INVITED)
 	{
 		resultCode=L2RC_Clans_WithdrawJoinInvitation_NO_SUCH_INVITATION_EXISTS;
@@ -3781,7 +3789,7 @@ bool RakNet::Clans_WithdrawJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerComma
 	return true;
 }
 
-bool RakNet::Clans_AcceptJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_AcceptJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3794,7 +3802,7 @@ bool RakNet::Clans_AcceptJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_JOIN_INVITED)
 	{
 		resultCode=L2RC_Clans_AcceptJoinInvitation_NO_SUCH_INVITATION_EXISTS;
@@ -3844,7 +3852,7 @@ bool RakNet::Clans_AcceptJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_RejectJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_RejectJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3857,7 +3865,7 @@ bool RakNet::Clans_RejectJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_JOIN_INVITED)
 	{
 		resultCode=L2RC_Clans_RejectJoinInvitation_NO_SUCH_INVITATION_EXISTS;
@@ -3894,7 +3902,7 @@ bool RakNet::Clans_RejectJoinInvitation_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_DownloadInvitationList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_DownloadInvitationList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result = pgsql->QueryVariadic(
@@ -3958,7 +3966,7 @@ bool RakNet::Clans_DownloadInvitationList_PGSQL::ServerDBImpl( Lobby2ServerComma
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_SendJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_SendJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -3973,7 +3981,7 @@ bool RakNet::Clans_SendJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState==CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_SendJoinRequest_ALREADY_IN_CLAN;
@@ -4065,7 +4073,7 @@ bool RakNet::Clans_SendJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool RakNet::Clans_WithdrawJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_WithdrawJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -4078,7 +4086,7 @@ bool RakNet::Clans_WithdrawJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState==CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_WithdrawJoinRequest_ALREADY_IN_CLAN;
@@ -4128,7 +4136,7 @@ bool RakNet::Clans_WithdrawJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 	return true;
 }
 
-bool RakNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -4141,7 +4149,7 @@ bool RakNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 	}
 
 	bool isSubleader;
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, command->callerUserId, &isSubleader, pgsql);
 	if (clanMemberState!=CMD_ACTIVE)
 	{
 		resultCode=L2RC_Clans_AcceptJoinRequest_NOT_IN_CLAN;
@@ -4156,7 +4164,7 @@ bool RakNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 	}
 
 	// Does target already have an entry?
-	unsigned int targetId = RakNet::GetUserRowFromHandle(requestingUserHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(requestingUserHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_AcceptJoinRequest_UNKNOWN_TARGET_HANDLE;
@@ -4170,7 +4178,7 @@ bool RakNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 	}
 
 	bool isTargetSubleader;
-	RakNet::ClanMemberState targetClanMemberState = GetClanMemberState(clanId, targetId, &isTargetSubleader, pgsql);
+	SLNet::ClanMemberState targetClanMemberState = GetClanMemberState(clanId, targetId, &isTargetSubleader, pgsql);
 	if (targetClanMemberState==CMD_ACTIVE)
 	{
 		// active member
@@ -4230,7 +4238,7 @@ bool RakNet::Clans_AcceptJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 	return true;
 }
 
-bool RakNet::Clans_RejectJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_RejectJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -4257,7 +4265,7 @@ bool RakNet::Clans_RejectJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 		return true;
 	}
 
-	unsigned int targetId = RakNet::GetUserRowFromHandle(requestingUserHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(requestingUserHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_RejectJoinRequest_REQUESTING_USER_HANDLE_UNKNOWN;
@@ -4308,7 +4316,7 @@ bool RakNet::Clans_RejectJoinRequest_PGSQL::ServerDBImpl( Lobby2ServerCommand *c
 	return true;
 };
 
-bool RakNet::Clans_DownloadRequestList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_DownloadRequestList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	PostgreSQLInterface *pgsql = (PostgreSQLInterface *)databaseInterface;
 	PGresult *result=0;
@@ -4366,7 +4374,7 @@ bool RakNet::Clans_DownloadRequestList_PGSQL::ServerDBImpl( Lobby2ServerCommand 
 	return true;
 }
 
-bool RakNet::Clans_KickAndBlacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_KickAndBlacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 	(void)databaseInterface;
@@ -4395,7 +4403,7 @@ bool RakNet::Clans_KickAndBlacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand
 		return true;
 	}
 
-	unsigned int targetId = RakNet::GetUserRowFromHandle(targetHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(targetHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_KickAndBlacklistUser_UNKNOWN_TARGET_HANDLE;
@@ -4414,7 +4422,7 @@ bool RakNet::Clans_KickAndBlacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand
 		return true;
 	}
 
-	RakNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetId, &isSubleader, pgsql);
+	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetId, &isSubleader, pgsql);
 	if (clanMemberState==CMD_BANNED)
 	{
 		resultCode=L2RC_Clans_KickAndBlacklistUser_ALREADY_BLACKLISTED;
@@ -4488,7 +4496,7 @@ bool RakNet::Clans_KickAndBlacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand
 	return true;
 }
 
-bool RakNet::Clans_UnblacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_UnblacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -4517,7 +4525,7 @@ bool RakNet::Clans_UnblacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 		return true;
 	}
 
-	unsigned int targetId = RakNet::GetUserRowFromHandle(targetHandle, pgsql);
+	unsigned int targetId = SLNet::GetUserRowFromHandle(targetHandle, pgsql);
 	if (targetId==0)
 	{
 		resultCode=L2RC_Clans_UnblacklistUser_UNKNOWN_TARGET_HANDLE;
@@ -4560,7 +4568,7 @@ bool RakNet::Clans_UnblacklistUser_PGSQL::ServerDBImpl( Lobby2ServerCommand *com
 	return true;
 }
 
-bool RakNet::Clans_GetBlacklist_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GetBlacklist_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -4587,7 +4595,7 @@ bool RakNet::Clans_GetBlacklist_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 		return true;
 	}
 
-	RakNet::RakString memberName;
+	SLNet::RakString memberName;
 	for (int i=0; i < PQntuples(result); i++)
 	{
 		PostgreSQLInterface::PQGetValueFromBinary(&memberName, result, i, "handle");
@@ -4599,7 +4607,7 @@ bool RakNet::Clans_GetBlacklist_PGSQL::ServerDBImpl( Lobby2ServerCommand *comman
 	return true;
 }
 
-bool RakNet::Clans_GetMembers_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GetMembers_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -4641,7 +4649,7 @@ bool RakNet::Clans_GetMembers_PGSQL::ServerDBImpl( Lobby2ServerCommand *command,
 		return true;
 	}
 
-	RakNet::RakString memberName;
+	SLNet::RakString memberName;
 	for (int i=0; i < PQntuples(result); i++)
 	{
 		PostgreSQLInterface::PQGetValueFromBinary(&memberName, result, i, "handle");
@@ -4653,7 +4661,7 @@ bool RakNet::Clans_GetMembers_PGSQL::ServerDBImpl( Lobby2ServerCommand *command,
 	return true;
 }
 
-bool RakNet::Clans_GetList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
+bool SLNet::Clans_GetList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface )
 {
 	(void)command;
 
@@ -4666,7 +4674,7 @@ bool RakNet::Clans_GetList_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, vo
 		return true;
 	}
 
-	RakNet::RakString clanName;
+	SLNet::RakString clanName;
 	for (int i=0; i < PQntuples(result); i++)
 	{
 		PostgreSQLInterface::PQGetValueFromBinary(&clanName, result, i, "clanhandle");

@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //--------------------------Renames--------------------------------
 //These are renames, to make the interface a different name than the C++ interface
 //There are many reasons to do this sometimes the original function is useful but not perfect and a pure

@@ -3,6 +3,10 @@
 // Please refer to http://developer.download.nvidia.com/SDK/10/opengl/samples.html#compress_YCoCgDXT for more information.
 /* ------------------------------------------------------------------------------------------------------------------------------------ */
 
+/*
+ * This file was taken from RakNet 4.082 without any modifications.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ */
 
 /* ------------------------------------------------------------------------------------------------------------------------------------ */
 // Includes

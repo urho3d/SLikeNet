@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __RPC3_BOOST_H
@@ -40,11 +45,11 @@
 // Not needed?
 //#include <boost/fusion/container/generation/make_vector.hpp>
 
-#include "NetworkIDManager.h"
-#include "NetworkIDObject.h"
-#include "BitStream.h"
+#include "slikenet/NetworkIDManager.h"
+#include "slikenet/NetworkIDObject.h"
+#include "slikenet/BitStream.h"
 
-namespace RakNet
+namespace SLNet
 {
 class RPC3;
 class BitStream;
@@ -65,7 +70,7 @@ enum InvokeResultCodes
 struct InvokeArgs
 {
 	// Bitstream to use to deserialize
-	RakNet::BitStream *bitStream;
+	SLNet::BitStream *bitStream;
 
 	// NetworkIDManager to use to lookup objects
 	NetworkIDManager *networkIDManager;
@@ -103,12 +108,12 @@ struct RPC3Tag
 	unsigned char flag;
 };
 
-// Track the pointers tagged with RakNet::_RPC3::Deref
+// Track the pointers tagged with SLNet::_RPC3::Deref
 static RPC3Tag __RPC3TagPtrs[BOOST_FUSION_INVOKE_MAX_ARITY+1];
 static int __RPC3TagHead=0;
 static int __RPC3TagTail=0;
 
-// If this assert hits, then RakNet::_RPC3::Deref was called more times than the argument was passed to the function
+// If this assert hits, then SLNet::_RPC3::Deref was called more times than the argument was passed to the function
 static void __RPC3_Tag_AddHead(const RPC3Tag &p)
 {
 	// Update tag if already in array
@@ -171,9 +176,9 @@ inline const templateType& PtrToArray(unsigned int count, const templateType & t
 
 struct ReadBitstream
 {
-	static void applyArray(RakNet::BitStream &bitStream, RakNet::BitStream* t){apply(bitStream,t);}
+	static void applyArray(SLNet::BitStream &bitStream, SLNet::BitStream* t){apply(bitStream,t);}
 
-	static void apply(RakNet::BitStream &bitStream, RakNet::BitStream* t)
+	static void apply(SLNet::BitStream &bitStream, SLNet::BitStream* t)
 	{
 		BitSize_t numBitsUsed;
 		bitStream.ReadCompressed(numBitsUsed);
@@ -185,17 +190,17 @@ struct ReadBitstream
 struct ReadPtr
 {
 	template <typename T2>
-	static inline void applyArray(RakNet::BitStream &bitStream, T2 *t) {bitStream >> (*t);}
+	static inline void applyArray(SLNet::BitStream &bitStream, T2 *t) {bitStream >> (*t);}
 	template <typename T2>
-	static inline void apply(RakNet::BitStream &bitStream, T2 *t) {bitStream >> (*t);}
+	static inline void apply(SLNet::BitStream &bitStream, T2 *t) {bitStream >> (*t);}
 
-	static inline void apply(RakNet::BitStream &bitStream, char *&t) {applyStr(bitStream, (char *&) t);}
-	static inline void apply(RakNet::BitStream &bitStream, unsigned char *&t) {applyStr(bitStream, (char *&) t);}
-	static inline void apply(RakNet::BitStream &bitStream, const char *&t) {applyStr(bitStream, (char *&) t);}
-	static inline void apply(RakNet::BitStream &bitStream, const unsigned char *&t) {applyStr(bitStream, (char *&) t);}
-	static inline void applyStr(RakNet::BitStream &bitStream, char *&t)
+	static inline void apply(SLNet::BitStream &bitStream, char *&t) {applyStr(bitStream, (char *&) t);}
+	static inline void apply(SLNet::BitStream &bitStream, unsigned char *&t) {applyStr(bitStream, (char *&) t);}
+	static inline void apply(SLNet::BitStream &bitStream, const char *&t) {applyStr(bitStream, (char *&) t);}
+	static inline void apply(SLNet::BitStream &bitStream, const unsigned char *&t) {applyStr(bitStream, (char *&) t);}
+	static inline void applyStr(SLNet::BitStream &bitStream, char *&t)
 	{
-		RakNet::RakString rs;
+		SLNet::RakString rs;
 		bitStream >> rs;
 		size_t len = rs.GetLength()+1;
 		
@@ -214,7 +219,7 @@ template< typename T >
 struct DoRead
 {
 	typedef typename boost::mpl::if_<
-		boost::is_convertible<T*,RakNet::BitStream*>,
+		boost::is_convertible<T*, SLNet::BitStream*>,
 		ReadBitstream,
 		ReadPtr >::type type;
 };
@@ -504,7 +509,7 @@ struct BoostRPCInvoker<Function,To,To>
 template <typename T>
 struct DoNothing
 {
-	static void apply(RakNet::BitStream &bitStream, T& t)
+	static void apply(SLNet::BitStream &bitStream, T& t)
 	{
 		(void) bitStream;
 		(void) t;
@@ -514,8 +519,8 @@ struct DoNothing
 
 struct WriteBitstream
 {
-	static void applyArray(RakNet::BitStream &bitStream, RakNet::BitStream* t) {apply(bitStream,t);}
-	static void apply(RakNet::BitStream &bitStream, RakNet::BitStream* t)
+	static void applyArray(SLNet::BitStream &bitStream, SLNet::BitStream* t) {apply(bitStream,t);}
+	static void apply(SLNet::BitStream &bitStream, SLNet::BitStream* t)
 	{
 		BitSize_t oldReadOffset = t->GetReadOffset();
 		t->ResetReadPointer();
@@ -529,24 +534,24 @@ struct WriteBitstream
 struct WritePtr
 {
 	template <typename T2>
-	static inline void applyArray(RakNet::BitStream &bitStream, T2 *t) {bitStream << (*t);}
+	static inline void applyArray(SLNet::BitStream &bitStream, T2 *t) {bitStream << (*t);}
 	template <typename T2>
-	static inline void apply(RakNet::BitStream &bitStream, T2 *t) {bitStream << (*t);}
+	static inline void apply(SLNet::BitStream &bitStream, T2 *t) {bitStream << (*t);}
 //	template <>
-	static inline void apply(RakNet::BitStream &bitStream, char *t) {bitStream << t;}
+	static inline void apply(SLNet::BitStream &bitStream, char *t) {bitStream << t;}
 //	template <>
-	static inline void apply(RakNet::BitStream &bitStream, unsigned char *t) {bitStream << t;}
+	static inline void apply(SLNet::BitStream &bitStream, unsigned char *t) {bitStream << t;}
 //	template <>
-	static inline void apply(RakNet::BitStream &bitStream, const char *t) {bitStream << t;}
+	static inline void apply(SLNet::BitStream &bitStream, const char *t) {bitStream << t;}
 //	template <>
-	static inline void apply(RakNet::BitStream &bitStream, const unsigned char *t) {bitStream << t;}
+	static inline void apply(SLNet::BitStream &bitStream, const unsigned char *t) {bitStream << t;}
 };
 
 template< typename T >
 struct DoWrite
 {
 	typedef typename boost::mpl::if_<
-		boost::is_convertible<T*,RakNet::BitStream*>,
+		boost::is_convertible<T*, SLNet::BitStream*>,
 		WriteBitstream,
 		WritePtr >::type type;
 };
@@ -554,7 +559,7 @@ struct DoWrite
 template <typename T>
 struct WriteWithNetworkIDPtr
 {
-	static void apply(RakNet::BitStream &bitStream, T& t)
+	static void apply(SLNet::BitStream &bitStream, T& t)
 	{
 		bool isNull;
 		isNull=(t==0);
@@ -597,7 +602,7 @@ struct WriteWithNetworkIDPtr
 template <typename T>
 struct WriteWithoutNetworkIDNoPtr
 {
-	static void apply(RakNet::BitStream &bitStream, T& t)
+	static void apply(SLNet::BitStream &bitStream, T& t)
 	{
 		DoWrite< typename boost::remove_pointer<T>::type >::type::apply(bitStream,&t);
 	}
@@ -606,7 +611,7 @@ struct WriteWithoutNetworkIDNoPtr
 template <typename T>
 struct WriteWithoutNetworkIDPtr
 {
-	static void apply(RakNet::BitStream &bitStream, T& t)
+	static void apply(SLNet::BitStream &bitStream, T& t)
 	{
 		bool isNull;
 		isNull=(t==0);

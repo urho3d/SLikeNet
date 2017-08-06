@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -24,7 +29,7 @@ class RakPeerInterface;
 
 #define MAX_PACKETS_PER_CPU_INPUT_THREAD 16
 
-namespace RakNet
+namespace SLNet
 {
 
 	/// \brief Extends SQLite3ServerPlugin to support logging functions, including compressing images.
@@ -109,23 +114,23 @@ namespace RakNet
 
 		struct SessionNameAndSystemAddress
 		{
-			RakNet::RakString sessionName;
+			SLNet::RakString sessionName;
 			SystemAddress systemAddress;
 			sqlite3 *referencedPointer;
-			RakNet::TimeMS timestampDelta;
-//			RakNet::TimeMS dbAgeWhenCreated;
+			SLNet::TimeMS timestampDelta;
+//			SLNet::TimeMS dbAgeWhenCreated;
 		};
 		DataStructures::List<SessionNameAndSystemAddress> loggedInSessions;
 
 		// An incoming data packet, and when it arrived
 		struct CPUThreadInputNode
 		{
-			RakNet::Packet *packet;
-		//	RakNet::TimeMS whenMessageArrived;
+			SLNet::Packet *packet;
+		//	SLNet::TimeMS whenMessageArrived;
 			// Time difference from their time to server time, plus the age of the database at the time the session was created
 			// Applied to CPUThreadOutputNode::clientSendingTime before being passed to SQL
-			RakNet::TimeMS timestampDelta;
-			RakNet::RakString dbIdentifier;
+			SLNet::TimeMS timestampDelta;
+			SLNet::RakString dbIdentifier;
 		};
 		// As packets arrive, they are added to a CPUThreadInput structure.
 		// When the structure is full, or when a maximum amount of time has elapsed, whichever is first, then it is pushed to a thread for processing
@@ -141,17 +146,17 @@ namespace RakNet
 		// Images are now in compressed format, should the parameter list indeed have a query
 		struct CPUThreadOutputNode
 		{
-			RakNet::Packet *packet; // Passthrough
-//			RakNet::TimeMS whenMessageArrived; // Passthrough
-			RakNet::RakString dbIdentifier; // Passthrough
+			SLNet::Packet *packet; // Passthrough
+//			SLNet::TimeMS whenMessageArrived; // Passthrough
+			SLNet::RakString dbIdentifier; // Passthrough
 			// SystemAddress systemAddress;
 			char ipAddressString[32];
-			RakNet::RakString tableName;
-			RakNet::RakString file;
-			RakNet::TimeMS clientSendingTime;
+			SLNet::RakString tableName;
+			SLNet::RakString file;
+			SLNet::TimeMS clientSendingTime;
 			unsigned char parameterCount;
 			bool isFunctionCall;
-			DataStructures::List<RakNet::RakString> insertingColumnNames;
+			DataStructures::List<SLNet::RakString> insertingColumnNames;
 			LogParameter parameterList[MAX_SQLLITE_LOGGER_PARAMETERS];
 			uint32_t tickCount;
 			int line;
@@ -176,12 +181,12 @@ namespace RakNet
 		};
 
 	protected:
-		unsigned int CreateDBHandle(RakNet::RakString dbIdentifier);
+		unsigned int CreateDBHandle(SLNet::RakString dbIdentifier);
 		void CloseUnreferencedSessions(void);
 
 		SessionManagementMode sessionManagementMode;
 		bool createDirectoryForFile;
-		RakNet::RakString newDatabaseFilePath;
+		SLNet::RakString newDatabaseFilePath;
 
 		ThreadPool<CPUThreadInput*, CPUThreadOutput*> cpuLoggerThreadPool;
 		ThreadPool<SQLThreadInput, SQLThreadOutput> sqlLoggerThreadPool;
@@ -195,7 +200,7 @@ namespace RakNet
 		void StopCPUSQLThreads(void);
 
 		CPUThreadInput *cpuThreadInput;
-		RakNet::TimeMS whenCpuThreadInputAllocated;
+		SLNet::TimeMS whenCpuThreadInputAllocated;
 		bool dxtCompressionEnabled;
 
 	};

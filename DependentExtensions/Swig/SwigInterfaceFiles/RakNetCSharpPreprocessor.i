@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //----------------Extra Swig PreProcessor------------
 //To keep everything clean general swig preprocessor commands are stuck here
 //Alot of items not in here may be preprocessor, but are in thier own section for some reason or another

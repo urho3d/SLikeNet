@@ -1,28 +1,33 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __TRANFORMATION_HISTORY_H
 #define __TRANFORMATION_HISTORY_H
 
-#include "RakNetTypes.h"
+#include "slikenet/types.h"
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"
-#include "DS_Queue.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/DS_Queue.h"
+#include "slikenet/memoryoverride.h"
 
 struct TransformationHistoryCell
 {
 	TransformationHistoryCell();
-	TransformationHistoryCell(RakNet::TimeMS t, const Ogre::Vector3& pos, const Ogre::Vector3& vel, const Ogre::Quaternion& quat  );
+	TransformationHistoryCell(SLNet::TimeMS t, const Ogre::Vector3& pos, const Ogre::Vector3& vel, const Ogre::Quaternion& quat  );
 
-	RakNet::TimeMS time;
+	SLNet::TimeMS time;
 	Ogre::Vector3 position;
 	Ogre::Quaternion orientation;
 	Ogre::Vector3 velocity;
@@ -40,7 +45,7 @@ public:
 	/// maxHistoryTime is the maximum amount of time you want to read in the past
 	/// \param[in] maxWriteInterval Minimum amount of time that must elapse between new data points added with Write.
 	/// \param[in] maxHistoryTime How long to store data points before they expire
-	void Init(RakNet::TimeMS maxWriteInterval, RakNet::TimeMS maxHistoryTime);
+	void Init(SLNet::TimeMS maxWriteInterval, SLNet::TimeMS maxHistoryTime);
 
 	/// \brief Adds a new data point to the end of the queue
 	/// If less than maxWriteInterval has elapsed since the last call, the Write() call is ignored.
@@ -48,10 +53,10 @@ public:
 	/// \param[in] velocity Velocity to write
 	/// \param[in] orientation Orientation to write
 	/// \param[in] curTimeMS Time when data point was generated, which should generally increment each call
-	void Write(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, RakNet::TimeMS curTimeMS);
+	void Write(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, SLNet::TimeMS curTimeMS);
 
 	/// \brief Same as Write(), except that if the point is in the past, an older point updated
-	void Overwrite(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, RakNet::TimeMS when);
+	void Overwrite(const Ogre::Vector3 &position, const Ogre::Vector3 &velocity, const Ogre::Quaternion &orientation, SLNet::TimeMS when);
 
 	enum ReadResult
 	{
@@ -71,14 +76,14 @@ public:
 	/// \param[in] curTime Right now
 	/// \return What method was used to calculate outputs
 	ReadResult Read(Ogre::Vector3 *position, Ogre::Vector3 *velocity, Ogre::Quaternion *orientation,
-		RakNet::TimeMS when, RakNet::TimeMS curTime);
+		SLNet::TimeMS when, SLNet::TimeMS curTime);
 
 	/// \brief Clear all values in the history
 	void Clear(void);
 protected:
 	DataStructures::Queue<TransformationHistoryCell> history;
 	unsigned maxHistoryLength;
-	RakNet::TimeMS writeInterval;
+	SLNet::TimeMS writeInterval;
 };
 
 #endif

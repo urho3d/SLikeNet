@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Message.h"
@@ -13,12 +18,12 @@
 // libpq-fe.h is part of PostgreSQL which must be installed on this computer to use the PostgreRepository
 #include "libpq-fe.h"
 #include "PostgreSQLInterface.h"
-#include "EpochTimeToString.h"
+#include "slikenet/EpochTimeToString.h"
 
 #ifndef __LOBBY_2_MESSAGE_PGSQL_H
 #define __LOBBY_2_MESSAGE_PGSQL_H
 
-namespace RakNet
+namespace SLNet
 {
 
 // --------------------------------------------- Database specific message implementations for the server --------------------------------------------
@@ -29,37 +34,37 @@ struct __NAME__##_##__DB__ : public __NAME__
 struct ClanMemberDescriptor
 {
 	unsigned int userId;
-	RakNet::RakString name;
+	SLNet::RakString name;
 	bool isSubleader;
 	ClanMemberState memberState;
-	RakNet::RakString banReason;
+	SLNet::RakString banReason;
 };
 
 
 // Helper functions
-unsigned int GetUserRowFromHandle(RakNet::RakString& userName, PostgreSQLInterface *pgsql);
-unsigned int GetClanIdFromHandle(RakNet::RakString clanName, PostgreSQLInterface *pgsql);
-bool IsClanLeader(RakNet::RakString clanName, unsigned int userId, PostgreSQLInterface *pgsql);
+unsigned int GetUserRowFromHandle(SLNet::RakString& userName, PostgreSQLInterface *pgsql);
+unsigned int GetClanIdFromHandle(SLNet::RakString clanName, PostgreSQLInterface *pgsql);
+bool IsClanLeader(SLNet::RakString clanName, unsigned int userId, PostgreSQLInterface *pgsql);
 unsigned int GetClanLeaderId(unsigned int clanId, PostgreSQLInterface *pgsql);
 bool IsClanLeader(unsigned int clanId, unsigned int userId, PostgreSQLInterface *pgsql);
 ClanMemberState GetClanMemberState(unsigned int clanId, unsigned int userId, bool *isSubleader, PostgreSQLInterface *pgsql);
 void GetClanMembers(unsigned int clanId, DataStructures::List<ClanMemberDescriptor> &clanMembers, PostgreSQLInterface *pgsql);
-bool IsTitleInUse(RakNet::RakString titleName, PostgreSQLInterface *pgsql);
-bool StringContainsProfanity(RakNet::RakString string, PostgreSQLInterface *pgsql);
-bool IsValidCountry(RakNet::RakString string, bool *countryHasStates, PostgreSQLInterface *pgsql);
-bool IsValidState(RakNet::RakString string, PostgreSQLInterface *pgsql);
-bool IsValidRace(RakNet::RakString string, PostgreSQLInterface *pgsql);
+bool IsTitleInUse(SLNet::RakString titleName, PostgreSQLInterface *pgsql);
+bool StringContainsProfanity(SLNet::RakString string, PostgreSQLInterface *pgsql);
+bool IsValidCountry(SLNet::RakString string, bool *countryHasStates, PostgreSQLInterface *pgsql);
+bool IsValidState(SLNet::RakString string, PostgreSQLInterface *pgsql);
+bool IsValidRace(SLNet::RakString string, PostgreSQLInterface *pgsql);
 void GetFriendIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output);
 void GetClanMateIDs(unsigned int callerUserId, bool excludeIfIgnored, PostgreSQLInterface *pgsql, DataStructures::List<unsigned int> &output);
 bool IsIgnoredByTarget(unsigned int callerUserId, unsigned int targetUserId, PostgreSQLInterface *pgsql);
-void OutputFriendsNotification(RakNet::Notification_Friends_StatusChange::Status notificationType, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql);
+void OutputFriendsNotification(SLNet::Notification_Friends_StatusChange::Status notificationType, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql);
 // This does NOT return the online status to output, as it is not threadsafe
-void GetFriendInfosByStatus(unsigned int callerUserId, RakNet::RakString status, PostgreSQLInterface *pgsql, DataStructures::List<FriendInfo> &output, bool callerIsUserOne);
-void SendEmail(DataStructures::List<RakNet::RakString> &recipientNames, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql);
-void SendEmail(DataStructures::List<unsigned int> &targetUserIds, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql);
-void SendEmail(unsigned int targetUserId, unsigned int senderUserId, RakNet::RakString senderUserName, Lobby2Server *server, RakNet::RakString subject, RakNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, RakNet::RakString triggerString, PostgreSQLInterface *pgsql);
+void GetFriendInfosByStatus(unsigned int callerUserId, SLNet::RakString status, PostgreSQLInterface *pgsql, DataStructures::List<FriendInfo> &output, bool callerIsUserOne);
+void SendEmail(DataStructures::List<SLNet::RakString> &recipientNames, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql);
+void SendEmail(DataStructures::List<unsigned int> &targetUserIds, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql);
+void SendEmail(unsigned int targetUserId, unsigned int senderUserId, SLNet::RakString senderUserName, Lobby2Server *server, SLNet::RakString subject, SLNet::RakString body, RakNetSmartPtr<BinaryDataBlock>binaryData, int status, SLNet::RakString triggerString, PostgreSQLInterface *pgsql);
 int GetActiveClanCount(unsigned int userId, PostgreSQLInterface *pgsql);
-bool CreateAccountParametersFailed( CreateAccountParameters &createAccountParameters, RakNet::Lobby2ResultCode &resultCode, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql);
+bool CreateAccountParametersFailed( CreateAccountParameters &createAccountParameters, SLNet::Lobby2ResultCode &resultCode, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql);
 void UpdateAccountFromMissingCreationParameters(CreateAccountParameters &createAccountParameters, unsigned int userPrimaryKey, Lobby2ServerCommand *command, PostgreSQLInterface *pgsql);
 
 __L2_MSG_DB_HEADER(Platform_Startup, PGSQL){virtual bool ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface ) { (void)command; (void)databaseInterface; return false; }};
@@ -340,7 +345,7 @@ __L2_MSG_DB_HEADER(Notification_Friends_StatusChange, PGSQL)
 			OutputFriendsNotification(Notification_Friends_StatusChange::FRIEND_LOGGED_OFF, command, pgsql);
 		}
 
-		// Don't let the thread return this notification with RakNet::UNASSIGNED_SYSTEM_ADDRESS to the user. It's just a message to the thread.
+		// Don't let the thread return this notification with SLNet::UNASSIGNED_SYSTEM_ADDRESS to the user. It's just a message to the thread.
 		return false;
 	}
 	virtual void ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle )
@@ -387,7 +392,7 @@ __L2_MSG_DB_HEADER(Notification_Friends_PresenceUpdate, PGSQL)
 			command->server->AddOutputFromThread(notification, output[idx], "");
 		}
 
-		// Don't let the thread return this notification with RakNet::UNASSIGNED_SYSTEM_ADDRESS to the user. It's just a message to the thread.
+		// Don't let the thread return this notification with SLNet::UNASSIGNED_SYSTEM_ADDRESS to the user. It's just a message to the thread.
 		return false;
 	}
 };
@@ -395,7 +400,7 @@ __L2_MSG_DB_HEADER(Notification_Friends_PresenceUpdate, PGSQL)
 
 // --------------------------------------------- Database specific factory class for all messages --------------------------------------------
 
-#define __L2_MSG_FACTORY_IMPL(__NAME__,__DB__) {case L2MID_##__NAME__ : return RakNet::OP_NEW< __NAME__##_##__DB__ >( _FILE_AND_LINE_ ) ;}
+#define __L2_MSG_FACTORY_IMPL(__NAME__,__DB__) {case L2MID_##__NAME__ : return SLNet::OP_NEW< __NAME__##_##__DB__ >( _FILE_AND_LINE_ ) ;}
 
 struct Lobby2MessageFactory_PGSQL : public Lobby2MessageFactory
 {
@@ -521,6 +526,6 @@ struct Lobby2MessageFactory_PGSQL : public Lobby2MessageFactory
 		};
 	};
 };
-}; // namespace RakNet
+}; // namespace SLNet
 
 #endif

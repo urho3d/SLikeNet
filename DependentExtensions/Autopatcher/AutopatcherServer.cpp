@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,25 +18,21 @@
 
 
 #include "AutopatcherServer.h"
-#include "DirectoryDeltaTransfer.h"
-#include "FileList.h"
-#include "StringCompressor.h"
-#include "RakPeerInterface.h"
-#include "FileListTransfer.h"
-#include "FileListTransferCBInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "AutopatcherRepositoryInterface.h"
-#include "RakAssert.h"
-#include "AutopatcherPatchContext.h"
+#include "slikenet/DirectoryDeltaTransfer.h"
+#include "slikenet/FileList.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/AutopatcherRepositoryInterface.h"
+#include "slikenet/assert.h"
+#include "slikenet/AutopatcherPatchContext.h"
 #include <stdio.h>
 #include <time.h>
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
-
-using namespace RakNet;
+using namespace SLNet;
 
 const static unsigned HASH_LENGTH=4;
 
@@ -40,7 +41,7 @@ void AutopatcherServerLoadNotifier_Printf::OnQueueUpdate(SystemAddress remoteSys
 	char *operationString;
 	char *requestTypeString;
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString);
+	remoteSystem.ToString(true, systemAddressString, 32);
 	if (requestType==ASUMC_GET_CHANGELIST)
 		requestTypeString="GetChangelist";
 	else
@@ -60,7 +61,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(
 									  AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 {
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString);
+	remoteSystem.ToString(true, systemAddressString, 32);
 
 	char *changelistString;
 	if (getChangelistResult==GCR_DELETE_FILES)
@@ -79,7 +80,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(
 void AutopatcherServerLoadNotifier_Printf::OnGetPatchCompleted(SystemAddress remoteSystem, AutopatcherServerLoadNotifier::PatchResult patchResult, AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 {
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString);
+	remoteSystem.ToString(true, systemAddressString, 32);
 
 	char *patchResultString;
 	if (patchResult==PR_NO_FILES_NEEDED_PATCHING)
@@ -172,9 +173,6 @@ void AutopatcherServer::OnDetach(void)
 {
 	Clear();
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherServer::Update(void)
 {
 	while (PatchingUserLimitReached()==false && userRequestWaitingQueue.Size()>0)
@@ -205,9 +203,6 @@ PluginReceiveResult AutopatcherServer::OnReceive(Packet *packet)
 
 	return RR_CONTINUE_PROCESSING;
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherServer::OnShutdown(void)
 {
 	Clear();
@@ -221,14 +216,14 @@ void AutopatcherServer::Clear(void)
 	{
 		if (DecrementPatchingUserCount(threadPool.GetInputAtIndex(i).systemAddress))
 			CallPatchCompleteCallback(threadPool.GetInputAtIndex(i).systemAddress, AutopatcherServerLoadNotifier::PR_ABORTED_FROM_INPUT_THREAD);
-		RakNet::OP_DELETE(threadPool.GetInputAtIndex(i).clientList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadPool.GetInputAtIndex(i).clientList, _FILE_AND_LINE_);
 	}
 	threadPool.ClearInput();
 	for (i=0; i < threadPool.OutputSize(); i++)
 	{
-		RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->patchList, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->deletedFiles, _FILE_AND_LINE_);
-		RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->addedOrModifiedFilesWithHashData, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->patchList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->deletedFiles, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->addedOrModifiedFilesWithHashData, _FILE_AND_LINE_);
 	}
 	threadPool.ClearOutput();
 
@@ -237,15 +232,9 @@ void AutopatcherServer::Clear(void)
 
 	patchingUsers.Clear(true, _FILE_AND_LINE_);
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherServer::OnStartup(RakPeerInterface *peer)
 {
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
 	RemoveFromThreadPool(systemAddress);
@@ -281,7 +270,7 @@ void AutopatcherServer::RemoveFromThreadPool(SystemAddress systemAddress)
 		{
 			if (DecrementPatchingUserCount(systemAddress))
 				CallPatchCompleteCallback(threadPool.GetInputAtIndex(i).systemAddress, AutopatcherServerLoadNotifier::PR_ABORTED_FROM_INPUT_THREAD);
-			RakNet::OP_DELETE(threadPool.GetInputAtIndex(i).clientList, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadPool.GetInputAtIndex(i).clientList, _FILE_AND_LINE_);
 			threadPool.RemoveInputAtIndex(i);
 		}
 		else
@@ -295,9 +284,9 @@ void AutopatcherServer::RemoveFromThreadPool(SystemAddress systemAddress)
 	{
 		if (threadPool.GetOutputAtIndex(i)->systemAddress==systemAddress)
 		{
-			RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->patchList, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->deletedFiles, _FILE_AND_LINE_);
-			RakNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->addedOrModifiedFilesWithHashData, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->patchList, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->deletedFiles, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadPool.GetOutputAtIndex(i)->addedOrModifiedFilesWithHashData, _FILE_AND_LINE_);
 			threadPool.RemoveOutputAtIndex(i);
 		}
 		else
@@ -305,7 +294,7 @@ void AutopatcherServer::RemoveFromThreadPool(SystemAddress systemAddress)
 	}
 	threadPool.UnlockOutput();
 }
-namespace RakNet
+namespace SLNet
 {
 AutopatcherServer::ResultTypeAndBitstream* GetChangelistSinceDateCB(AutopatcherServer::ThreadData threadData, bool *returnOutput, void* perThreadData)
 {
@@ -314,11 +303,11 @@ AutopatcherServer::ResultTypeAndBitstream* GetChangelistSinceDateCB(AutopatcherS
 	FileList addedOrModifiedFilesWithHashData, deletedFiles;
 	AutopatcherServer *server = threadData.server;
 
-	//AutopatcherServer::ResultTypeAndBitstream *rtab = RakNet::OP_NEW<AutopatcherServer::ResultTypeAndBitstream>( _FILE_AND_LINE_ );
+	//AutopatcherServer::ResultTypeAndBitstream *rtab = SLNet::OP_NEW<AutopatcherServer::ResultTypeAndBitstream>( _FILE_AND_LINE_ );
 	AutopatcherServer::ResultTypeAndBitstream rtab;
 	rtab.systemAddress=threadData.systemAddress;
-// 	rtab.deletedFiles=RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
-// 	rtab.addedFiles=RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+// 	rtab.deletedFiles=SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+// 	rtab.addedFiles=SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
 	rtab.deletedFiles=&deletedFiles;
 	rtab.addedOrModifiedFilesWithHashData=&addedOrModifiedFilesWithHashData;
 
@@ -367,8 +356,8 @@ AutopatcherServer::ResultTypeAndBitstream* GetChangelistSinceDateCB(AutopatcherS
 		rtab.bitStream2.Write((unsigned char) ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR);
 		StringCompressor::Instance()->EncodeString(repository->GetLastError(), 256, &rtab.bitStream2);	
 	}
-// 	RakNet::OP_DELETE(rtab.deletedFiles, _FILE_AND_LINE_);
-// 	RakNet::OP_DELETE(rtab.addedFiles, _FILE_AND_LINE_);
+// 	SLNet::OP_DELETE(rtab.deletedFiles, _FILE_AND_LINE_);
+// 	SLNet::OP_DELETE(rtab.addedFiles, _FILE_AND_LINE_);
 
 	*returnOutput=false;
 
@@ -407,7 +396,7 @@ AutopatcherServer::ResultTypeAndBitstream* GetChangelistSinceDateCB(AutopatcherS
 }
 PluginReceiveResult AutopatcherServer::OnGetChangelistSinceDate(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	ThreadData threadData;
 	threadData.clientList=0;
 	inBitStream.IgnoreBits(8);
@@ -416,8 +405,8 @@ PluginReceiveResult AutopatcherServer::OnGetChangelistSinceDate(Packet *packet)
 
 	if (cacheLoaded && threadData.lastUpdateDate!=0 && threadData.applicationName==cache_appName)
 	{
-		RakNet::BitStream bitStream1;
-		RakNet::BitStream bitStream2;
+		SLNet::BitStream bitStream1;
+		SLNet::BitStream bitStream2;
 		double currentDate=(double) time(NULL);
 		if (cache_maxTime!=0 && threadData.lastUpdateDate>cache_maxTime)
 		{
@@ -465,7 +454,7 @@ PluginReceiveResult AutopatcherServer::OnGetChangelistSinceDate(Packet *packet)
 }
 void AutopatcherServer::OnGetChangelistSinceDateInt(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	ThreadData threadData;
 	threadData.clientList=0;
 	inBitStream.IgnoreBits(8);
@@ -481,17 +470,17 @@ void AutopatcherServer::OnGetChangelistSinceDateInt(Packet *packet)
 		threadPool.AddInput(GetChangelistSinceDateCB, threadData);
 	}
 }
-namespace RakNet {
+namespace SLNet {
 AutopatcherServer::ResultTypeAndBitstream* GetPatchCB(AutopatcherServer::ThreadData threadData, bool *returnOutput, void* perThreadData)
 {
 	AutopatcherServer *server = threadData.server;
 	AutopatcherRepositoryInterface *repository = (AutopatcherRepositoryInterface*)perThreadData;
 
-	// AutopatcherServer::ResultTypeAndBitstream *rtab = RakNet::OP_NEW<AutopatcherServer::ResultTypeAndBitstream>( _FILE_AND_LINE_ );
+	// AutopatcherServer::ResultTypeAndBitstream *rtab = SLNet::OP_NEW<AutopatcherServer::ResultTypeAndBitstream>( _FILE_AND_LINE_ );
 	AutopatcherServer::ResultTypeAndBitstream rtab;
 	rtab.systemAddress=threadData.systemAddress;
 	FileList fileList;
-	// rtab.patchList=RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+	// rtab.patchList=SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
 	rtab.patchList=&fileList;
 	RakAssert(server);
 //	RakAssert(server->repository);
@@ -501,7 +490,7 @@ AutopatcherServer::ResultTypeAndBitstream* GetPatchCB(AutopatcherServer::ThreadD
 	rtab.setId=threadData.setId;
 	rtab.currentDate=(double) time(NULL);
 
-	RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 
 	if (rtab.resultCode==1)
 	{
@@ -574,7 +563,7 @@ AutopatcherServer::ResultTypeAndBitstream* GetPatchCB(AutopatcherServer::ThreadD
 }
 PluginReceiveResult AutopatcherServer::OnGetPatch(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	
 	ThreadData threadData;
 	inBitStream.IgnoreBits(8);
@@ -589,22 +578,22 @@ PluginReceiveResult AutopatcherServer::OnGetPatch(Packet *packet)
 	{
 		threadData.systemAddress=packet->systemAddress;
 		threadData.server=this;
-		threadData.clientList=RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+		threadData.clientList= SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
 
 		if (threadData.clientList->Deserialize(&inBitStream)==false)
 		{
-			RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 			return RR_STOP_PROCESSING_AND_DEALLOCATE;
 		}
 		if (threadData.clientList->fileList.Size()==0)
 		{
 			RakAssert(0);
-			RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 			return RR_STOP_PROCESSING_AND_DEALLOCATE;
 		}
 
 		char *userHash;
-		RakNet::RakString userFilename;
+		SLNet::RakString userFilename;
 		FileList patchList;
 		bool cacheUpdateFailed=false;
 
@@ -620,7 +609,7 @@ PluginReceiveResult AutopatcherServer::OnGetPatch(Packet *packet)
 				// If the user has a hash, check for this file in cache_patchedFiles. If not found, or hash is wrong, use DB
 				if (threadData.clientList->fileList[i].dataLengthBytes!=HASH_LENGTH)
 				{
-					RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+					SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 					return RR_STOP_PROCESSING_AND_DEALLOCATE;
 				}
 
@@ -684,19 +673,19 @@ PluginReceiveResult AutopatcherServer::OnGetPatch(Packet *packet)
 			if (IncrementPatchingUserCount(packet->systemAddress))
 			{
 				fileListTransfer->Send(&patchList, 0, packet->systemAddress, threadData.setId, priority, orderingChannel, this, 262144*4*4);
-				RakNet::BitStream bitStream1;
+				SLNet::BitStream bitStream1;
 				bitStream1.Write((unsigned char) ID_AUTOPATCHER_FINISHED_INTERNAL);
 				double t =(double) time(NULL);
 				bitStream1.Write(t);
 				SendUnified(&bitStream1, priority, RELIABLE_ORDERED, orderingChannel, packet->systemAddress, false);
 
-				RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+				SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 				return RR_STOP_PROCESSING_AND_DEALLOCATE;
 			}
 		}
 	}
 
-	RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 	
 	if (PatchingUserLimitReached())
 	{
@@ -709,7 +698,7 @@ PluginReceiveResult AutopatcherServer::OnGetPatch(Packet *packet)
 }
 void AutopatcherServer::OnGetPatchInt(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 
 	ThreadData threadData;
 	inBitStream.IgnoreBits(8);
@@ -719,17 +708,17 @@ void AutopatcherServer::OnGetPatchInt(Packet *packet)
 	inBitStream.ReadCompressed(threadData.applicationName);
 	threadData.systemAddress=packet->systemAddress;
 	threadData.server=this;
-	threadData.clientList=RakNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
+	threadData.clientList= SLNet::OP_NEW<FileList>( _FILE_AND_LINE_ );
 
 	if (threadData.clientList->Deserialize(&inBitStream)==false)
 	{
-		RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 		return;
 	}
 	if (threadData.clientList->fileList.Size()==0)
 	{
 		RakAssert(0);
-		RakNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(threadData.clientList, _FILE_AND_LINE_);
 		return;
 	}
 
@@ -882,7 +871,3 @@ unsigned int AutopatcherServer::GetFilePart( const char *filename, unsigned int 
 	memcpy(preallocatedDestination, context.dataPtr, bytesToRead);
 	return bytesToRead;
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

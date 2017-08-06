@@ -13,6 +13,17 @@ LGPL like the rest of the engine.
 */
 
 /*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * Modifications in this file are free to be used for anything you like.
+ * Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The
+ * license can be found in the license.txt file in the root directory of this source tree.
+ */
+
+/*
 -----------------------------------------------------------------------------
 Filename:    BspCollision.cpp
 Description: Somewhere to play in the sand...
@@ -33,10 +44,10 @@ static const int num_rows = 3;
 
 // RakNet: Logger includes.
 #include "SQLiteClientLoggerPlugin.h"
-#include "PacketizedTCP.h"
+#include "slikenet/PacketizedTCP.h"
 #include "Ogre3D_DX9_BackbufferGrabber.h"
-#include "RakNetTime.h"
-#include "GetTime.h"
+#include "slikenet/time.h"
+#include "slikenet/GetTime.h"
 
 // Event handler to add ability to alter curvature
 class BspCollisionListener : public ExampleRefAppFrameListener
@@ -44,9 +55,9 @@ class BspCollisionListener : public ExampleRefAppFrameListener
 protected:
 	// RakNet: For logging video
 	PacketizedTCP packetizedTCP;
-	RakNet::SQLiteClientLoggerPlugin loggerPlugin;
+	SLNet::SQLiteClientLoggerPlugin loggerPlugin;
 	Ogre3D_DX9_BackbufferGrabber backbufferGrabber;
-	RakNet::TimeMS lastScreenshotTime;
+	SLNet::TimeMS lastScreenshotTime;
 
 	// Also save the world * so we can log it out
 	World* mWorld;
@@ -114,18 +125,18 @@ public:
 		// RakNet: Send screenshot and FPS info to server if connected, at most once every 30 milliseconds
 		// This is constrained so we don't overflow the server with screenshots
 		// Also only do it if we connected to the server
-		RakNet::TimeMS timeSinceLastLog=RakNet::GetTimeMS()-lastScreenshotTime;
+		SLNet::TimeMS timeSinceLastLog= SLNet::GetTimeMS()-lastScreenshotTime;
 		if (packetizedTCP.GetConnectionCount()>0 && timeSinceLastLog>30)
 		{
-			RakNet::RGBImageBlob blob;
+			SLNet::RGBImageBlob blob;
 			backbufferGrabber.LockBackbufferCopy(&blob);
 			RakAssert(blob.data!=0);
 			// RakNet: Log frame data, including screenshot and FPS
-			RakNet::SQLLogResult logResult = rakSqlLog("FrameData", "screenshot,averageFPS,lastFPS,bestFPS,worstFPS,numTris,DebugText",
+			SLNet::SQLLogResult logResult = rakSqlLog("FrameData", "screenshot,averageFPS,lastFPS,bestFPS,worstFPS,numTris,DebugText",
 				( &blob,mWindow->getAverageFPS(),mWindow->getLastFPS(),mWindow->getBestFPS(),mWindow->getWorstFPS(),(int) mWindow->getTriangleCount(),mDebugText.c_str() ));
 			// Release backbuffer as soon as possible, after sending frame data
 			backbufferGrabber.ReleaseBackbufferCopy();
-			if ( logResult==RakNet::SQLLR_WOULD_EXCEED_MEMORY_CONSTRAINT )
+			if ( logResult== SLNet::SQLLR_WOULD_EXCEED_MEMORY_CONSTRAINT )
 			{
 				/// Sending too large of screenshots, or can't transfer data fast enough. See loggerPlugin.SetMemoryConstraint
 			}
@@ -151,7 +162,7 @@ public:
 				}
 			}
 
-			lastScreenshotTime=RakNet::GetTimeMS();
+			lastScreenshotTime= SLNet::GetTimeMS();
 		}
 
         return ret;

@@ -1,7 +1,19 @@
-#include "SQLiteLoggerCommon.h"
-#include "BitStream.h"
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
 
-using namespace RakNet;
+#include "SQLiteLoggerCommon.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
+
+using namespace SLNet;
 
 static const char *sqlDataTypeNames[SQLLPDT_COUNT] = 
 {
@@ -15,7 +27,7 @@ static const char *sqlDataTypeNames[SQLLPDT_COUNT] =
 
 extern "C" const char *GetSqlDataTypeName(SQLLoggerPrimaryDataType idx) {return sqlDataTypeNames[(int)idx];}
 
-void LogParameter::Serialize(RakNet::BitStream *bs) const
+void LogParameter::Serialize(SLNet::BitStream *bs) const
 {
 	unsigned char c = type;
 	bs->Write(c);
@@ -44,7 +56,7 @@ void LogParameter::Serialize(RakNet::BitStream *bs) const
 			break;
 	}
 }
-bool LogParameter::Deserialize(RakNet::BitStream *bs)
+bool LogParameter::Deserialize(SLNet::BitStream *bs)
 {
 	bool b;
 	unsigned char c;
@@ -124,7 +136,8 @@ void RGBImageBlob::SaveToTGA(const char *filename)
 // 	DXT compressor input format is ARGB.
 
 	// http://local.wasp.uwa.edu.au/~pbourke/dataformats/tga/
-	FILE *fptr = fopen(filename, "wb");
+	FILE *fptr;
+	fopen_s(&fptr, filename, "wb");
 	TGAHEADER h;
 	memset(&h,0,sizeof(h));
 	h.datatypecode=2;

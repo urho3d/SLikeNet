@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //Macros that are not in a specific file are placed here, note that not all macros are here some are spread throughout the other files
 
 //This you only need it once for all simple situations 

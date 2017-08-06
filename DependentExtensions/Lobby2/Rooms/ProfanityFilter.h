@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __PROFANITY_FILTER__H__
 #define __PROFANITY_FILTER__H__
 
-#include "DS_List.h"
-#include "RakString.h"
+#include "slikenet/DS_List.h"
+#include "slikenet/string.h"
 
-namespace RakNet {
+namespace SLNet {
 
 class ProfanityFilter
 {
@@ -26,14 +31,14 @@ public:
 	bool HasProfanity(const char *str);
 
 	// Removes profanity. Returns number of occurrences of profanity matches (including 0)
-	int FilterProfanity(const char *str, char *output, bool filter = true); 		
+	int FilterProfanity(const char *str, char *output, size_t outputLength, bool filter = true); 		
 	
 	// Number of profanity words loaded
 	int Count();
 
-	void AddWord(RakNet::RakString newWord);
+	void AddWord(SLNet::RakString newWord);
 private:	
-	DataStructures::List<RakNet::RakString> words;
+	DataStructures::List<SLNet::RakString> words;
 
 	char RandomBanChar();
 
@@ -41,6 +46,6 @@ private:
 	static char WORDCHARS[];
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __PROFANITY__H__

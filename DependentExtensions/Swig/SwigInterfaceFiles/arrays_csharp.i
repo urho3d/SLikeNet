@@ -1,6 +1,12 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * See licenses/SWIG library files license.txt for license and copyright information.
+ * 
+ * Modified work : Copyright(c) 2017, SLikeSoft UG(haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications in this file are provided with no particular
+ * license requirements.
+ * Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The
+ * license can be found in the license.txt file in the root directory of this source tree.
  *
  * arrays_csharp.i
  *

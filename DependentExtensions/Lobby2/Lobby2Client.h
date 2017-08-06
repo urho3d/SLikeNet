@@ -1,20 +1,25 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_CLIENT_H
 #define __LOBBY_2_CLIENT_H
 
 #include "Lobby2Plugin.h"
-#include "DS_OrderedList.h"
+#include "slikenet/DS_OrderedList.h"
 
-namespace RakNet
+namespace SLNet
 {
 
 struct Lobby2Message;
@@ -25,14 +30,14 @@ struct Lobby2Message;
 /// To use:<BR>
 /// <OL>
 /// <LI>Call Lobby2Client::SetServerAddress() after connecting to the system running Lobby2Server.
-/// <LI>Instantiate an instance of RakNet::Lobby2MessageFactory and register it with RakNet::Lobby2Plugin::SetMessageFactory() (the base class of Lobby2Client)
+/// <LI>Instantiate an instance of SLNet::Lobby2MessageFactory and register it with SLNet::Lobby2Plugin::SetMessageFactory() (the base class of Lobby2Client)
 /// <LI>Call messageFactory.Alloc(command); where command is one of the Lobby2MessageID enumerations.
 /// <LI>Instantiate a (probably derived) instance of Lobby2Callbacks and register it with Lobby2Client::SetCallbackInterface()
 /// <LI>Cast the returned structure, fill in the input parameters, and call Lobby2Client::SendMsg() to send this command to the server.
 /// <LI>Wait for the result of the operation to be sent to your callback. The message will contain the original input parameters, possibly output parameters, and Lobby2Message::resultCode will be filled in.
 /// </OL>
 /// \ingroup LOBBY_2_CLIENT
-class RAK_DLL_EXPORT Lobby2Client : public RakNet::Lobby2Plugin
+class RAK_DLL_EXPORT Lobby2Client : public SLNet::Lobby2Plugin
 {
 public:	
 	Lobby2Client();
@@ -59,13 +64,13 @@ public:
 	/// Client_GetIgnoreList is sent to us from the server automatically on login.
 	/// The main reason this is here is so if you use RoomsPlugin as a client, you can check this list to filter out chat messages from ignored users.
 	/// This is just a list of strings for you to read - it does NOT actually perform the ignore operation.
-	virtual void AddToIgnoreList(RakNet::RakString user);
-	virtual void RemoveFromIgnoreList(RakNet::RakString user);
-	virtual void SetIgnoreList(DataStructures::List<RakNet::RakString> users);
-	virtual bool IsInIgnoreList(RakNet::RakString user) const;
+	virtual void AddToIgnoreList(SLNet::RakString user);
+	virtual void RemoveFromIgnoreList(SLNet::RakString user);
+	virtual void SetIgnoreList(DataStructures::List<SLNet::RakString> users);
+	virtual bool IsInIgnoreList(SLNet::RakString user) const;
 	void ClearIgnoreList(void);
-	const DataStructures::OrderedList<RakNet::RakString, RakNet::RakString>* GetIgnoreList(void) const;
-	DataStructures::OrderedList<RakNet::RakString, RakNet::RakString> ignoreList;
+	const DataStructures::OrderedList<SLNet::RakString, SLNet::RakString>* GetIgnoreList(void) const;
+	DataStructures::OrderedList<SLNet::RakString, SLNet::RakString> ignoreList;
 	*/
 
 protected:

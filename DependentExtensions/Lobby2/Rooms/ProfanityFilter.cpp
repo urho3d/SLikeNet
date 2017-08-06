@@ -1,17 +1,24 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "ProfanityFilter.h"
-#include "Rand.h"
-#include "RakAssert.h"
-#include "LinuxStrings.h"
+#include "slikenet/Rand.h"
+#include "slikenet/assert.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #if defined(_WIN32)
 #include <malloc.h> // alloca
@@ -20,7 +27,7 @@
 #else
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 
 char ProfanityFilter::BANCHARS[] = "!@#$%^&*()";
 char ProfanityFilter::WORDCHARS[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -42,21 +49,21 @@ char ProfanityFilter::RandomBanChar()
 
 bool ProfanityFilter::HasProfanity(const char *str)
 {
-	return FilterProfanity(str, 0,false) > 0;
+	return FilterProfanity(str, 0, 0,false) > 0;
 }
 
-int ProfanityFilter::FilterProfanity(const char *input, char *output, bool filter)
+int ProfanityFilter::FilterProfanity(const char *input, char *output, size_t outputLength, bool filter)
 {
 	if (input==0 || input[0]==0)
 		return 0;
 
 	int count = 0;
 	char* b = (char *) alloca(strlen(input) + 1); 
-	strcpy(b, input);
+	strcpy_s(b, strlen(input) + 1, input);
 	_strlwr(b);
 	char *start = b;
 	if (output)
-		strcpy(output,input);
+		strcpy_s(output,outputLength,input);
 
 	start = strpbrk(start, WORDCHARS);
 	while (start != 0)
@@ -100,7 +107,7 @@ int ProfanityFilter::Count()
 {
 	return words.Size();
 }
-void ProfanityFilter::AddWord(RakNet::RakString newWord)
+void ProfanityFilter::AddWord(SLNet::RakString newWord)
 {
 	words.Insert(newWord, _FILE_AND_LINE_ );
 }

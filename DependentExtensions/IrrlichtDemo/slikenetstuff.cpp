@@ -1,29 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakNetStuff.h"
+#include "slikenetstuff.h"
 
-#include "NetworkIDManager.h"
+#include "slikenet/NetworkIDManager.h"
 #include "CDemo.h"
-#include "RakNetTime.h"
-#include "GetTime.h"
-#include "SocketLayer.h"
+#include "slikenet/time.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 RakPeerInterface *rakPeer;
 NetworkIDManager *networkIDManager;
 ReplicaManager3Irrlicht *replicaManager3;
 NatPunchthroughClient *natPunchthroughClient;
 CloudClient *cloudClient;
-RakNet::FullyConnectedMesh2 *fullyConnectedMesh2;
+SLNet::FullyConnectedMesh2 *fullyConnectedMesh2;
 PlayerReplica *playerReplica;
 
 /*
@@ -83,18 +90,18 @@ void InstantiateRakNetClasses(void)
 {
 	static const int MAX_PLAYERS=32;
 	static const unsigned short TCP_PORT=0;
-	static const RakNet::TimeMS UDP_SLEEP_TIMER=30;
+	static const SLNet::TimeMS UDP_SLEEP_TIMER=30;
 
 	// Basis of all UDP communications
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	// Using fixed port so we can use AdvertiseSystem and connect on the LAN if the server is not available.
-	RakNet::SocketDescriptor sd(1234,0);
+	SLNet::SocketDescriptor sd(1234,0);
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	while (IRNS2_Berkley::IsPortInUse(sd.port, sd.hostAddress, sd.socketFamily, SOCK_DGRAM)==true)
 		sd.port++;
 	// +1 is for the connection to the NAT punchthrough server
-	RakNet::StartupResult sr = rakPeer->Startup(MAX_PLAYERS+1,&sd,1);
-	RakAssert(sr==RakNet::RAKNET_STARTED);
+	SLNet::StartupResult sr = rakPeer->Startup(MAX_PLAYERS+1,&sd,1);
+	RakAssert(sr== SLNet::RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(MAX_PLAYERS);
 	// Fast disconnect for easier testing of host migration
 	rakPeer->SetTimeoutTime(5000,UNASSIGNED_SYSTEM_ADDRESS);
@@ -133,7 +140,7 @@ void DeinitializeRakNetClasses(void)
 {
 	// Shutdown so the server knows we stopped
 	rakPeer->Shutdown(100,0);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	delete networkIDManager;
 	delete replicaManager3;
 	delete natPunchthroughClient;
@@ -150,23 +157,23 @@ BaseIrrlichtReplica::~BaseIrrlichtReplica()
 {
 
 }
-void BaseIrrlichtReplica::SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)
+void BaseIrrlichtReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
 	constructionBitstream->Write(position);
 }
-bool BaseIrrlichtReplica::DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection)
+bool BaseIrrlichtReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 {
 	constructionBitstream->Read(position);
 	return true;
 }
-RM3SerializationResult BaseIrrlichtReplica::Serialize(RakNet::SerializeParameters *serializeParameters)
+RM3SerializationResult BaseIrrlichtReplica::Serialize(SLNet::SerializeParameters *serializeParameters)
 {
 	return RM3SR_BROADCAST_IDENTICALLY;
 }
-void BaseIrrlichtReplica::Deserialize(RakNet::DeserializeParameters *deserializeParameters)
+void BaseIrrlichtReplica::Deserialize(SLNet::DeserializeParameters *deserializeParameters)
 {
 }
-void BaseIrrlichtReplica::Update(RakNet::TimeMS curTime)
+void BaseIrrlichtReplica::Update(SLNet::TimeMS curTime)
 {
 }
 PlayerReplica::PlayerReplica()
@@ -175,7 +182,7 @@ PlayerReplica::PlayerReplica()
 	rotationDeltaPerMS=0.0f;
 	isMoving=false;
 	deathTimeout=0;
-	lastUpdate=RakNet::GetTimeMS();
+	lastUpdate= SLNet::GetTimeMS();
 	playerList.Push(this,_FILE_AND_LINE_);
 }
 PlayerReplica::~PlayerReplica()
@@ -184,18 +191,18 @@ PlayerReplica::~PlayerReplica()
 	if (index != (unsigned int) -1)
 		playerList.RemoveAtIndexFast(index);
 }
-void PlayerReplica::WriteAllocationID(RakNet::Connection_RM3 *destinationConnection, RakNet::BitStream *allocationIdBitstream) const
+void PlayerReplica::WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
 {
-	allocationIdBitstream->Write(RakNet::RakString("PlayerReplica"));
+	allocationIdBitstream->Write(SLNet::RakString("PlayerReplica"));
 }
-void PlayerReplica::SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)
+void PlayerReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
 	BaseIrrlichtReplica::SerializeConstruction(constructionBitstream, destinationConnection);
 	constructionBitstream->Write(rotationAroundYAxis);
 	constructionBitstream->Write(playerName);
 	constructionBitstream->Write(IsDead());
 }
-bool PlayerReplica::DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection)
+bool PlayerReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 {
 	if (!BaseIrrlichtReplica::DeserializeConstruction(constructionBitstream, sourceConnection))
 		return false;
@@ -204,7 +211,7 @@ bool PlayerReplica::DeserializeConstruction(RakNet::BitStream *constructionBitst
 	constructionBitstream->Read(isDead);
 	return true;
 }
-void PlayerReplica::PostDeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)
+void PlayerReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
 	// Object was remotely created and all data loaded. Now we can make the object visible
 	scene::IAnimatedMesh* mesh = 0;
@@ -228,18 +235,18 @@ void PlayerReplica::PostDeserializeConstruction(RakNet::BitStream *constructionB
 	model->setVisible(true);
 	model->setAnimationEndCallback(this);
 	wchar_t playerNameWChar[1024];
-	mbstowcs(playerNameWChar, playerName.C_String(), 1024);
+	mbstowcs_s(NULL, playerNameWChar, playerName.C_String(), 1023);
 	scene::IBillboardSceneNode *bb = sm->addBillboardTextSceneNode(0, playerNameWChar, model);
 	bb->setSize(core::dimension2df(40,20));
-	bb->setPosition(core::vector3df(0,model->getBoundingBox().MaxEdge.Y+bb->getBoundingBox().MaxEdge.Y-bb->getBoundingBox().MinEdge.Y+5.0,0));
+	bb->setPosition(core::vector3df(0,model->getBoundingBox().MaxEdge.Y+bb->getBoundingBox().MaxEdge.Y-bb->getBoundingBox().MinEdge.Y+5.0f,0));
 	bb->setColor(video::SColor(255,255,128,128), video::SColor(255,255,128,128));
 }
-void PlayerReplica::PreDestruction(RakNet::Connection_RM3 *sourceConnection)
+void PlayerReplica::PreDestruction(SLNet::Connection_RM3 *sourceConnection)
 {
 	if (model)
 		model->remove();
 }
-RM3SerializationResult PlayerReplica::Serialize(RakNet::SerializeParameters *serializeParameters)
+RM3SerializationResult PlayerReplica::Serialize(SLNet::SerializeParameters *serializeParameters)
 {
 	BaseIrrlichtReplica::Serialize(serializeParameters);
 	serializeParameters->outputBitstream[0].Write(position);
@@ -248,7 +255,7 @@ RM3SerializationResult PlayerReplica::Serialize(RakNet::SerializeParameters *ser
 	serializeParameters->outputBitstream[0].Write(IsDead());
 	return RM3SR_BROADCAST_IDENTICALLY;
 }
-void PlayerReplica::Deserialize(RakNet::DeserializeParameters *deserializeParameters)
+void PlayerReplica::Deserialize(SLNet::DeserializeParameters *deserializeParameters)
 {
 	BaseIrrlichtReplica::Deserialize(deserializeParameters);
 	deserializeParameters->serializationBitstream[0].Read(position);
@@ -267,12 +274,12 @@ void PlayerReplica::Deserialize(RakNet::DeserializeParameters *deserializeParame
 	float rotationOffset;
 	rotationOffset=GetRotationDifference(rotationAroundYAxis,model->getRotation().Y);
 	rotationDeltaPerMS = rotationOffset / INTERP_TIME_MS;
-	interpEndTime = RakNet::GetTimeMS() + (RakNet::TimeMS) INTERP_TIME_MS;
+	interpEndTime = SLNet::GetTimeMS() + (SLNet::TimeMS) INTERP_TIME_MS;
 }
-void PlayerReplica::Update(RakNet::TimeMS curTime)
+void PlayerReplica::Update(SLNet::TimeMS curTime)
 {
 	// Is a locally created object?
-	if (creatingSystemGUID==rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS))
+	if (creatingSystemGUID==rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS))
 	{
 		// Local player has no mesh to interpolate
 		// Input our camera position as our player position
@@ -288,7 +295,7 @@ void PlayerReplica::Update(RakNet::TimeMS curTime)
 	}
 
 	// Update interpolation
-	RakNet::TimeMS elapsed = curTime-lastUpdate;
+	SLNet::TimeMS elapsed = curTime-lastUpdate;
 	if (elapsed<=1)
 		return;
 	if (elapsed>100)
@@ -377,32 +384,32 @@ void PlayerReplica::PlayAttackAnimation(void)
 }
 bool PlayerReplica::IsDead(void) const
 {
-	return deathTimeout > RakNet::GetTimeMS();
+	return deathTimeout > SLNet::GetTimeMS();
 }
 BallReplica::BallReplica()
 {
-	creationTime=RakNet::GetTimeMS();
+	creationTime= SLNet::GetTimeMS();
 }
 BallReplica::~BallReplica()
 {
 }
-void BallReplica::WriteAllocationID(RakNet::Connection_RM3 *destinationConnection, RakNet::BitStream *allocationIdBitstream) const 
+void BallReplica::WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
 {
-	allocationIdBitstream->Write(RakNet::RakString("BallReplica"));
+	allocationIdBitstream->Write(SLNet::RakString("BallReplica"));
 }
-void BallReplica::SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)
+void BallReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
 	BaseIrrlichtReplica::SerializeConstruction(constructionBitstream, destinationConnection);
 	constructionBitstream->Write(shotDirection);
 }
-bool BallReplica::DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection)
+bool BallReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 {
 	if (!BaseIrrlichtReplica::DeserializeConstruction(constructionBitstream, sourceConnection))
 		return false;
 	constructionBitstream->Read(shotDirection);
 	return true;
 }
-void BallReplica::PostDeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)
+void BallReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
 	// Shot visible effect and BallReplica classes are not linked, but they update the same way, such that
 	// they are in the same spot all the time
@@ -419,24 +426,24 @@ void BallReplica::PostDeserializeConstruction(RakNet::BitStream *constructionBit
 		}
 	}
 }
-void BallReplica::PreDestruction(RakNet::Connection_RM3 *sourceConnection)
+void BallReplica::PreDestruction(SLNet::Connection_RM3 *sourceConnection)
 {
 	// The system that shot this ball destroyed it, or disconnected
 	// Technically we should clear out the node visible effect too, but it's not important for now
 }
-RM3SerializationResult BallReplica::Serialize(RakNet::SerializeParameters *serializeParameters)
+RM3SerializationResult BallReplica::Serialize(SLNet::SerializeParameters *serializeParameters)
 {
 	BaseIrrlichtReplica::Serialize(serializeParameters);
 	return RM3SR_BROADCAST_IDENTICALLY;
 }
-void BallReplica::Deserialize(RakNet::DeserializeParameters *deserializeParameters)
+void BallReplica::Deserialize(SLNet::DeserializeParameters *deserializeParameters)
 {
 	BaseIrrlichtReplica::Deserialize(deserializeParameters);
 }
-void BallReplica::Update(RakNet::TimeMS curTime)
+void BallReplica::Update(SLNet::TimeMS curTime)
 {
 	// Is a locally created object?
-	if (creatingSystemGUID==rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS))
+	if (creatingSystemGUID==rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS))
 	{
 		// Destroy if shot expired
 		if (curTime > shotLifetime)
@@ -451,7 +458,7 @@ void BallReplica::Update(RakNet::TimeMS curTime)
 	// Keep at the same position as the visible effect
 	// Deterministic, so no need to actually transmit position
 	// The variable position is the origin that the ball was created at. For the player, it is their actual position
-	RakNet::TimeMS elapsedTime;
+	SLNet::TimeMS elapsedTime;
 	// Due to ping variances and timestamp miscalculations, it's possible with very low pings to get a slightly negative time, so we have to check
 	if (curTime>=creationTime)
 		elapsedTime = curTime - creationTime;
@@ -460,7 +467,7 @@ void BallReplica::Update(RakNet::TimeMS curTime)
 	irr::core::vector3df updatedPosition = position + shotDirection * (float) elapsedTime * SHOT_SPEED;
 
 	// See if the bullet hit us
-	if (creatingSystemGUID!=rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS))
+	if (creatingSystemGUID!=rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS))
 	{
 		if (playerReplica->IsDead()==false)
 		{
@@ -475,9 +482,9 @@ void BallReplica::Update(RakNet::TimeMS curTime)
 		}
 	}
 }
-RakNet::Replica3 *Connection_RM3Irrlicht::AllocReplica(RakNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
+SLNet::Replica3 *Connection_RM3Irrlicht::AllocReplica(SLNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
 {
-	RakNet::RakString typeName; allocationId->Read(typeName);
+	SLNet::RakString typeName; allocationId->Read(typeName);
 	if (typeName=="PlayerReplica") {BaseIrrlichtReplica *r = new PlayerReplica; r->demo=demo; return r;}
 	if (typeName=="BallReplica") {BaseIrrlichtReplica *r = new BallReplica; r->demo=demo; return r;}
 	return 0;

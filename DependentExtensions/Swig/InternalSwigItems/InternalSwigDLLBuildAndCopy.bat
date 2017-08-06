@@ -1,3 +1,6 @@
+REM This file was taken from RakNet 4.082 without any modifications.
+REM Please see licenses/RakNet license.txt for the underlying license and related copyright.
+
 @echo off
 if "%1"=="" goto :SKIPSETPATH
 set swigPath=%1
@@ -6,11 +9,13 @@ set swigPath=%swigPath:~0,-1%
 :SKIPREMOVESLASH
 set PATH=%PATH%;%swigPath%
 :SKIPSETPATH
-if "%VS80COMNTOOLS%"=="" goto :DONTUSEVS8
+if "%VS80COMNTOOLS%"=="" goto :DONTUSEVS8
+
 set toolDir=%VS80COMNTOOLS%
 goto :ENDFINDTOOLS
 :DONTUSEVS8
-if "%VS90COMNTOOLS%"=="" goto :DONTUSEVS9
+if "%VS90COMNTOOLS%"=="" goto :DONTUSEVS9
+
 set toolDir=%VS90COMNTOOLS%
 goto :ENDFINDTOOLS
 :DONTUSEVS9

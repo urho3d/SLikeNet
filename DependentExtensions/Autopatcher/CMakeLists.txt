@@ -1,3 +1,8 @@
+#
+# This file was taken from RakNet 4.082 without any modifications.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+
 project(Autopatcher)
 IF (UNIX AND NOT WIN32)
 	FILE(GLOB ALL_HEADER_SRCS *.h)

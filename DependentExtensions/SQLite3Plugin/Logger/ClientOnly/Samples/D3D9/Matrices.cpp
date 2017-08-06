@@ -24,15 +24,25 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
 
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
 
 // RakNet: Logger includes. Include before Windows.h
 #include "SQLiteClientLoggerPlugin.h"
-#include "PacketizedTCP.h"
+#include "slikenet/PacketizedTCP.h"
 #include "DX9_BackbufferGrabber.h"
 
 #include <Windows.h>
 #include <mmsystem.h>
 #include <d3dx9.h>
+#include <tchar.h>	// used for _T-macro
 #pragma warning( disable : 4996 ) // disable deprecated warning 
 #include <strsafe.h>
 #pragma warning( default : 4996 )
@@ -257,13 +267,13 @@ INT WINAPI wWinMain( HINSTANCE hInst, HINSTANCE, LPWSTR, INT )
     {
         sizeof( WNDCLASSEX ), CS_CLASSDC, MsgProc, 0L, 0L,
         GetModuleHandle( NULL ), NULL, NULL, NULL, NULL,
-        L"D3D Tutorial", NULL
+        _T("D3D Tutorial"), NULL
     };
     RegisterClassEx( &wc );
 
 	// Connect to the server if it is running, to store screenshots
-	RakNet::PacketizedTCP packetizedTCP;
-	RakNet::SQLiteClientLoggerPlugin loggerPlugin;
+	SLNet::PacketizedTCP packetizedTCP;
+	SLNet::SQLiteClientLoggerPlugin loggerPlugin;
 	packetizedTCP.AttachPlugin(&loggerPlugin);
 	packetizedTCP.Start(0,0);
 	loggerPlugin.SetServerParameters(packetizedTCP.Connect("127.0.0.1", 38123, true), "d3dvideo.sqlite");
@@ -271,7 +281,7 @@ INT WINAPI wWinMain( HINSTANCE hInst, HINSTANCE, LPWSTR, INT )
 	DX9_BackbufferGrabber backbufferGrabber;
 
     // Create the application's window
-    HWND hWnd = CreateWindow( L"D3D Tutorial", L"D3D Tutorial 03: Matrices",
+    HWND hWnd = CreateWindow(_T("D3D Tutorial"), _T("D3D Tutorial 03: Matrices"),
                               WS_OVERLAPPEDWINDOW, 100, 100, 512, 512,
                               NULL, NULL, hInst, NULL );
 	
@@ -309,7 +319,7 @@ INT WINAPI wWinMain( HINSTANCE hInst, HINSTANCE, LPWSTR, INT )
 					timeSinceLastLog=timeGetTime()-lastLogTime;
 					if (packetizedTCP.GetConnectionCount()>0 && timeSinceLastLog>30)
 					{
-						RakNet::RGBImageBlob blob;
+						SLNet::RGBImageBlob blob;
 						backbufferGrabber.LockBackbufferCopy(&blob);
 						RakAssert(blob.data!=0);
 						rakSqlLog("Screenshots", "screenshot", ( &blob ));
@@ -345,7 +355,7 @@ INT WINAPI wWinMain( HINSTANCE hInst, HINSTANCE, LPWSTR, INT )
         }
     }
 
-    UnregisterClass( L"D3D Tutorial", wc.hInstance );
+    UnregisterClass(_T("D3D Tutorial"), wc.hInstance );
     return 0;
 }
 

@@ -1,15 +1,25 @@
-#include "SQLite3ClientPlugin.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
 
-using namespace RakNet;
+#include "SQLite3ClientPlugin.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+
+using namespace SLNet;
 
 void SQLite3PluginResultInterface_Printf::_sqlite3_exec(
-	RakNet::RakString inputStatement,
+	SLNet::RakString inputStatement,
 	unsigned int queryId,
-	RakNet::RakString dbIdentifier,
+	SLNet::RakString dbIdentifier,
 	const SQLite3Table &table,
-	RakNet::RakString errorMsg)
+	SLNet::RakString errorMsg)
 {
 
 	if (errorMsg.IsEmpty()==false)
@@ -39,9 +49,9 @@ void SQLite3PluginResultInterface_Printf::_sqlite3_exec(
 	}
 }
 void SQLite3PluginResultInterface_Printf::OnUnknownDBIdentifier(
-	RakNet::RakString inputStatement,
+	SLNet::RakString inputStatement,
 	unsigned int queryId,
-	RakNet::RakString dbIdentifier)
+	SLNet::RakString dbIdentifier)
 {
 	printf("Unknown DB %s\n", dbIdentifier.C_String());
 }
@@ -66,10 +76,10 @@ void SQLite3ClientPlugin::ClearResultHandlers(void)
 {
 	resultHandlers.Clear(true,_FILE_AND_LINE_);
 }
-unsigned int SQLite3ClientPlugin::_sqlite3_exec(RakNet::RakString dbIdentifier, RakNet::RakString inputStatement,
+unsigned int SQLite3ClientPlugin::_sqlite3_exec(SLNet::RakString dbIdentifier, SLNet::RakString inputStatement,
 										  PacketPriority priority, PacketReliability reliability, char orderingChannel, const SystemAddress &systemAddress)
 {
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_SQLite3_EXEC);
 	bsOut.Write(nextQueryId);
 	bsOut.Write(dbIdentifier);
@@ -87,9 +97,9 @@ PluginReceiveResult SQLite3ClientPlugin::OnReceive(Packet *packet)
 	case ID_SQLite3_EXEC:
 		{
 			unsigned int queryId;
-			RakNet::RakString dbIdentifier;
-			RakNet::RakString inputStatement;
-			RakNet::BitStream bsIn(packet->data, packet->length, false);
+			SLNet::RakString dbIdentifier;
+			SLNet::RakString inputStatement;
+			SLNet::BitStream bsIn(packet->data, packet->length, false);
 			bsIn.IgnoreBytes(sizeof(MessageID));
 			bsIn.Read(queryId);
 			bsIn.Read(dbIdentifier);
@@ -104,7 +114,7 @@ PluginReceiveResult SQLite3ClientPlugin::OnReceive(Packet *packet)
 			else
 			{
 				// Client code
-				RakNet::RakString errorMsgStr;
+				SLNet::RakString errorMsgStr;
 				SQLite3Table inputTable;		
 
 				// Read it
@@ -122,9 +132,9 @@ PluginReceiveResult SQLite3ClientPlugin::OnReceive(Packet *packet)
 	case ID_SQLite3_UNKNOWN_DB:
 		{
 			unsigned int queryId;
-			RakNet::RakString dbIdentifier;
-			RakNet::RakString inputStatement;
-			RakNet::BitStream bsIn(packet->data, packet->length, false);
+			SLNet::RakString dbIdentifier;
+			SLNet::RakString inputStatement;
+			SLNet::BitStream bsIn(packet->data, packet->length, false);
 			bsIn.IgnoreBytes(sizeof(MessageID));
 			bsIn.Read(queryId);
 			bsIn.Read(dbIdentifier);

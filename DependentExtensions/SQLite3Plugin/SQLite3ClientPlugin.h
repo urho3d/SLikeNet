@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,18 +22,18 @@
 #ifndef ___SQLITE_3_CLIENT_PLUGIN_H
 #define ___SQLITE_3_CLIENT_PLUGIN_H
 
-#include "RakNetTypes.h"
-#include "Export.h"
-#include "PluginInterface2.h"
-#include "PacketPriority.h"
-#include "SocketIncludes.h"
-#include "DS_Multilist.h"
-#include "RakString.h"
+#include "slikenet/types.h"
+#include "slikenet/Export.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/SocketIncludes.h"
+#include "slikenet/DS_Multilist.h"
+#include "slikenet/string.h"
 #include "SQLite3PluginCommon.h"
 
 class RakPeerInterface;
 
-namespace RakNet
+namespace SLNet
 {
 
 /// \brief Handles results of calls to SQLite3Plugin::_sqlite3_exec()
@@ -49,11 +54,11 @@ public:
 	/// \param[out] errorMsg If _sqlite3_exec failed, then the error message is here, and table will be empty
 	/// \ingroup SQL_LITE_3_PLUGIN
 	virtual void _sqlite3_exec(
-		RakNet::RakString inputStatement,
+		SLNet::RakString inputStatement,
 		unsigned int queryId,
-		RakNet::RakString dbIdentifier,
+		SLNet::RakString dbIdentifier,
 		const SQLite3Table &table,
-		RakNet::RakString errorMsg)=0;
+		SLNet::RakString errorMsg)=0;
 
 	/// dbIdentifier is unknown on the remote system
 	///
@@ -62,9 +67,9 @@ public:
 	/// \param[out] dbIdentifier Passed to SQLite3Plugin::_sqlite3_exec
 	/// \ingroup SQL_LITE_3_PLUGIN
 	virtual void OnUnknownDBIdentifier(
-		RakNet::RakString inputStatement,
+		SLNet::RakString inputStatement,
 		unsigned int queryId,
-		RakNet::RakString dbIdentifier)=0;
+		SLNet::RakString dbIdentifier)=0;
 };
 
 /// Sample callback implementation that just prints to the screen the results
@@ -72,16 +77,16 @@ public:
 class SQLite3PluginResultInterface_Printf : public SQLite3PluginResultInterface
 {
 	virtual void _sqlite3_exec(
-		RakNet::RakString inputStatement,
+		SLNet::RakString inputStatement,
 		unsigned int queryId,
-		RakNet::RakString dbIdentifier,
+		SLNet::RakString dbIdentifier,
 		const SQLite3Table &table,
-		RakNet::RakString errorMsg);
+		SLNet::RakString errorMsg);
 
 	virtual void OnUnknownDBIdentifier(
-		RakNet::RakString inputStatement,
+		SLNet::RakString inputStatement,
 		unsigned int queryId,
-		RakNet::RakString dbIdentifier);
+		SLNet::RakString dbIdentifier);
 };
 
 /// SQLite version 3 supports remote calls via networked file handles, but not over the regular internet
@@ -111,7 +116,7 @@ public:
 	/// \param[in] orderingChannel See RakPeerInterface::Send()
 	/// \param[in] systemAddress See RakPeerInterface::Send()
 	/// \return Query ID. Will be returned in _sqlite3_exec
-	unsigned int _sqlite3_exec(RakNet::RakString dbIdentifier, RakNet::RakString inputStatement,
+	unsigned int _sqlite3_exec(SLNet::RakString dbIdentifier, SLNet::RakString inputStatement,
 		PacketPriority priority, PacketReliability reliability, char orderingChannel, const SystemAddress &systemAddress);
 
 	/// \internal For plugin handling

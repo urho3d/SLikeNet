@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,13 +22,13 @@
 #ifndef __ROOMS_PLUGIN_H
 #define __ROOMS_PLUGIN_H
 
-#include "RakNetTypes.h"
-#include "PluginInterface2.h"
-#include "DS_OrderedList.h"
-#include "Export.h"
+#include "slikenet/types.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/DS_OrderedList.h"
+#include "slikenet/Export.h"
 #include "RoomsContainer.h"
-#include "PacketPriority.h"
-#include "BitStream.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/BitStream.h"
 
 /// \defgroup ROOMS_GROUP RoomsPlugin
 /// \brief Networked implementation of a rooms system, where members join and leave rooms.
@@ -40,7 +45,7 @@
 /// \details
 /// \ingroup ROOMS_GROUP
 
-namespace RakNet
+namespace SLNet
 {
 	class RakPeerInterface;
 
@@ -50,11 +55,11 @@ namespace RakNet
 struct RoomsPluginFunc {
 	RoomsPluginFunc() {}
 	virtual ~RoomsPluginFunc() {}
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream)=0;
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream)=0;
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream)=0;
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream)=0;
 	void PrintResult(void);
 	/// \param[in] userName Who is performing this operation. Input parameter
-	RakNet::RakString userName;
+	SLNet::RakString userName;
 
 	/// \param[out] resultCode Result of this operation
 	RoomsErrorCode resultCode;
@@ -72,8 +77,8 @@ struct CreateRoom_Func : public RoomsPluginFunc {
 	RoomID roomId;
 	RoomDescriptor roomDescriptor;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Joins a room if possible. If not, creates a room.
 /// \ingroup ROOMS_COMMANDS
@@ -100,8 +105,8 @@ struct EnterRoom_Func : public RoomsPluginFunc {
 			printf("%s entered room with %i members\n", userName.C_String(), joinedRoomResult.roomDescriptor.roomMemberList.Size());
 	}
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Joins a room given the filter parameters and desired room member mode.
 /// \details Room joins may fail if the room is locked, or does not have slots of the particular type
@@ -133,8 +138,8 @@ struct JoinByFilter_Func : public RoomsPluginFunc {
 	}
 
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Leaves a room. You can leave at any time, even if the room is locked.
 /// \ingroup ROOMS_COMMANDS
@@ -143,8 +148,8 @@ struct LeaveRoom_Func : public RoomsPluginFunc {
 	// Output parameters
 	RemoveUserResult removeUserResult;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// Gets all invitations to you to various rooms.
 /// \ingroup ROOMS_COMMANDS
@@ -153,8 +158,8 @@ struct GetInvitesToParticipant_Func : public RoomsPluginFunc {
 	// Output parameters
 	DataStructures::List<InvitedUser> invitedUsers;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Sends an invitation to someone.
 /// \details Each user may have at most one invitation to the same room, although they have have invitations to multiple rooms.<BR>
@@ -163,26 +168,26 @@ struct GetInvitesToParticipant_Func : public RoomsPluginFunc {
 /// \ingroup ROOMS_COMMANDS
 struct SendInvite_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString inviteeName;
+	SLNet::RakString inviteeName;
 	bool inviteToSpectatorSlot;
-	RakNet::RakString subject;
-	RakNet::RakString body;
+	SLNet::RakString subject;
+	SLNet::RakString body;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Accept an invitation from a user to a room.
 /// \details Invitations are the only way to join reserved slots. If all reserved slots are full, will join a public slot if possible.
 /// \ingroup ROOMS_COMMANDS
 struct AcceptInvite_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString inviteSender;
+	SLNet::RakString inviteSender;
 	RoomID roomId;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Begin spectating. Spectators are considered room members that are not playing the game, only watching
 /// \details Spectators do not count towards room ready states. The moderator can lock the room, preventing users from spectating, or not allow spectators at all
@@ -191,8 +196,8 @@ struct StartSpectating_Func : public RoomsPluginFunc {
 	// Input parameters
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Stop spectating. This will rejoin the room as a player, using a reserved slot if we were invited, and a public slot if not or if there are no reserved slots
 /// \details This may fail if the moderator locked the room, or if no slots are available.
@@ -201,18 +206,18 @@ struct StopSpectating_Func : public RoomsPluginFunc {
 	// Input parameters
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Give moderator to another player. Moderators cannot be spectators.
 /// \ingroup ROOMS_COMMANDS
 struct GrantModerator_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString newModerator;
+	SLNet::RakString newModerator;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Change the allowed slot counts for the room. Setting fewer slot counts than the number of players does not kick out players, though it may prevent changing spectator status
 /// \ingroup ROOMS_COMMANDS
@@ -221,8 +226,8 @@ struct ChangeSlotCounts_Func : public RoomsPluginFunc {
 	Slots slots;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Sets a table of user-defined room properties
 /// \details Fill out the table with the column name, type, and value.<BR>
@@ -234,15 +239,15 @@ struct SetCustomRoomProperties_Func : public RoomsPluginFunc {
 	DataStructures::Table table;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Given a named room, return the properties of that room, including member list
 /// \ingroup ROOMS_COMMANDS
 struct GetRoomProperties_Func : public RoomsPluginFunc {
 	// Input parameters
 	// If blank, uses the room the user is currently in.
-	RakNet::RakString roomName;
+	SLNet::RakString roomName;
 	// Output parameters
 	RoomDescriptor roomDescriptor;
 
@@ -266,19 +271,19 @@ struct GetRoomProperties_Func : public RoomsPluginFunc {
 		}
 	}
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 
 /// \brief Change the name of the room
 /// \ingroup ROOMS_COMMANDS
 struct ChangeRoomName_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString newRoomName;
+	SLNet::RakString newRoomName;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Set or unset the room hidden from searches. If a room is hidden from searches, it can only be joined through invitations
 /// \ingroup ROOMS_COMMANDS
@@ -287,8 +292,8 @@ struct SetHiddenFromSearches_Func : public RoomsPluginFunc {
 	bool hiddenFromSearches;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Sets or unsets to destroy the room when the moderator leaves the room
 /// \details If false, the next moderator will be the oldest member that is not a spectator.
@@ -298,8 +303,8 @@ struct SetDestroyOnModeratorLeave_Func : public RoomsPluginFunc {
 	bool destroyOnModeratorLeave;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Sets or unsets the user as flagged 'ready'
 /// \details Ready means ready to play the game. This flag can be set or unset by each room member.BR>
@@ -309,8 +314,8 @@ struct SetReadyStatus_Func : public RoomsPluginFunc {
 	// Input parameters
 	bool isReady;
 	// Output parameters
-	DataStructures::List<RakNet::RakString> readyUsers;
-	DataStructures::List<RakNet::RakString> unreadyUsers;
+	DataStructures::List<SLNet::RakString> readyUsers;
+	DataStructures::List<SLNet::RakString> unreadyUsers;
 
 	void PrintResult(void)
 	{
@@ -346,19 +351,19 @@ struct SetReadyStatus_Func : public RoomsPluginFunc {
 		}
 	}
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Gets the ready states for every user in the room, excluding spectators
 /// \ingroup ROOMS_COMMANDS
 struct GetReadyStatus_Func : public RoomsPluginFunc {
 	// Input parameters
 	// Output parameters
-	DataStructures::List<RakNet::RakString> readyUsers;
-	DataStructures::List<RakNet::RakString> unreadyUsers;
+	DataStructures::List<SLNet::RakString> readyUsers;
+	DataStructures::List<SLNet::RakString> unreadyUsers;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Lock or unlock the room
 /// \details If the room is locked, no further players can join regardless of the available room slots. This includes invited players.<BR>
@@ -369,8 +374,8 @@ struct SetRoomLockState_Func : public RoomsPluginFunc {
 	RoomLockState roomLockState;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Gets the lock state of the room
 /// \ingroup ROOMS_COMMANDS
@@ -379,8 +384,8 @@ struct GetRoomLockState_Func : public RoomsPluginFunc {
 	// Output parameters
 	RoomLockState roomLockState;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief If all members have been set to ready using SetReadyStatus_Func, this operation will set allReady to true.
 /// \ingroup ROOMS_COMMANDS
@@ -389,29 +394,29 @@ struct AreAllMembersReady_Func : public RoomsPluginFunc {
 	// Output parameters
 	bool allReady;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Kick a member out of the room. This will also automatically ban that member from rejoining as long as the moderator does not change, or the member is unbanned
 /// \ingroup ROOMS_COMMANDS
 struct KickMember_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString kickedMember;
-	RakNet::RakString reason;
+	SLNet::RakString kickedMember;
+	SLNet::RakString reason;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Allow a member previously kicked out of the room to rejoin.
 /// \ingroup ROOMS_COMMANDS
 struct UnbanMember_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString bannedMemberName;
+	SLNet::RakString bannedMemberName;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief For a given room, get the \a reason parameter of KickMember_Func when we were kicked out.
 /// \ingroup ROOMS_COMMANDS
@@ -419,10 +424,10 @@ struct GetBanReason_Func : public RoomsPluginFunc {
 	// Input parameters
 	RoomID roomId;
 	// Output parameters
-	RakNet::RakString reason;
+	SLNet::RakString reason;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Enter quick join mode
 /// \details Quick join mode will wait until the specified timeout to try to automatically join a room each second.<BR>
@@ -436,8 +441,8 @@ struct AddUserToQuickJoin_Func : public RoomsPluginFunc {
 	GameIdentifier gameIdentifier;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Leave quick join mode
 /// \ingroup ROOMS_COMMANDS
@@ -445,8 +450,8 @@ struct RemoveUserFromQuickJoin_Func : public RoomsPluginFunc {
 	// Input parameters
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Returns if you are waiting in quick join mode
 /// \ingroup ROOMS_COMMANDS
@@ -455,8 +460,8 @@ struct IsInQuickJoin_Func : public RoomsPluginFunc {
 	// Output parameters
 	bool isInQuickJoin;
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Return all rooms that pass the \a roomQuery filter
 /// \details Use onlyJoinable to further filter by rooms that you can join (not locked, not banned, public or invited slots)
@@ -489,105 +494,105 @@ struct SearchByFilter_Func : public RoomsPluginFunc {
 		}
 	}
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Change your handle
 /// \ingroup ROOMS_COMMANDS
 struct ChangeHandle_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString newHandle;
+	SLNet::RakString newHandle;
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Send a chat message
 /// \ingroup ROOMS_COMMANDS
 struct Chat_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::RakString chatMessage;
+	SLNet::RakString chatMessage;
 	// Leave recipient blank for all in room
-	RakNet::RakString privateMessageRecipient;
+	SLNet::RakString privateMessageRecipient;
 	/// If true, only sends the chat message if the user is in the same room.
 	/// If false, privateMessageRecipient must also be filled out
 	bool chatDirectedToRoom;
 
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Send an arbitrary binary message
 /// \ingroup ROOMS_COMMANDS
 struct Bitstream_Func : public RoomsPluginFunc {
 	// Input parameters
-	RakNet::BitStream bsToSend;
+	SLNet::BitStream bsToSend;
 	// Leave recipient blank for all in room
-	RakNet::RakString privateMessageRecipient;
+	SLNet::RakString privateMessageRecipient;
 	/// If true, only sends the bitstream if the user is in the same room.
 	/// If false, privateMessageRecipient must also be filled out
 	bool directedToRoom;
 
 	// Output parameters
 
-	virtual void SerializeIn(bool writeToBitstream, RakNet::BitStream *bitStream);
-	virtual void SerializeOut(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void SerializeIn(bool writeToBitstream, SLNet::BitStream *bitStream);
+	virtual void SerializeOut(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief Base class for notification callbacks
 /// \ingroup ROOMS_GROUP
 struct RoomsPluginNotification {
 	virtual ~RoomsPluginNotification() {}
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)=0;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)=0;
 	virtual void PrintResult(void)=0;
 	/// Always filled out so you know which user this callback applies to
-	RakNet::RakString recipient;
+	SLNet::RakString recipient;
 };
 /// \brief The quick join duration has expired without joining or creating any rooms
 /// \ingroup ROOMS_NOTIFICATIONS
 struct QuickJoinExpired_Notification : public RoomsPluginNotification {
 	NetworkedQuickJoinUser networkedQuickJoinUser;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("QuickJoinExpired_Notification to %s\n", recipient.C_String());}
 };
 /// \brief Quick join succeeded, and you are now in a room
 /// \ingroup ROOMS_NOTIFICATIONS
 struct QuickJoinEnteredRoom_Notification : public RoomsPluginNotification {
 	JoinedRoomResult joinedRoomResult;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("QuickJoinEnteredRoom_Notification to %s. roomId=%i\n", recipient.C_String(), joinedRoomResult.roomDescriptor.lobbyRoomId);}
 };
 /// \brief Another room member has started spectating
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberStartedSpectating_Notification : public RoomsPluginNotification {
 	RoomID roomId;
-	RakNet::RakString userName;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString userName;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberStartedSpectating_Notification to %s\n", recipient.C_String());}
 };
 /// \brief Another room member has stopped spectating
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberStoppedSpectating_Notification : public RoomsPluginNotification {
-	RakNet::RakString userName;
+	SLNet::RakString userName;
 	RoomID roomId;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberStoppedSpectating_Notification to %s\n", recipient.C_String());}
 };
 /// \brief The room has a new moderator (possibly you)
 /// \ingroup ROOMS_NOTIFICATIONS
 struct ModeratorChanged_Notification : public RoomsPluginNotification {
-	RakNet::RakString newModerator;
-	RakNet::RakString oldModerator;
+	SLNet::RakString newModerator;
+	SLNet::RakString oldModerator;
 	RoomID roomId;
 	virtual void PrintResult(void) {printf("ModeratorChanged_Notification to %s\n", recipient.C_String());}
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 };
 /// \brief The slot counts in the room has changed
 /// \ingroup ROOMS_NOTIFICATIONS
 struct SlotCountsSet_Notification : public RoomsPluginNotification {
 	Slots slots;
 	RoomID roomId;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("SlotCountsSet_Notification to %s\n", recipient.C_String());}
 };
 
@@ -599,16 +604,16 @@ struct CustomRoomPropertiesSet_Notification : public RoomsPluginNotification {
 	// Deserialization is written to table
 	DataStructures::Table *tablePtr;
 	DataStructures::Table table;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("CustomRoomPropertiesSet_Notification to %s\n", recipient.C_String());}
 };
 /// \brief The name of the room has been changed
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomNameSet_Notification : public RoomsPluginNotification {
 	RoomID roomId;
-	RakNet::RakString oldName;
-	RakNet::RakString newName;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString oldName;
+	SLNet::RakString newName;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomNameSet_Notification to %s\n", recipient.C_String());}
 };
 /// \brief The room is now hidden, or no longer hidden, from searches
@@ -616,7 +621,7 @@ struct RoomNameSet_Notification : public RoomsPluginNotification {
 struct HiddenFromSearchesSet_Notification : public RoomsPluginNotification {
 	RoomID roomId;
 	bool hiddenFromSearches;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("HiddenFromSearchesSet_Notification to %s\n", recipient.C_String());}
 };
 /// \brief Another room member has changed their ready status
@@ -624,13 +629,13 @@ struct HiddenFromSearchesSet_Notification : public RoomsPluginNotification {
 struct RoomMemberReadyStatusSet_Notification : public RoomsPluginNotification {
 	RoomID roomId;
 	bool isReady;
-	RakNet::RakString roomMember;
+	SLNet::RakString roomMember;
 
 	// Current status of all room members
-	DataStructures::List<RakNet::RakString> readyUsers;
-	DataStructures::List<RakNet::RakString> unreadyUsers;
+	DataStructures::List<SLNet::RakString> readyUsers;
+	DataStructures::List<SLNet::RakString> unreadyUsers;
 
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberReadyStatusSet_Notification to %s\n", recipient.C_String());}
 };
 /// \brief The room is now, or is no longer, locked
@@ -638,44 +643,44 @@ struct RoomMemberReadyStatusSet_Notification : public RoomsPluginNotification {
 struct RoomLockStateSet_Notification : public RoomsPluginNotification {
 	RoomID roomId;
 	RoomLockState roomLockState;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomLockStateSet_Notification to %s\n", recipient.C_String());}
 };
 /// \brief A room member has been kicked out of the room (possibly you)
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberKicked_Notification : public RoomsPluginNotification {
 	RoomID roomId;
-	RakNet::RakString kickedMember;
-	RakNet::RakString moderator;
-	RakNet::RakString reason;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString kickedMember;
+	SLNet::RakString moderator;
+	SLNet::RakString reason;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberKicked_Notification to %s\n", recipient.C_String());}
 };
 /// \brief A room member has changed their handle
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberHandleSet_Notification : public RoomsPluginNotification {
 	RoomID roomId;
-	RakNet::RakString oldName;
-	RakNet::RakString newName;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString oldName;
+	SLNet::RakString newName;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberHandleSet_Notification to %s\n", recipient.C_String());}
 };
 /// A room member has left the room
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberLeftRoom_Notification : public RoomsPluginNotification {
 	RoomID roomId;
-	RakNet::RakString roomMember;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString roomMember;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomMemberLeftRoom_Notification to %s\n", recipient.C_String());}
 };
 /// \brief A room member has joined the room
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomMemberJoinedRoom_Notification : public RoomsPluginNotification {
 	RoomMemberJoinedRoom_Notification() {joinedRoomResult=0;}
-	~RoomMemberJoinedRoom_Notification() {if (joinedRoomResult!=0) RakNet::OP_DELETE(joinedRoomResult, _FILE_AND_LINE_);}
+	~RoomMemberJoinedRoom_Notification() {if (joinedRoomResult!=0) SLNet::OP_DELETE(joinedRoomResult, _FILE_AND_LINE_);}
 	RoomID roomId;
 	JoinedRoomResult *joinedRoomResult;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void)
 	{
 		printf("RoomMemberJoinedRoom_Notification to %s: %s (%s) has joined the room.\n", recipient.C_String(), joinedRoomResult->joiningMemberName.C_String(), joinedRoomResult->joiningMemberAddress.ToString());
@@ -684,55 +689,55 @@ struct RoomMemberJoinedRoom_Notification : public RoomsPluginNotification {
 /// \brief You have received an invitation to a room
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomInvitationSent_Notification : public RoomsPluginNotification {
-	RakNet::RakString invitorName;
-	RakNet::RakString inviteeName;
+	SLNet::RakString invitorName;
+	SLNet::RakString inviteeName;
 	bool inviteToSpectatorSlot;
-	RakNet::RakString subject;
-	RakNet::RakString body;
+	SLNet::RakString subject;
+	SLNet::RakString body;
 	RoomID roomId;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomInvitationSent_Notification to %s\n", recipient.C_String());}
 };
 /// \brief A previous room invitation is no longer valid (possibly due to moderator change, or the room no longer exists)
 /// \ingroup ROOMS_NOTIFICATIONS
 struct RoomInvitationWithdrawn_Notification : public RoomsPluginNotification {
 	InvitedUser invitedUser;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomInvitationWithdrawn_Notification to %s\n", recipient.C_String());}
 };
 /// \brief The moderator has left the room, and everyone left is a spectator, or the room was set to be destroyed when the moderator left
 /// \ingroup ROOMS_NOTIFICATIONS
 /// You are no longer in the room
 struct RoomDestroyedOnModeratorLeft_Notification : public RoomsPluginNotification {
-	RakNet::RakString oldModerator;
+	SLNet::RakString oldModerator;
 	RoomID roomId;
 	RoomDescriptor roomDescriptor;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("RoomDestroyedOnModeratorLeft_Notification to %s\n", recipient.C_String());}
 };
 /// \brief You got a chat message from another user.
 /// \details If you want to support ignoring chat messages from specific users, use Lobby2Client_PC::IsInIgnoreList
 /// \ingroup ROOMS_NOTIFICATIONS
 struct Chat_Notification : public RoomsPluginNotification {
-	RakNet::RakString sender;
+	SLNet::RakString sender;
 	// If filled in, this was directed to you. Otherwise it was directed to the room
-	RakNet::RakString privateMessageRecipient;
+	SLNet::RakString privateMessageRecipient;
 	// The chat message
-	RakNet::RakString chatMessage;
+	SLNet::RakString chatMessage;
 	// The chat message with profanity filtered, if you want that instead
-	RakNet::RakString filteredChatMessage;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::RakString filteredChatMessage;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("Chat_Notification to %s\n", recipient.C_String());}
 };
 /// \brief You got a generic bitstream message from another user.
 /// \ingroup ROOMS_NOTIFICATIONS
 struct Bitstream_Notification : public RoomsPluginNotification {
-	RakNet::RakString sender;
+	SLNet::RakString sender;
 	// If filled in, this was directed to you. Otherwise it was directed to the room
-	RakNet::RakString privateMessageRecipient;
+	SLNet::RakString privateMessageRecipient;
 	// The chat message
-	RakNet::BitStream bitStreamReceived;
-	virtual void Serialize(bool writeToBitstream, RakNet::BitStream *bitStream);
+	SLNet::BitStream bitStreamReceived;
+	virtual void Serialize(bool writeToBitstream, SLNet::BitStream *bitStream);
 	virtual void PrintResult(void) {printf("Bitstream_Notification to %s\n", recipient.C_String());}
 };
 /// \ingroup ROOMS_GROUP
@@ -877,33 +882,33 @@ public:
 	/// \param[in] userName A unique string identifying the user
 	/// \param[in] roomsParticipantAddress The address of the user
 	/// \param[in] guid The guid of the user
-	/// \param[in] loginServerAddress The server adding this user. Use RakNet::UNASSIGNED_SYSTEM_ADDRESS for not applicable. Otherwise, the address must previously have been added using AddLoginServerAddress() or the function will fail.
-	bool LoginRoomsParticipant(RakNet::RakString userName, SystemAddress roomsParticipantAddress, RakNetGUID guid, SystemAddress loginServerAddress);
+	/// \param[in] loginServerAddress The server adding this user. Use SLNet::UNASSIGNED_SYSTEM_ADDRESS for not applicable. Otherwise, the address must previously have been added using AddLoginServerAddress() or the function will fail.
+	bool LoginRoomsParticipant(SLNet::RakString userName, SystemAddress roomsParticipantAddress, RakNetGUID guid, SystemAddress loginServerAddress);
 
 	/// \brief Removes a participant from the system
 	/// \param[in] userName A unique string identifying the user
-	/// \param[in] loginServerAddress The server removing. Use RakNet::UNASSIGNED_SYSTEM_ADDRESS for not applicable. Otherwise, the address must previously have been added using AddLoginServerAddress() or the function will fail.
-	bool LogoffRoomsParticipant(RakNet::RakString userName, SystemAddress loginServerAddress);
+	/// \param[in] loginServerAddress The server removing. Use SLNet::UNASSIGNED_SYSTEM_ADDRESS for not applicable. Otherwise, the address must previously have been added using AddLoginServerAddress() or the function will fail.
+	bool LogoffRoomsParticipant(SLNet::RakString userName, SystemAddress loginServerAddress);
 
 	/// \brief Clear all users
 	void ClearRoomMembers();
 
 	/// \brief Used for Lobby2. Serializes the same data that the plugin itself uses to login
 	/// \internal
-	static void SerializeLogin(RakNet::RakString userName, SystemAddress userAddress, RakNetGUID guid, RakNet::BitStream *bs);
+	static void SerializeLogin(SLNet::RakString userName, SystemAddress userAddress, RakNetGUID guid, SLNet::BitStream *bs);
 
 	/// \brief Used for Lobby2. Serializes the same data that the plugin itself uses to logoff
 	/// \internal
-	static void SerializeLogoff(RakNet::RakString userName, RakNet::BitStream *bs);
+	static void SerializeLogoff(SLNet::RakString userName, SLNet::BitStream *bs);
 
 	/// \brief Used for Lobby2. Serializes the same data that the plugin itself uses to change handles
 	/// \internal
-	static void SerializeChangeHandle(RakNet::RakString oldHandle, RakNet::RakString newHandle, RakNet::BitStream *bs);
+	static void SerializeChangeHandle(SLNet::RakString oldHandle, SLNet::RakString newHandle, SLNet::BitStream *bs);
 
 	/// \brief Change the handle a user
 	/// \param[in] oldHandle The handle previously known by the system
 	/// \param[in] newHandle The new handle to use
-	void ChangeHandle(RakNet::RakString oldHandle, RakNet::RakString newHandle);
+	void ChangeHandle(SLNet::RakString oldHandle, SLNet::RakString newHandle);
 
 	/// \brief Add a SystemAddress to a list that will be checked when LoginRoomsParticipant() and LogoffRoomsParticipant() is called
 	/// \param[in] systemAddress The address to add
@@ -952,7 +957,7 @@ protected:
 	DataStructures::List<RoomsCallback *> roomsCallback;
 	PacketPriority packetPriority;
 	ProfanityFilter *profanityFilter;
-	RakNet::TimeMS lastUpdateTime;
+	SLNet::TimeMS lastUpdateTime;
 
 	// Client data
 	SystemAddress serverAddress;
@@ -966,10 +971,10 @@ protected:
 		RoomsPluginParticipant() {lastRoomJoined=(RoomID)-1;}
 		RoomID lastRoomJoined;
 	};
-	static int RoomsPluginParticipantCompByRakString( const RakNet::RakString &key, RoomsPluginParticipant* const &data );
-	DataStructures::OrderedList<RakNet::RakString, RoomsPluginParticipant*, RoomsPluginParticipantCompByRakString> roomsParticipants;
+	static int RoomsPluginParticipantCompByRakString( const SLNet::RakString &key, RoomsPluginParticipant* const &data );
+	DataStructures::OrderedList<SLNet::RakString, RoomsPluginParticipant*, RoomsPluginParticipantCompByRakString> roomsParticipants;
 
-	RoomsPluginParticipant* GetParticipantByHandle(RakNet::RakString handle, const SystemAddress &systemAddress);
+	RoomsPluginParticipant* GetParticipantByHandle(SLNet::RakString handle, const SystemAddress &systemAddress);
 	RoomsPluginParticipant* ValidateUserHandle(RoomsPluginFunc* func, const SystemAddress &systemAddress);
 	void ProcessRemoveUserResult(RemoveUserResult *removeUserResult);
 
@@ -1065,6 +1070,6 @@ enum RoomsPluginOperations
 	RPN_BITSTREAM_NOTIFICATION,
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

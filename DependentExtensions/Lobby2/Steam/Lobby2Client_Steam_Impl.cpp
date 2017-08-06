@@ -1,21 +1,26 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Client_Steam_Impl.h"
 #include "Lobby2Message_Steam.h"
 #include <stdlib.h>
-#include "NativeTypes.h"
-#include "MTUSize.h"
+#include "slikenet/NativeTypes.h"
+#include "slikenet/MTUSize.h"
 #include <windows.h>
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(Lobby2Client_Steam,Lobby2Client_Steam_Impl)
 
@@ -40,18 +45,25 @@ int Lobby2Client_Steam_Impl::SteamIDAndRoomMemberComp( const uint64_t &key, cons
 }
 
 Lobby2Client_Steam_Impl::Lobby2Client_Steam_Impl() :
-m_CallbackLobbyDataUpdated( this, &Lobby2Client_Steam_Impl::OnLobbyDataUpdatedCallback ),
-m_CallbackPersonaStateChange( this, &Lobby2Client_Steam_Impl::OnPersonaStateChange ),
-m_CallbackLobbyDataUpdate( this, &Lobby2Client_Steam_Impl::OnLobbyDataUpdate ),
-m_CallbackChatDataUpdate( this, &Lobby2Client_Steam_Impl::OnLobbyChatUpdate ),
-m_CallbackChatMessageUpdate( this, &Lobby2Client_Steam_Impl::OnLobbyChatMessage ),
-m_CallbackP2PSessionRequest( this, &Lobby2Client_Steam_Impl::OnP2PSessionRequest ),
-m_CallbackP2PSessionConnectFail( this, &Lobby2Client_Steam_Impl::OnP2PSessionConnectFail )
+m_CallbackLobbyDataUpdated(nullptr, nullptr),
+m_CallbackPersonaStateChange(nullptr, nullptr),
+m_CallbackLobbyDataUpdate(nullptr, nullptr),
+m_CallbackChatDataUpdate(nullptr, nullptr),
+m_CallbackChatMessageUpdate(nullptr, nullptr),
+m_CallbackP2PSessionRequest(nullptr, nullptr),
+m_CallbackP2PSessionConnectFail(nullptr, nullptr)
 {
 	// Must recompile RakNet with MAXIMUM_MTU_SIZE set to 1200 in the preprocessor settings	
 	RakAssert(MAXIMUM_MTU_SIZE<=1200);
 	roomId=0;
 
+	m_CallbackLobbyDataUpdated.Register(this, &Lobby2Client_Steam_Impl::OnLobbyDataUpdatedCallback);
+	m_CallbackPersonaStateChange.Register(this, &Lobby2Client_Steam_Impl::OnPersonaStateChange);
+	m_CallbackLobbyDataUpdate.Register(this, &Lobby2Client_Steam_Impl::OnLobbyDataUpdate);
+	m_CallbackChatDataUpdate.Register(this, &Lobby2Client_Steam_Impl::OnLobbyChatUpdate);
+	m_CallbackChatMessageUpdate.Register(this, &Lobby2Client_Steam_Impl::OnLobbyChatMessage);
+	m_CallbackP2PSessionRequest.Register(this, &Lobby2Client_Steam_Impl::OnP2PSessionRequest);
+	m_CallbackP2PSessionConnectFail.Register(this, &Lobby2Client_Steam_Impl::OnP2PSessionConnectFail);
 }
 Lobby2Client_Steam_Impl::~Lobby2Client_Steam_Impl()
 {
@@ -133,7 +145,7 @@ void Lobby2Client_Steam_Impl::OnLobbyMatchListCallback( LobbyMatchList_t *pCallb
 			{
 				CSteamID steamId = SteamMatchmaking()->GetLobbyByIndex( iLobby );
 				callbackResult->roomIds.Push(steamId.ConvertToUint64(), _FILE_AND_LINE_ );
-				RakNet::RakString s = SteamMatchmaking()->GetLobbyData( steamId, "name" );
+				SLNet::RakString s = SteamMatchmaking()->GetLobbyData( steamId, "name" );
 				callbackResult->roomNames.Push(s, _FILE_AND_LINE_ );
 			}
 
@@ -597,11 +609,13 @@ void Lobby2Client_Steam_Impl::OnAttach(void)
 	// If this asserts, call RakPeer::Startup() before attaching Lobby2Client_Steam
 	DataStructures::List<RakNetSocket2* > sockets;
 	rakPeerInterface->GetSockets(sockets);
+	RakAssert(sockets.Size());
 	((RNS2_Windows*)sockets[0])->SetSocketLayerOverride(this);
 }
 void Lobby2Client_Steam_Impl::OnDetach(void)
 {
 	DataStructures::List<RakNetSocket2* > sockets;
 	rakPeerInterface->GetSockets(sockets);
-	((RNS2_Windows*)sockets[0])->SetSocketLayerOverride(this);
+	RakAssert(sockets.Size());
+	((RNS2_Windows*)sockets[0])->SetSocketLayerOverride(NULL);
 }

@@ -1,17 +1,22 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Server_PGSQL.h"
 #include "PostgreSQLInterface.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 STATIC_FACTORY_DEFINITIONS(Lobby2Server_PGSQL,Lobby2Server_PGSQL);
 
@@ -21,7 +26,7 @@ Lobby2ServerCommand Lobby2ServerWorkerThread(Lobby2ServerCommand input, bool *re
 	input.returnToSender = input.lobby2Message->ServerDBImpl(&input, postgreSQLInterface);
 	*returnOutput=input.returnToSender;
 	if (input.deallocMsgWhenDone && input.returnToSender==false)
-		RakNet::OP_DELETE(input.lobby2Message, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(input.lobby2Message, _FILE_AND_LINE_);
 	return input;
 }
 
@@ -32,7 +37,7 @@ Lobby2Server_PGSQL::~Lobby2Server_PGSQL()
 {
 	Clear();
 }
-void Lobby2Server_PGSQL::AddInputFromThread(Lobby2Message *msg, unsigned int targetUserId, RakNet::RakString targetUserHandle)
+void Lobby2Server_PGSQL::AddInputFromThread(Lobby2Message *msg, unsigned int targetUserId, SLNet::RakString targetUserHandle)
 {
 	Lobby2ServerCommand command;
 	command.lobby2Message=msg;
@@ -47,7 +52,7 @@ void Lobby2Server_PGSQL::AddInputCommand(Lobby2ServerCommand command)
 {
 	threadPool.AddInput(Lobby2ServerWorkerThread, command);
 }
-void Lobby2Server_PGSQL::AddOutputFromThread(Lobby2Message *msg, unsigned int targetUserId, RakNet::RakString targetUserHandle)
+void Lobby2Server_PGSQL::AddOutputFromThread(Lobby2Message *msg, unsigned int targetUserId, SLNet::RakString targetUserHandle)
 {
 	Lobby2ServerCommand command;
 	command.lobby2Message=msg;
@@ -70,10 +75,10 @@ bool Lobby2Server_PGSQL::ConnectToDB(const char *conninfo, int numWorkerThreads)
 	PostgreSQLInterface *connection;
 	for (i=0; i < numWorkerThreads; i++)
 	{
-		connection = RakNet::OP_NEW<PostgreSQLInterface>( _FILE_AND_LINE_ );
+		connection = SLNet::OP_NEW<PostgreSQLInterface>( _FILE_AND_LINE_ );
 		if (connection->Connect(conninfo)==false)
 		{
-			RakNet::OP_DELETE(connection, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(connection, _FILE_AND_LINE_);
 			ClearConnections();
 			return false;
 		}
@@ -101,14 +106,14 @@ void Lobby2Server_PGSQL::PerThreadDestructor(void* factoryResult, void *context)
 	(void)context;
 
 	PostgreSQLInterface* p = (PostgreSQLInterface*)factoryResult;
-	RakNet::OP_DELETE(p, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(p, _FILE_AND_LINE_);
 }
 void Lobby2Server_PGSQL::ClearConnections(void)
 {
 	unsigned int i;
 	connectionPoolMutex.Lock();
 	for (i=0; i < connectionPool.Size(); i++)
-		RakNet::OP_DELETE(connectionPool[i], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(connectionPool[i], _FILE_AND_LINE_);
 	connectionPool.Clear(false, _FILE_AND_LINE_);
 	connectionPoolMutex.Unlock();
 }

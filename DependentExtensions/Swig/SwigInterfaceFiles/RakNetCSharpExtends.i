@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //--------------------------------Extends-----------------------------------
 //This file extends classes with new C++ code, note that not all things are possible because
 //while typically it acts like the code is inserted into the class, it isn't really

@@ -1,26 +1,30 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "AppInterface.h"
-#include "RakAssert.h"
+#include "slikenet/assert.h"
 #include "FSM.h"
 #include "RunnableState.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #ifdef _CONSOLE
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 
-#if defined(__GNUC__)
-#define _vsnprintf vsnprintf
-#endif
 #endif
 
 AppInterface::AppInterface()
@@ -67,10 +71,10 @@ void AppInterface::DebugOut(unsigned int lifetimeMS, const char *format, ...)
 	char text[8096];
 	va_list ap;
 	va_start(ap, format);
-	_vsnprintf(text, 8096-1, format, ap);
+	vsnprintf_s(text, 8095, format, ap);
 	va_end(ap);
 	strcat(text, "\n");
-	text[8096-1]=0;
+	text[8095]=0;
 	printf(text);
 #else
 	// Don't call this without an implementation.  Perhaps you meant to use MainApp() instead

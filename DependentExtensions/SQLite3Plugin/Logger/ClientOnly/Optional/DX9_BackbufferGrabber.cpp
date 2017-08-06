@@ -1,3 +1,13 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 #include "DX9_BackbufferGrabber.h"
 
 DX9_BackbufferGrabber::DX9_BackbufferGrabber()
@@ -46,7 +56,7 @@ void DX9_BackbufferGrabber::InitBackbufferGrabber(LPDIRECT3DDEVICE9 pd3dDevice, 
 		NULL
 		);
 }
-void DX9_BackbufferGrabber::LockBackbufferCopy(RakNet::RGBImageBlob *blob)
+void DX9_BackbufferGrabber::LockBackbufferCopy(SLNet::RGBImageBlob *blob)
 {
 	LPDIRECT3DDEVICE9 pd3dDevice;
 	pd3dDevice=deviceUsedToInit;
@@ -57,7 +67,7 @@ void DX9_BackbufferGrabber::LockBackbufferCopy(RakNet::RGBImageBlob *blob)
 	hr = deviceUsedToInit->StretchRect(pBackBuffer, NULL, pRenderTargetSurface, NULL, D3DTEXF_NONE);
 	hr = deviceUsedToInit->GetRenderTargetData(pRenderTargetSurface,pDestSurface);
 
-	//	RakNet::TimeMS t1 = RakNet::GetTimeMS();
+	//	SLNet::TimeMS t1 = SLNet::GetTimeMS();
 	D3DLOCKED_RECT lockedRect;
 	unsigned int videoMemoryDestOffset=0;
 	unsigned int pDataOffset=0;

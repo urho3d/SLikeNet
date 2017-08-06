@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //This is the main file that puts everything together, large sections are put into thier own file
 //Smaller sections are placed directly in this file
 

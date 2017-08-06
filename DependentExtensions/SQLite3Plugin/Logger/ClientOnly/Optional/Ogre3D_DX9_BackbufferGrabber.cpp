@@ -1,3 +1,8 @@
+/*
+ * This file was taken from RakNet 4.082 without any modifications.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ */
+
 #include "Ogre3D_DX9_BackbufferGrabber.h"
 
 void Ogre3D_DX9_BackbufferGrabber::InitBackbufferGrabber(Ogre::RenderWindow* renderWindow, int _width, int _height)

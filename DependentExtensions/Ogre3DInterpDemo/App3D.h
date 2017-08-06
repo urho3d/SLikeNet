@@ -1,17 +1,23 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __APP_3D_H
 #define __APP_3D_H
 
 #include "AppInterface.h"
+#include <tchar.h>	// used for TCHAR
 
 namespace Ogre
 {
@@ -54,7 +60,7 @@ public:
 	const char * TakeScreenshot(const char *prefix, const char *suffix);
 	
 	Ogre::SceneManager* GetSceneManager(void) const;
-	const char* GetWorkingDirectory(void) const;
+	const TCHAR* GetWorkingDirectory(void) const;
 	
 	Ogre::Root *root;
 	Ogre::Camera* camera;
@@ -71,7 +77,7 @@ protected:
 	virtual char * GetWindowTitle(void) const=0;
 
 	bool isVisible;
-	char workingDirectory[512];
+	TCHAR workingDirectory[512];
 	bool hasPixelShader2;
 };
 

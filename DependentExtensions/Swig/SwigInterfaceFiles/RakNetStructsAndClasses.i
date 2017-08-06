@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //----------------------------Additional Class/Struct Defines-----------------------
 //These is here because it is a nested class and swig doesn't handle nested/structs/classes, this presents the interface for this struct. If the struct changes in the code so must this
 

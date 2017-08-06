@@ -1,17 +1,30 @@
 // This is a Demo of the Irrlicht Engine (c) 2005-2009 by N.Gebhardt.
 // This file is not documented.
 
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ * Alternatively you are permitted to license the modifications under the zlib/libpng license.
+ */
+
 #include "CDemo.h"
 
 // RakNet includes
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "RakNetTypes.h"
-#include "Itoa.h"
-#include "RakNetSmartPtr.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/types.h"
+#include "slikenet/Itoa.h"
+#include "slikenet/smartptr.h"
 #include "miniupnpc.h"
 #include "upnpcommands.h"
 #include "upnperrors.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 CDemo::CDemo(bool f, bool m, bool s, bool a, bool v, bool fsaa, video::E_DRIVER_TYPE d, core::stringw &_playerName)
 : fullscreen(f), music(m), shadows(s), additive(a), vsync(v), aa(fsaa),
@@ -99,7 +112,7 @@ void CDemo::run()
 	InstantiateRakNetClasses();
 
 	// Hook RakNet stuff into this class
-	playerReplica->playerName=RakNet::RakString(dest);
+	playerReplica->playerName= SLNet::RakString(dest);
 	playerReplica->demo=this;
 	replicaManager3->demo=this;
 
@@ -151,12 +164,12 @@ void CDemo::run()
 				lastfps = nowfps;
 			}
 */
-			RakNet::RakString curMsg = GetCurrentMessage();
+			SLNet::RakString curMsg = GetCurrentMessage();
 			if (curMsg.IsEmpty()==false)
 			{
 				wchar_t dest[1024];
 				memset(dest,0,sizeof(dest));
-				mbstowcs(dest, curMsg.C_String(), curMsg.GetLength());
+				mbstowcs_s(NULL, dest, curMsg.C_String(), curMsg.GetLength());
 				statusText->setText(dest);
 			}
 			else
@@ -743,7 +756,7 @@ void CDemo::EnableInput(bool enabled)
 }
 // RakNet - change shoot from assuming the camera, to taking any starting location
 // This way the same function can be called from the network
-RakNet::TimeMS CDemo::shootFromOrigin(core::vector3df camPosition, core::vector3df camAt)
+SLNet::TimeMS CDemo::shootFromOrigin(core::vector3df camPosition, core::vector3df camAt)
 {
 	scene::ISceneManager* sm = device->getSceneManager();
 	scene::ICameraSceneNode* camera = sm->getActiveCamera();
@@ -845,7 +858,7 @@ RakNet::TimeMS CDemo::shootFromOrigin(core::vector3df camPosition, core::vector3
 		playSound(ballSound);
 #endif
 
-	return (RakNet::TimeMS) time;
+	return (SLNet::TimeMS) time;
 }
 
 void CDemo::shoot()
@@ -863,7 +876,7 @@ void CDemo::shoot()
 	br->demo=this;
 	br->position=camPosition;
 	br->shotDirection=camAt;
-	br->shotLifetime=RakNet::GetTimeMS() + shootFromOrigin(camPosition, camAt);
+	br->shotLifetime= SLNet::GetTimeMS() + shootFromOrigin(camPosition, camAt);
 	replicaManager3->Reference(br);
 }
 
@@ -932,10 +945,10 @@ void CDemo::createParticleImpacts()
 /// RakNet stuff
 void CDemo::UpdateRakNet(void)
 {
-	RakNet::SystemAddress facilitatorSystemAddress(DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_IP, DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_PORT);
-	RakNet::Packet *packet;
-	RakNet::TimeMS curTime = RakNet::GetTimeMS();
-	RakNet::RakString targetName;
+	SLNet::SystemAddress facilitatorSystemAddress(DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_IP, DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_PORT);
+	SLNet::Packet *packet;
+	SLNet::TimeMS curTime = SLNet::GetTimeMS();
+	SLNet::RakString targetName;
 	for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 	{
 		if (strcmp(packet->systemAddress.ToString(false),DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_IP)==0)
@@ -951,35 +964,35 @@ void CDemo::UpdateRakNet(void)
 		{
 		case ID_IP_RECENTLY_CONNECTED:
 			{
-				PushMessage(RakNet::RakString("This IP address recently connected from ") + targetName + RakNet::RakString("."));
+				PushMessage(SLNet::RakString("This IP address recently connected from ") + targetName + SLNet::RakString("."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					PushMessage("Multiplayer will not work without the NAT punchthrough server!");
 			}
 			break;
 		case ID_INCOMPATIBLE_PROTOCOL_VERSION:
 			{
-				PushMessage(RakNet::RakString("Incompatible protocol version from ") + targetName + RakNet::RakString("."));
+				PushMessage(SLNet::RakString("Incompatible protocol version from ") + targetName + SLNet::RakString("."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					PushMessage("Multiplayer will not work without the NAT punchthrough server!");
 			}
 			break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				PushMessage(RakNet::RakString("Disconnected from ") + targetName + RakNet::RakString("."));
+				PushMessage(SLNet::RakString("Disconnected from ") + targetName + SLNet::RakString("."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					isConnectedToNATPunchthroughServer=false;
 			}
 			break;
 		case ID_CONNECTION_LOST:
 			{
-				PushMessage(RakNet::RakString("Connection to ") + targetName + RakNet::RakString(" lost."));
+				PushMessage(SLNet::RakString("Connection to ") + targetName + SLNet::RakString(" lost."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					isConnectedToNATPunchthroughServer=false;
 			}
 			break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
 			{
-				PushMessage(RakNet::RakString("No free incoming connections to ") + targetName + RakNet::RakString("."));
+				PushMessage(SLNet::RakString("No free incoming connections to ") + targetName + SLNet::RakString("."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					PushMessage("Multiplayer will not work without the NAT punchthrough server!");
 			}
@@ -988,23 +1001,24 @@ void CDemo::UpdateRakNet(void)
 			{
 				if (fullyConnectedMesh2->IsHostSystem())
 				{
-					PushMessage(RakNet::RakString("Sending player list to new connection"));
+					PushMessage(SLNet::RakString("Sending player list to new connection"));
 					fullyConnectedMesh2->StartVerifiedJoin(packet->guid);
 				}
 			}
 			break;
 		case ID_FCM2_VERIFIED_JOIN_START:
 			{
-				DataStructures::List<RakNet::SystemAddress> addresses;
-				DataStructures::List<RakNet::RakNetGUID> guids;
-				fullyConnectedMesh2->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids);
+				DataStructures::List<SLNet::SystemAddress> addresses;
+				DataStructures::List<SLNet::RakNetGUID> guids;
+				DataStructures::List<SLNet::BitStream*> userdata;
+				fullyConnectedMesh2->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids, userdata);
 				for (unsigned int i=0; i < guids.Size(); i++)
 					natPunchthroughClient->OpenNAT(guids[i], facilitatorSystemAddress);
 			}
 			break;
 		case ID_FCM2_VERIFIED_JOIN_FAILED:
 			{
-				PushMessage(RakNet::RakString("Failed to join game session"));
+				PushMessage(SLNet::RakString("Failed to join game session"));
 			}
 			break;
 		case ID_FCM2_VERIFIED_JOIN_CAPABLE:
@@ -1014,13 +1028,13 @@ void CDemo::UpdateRakNet(void)
 			break;
 		case ID_FCM2_VERIFIED_JOIN_ACCEPTED:
 			{
-				DataStructures::List<RakNet::RakNetGUID> systemsAccepted;
+				DataStructures::List<SLNet::RakNetGUID> systemsAccepted;
 				bool thisSystemAccepted;
 				fullyConnectedMesh2->GetVerifiedJoinAcceptedAdditionalData(packet, &thisSystemAccepted, systemsAccepted, 0);
 				if (thisSystemAccepted)
 					PushMessage("Game join request accepted\n");
 				else
-					PushMessage(RakNet::RakString("System %s joined the mesh\n", systemsAccepted[0].ToString()));
+					PushMessage(SLNet::RakString("System %s joined the mesh\n", systemsAccepted[0].ToString()));
 				
 				// DataStructures::List<RakNetGUID> participantList;
 				// fullyConnectedMesh2->GetParticipantList(participantList);
@@ -1031,7 +1045,7 @@ void CDemo::UpdateRakNet(void)
 			break;
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
-				PushMessage(RakNet::RakString("Connection request to ") + targetName + RakNet::RakString(" accepted."));
+				PushMessage(SLNet::RakString("Connection request to ") + targetName + SLNet::RakString(" accepted."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 				{
 					isConnectedToNATPunchthroughServer=true;
@@ -1063,8 +1077,8 @@ void CDemo::UpdateRakNet(void)
 					}
 					
 					// Query cloud for other running game instances
-					RakNet::CloudQuery cloudQuery;
-					cloudQuery.keys.Push(RakNet::CloudKey("IrrlichtDemo",0),_FILE_AND_LINE_);
+					SLNet::CloudQuery cloudQuery;
+					cloudQuery.keys.Push(SLNet::CloudKey("IrrlichtDemo",0),_FILE_AND_LINE_);
 					cloudClient->Get(&cloudQuery, packet->guid);
 				}
 			}
@@ -1074,26 +1088,26 @@ void CDemo::UpdateRakNet(void)
 				if (packet->guid==rakPeer->GetMyGUID())
 				{
 					// Original host dropped. I am the new session host. Upload to the cloud so new players join this system.
-					RakNet::CloudKey cloudKey("IrrlichtDemo",0);
+					SLNet::CloudKey cloudKey("IrrlichtDemo",0);
 					cloudClient->Post(&cloudKey, 0, 0, rakPeer->GetGuidFromSystemAddress(facilitatorSystemAddress));
 				}
 			}
 			break;
 		case ID_CLOUD_GET_RESPONSE:
 			{
-				RakNet::CloudQueryResult cloudQueryResult;
+			SLNet::CloudQueryResult cloudQueryResult;
 				cloudClient->OnGetReponse(&cloudQueryResult, packet);
 				if (cloudQueryResult.rowsReturned.Size()>0)
 				{	
-					PushMessage(RakNet::RakString("NAT punch to existing game instance"));
+					PushMessage(SLNet::RakString("NAT punch to existing game instance"));
 					natPunchthroughClient->OpenNAT(cloudQueryResult.rowsReturned[0]->clientGUID, facilitatorSystemAddress);
 				}
 				else
 				{
-					PushMessage(RakNet::RakString("Publishing new game instance"));
+					PushMessage(SLNet::RakString("Publishing new game instance"));
 
 					// Start as a new game instance because no other games are running
-					RakNet::CloudKey cloudKey("IrrlichtDemo",0);
+					SLNet::CloudKey cloudKey("IrrlichtDemo",0);
 					cloudClient->Post(&cloudKey, 0, 0, packet->guid);
 				}
 
@@ -1102,49 +1116,49 @@ void CDemo::UpdateRakNet(void)
 			break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
-				PushMessage(RakNet::RakString("Connection attempt to ") + targetName + RakNet::RakString(" failed."));
+				PushMessage(SLNet::RakString("Connection attempt to ") + targetName + SLNet::RakString(" failed."));
 				if (packet->systemAddress==facilitatorSystemAddress)
 					PushMessage("Multiplayer will not work without the NAT punchthrough server!");
 			}
 			break;
 		case ID_NAT_TARGET_NOT_CONNECTED:
 			{
-				RakNet::RakNetGUID recipientGuid;
-				RakNet::BitStream bs(packet->data,packet->length,false);
-				bs.IgnoreBytes(sizeof(RakNet::MessageID));
+			SLNet::RakNetGUID recipientGuid;
+			SLNet::BitStream bs(packet->data,packet->length,false);
+				bs.IgnoreBytes(sizeof(SLNet::MessageID));
 				bs.Read(recipientGuid);
 				targetName=recipientGuid.ToString();
-				PushMessage(RakNet::RakString("NAT target ") + targetName + RakNet::RakString(" not connected."));
+				PushMessage(SLNet::RakString("NAT target ") + targetName + SLNet::RakString(" not connected."));
 			}
 			break;
 		case ID_NAT_TARGET_UNRESPONSIVE:
 			{
-				RakNet::RakNetGUID recipientGuid;
-				RakNet::BitStream bs(packet->data,packet->length,false);
-				bs.IgnoreBytes(sizeof(RakNet::MessageID));
+			SLNet::RakNetGUID recipientGuid;
+			SLNet::BitStream bs(packet->data,packet->length,false);
+				bs.IgnoreBytes(sizeof(SLNet::MessageID));
 				bs.Read(recipientGuid);
 				targetName=recipientGuid.ToString();
-				PushMessage(RakNet::RakString("NAT target ") + targetName + RakNet::RakString(" unresponsive."));
+				PushMessage(SLNet::RakString("NAT target ") + targetName + SLNet::RakString(" unresponsive."));
 			}
 			break;
 		case ID_NAT_CONNECTION_TO_TARGET_LOST:
 			{
-				RakNet::RakNetGUID recipientGuid;
-				RakNet::BitStream bs(packet->data,packet->length,false);
-				bs.IgnoreBytes(sizeof(RakNet::MessageID));
+			SLNet::RakNetGUID recipientGuid;
+			SLNet::BitStream bs(packet->data,packet->length,false);
+				bs.IgnoreBytes(sizeof(SLNet::MessageID));
 				bs.Read(recipientGuid);
 				targetName=recipientGuid.ToString();
-				PushMessage(RakNet::RakString("NAT target connection to ") + targetName + RakNet::RakString(" lost."));
+				PushMessage(SLNet::RakString("NAT target connection to ") + targetName + SLNet::RakString(" lost."));
 			}
 			break;
 		case ID_NAT_ALREADY_IN_PROGRESS:
 			{
-				RakNet::RakNetGUID recipientGuid;
-				RakNet::BitStream bs(packet->data,packet->length,false);
-				bs.IgnoreBytes(sizeof(RakNet::MessageID));
+			SLNet::RakNetGUID recipientGuid;
+			SLNet::BitStream bs(packet->data,packet->length,false);
+				bs.IgnoreBytes(sizeof(SLNet::MessageID));
 				bs.Read(recipientGuid);
 				targetName=recipientGuid.ToString();
-				PushMessage(RakNet::RakString("NAT punchthrough to ") + targetName + RakNet::RakString(" in progress (skipping)."));
+				PushMessage(SLNet::RakString("NAT punchthrough to ") + targetName + SLNet::RakString(" in progress (skipping)."));
 			}
 			break;
 
@@ -1152,20 +1166,20 @@ void CDemo::UpdateRakNet(void)
 			{
 				if (packet->data[1]==1)
 				{
-					PushMessage(RakNet::RakString("Connecting to existing game instance"));
-					RakNet::ConnectionAttemptResult car = rakPeer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
-					RakAssert(car==RakNet::CONNECTION_ATTEMPT_STARTED);
+					PushMessage(SLNet::RakString("Connecting to existing game instance"));
+					SLNet::ConnectionAttemptResult car = rakPeer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
+					RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
 				}
 			}
 			break;
 
 		case ID_ADVERTISE_SYSTEM:
-			if (packet->guid!=rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS))
+			if (packet->guid!=rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS))
 			{
 				char hostIP[32];
-				packet->systemAddress.ToString(false,hostIP);
-				RakNet::ConnectionAttemptResult car = rakPeer->Connect(hostIP,packet->systemAddress.GetPort(),0,0);
-				RakAssert(car==RakNet::CONNECTION_ATTEMPT_STARTED);
+				packet->systemAddress.ToString(false,hostIP,32);
+				SLNet::ConnectionAttemptResult car = rakPeer->Connect(hostIP,packet->systemAddress.GetPort(),0,0);
+				RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
 			}
 			break;
 		}
@@ -1190,19 +1204,19 @@ KeyIsDown[KEY_KEY_S] |
 KeyIsDown[KEY_KEY_A] | 
 KeyIsDown[KEY_KEY_D];
 }
-void CDemo::PushMessage(RakNet::RakString rs)
+void CDemo::PushMessage(SLNet::RakString rs)
 {
 	outputMessages.Push(rs,_FILE_AND_LINE_);
 	if (whenOutputMessageStarted==0)
 	{
-		whenOutputMessageStarted=RakNet::GetTimeMS();
+		whenOutputMessageStarted= SLNet::GetTimeMS();
 	}
 }
 const char *CDemo::GetCurrentMessage(void)
 {
 	if (outputMessages.GetSize()==0)
 		return "";
-	RakNet::TimeMS curTime = RakNet::GetTimeMS();
+	SLNet::TimeMS curTime = SLNet::GetTimeMS();
 	if (curTime-whenOutputMessageStarted>2500)
 	{
 		outputMessages.Pop(_FILE_AND_LINE_);

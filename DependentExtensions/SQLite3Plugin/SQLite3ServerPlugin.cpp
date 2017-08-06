@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "SQLite3ServerPlugin.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
-bool operator<( const DataStructures::MLKeyRef<RakNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() < cls.dbIdentifier;}
-bool operator>( const DataStructures::MLKeyRef<RakNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() > cls.dbIdentifier;}
-bool operator==( const DataStructures::MLKeyRef<RakNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() == cls.dbIdentifier;}
+bool operator<( const DataStructures::MLKeyRef<SLNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() < cls.dbIdentifier;}
+bool operator>( const DataStructures::MLKeyRef<SLNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() > cls.dbIdentifier;}
+bool operator==( const DataStructures::MLKeyRef<SLNet::RakString> &inputKey, const SQLite3ServerPlugin::NamedDBHandle &cls ) {return inputKey.Get() == cls.dbIdentifier;}
 
 
 int PerRowCallback(void *userArgument, int argc, char **argv, char **azColName)
@@ -29,7 +34,7 @@ int PerRowCallback(void *userArgument, int argc, char **argv, char **azColName)
 		for (idx=0; idx < (unsigned int) argc; idx++)
 			outputTable->columnNames.Push(azColName[idx], _FILE_AND_LINE_ );
 	}
-	SQLite3Row *row = RakNet::OP_NEW<SQLite3Row>(_FILE_AND_LINE_);
+	SQLite3Row *row = SLNet::OP_NEW<SQLite3Row>(_FILE_AND_LINE_);
 	outputTable->rows.Push(row,_FILE_AND_LINE_);
 	for (idx=0; idx < (unsigned int) argc; idx++)
 	{
@@ -47,7 +52,7 @@ SQLite3ServerPlugin::~SQLite3ServerPlugin()
 {
 	StopThreads();
 }
-bool SQLite3ServerPlugin::AddDBHandle(RakNet::RakString dbIdentifier, sqlite3 *dbHandle, bool dbAutoCreated)
+bool SQLite3ServerPlugin::AddDBHandle(SLNet::RakString dbIdentifier, sqlite3 *dbHandle, bool dbAutoCreated)
 {
 	if (dbIdentifier.IsEmpty())
 		return false;
@@ -58,7 +63,7 @@ bool SQLite3ServerPlugin::AddDBHandle(RakNet::RakString dbIdentifier, sqlite3 *d
 	ndbh.dbHandle=dbHandle;
 	ndbh.dbIdentifier=dbIdentifier;
 	ndbh.dbAutoCreated=dbAutoCreated;
-	ndbh.whenCreated=RakNet::GetTimeMS();
+	ndbh.whenCreated= SLNet::GetTimeMS();
 	dbHandles.InsertAtIndex(ndbh,idx,_FILE_AND_LINE_);
 	
 #ifdef SQLite3_STATEMENT_EXECUTE_THREADED
@@ -68,7 +73,7 @@ bool SQLite3ServerPlugin::AddDBHandle(RakNet::RakString dbIdentifier, sqlite3 *d
 
 	return true;
 }
-void SQLite3ServerPlugin::RemoveDBHandle(RakNet::RakString dbIdentifier, bool alsoCloseConnection)
+void SQLite3ServerPlugin::RemoveDBHandle(SLNet::RakString dbIdentifier, bool alsoCloseConnection)
 {
 	unsigned int idx = dbHandles.GetIndexOf(dbIdentifier);
 	if (idx!=(unsigned int)-1)
@@ -113,7 +118,7 @@ void SQLite3ServerPlugin::Update(void)
 	while (sqlThreadPool.HasOutputFast() && sqlThreadPool.HasOutput())
 	{
 		output = sqlThreadPool.GetOutput();
-		RakNet::BitStream bsOut((unsigned char*) output.data, output.length,false);
+		SLNet::BitStream bsOut((unsigned char*) output.data, output.length,false);
 		SendUnified(&bsOut, MEDIUM_PRIORITY,RELIABLE_ORDERED,0,output.sender,false);
 		rakFree_Ex(output.data,_FILE_AND_LINE_);
 	}
@@ -121,9 +126,9 @@ void SQLite3ServerPlugin::Update(void)
 SQLite3ServerPlugin::SQLExecThreadOutput ExecStatementThread(SQLite3ServerPlugin::SQLExecThreadInput threadInput, bool *returnOutput, void* perThreadData)
 {
 	unsigned int queryId;
-	RakNet::RakString dbIdentifier;
-	RakNet::RakString inputStatement;
-	RakNet::BitStream bsIn((unsigned char*) threadInput.data, threadInput.length, false);
+	SLNet::RakString dbIdentifier;
+	SLNet::RakString inputStatement;
+	SLNet::BitStream bsIn((unsigned char*) threadInput.data, threadInput.length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
 	bsIn.Read(queryId);
 	bsIn.Read(dbIdentifier);
@@ -133,7 +138,7 @@ SQLite3ServerPlugin::SQLExecThreadOutput ExecStatementThread(SQLite3ServerPlugin
 	bsIn.IgnoreBits(1);
 
 	char *errorMsg;
-	RakNet::RakString errorMsgStr;
+	SLNet::RakString errorMsgStr;
 	SQLite3Table outputTable;					
 	sqlite3_exec(threadInput.dbHandle, inputStatement.C_String(), PerRowCallback, &outputTable, &errorMsg);
 	if (errorMsg)
@@ -142,7 +147,7 @@ SQLite3ServerPlugin::SQLExecThreadOutput ExecStatementThread(SQLite3ServerPlugin
 		sqlite3_free(errorMsg);
 	}
 
-	RakNet::BitStream bsOut;
+	SLNet::BitStream bsOut;
 	bsOut.Write((MessageID)ID_SQLite3_EXEC);
 	bsOut.Write(queryId);
 	bsOut.Write(dbIdentifier);
@@ -174,9 +179,9 @@ PluginReceiveResult SQLite3ServerPlugin::OnReceive(Packet *packet)
 	case ID_SQLite3_EXEC:
 		{
 			unsigned int queryId;
-			RakNet::RakString dbIdentifier;
-			RakNet::RakString inputStatement;
-			RakNet::BitStream bsIn(packet->data, packet->length, false);
+			SLNet::RakString dbIdentifier;
+			SLNet::RakString inputStatement;
+			SLNet::BitStream bsIn(packet->data, packet->length, false);
 			bsIn.IgnoreBytes(sizeof(MessageID));
 			bsIn.Read(queryId);
 			bsIn.Read(dbIdentifier);
@@ -190,7 +195,7 @@ PluginReceiveResult SQLite3ServerPlugin::OnReceive(Packet *packet)
 				unsigned int idx = dbHandles.GetIndexOf(dbIdentifier);
 				if (idx==-1)
 				{
-					RakNet::BitStream bsOut;
+					SLNet::BitStream bsOut;
 					bsOut.Write((MessageID)ID_SQLite3_UNKNOWN_DB);
 					bsOut.Write(queryId);
 					bsOut.Write(dbIdentifier);
@@ -210,7 +215,7 @@ PluginReceiveResult SQLite3ServerPlugin::OnReceive(Packet *packet)
 					sqlThreadPool.AddInput(ExecStatementThread, input);
 #else
 					char *errorMsg;
-					RakNet::RakString errorMsgStr;
+					SLNet::RakString errorMsgStr;
 					SQLite3Table outputTable;					
 					sqlite3_exec(dbHandles[idx].dbHandle, inputStatement.C_String(), PerRowCallback, &outputTable, &errorMsg);
 					if (errorMsg)
@@ -218,7 +223,7 @@ PluginReceiveResult SQLite3ServerPlugin::OnReceive(Packet *packet)
 						errorMsgStr=errorMsg;
 						sqlite3_free(errorMsg);
 					}
-					RakNet::BitStream bsOut;
+					SLNet::BitStream bsOut;
 					bsOut.Write((MessageID)ID_SQLite3_EXEC);
 					bsOut.Write(queryId);
 					bsOut.Write(dbIdentifier);
@@ -252,12 +257,12 @@ void SQLite3ServerPlugin::StopThreads(void)
 	unsigned int i;
 	for (i=0; i < sqlThreadPool.InputSize(); i++)
 	{
-		RakNet::OP_DELETE(sqlThreadPool.GetInputAtIndex(i).data, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(sqlThreadPool.GetInputAtIndex(i).data, _FILE_AND_LINE_);
 	}
 	sqlThreadPool.ClearInput();
 	for (i=0; i < sqlThreadPool.OutputSize(); i++)
 	{
-		RakNet::OP_DELETE(sqlThreadPool.GetOutputAtIndex(i).data, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(sqlThreadPool.GetOutputAtIndex(i).data, _FILE_AND_LINE_);
 	}
 	sqlThreadPool.ClearOutput();
 #endif

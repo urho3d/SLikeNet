@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C# Express 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternalSwigTestApp", "InternalSwigTestApp\InternalSwigTestApp.csproj", "{D5413F9B-65A2-47AA-A0B1-E0FA9A036AC1}"
 EndProject
 Global

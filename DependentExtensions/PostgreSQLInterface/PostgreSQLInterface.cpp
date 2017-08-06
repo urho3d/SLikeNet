@@ -1,15 +1,20 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "PostgreSQLInterface.h"
-#include "VariadicSQLParser.h"
+#include "slikenet/VariadicSQLParser.h"
 
 // libpq-fe.h is part of PostgreSQL which must be installed on this computer to use the PostgreRepository
 #include "libpq-fe.h"
@@ -32,11 +37,13 @@
 //#include <stdlib.h>
 #endif
 
-#include "RakString.h"
-#include "RakAssert.h"
-#include "BitStream.h"
-#include "FormatString.h"
-#include "LinuxStrings.h"
+#include "slikenet/string.h"
+#include "slikenet/assert.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/FormatString.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #define PQEXECPARAM_FORMAT_TEXT		0
 #define PQEXECPARAM_FORMAT_BINARY	1
@@ -103,7 +110,7 @@ bool PostgreSQLInterface::IsResultSuccessful(PGresult *result, bool rollbackOnFa
 
 	bool success=false;
 	ExecStatusType execStatus = PQresultStatus(result);
-	strcpy(lastError,PQresultErrorMessage(result));
+	strcpy_s(lastError,PQresultErrorMessage(result));
 	switch (execStatus)
 	{
 	case PGRES_COMMAND_OK:
@@ -242,7 +249,7 @@ bool PostgreSQLInterface::PQGetValueFromBinary(bool *output, PGresult *result, i
 	
 	return true;
 }
-bool PostgreSQLInterface::PQGetValueFromBinary(RakNet::RakString *output, PGresult *result, int rowIndex, const char *columnName)
+bool PostgreSQLInterface::PQGetValueFromBinary(SLNet::RakString *output, PGresult *result, int rowIndex, const char *columnName)
 {
 	int columnIndex = PQfnumber(result, columnName); if (columnIndex==-1) return false;
 	char *gv;
@@ -304,16 +311,16 @@ char *PostgreSQLInterface::GetLocalTimestamp(void)
 		char *ts=PQgetvalue(result, 0, 0);
 		if (ts)
 		{
-			sprintf(strRes,"Local timestamp is: %s\n", ts);
+			sprintf_s(strRes,"Local timestamp is: %s\n", ts);
 		}
 		else
 		{
-			sprintf(strRes,"Can't read current time\n");
+			sprintf_s(strRes,"Can't read current time\n");
 		}
 		PQclear(result);
 	}
 	else
-		sprintf(strRes,"Failed to read LOCALTIMESTAMP\n");
+		sprintf_s(strRes,"Failed to read LOCALTIMESTAMP\n");
 
 	return (char*)strRes;
 }
@@ -331,7 +338,7 @@ const char* PostgreSQLInterface::GetLastError(void) const
 {
 	return (char*)lastError;
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, unsigned int value, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, unsigned int value, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -346,7 +353,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, unsigned int val
 	paramTypeStr += colName;
 	valueStr += FormatString("%i", value);
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, unsigned int value, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, unsigned int value, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -361,7 +368,7 @@ void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, unsigned int va
 	valueStr += " = ";
 	valueStr += FormatString("%i", value);
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, int value, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, int value, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -376,7 +383,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, int value, RakNe
 	paramTypeStr += colName;
 	valueStr += FormatString("%i", value);
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, bool value, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, bool value, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -394,7 +401,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, bool value, RakN
 	else
 		valueStr += "false";
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, int value, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, int value, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -409,7 +416,7 @@ void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, int value, RakN
 	valueStr += " = ";
 	valueStr += FormatString("%i", value);
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, float value, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, float value, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -424,7 +431,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, float value, Rak
 	paramTypeStr += colName;
 	valueStr += FormatString("%f", value);
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, float value, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, float value, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	(void)numParams;
 	(void)paramData;
@@ -439,7 +446,7 @@ void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, float value, Ra
 	valueStr += " = ";
 	valueStr += FormatString("%f", value);
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, char *binaryData, int binaryDataLength, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, char *binaryData, int binaryDataLength, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty)
 {
 	if (writeEmpty==false && (binaryData==0 || binaryDataLength==0))
 		return;
@@ -460,7 +467,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, char *binaryData
 	paramFormat[numParams]=PQEXECPARAM_FORMAT_BINARY;
 	numParams++;
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, char *binaryData, int binaryDataLength, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, char *binaryData, int binaryDataLength, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat)
 {
 	if (binaryData==0 || binaryDataLength==0)
 		return;
@@ -481,7 +488,7 @@ void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, char *binaryDat
 	paramFormat[numParams]=PQEXECPARAM_FORMAT_BINARY;
 	numParams++;
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, const char *str, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty, const char *type)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, const char *str, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty, const char *type)
 {
 	if (writeEmpty==false && (str==0 || str[0]==0))
 		return;
@@ -518,7 +525,7 @@ void PostgreSQLInterface::EncodeQueryInput(const char *colName, const char *str,
 	paramFormat[numParams]=PQEXECPARAM_FORMAT_TEXT;
 	numParams++;
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, const char *str, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, const char *type)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, const char *str, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, const char *type)
 {
 	if (str==0 || str[0]==0)
 		return;
@@ -537,21 +544,21 @@ void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, const char *str
 	paramFormat[numParams]=PQEXECPARAM_FORMAT_TEXT;
 	numParams++;
 }
-void PostgreSQLInterface::EncodeQueryInput(const char *colName, const RakNet::RakString &str, RakNet::RakString &paramTypeStr, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty, const char *type)
+void PostgreSQLInterface::EncodeQueryInput(const char *colName, const SLNet::RakString &str, SLNet::RakString &paramTypeStr, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, bool writeEmpty, const char *type)
 {
 	EncodeQueryInput(colName, str.C_String(), paramTypeStr, valueStr, numParams, paramData, paramLength, paramFormat, writeEmpty, type);
 }
-void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, const RakNet::RakString &str, RakNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, const char *type)
+void PostgreSQLInterface::EncodeQueryUpdate(const char *colName, const SLNet::RakString &str, SLNet::RakString &valueStr, int &numParams, char **paramData, int *paramLength, int *paramFormat, const char *type)
 {
 	EncodeQueryUpdate(colName, str.C_String(), valueStr, numParams, paramData, paramLength, paramFormat, type);
 }
-RakNet::RakString PostgreSQLInterface::GetEscapedString(const char *input) const
+SLNet::RakString PostgreSQLInterface::GetEscapedString(const char *input) const
 {
 	unsigned long len = (unsigned long) strlen(input);
 	char *fn = (char*) rakMalloc_Ex(len*2+1,_FILE_AND_LINE_);
 	int error;
 	PQescapeStringConn(pgConn, fn, input, len, &error);
-	RakNet::RakString output;
+	SLNet::RakString output;
 	// Use assignment so it doesn't parse printf escape strings
 	output = fn;
 	rakFree_Ex(fn,_FILE_AND_LINE_);
@@ -560,14 +567,14 @@ RakNet::RakString PostgreSQLInterface::GetEscapedString(const char *input) const
 
 PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 {
-	RakNet::RakString query;
+	SLNet::RakString query;
 	PGresult *result;
 	DataStructures::List<VariadicSQLParser::IndexAndType> indices;
 	if ( input==0 || input[0]==0 )
 		return 0;
 
 	// Lookup this query in the stored query table. If it doesn't exist, prepare it.
-	RakNet::RakString inputStr;
+	SLNet::RakString inputStr;
 	inputStr=input;
 	unsigned int preparedQueryIndex;
 	for (preparedQueryIndex=0; preparedQueryIndex < preparedQueries.Size(); preparedQueryIndex++)
@@ -585,8 +592,8 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 	{
 //		if (indices.Size()>0)
 //			query += " (";
-		RakNet::RakString formatCopy;
-		RakNet::RakString insertion;
+		SLNet::RakString formatCopy;
+		SLNet::RakString insertion;
 		formatCopy=input;
 		unsigned int i;
 		unsigned int indexOffset=0;
@@ -599,7 +606,7 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 //			if (i < 9)
 //				formatCopy.SetChar(indices[i].strIndex+1, i+1+'0');
 //			else
-			insertion=RakNet::RakString("%i::%s", i+1, VariadicSQLParser::GetTypeMappingAtIndex(indices[i].typeMappingIndex));
+			insertion= SLNet::RakString("%i::%s", i+1, VariadicSQLParser::GetTypeMappingAtIndex(indices[i].typeMappingIndex));
 			formatCopy.SetChar(indices[i].strIndex+1+indexOffset, insertion);
 			indexOffset+=(unsigned int) insertion.GetLength()-1;
 		}
@@ -609,7 +616,7 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 		query += formatCopy;
 	//	query += ";\n";
 		formatCopy+= ";\n";
-		result = PQprepare(pgConn, RakNet::RakString("PGSQL_ExecuteVariadic_%i", preparedQueries.Size()), formatCopy.C_String(), indices.Size(), NULL);
+		result = PQprepare(pgConn, SLNet::RakString("PGSQL_ExecuteVariadic_%i", preparedQueries.Size()), formatCopy.C_String(), indices.Size(), NULL);
 		if (IsResultSuccessful(result, false))
 		{
 			PQclear(result);
@@ -636,12 +643,12 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 	int *paramLength;
 	int *paramFormat;
 	ExtractArguments(argptr, indices, &paramData, &paramLength);
-	paramFormat=RakNet::OP_NEW_ARRAY<int>(indices.Size(),_FILE_AND_LINE_);
+	paramFormat= SLNet::OP_NEW_ARRAY<int>(indices.Size(),_FILE_AND_LINE_);
 	for (unsigned int i=0; i < indices.Size(); i++)
 		paramFormat[i]=PQEXECPARAM_FORMAT_BINARY;
-	result = PQexecPrepared(pgConn, RakNet::RakString("PGSQL_ExecuteVariadic_%i", preparedQueryIndex), indices.Size(), paramData, paramLength, paramFormat, PQEXECPARAM_FORMAT_BINARY );
+	result = PQexecPrepared(pgConn, SLNet::RakString("PGSQL_ExecuteVariadic_%i", preparedQueryIndex), indices.Size(), paramData, paramLength, paramFormat, PQEXECPARAM_FORMAT_BINARY );
 	VariadicSQLParser::FreeArguments(indices, paramData, paramLength);
-	RakNet::OP_DELETE_ARRAY(paramFormat,_FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(paramFormat,_FILE_AND_LINE_);
 	va_end(argptr);
 
 	if (IsResultSuccessful(result, false)==false)
@@ -655,7 +662,7 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 /*
 PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 {
-	RakNet::RakString query;
+	SLNet::RakString query;
 	PGresult *result;
 	unsigned int i;
 	DataStructures::List<IndexAndType> indices;
@@ -681,7 +688,7 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 			int val = va_arg( argptr, int );
 			paramData[i]=(char*) &val;
 			paramLength[i]=sizeof(val);
-			if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+			if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 		}
 		else if (typeMappings[indices[i].typeMappingIndex].inputType=='s')
 		{
@@ -694,21 +701,21 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 			bool val = va_arg( argptr, bool );
 			paramData[i]=(char*) &val;
 			paramLength[i]=sizeof(bool);
-			if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+			if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 		}
 		else if (typeMappings[indices[i].typeMappingIndex].inputType=='f')
 		{
 			float val = va_arg( argptr, float );
 			paramData[i]=(char*) &val;
 			paramLength[i]=sizeof(float);
-			if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+			if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 		}
 		else if (typeMappings[indices[i].typeMappingIndex].inputType=='g')
 		{
 			double val = va_arg( argptr, double );
 			paramData[i]=(char*) &val;
 			paramLength[i]=sizeof(double);
-			if (RakNet::BitStream::IsNetworkOrder()==false) RakNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
+			if (SLNet::BitStream::IsNetworkOrder()==false) SLNet::BitStream::ReverseBytesInPlace((unsigned char*) paramData[i], paramLength[i]);
 		}
 		else if (typeMappings[indices[i].typeMappingIndex].inputType=='a')
 		{
@@ -719,15 +726,16 @@ PGresult * PostgreSQLInterface::QueryVariadic( const char * input, ... )
 		}
 		paramFormat[i]=PQEXECPARAM_FORMAT_BINARY;
 	}
+	va_end(argptr);
 
 	// Replace each %whatever with $index::type
-	RakNet::RakString inputCopy;
+	SLNet::RakString inputCopy;
 	inputCopy=input;
 	unsigned int lastIndex=0;
 	for (i=0; i < indices.Size(); i++)
 	{
 		query+=inputCopy.SubStr(lastIndex, indices[i].strIndex-lastIndex);
-		query+=RakNet::RakString("$%i::", i+1);
+		query+=SLNet::RakString("$%i::", i+1);
 		query+=typeMappings[indices[i].typeMappingIndex].type;
 		lastIndex=indices[i].strIndex+2; // +2 is to skip the %whateverCharacter
 	}

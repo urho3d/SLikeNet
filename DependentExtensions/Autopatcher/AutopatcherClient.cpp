@@ -1,38 +1,41 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "AutopatcherClient.h"
-#include "DirectoryDeltaTransfer.h"
-#include "FileList.h"
-#include "StringCompressor.h"
-#include "RakPeerInterface.h"
-#include "FileListTransfer.h"
-#include "FileListTransferCBInterface.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "AutopatcherPatchContext.h"
+#include "slikenet/DirectoryDeltaTransfer.h"
+#include "slikenet/FileList.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/AutopatcherPatchContext.h"
 #include "ApplyPatch.h"
-#include "FileOperations.h"
-//#include "DR_SHA1.h"
+#include "slikenet/FileOperations.h"
+//#include "slikenet/DR_SHA1.h"
 #include <stdio.h>
-#include "FileOperations.h"
-#include "RakAssert.h"
-#include "ThreadPool.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/assert.h"
+#include "slikenet/ThreadPool.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+using namespace SLNet;
 
-using namespace RakNet;
-
-#include "SuperFastHash.h"
+#include "slikenet/SuperFastHash.h"
 static const unsigned HASH_LENGTH=4;
 
 #define COPY_ON_RESTART_EXTENSION ".patched.tmp"
@@ -47,8 +50,7 @@ PatchContext AutopatcherClientCBInterface::ApplyPatchBase(const char *oldFilePat
 PatchContext AutopatcherClientCBInterface::ApplyPatchBSDiff(const char *oldFilePath, char **newFileContents, unsigned int *newFileSize, char *patchContents, unsigned int patchSize)
 {
 	FILE *fp;
-	fp=fopen(oldFilePath, "rb");
-	if (fp==0)
+	if (fopen_s(&fp, oldFilePath, "rb")!=0)
 		return PC_ERROR_PATCH_TARGET_MISSING;
 
 	fseek(fp, 0, SEEK_END);
@@ -88,15 +90,15 @@ AutopatcherClientThreadInfo* AutopatcherClientWorkerThread(AutopatcherClientThre
 	char fullPathToDir[1024];
 	*returnOutput=true;
 
-	strcpy(fullPathToDir, input->applicationDirectory);
-	strcat(fullPathToDir, input->onFileStruct.fileName);
+	strcpy_s(fullPathToDir, input->applicationDirectory);
+	strcat_s(fullPathToDir, input->onFileStruct.fileName);
 	if (input->onFileStruct.context.op==PC_WRITE_FILE)
 	{
 		if (WriteFileWithDirectories(fullPathToDir, (char*)input->onFileStruct.fileData, input->onFileStruct.byteLengthOfThisFile)==false)
 		{
 			char newDir[1024];
-			strcpy(newDir, fullPathToDir);
-			strcat(newDir, COPY_ON_RESTART_EXTENSION);
+			strcpy_s(newDir, fullPathToDir);
+			strcat_s(newDir, COPY_ON_RESTART_EXTENSION);
 			if (WriteFileWithDirectories(newDir, (char*)input->onFileStruct.fileData, input->onFileStruct.byteLengthOfThisFile))
 			{
 				input->result=PC_NOTICE_WILL_COPY_ON_RESTART;
@@ -136,8 +138,8 @@ AutopatcherClientThreadInfo* AutopatcherClientWorkerThread(AutopatcherClientThre
 		}
 
 		unsigned int hash = SuperFastHash(input->postPatchFile, input->postPatchLength);
-		if (RakNet::BitStream::DoEndianSwap())
-			RakNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
+		if (SLNet::BitStream::DoEndianSwap())
+			SLNet::BitStream::ReverseBytesInPlace((unsigned char*) &hash, sizeof(hash));
 
 		//if (memcmp(sha1.GetHash(), input->onFileStruct.fileData, HASH_LENGTH)!=0)
 
@@ -151,8 +153,8 @@ AutopatcherClientThreadInfo* AutopatcherClientWorkerThread(AutopatcherClientThre
 			if (WriteFileWithDirectories(fullPathToDir, (char*)input->postPatchFile, input->postPatchLength)==false)
 			{
 				char newDir[1024];
-				strcpy(newDir, fullPathToDir);
-				strcat(newDir, COPY_ON_RESTART_EXTENSION);
+				strcpy_s(newDir, fullPathToDir);
+				strcat_s(newDir, COPY_ON_RESTART_EXTENSION);
 				if (WriteFileWithDirectories(newDir, (char*)input->postPatchFile, input->postPatchLength))
 				{
 					input->result=PC_NOTICE_WILL_COPY_ON_RESTART;
@@ -172,7 +174,7 @@ AutopatcherClientThreadInfo* AutopatcherClientWorkerThread(AutopatcherClientThre
 	return input;
 }
 // -----------------------------------------------------------------
-namespace RakNet
+namespace SLNet
 {
 class AutopatcherClientCallback : public FileListTransferCBInterface
 {
@@ -210,7 +212,7 @@ public:
 				rakFree_Ex(info->postPatchFile, _FILE_AND_LINE_ );
 			if (info->onFileStruct.fileData)
 				rakFree_Ex(info->onFileStruct.fileData, _FILE_AND_LINE_ );
-			RakNet::OP_DELETE(info, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(info, _FILE_AND_LINE_);
 		}
 		threadPool.ClearInput();
 		for (i=0; i < threadPool.OutputSize(); i++)
@@ -222,7 +224,7 @@ public:
 				rakFree_Ex(info->postPatchFile, _FILE_AND_LINE_ );
 			if (info->onFileStruct.fileData)
 				rakFree_Ex(info->onFileStruct.fileData, _FILE_AND_LINE_ );
-			RakNet::OP_DELETE(info, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(info, _FILE_AND_LINE_);
 		}
 		threadPool.ClearOutput();
 	}
@@ -312,7 +314,7 @@ public:
 				rakFree_Ex(threadInfo->postPatchFile, _FILE_AND_LINE_ );
 			if (threadInfo->onFileStruct.fileData)
 				rakFree_Ex(threadInfo->onFileStruct.fileData, _FILE_AND_LINE_ );
-			RakNet::OP_DELETE(threadInfo, _FILE_AND_LINE_);
+			SLNet::OP_DELETE(threadInfo, _FILE_AND_LINE_);
 		}
 
 		// If both input and output are empty, we are done.
@@ -347,13 +349,13 @@ public:
 	}
 	virtual bool OnFile(OnFileStruct *onFileStruct)
 	{
-		AutopatcherClientThreadInfo *inStruct = RakNet::OP_NEW<AutopatcherClientThreadInfo>( _FILE_AND_LINE_ );
+		AutopatcherClientThreadInfo *inStruct = SLNet::OP_NEW<AutopatcherClientThreadInfo>( _FILE_AND_LINE_ );
 		memset(inStruct,0,sizeof(AutopatcherClientThreadInfo));
 //		inStruct->prePatchFile=0;
 		inStruct->postPatchFile=0;
 		inStruct->cbInterface=onFileCallback;
 		memcpy(&(inStruct->onFileStruct), onFileStruct, sizeof(OnFileStruct));
-		strcpy(inStruct->applicationDirectory,applicationDirectory);
+		strcpy_s(inStruct->applicationDirectory,applicationDirectory);
 		if (onFileStruct->context.op==PC_HASH_1_WITH_PATCH || onFileStruct->context.op==PC_HASH_2_WITH_PATCH)
 			onFileStruct->context.op=PC_NOTICE_FILE_DOWNLOADED_PATCH;
 		else
@@ -370,8 +372,8 @@ public:
 
 		if (fps->onFileStruct->fileName)
 		{
-			strcpy(fullPathToDir, applicationDirectory);
-			strcat(fullPathToDir, fps->onFileStruct->fileName);
+			strcpy_s(fullPathToDir, applicationDirectory);
+			strcat_s(fullPathToDir, fps->onFileStruct->fileName);
 			onFileCallback->OnFileProgress(fps);
 		}
 	}
@@ -442,28 +444,25 @@ bool AutopatcherClient::PatchApplication(const char *_applicationName, const cha
 	if (IsPatching())
 		return false; // Already in the middle of patching.
 
-	strcpy(applicationDirectory, _applicationDirectory);
-	FileList::FixEndingSlash(applicationDirectory);
-	strcpy(applicationName, _applicationName);
+	strcpy_s(applicationDirectory, _applicationDirectory);
+	FileList::FixEndingSlash(applicationDirectory, 512);
+	strcpy_s(applicationName, _applicationName);
 	serverId=host;
 	patchComplete=false;
 	userCB=onFileCallback;
-	strcpy(copyOnRestartOut, restartOutputFilename);
-	strcpy(restartExe, pathToRestartExe);
+	strcpy_s(copyOnRestartOut, restartOutputFilename);
+	strcpy_s(restartExe, pathToRestartExe);
 	processThreadCompletionMutex.Lock();
 	processThreadCompletion=false;
 	processThreadCompletionMutex.Unlock();
 
-	RakNet::BitStream outBitStream;
+	SLNet::BitStream outBitStream;
 	outBitStream.Write((unsigned char)ID_AUTOPATCHER_GET_CHANGELIST_SINCE_DATE);
 	StringCompressor::Instance()->EncodeString(applicationName, 512, &outBitStream);
 	outBitStream.Write(lastUpdateDate);
     SendUnified(&outBitStream, priority, RELIABLE_ORDERED, orderingChannel, host, false);
 	return true;
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherClient::Update(void)
 {
 	processThreadCompletionMutex.Lock();
@@ -477,10 +476,10 @@ void AutopatcherClient::Update(void)
 		// If redownload list, process it
 		if (redownloadList.fileList.Size())
 		{
-			RakNet::BitStream outBitStream;
+			SLNet::BitStream outBitStream;
 			AutopatcherClientCallback *transferCallback;
-			transferCallback = RakNet::OP_NEW<AutopatcherClientCallback>( _FILE_AND_LINE_ );
-			strcpy(transferCallback->applicationDirectory, applicationDirectory);
+			transferCallback = SLNet::OP_NEW<AutopatcherClientCallback>( _FILE_AND_LINE_ );
+			strcpy_s(transferCallback->applicationDirectory, applicationDirectory);
 			transferCallback->onFileCallback=userCB;
 			transferCallback->client=this;
 			setId = fileListTransfer->SetupReceive(transferCallback, true, serverId);
@@ -505,9 +504,9 @@ void AutopatcherClient::Update(void)
 			PushBackPacketUnified(p,false);
 
 			FILE *fp;
-			fp = fopen(copyOnRestartOut, "wt");
-			RakAssert(fp);
-			if (fp)
+			errno_t error = fopen_s(&fp, copyOnRestartOut, "wt");
+			RakAssert(error == 0);
+			if (error == 0)
 			{
 				fprintf(fp, "#Sleep 1000\n");
 				unsigned i;
@@ -575,9 +574,6 @@ PluginReceiveResult AutopatcherClient::OnReceive(Packet *packet)
 	}
 	return RR_CONTINUE_PROCESSING;
 }
-#ifdef _MSC_VER
-#pragma warning( disable : 4100 ) // warning C4100: <variable name> : unreferenced formal parameter
-#endif
 void AutopatcherClient::OnShutdown(void)
 {
 	// TODO
@@ -589,8 +585,8 @@ PluginReceiveResult AutopatcherClient::OnCreationList(Packet *packet)
 	if (packet->systemAddress!=serverId)
 		return RR_STOP_PROCESSING_AND_DEALLOCATE;
 
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
-	RakNet::BitStream outBitStream;
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream outBitStream;
 	FileList remoteFileList, missingOrChanged;
 	inBitStream.IgnoreBits(8);
 	if (remoteFileList.Deserialize(&inBitStream)==false)
@@ -611,8 +607,8 @@ PluginReceiveResult AutopatcherClient::OnCreationList(Packet *packet)
 
 	// Prepare the transfer plugin to get a file list.
 	AutopatcherClientCallback *transferCallback;
-	transferCallback = RakNet::OP_NEW<AutopatcherClientCallback>( _FILE_AND_LINE_ );
-	strcpy(transferCallback->applicationDirectory, applicationDirectory);
+	transferCallback = SLNet::OP_NEW<AutopatcherClientCallback>( _FILE_AND_LINE_ );
+	strcpy_s(transferCallback->applicationDirectory, applicationDirectory);
 	transferCallback->onFileCallback=userCB;
 	transferCallback->client=this;
 	setId = fileListTransfer->SetupReceive(transferCallback, true, packet->systemAddress);
@@ -632,8 +628,8 @@ void AutopatcherClient::OnDeletionList(Packet *packet)
 	if (packet->systemAddress!=serverId)
 		return;
 
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
-	RakNet::BitStream outBitStream;
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream outBitStream;
 	inBitStream.IgnoreBits(8);
 	FileList fileList;
 	if (fileList.Deserialize(&inBitStream)==false)
@@ -642,7 +638,7 @@ void AutopatcherClient::OnDeletionList(Packet *packet)
 }
 PluginReceiveResult AutopatcherClient::OnDownloadFinished(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
 	// This may have been created internally, with no serverDate written (line 469 or so)
 	if (inBitStream.GetNumberOfUnreadBits()>7)
@@ -656,7 +652,7 @@ PluginReceiveResult AutopatcherClient::OnDownloadFinished(Packet *packet)
 }
 PluginReceiveResult AutopatcherClient::OnDownloadFinishedInternal(Packet *packet)
 {
-	RakNet::BitStream inBitStream(packet->data, packet->length, false);
+	SLNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
 	serverId=packet->systemAddress;
 	serverIdIndex=packet->systemAddress.systemIndex;
@@ -673,7 +669,3 @@ void AutopatcherClient::Redownload(const char *filePath)
 {
 	redownloadList.AddFile(filePath,filePath, 0, 0, 0, FileListNodeContext(0,0,0,0));
 }
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif

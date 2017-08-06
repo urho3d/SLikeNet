@@ -1,17 +1,28 @@
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
+
 #include "SQLiteServerLoggerPlugin.h"
-#include "RakPeerInterface.h"
-#include "PacketizedTCP.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/MessageIdentifiers.h"
 #include "SQLiteLoggerCommon.h"
 #include "jpeglib.h"
 #include "jpeg_memory_dest.h"
-#include "FileOperations.h"
-#include "GetTime.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/GetTime.h"
 #include <time.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include "DXTCompressor.h"
+#include "slikenet/linux_adapter.h"
 
 // http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html
 
@@ -36,7 +47,7 @@
 //#define RGB_BLUE	2	/* Offset of Blue */
 //#define RGB_PIXELSIZE	3	/* JSAMPLEs per RGB scanline element */
 
-using namespace RakNet;
+using namespace SLNet;
 
 // JPEG ENCODING ERRORS
 struct my_error_mgr {
@@ -56,10 +67,10 @@ METHODDEF(void) my_error_exit (j_common_ptr cinfo) {}
 
 // Store packets in the CPUThreadInput until at most this much time has elapsed. This is so
 // batch processing can occur on multiple image sources at once
-static const RakNet::TimeMS MAX_TIME_TO_BUFFER_PACKETS=1000;
+static const SLNet::TimeMS MAX_TIME_TO_BUFFER_PACKETS=1000;
 
 // WTF am I getting this?
-// 2>SQLiteServerLoggerPlugin.obj : error LNK2019: unresolved external symbol _GetSqlDataTypeName referenced in function "struct RakNet::SQLite3ServerPlugin::SQLExecThreadOutput __cdecl ExecSQLLoggingThread(struct RakNet::SQLite3ServerPlugin::SQLExecThreadInput,bool *,void *)" (?ExecSQLLoggingThread@@YA?AUExecThreadOutput@SQLite3ServerPlugin@RakNet@@UExecThreadInput@23@PA_NPAX@Z)
+// 2>SQLiteServerLoggerPlugin.obj : error LNK2019: unresolved external symbol _GetSqlDataTypeName referenced in function "struct SLNet::SQLite3ServerPlugin::SQLExecThreadOutput __cdecl ExecSQLLoggingThread(struct SLNet::SQLite3ServerPlugin::SQLExecThreadInput,bool *,void *)" (?ExecSQLLoggingThread@@YA?AUExecThreadOutput@SQLite3ServerPlugin@RakNet@@UExecThreadInput@23@PA_NPAX@Z)
 // 2>C:\RakNet\Debug\SQLiteServerLogger.exe : fatal error LNK1120: 1 unresolved externals
 static const char *sqlDataTypeNames[SQLLPDT_COUNT] = 
 {
@@ -74,7 +85,7 @@ const char *GetSqlDataTypeName2(SQLLoggerPrimaryDataType idx) {return sqlDataTyp
 
 void CompressAsJpeg(char **cptrInOut, uint32_t *sizeInOut, uint16_t imageWidth, uint16_t imageHeight, int16_t linePitch, unsigned char input_components)
 {
-	RakNet::TimeUS t1=RakNet::GetTimeUS();
+	SLNet::TimeUS t1= SLNet::GetTimeUS();
 
 	// Compress to jpg
 	// http://www.google.com/codesearch/p?hl=en#I-_InJ6STRE/gthumb-1.108/libgthumb/pixbuf-utils.c&q=jpeg_create_compress
@@ -119,8 +130,8 @@ void CompressAsJpeg(char **cptrInOut, uint32_t *sizeInOut, uint16_t imageWidth, 
 	*cptrInOut = (char*) rakRealloc_Ex(storage, jpegSizeAfterCompression,_FILE_AND_LINE_);
 	*sizeInOut=jpegSizeAfterCompression;
 
-	RakNet::TimeUS t2=RakNet::GetTimeUS();
-	RakNet::TimeUS diff=t2-t1;
+	SLNet::TimeUS t2= SLNet::GetTimeUS();
+	SLNet::TimeUS diff=t2-t1;
 }
 static bool needsDxtInit=true;
 static bool dxtCompressionSupported=false;
@@ -148,21 +159,21 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 {
 	int i;
 	*returnOutput=true;
-	SQLiteServerLoggerPlugin::CPUThreadOutput *cpuThreadOutput = RakNet::OP_NEW<SQLiteServerLoggerPlugin::CPUThreadOutput>(_FILE_AND_LINE_);
+	SQLiteServerLoggerPlugin::CPUThreadOutput *cpuThreadOutput = SLNet::OP_NEW<SQLiteServerLoggerPlugin::CPUThreadOutput>(_FILE_AND_LINE_);
 	cpuThreadOutput->arraySize=cpuThreadInput->arraySize;
-	//cpuThreadOutput->cpuOutputNodeArray=RakNet::OP_NEW_ARRAY<SQLiteServerLoggerPlugin::CPUThreadOutputNode*>(cpuThreadInput->arraySize,_FILE_AND_LINE_);
+	//cpuThreadOutput->cpuOutputNodeArray=SLNet::OP_NEW_ARRAY<SQLiteServerLoggerPlugin::CPUThreadOutputNode*>(cpuThreadInput->arraySize,_FILE_AND_LINE_);
 	//printf("1. arraySize=%i, ",cpuThreadInput->arraySize);
 	for (i=0; i<cpuThreadInput->arraySize; i++)
 	{
-		cpuThreadOutput->cpuOutputNodeArray[i]=RakNet::OP_NEW<SQLiteServerLoggerPlugin::CPUThreadOutputNode>(_FILE_AND_LINE_);
+		cpuThreadOutput->cpuOutputNodeArray[i]= SLNet::OP_NEW<SQLiteServerLoggerPlugin::CPUThreadOutputNode>(_FILE_AND_LINE_);
 		SQLiteServerLoggerPlugin::CPUThreadOutputNode *outputNode = cpuThreadOutput->cpuOutputNodeArray[i];
 		Packet *packet = cpuThreadInput->cpuInputArray[i].packet;
-		RakNet::RakString dbIdentifier = cpuThreadInput->cpuInputArray[i].dbIdentifier;
+		SLNet::RakString dbIdentifier = cpuThreadInput->cpuInputArray[i].dbIdentifier;
 		// outputNode->whenMessageArrived = cpuThreadInput->cpuInputArray[i].whenMessageArrived;
 		outputNode->packet=packet;
 		
-		packet->systemAddress.ToString(true,outputNode->ipAddressString);
-		RakNet::BitStream bitStream(packet->data, packet->length, false);
+		packet->systemAddress.ToString(true,outputNode->ipAddressString,32);
+		SLNet::BitStream bitStream(packet->data, packet->length, false);
 		bitStream.IgnoreBytes(1);
 		bitStream.Read(outputNode->dbIdentifier);
 		bitStream.Read(outputNode->tableName);
@@ -175,7 +186,7 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 		bitStream.Read(outputNode->parameterCount);
 		if (outputNode->isFunctionCall==false)
 		{
-			RakNet::RakString columnName;
+			SLNet::RakString columnName;
 		//	printf("2. parameterCount=%i, ",outputNode->parameterCount);
 			for (int i=0; i < outputNode->parameterCount; i++)
 			{
@@ -244,7 +255,8 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 // 						if (testWriteToDisk)
 // 						{
 // 							printf("Wrote test.dds\n");
-// 							FILE *fp = fopen("test.dds", "wb");
+// 							FILE *fp;
+//							fopen_s(&fp, "test.dds", "wb");
 // 							fwrite(outputData,1,outputNode->parameterList[parameterCountIndex].size,fp);
 // 							fclose(fp);
 // 							testWriteToDisk=false;
@@ -307,7 +319,8 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 // 						if (testWriteToDisk)
 // 						{
 // 							printf("Wrote test.jpg\n");
-// 							FILE *fp = fopen("test.jpg", "wb");
+// 							FILE *fp;
+//							fopen_s(&fp, "test.jpg", "wb");
 // 							fwrite(outputNode->parameterList[parameterCountIndex].data.cptr,1,outputNode->parameterList[parameterCountIndex].size,fp);
 // 							fclose(fp);
 // 							testWriteToDisk=false;
@@ -319,7 +332,7 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 	}
 
 //	printf("5. out1, ");
-	RakNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
 //	printf("6. out2\n");
 	return cpuThreadOutput;
 }
@@ -337,7 +350,7 @@ struct SQLPreparedStatements
 };
 void* SQLLoggerThreadAllocPreparedStatements()
 {
-	SQLPreparedStatements *s = RakNet::OP_NEW<SQLPreparedStatements>(_FILE_AND_LINE_);
+	SQLPreparedStatements *s = SLNet::OP_NEW<SQLPreparedStatements>(_FILE_AND_LINE_);
 	return s;
 }
 void SQLLoggerThreadDeallocPreparedStatements(void* statementStruct)
@@ -346,7 +359,7 @@ void SQLLoggerThreadDeallocPreparedStatements(void* statementStruct)
 	if (s->selectNameFromMaster) sqlite3_finalize(s->selectNameFromMaster);
 	if (s->insertIntoFunctionCalls) sqlite3_finalize(s->insertIntoFunctionCalls);
 	if (s->insertIntoFunctionCallParameters) sqlite3_finalize(s->insertIntoFunctionCallParameters);
-	RakNet::OP_DELETE(s,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(s,_FILE_AND_LINE_);
 }
 void DeleteBlobOrText(void* v)
 {
@@ -374,7 +387,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 			// Create function tables if they are not there already
 			if (sqlite3_prepare_v2(
 				dbHandle, 
-				"SELECT name FROM sqlite_master WHERE type='table' AND name="FUNCTION_CALL_TABLE" ",
+				"SELECT name FROM sqlite_master WHERE type='table' AND name=" FUNCTION_CALL_TABLE " ",
 				-1,
 				&preparedStatements->selectNameFromMaster,
 				0
@@ -393,11 +406,11 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 		if (rc!=SQLITE_ROW)
 		{
 			// Create table if it isn't there already
-			rc = sqlite3_exec(dbHandle,"CREATE TABLE "FUNCTION_CALL_TABLE" (functionId_pk INTEGER PRIMARY KEY, "FUNCTION_CALL_FRIENDLY_TEXT" TEXT, functionName TEXT, "FILE_COLUMN" TEXT, "LINE_COLUMN" INTEGER, "TICK_COUNT_COLUMN" INTEGER, "AUTO_IP_COLUMN" TEXT, "TIMESTAMP_TEXT_COLUMN" TIMESTAMP DATE DEFAULT (datetime('now','localtime')), "TIMESTAMP_NUMERIC_COLUMN" NUMERIC )", 0, 0, &errorMsg);
+			rc = sqlite3_exec(dbHandle,"CREATE TABLE " FUNCTION_CALL_TABLE " (functionId_pk INTEGER PRIMARY KEY, " FUNCTION_CALL_FRIENDLY_TEXT " TEXT, functionName TEXT, " FILE_COLUMN " TEXT, " LINE_COLUMN " INTEGER, " TICK_COUNT_COLUMN " INTEGER, " AUTO_IP_COLUMN " TEXT, " TIMESTAMP_TEXT_COLUMN " TIMESTAMP DATE DEFAULT (datetime('now','localtime')), " TIMESTAMP_NUMERIC_COLUMN " NUMERIC )", 0, 0, &errorMsg);
 			RakAssert(rc==SQLITE_OK);
 			sqlite3_free(errorMsg);
 			// See sqlDataTypeNames for *val
-			rc = sqlite3_exec(dbHandle,"CREATE TABLE "FUNCTION_CALL_PARAMETERS_TABLE" (fcpId_pk INTEGER PRIMARY KEY, functionId_fk integer NOT NULL, value TEXT, FOREIGN KEY (functionId_fk) REFERENCES "FUNCTION_CALL_TABLE" (functionId_pk))", 0, 0, &errorMsg);
+			rc = sqlite3_exec(dbHandle,"CREATE TABLE " FUNCTION_CALL_PARAMETERS_TABLE " (fcpId_pk INTEGER PRIMARY KEY, functionId_fk integer NOT NULL, value TEXT, FOREIGN KEY (functionId_fk) REFERENCES " FUNCTION_CALL_TABLE " (functionId_pk))", 0, 0, &errorMsg);
 			RakAssert(rc==SQLITE_OK);
 			sqlite3_free(errorMsg);
 		}
@@ -408,7 +421,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 
 		// Insert into function calls
 		int parameterCountIndex;
-		RakNet::RakString functionCallFriendlyText("%s(", cpuOutputNode->tableName.C_String());
+		SLNet::RakString functionCallFriendlyText("%s(", cpuOutputNode->tableName.C_String());
 		for (parameterCountIndex=0; parameterCountIndex < cpuOutputNode->parameterCount; parameterCountIndex++)
 		{
 			if (parameterCountIndex!=0)
@@ -417,32 +430,32 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 			{
 			case SQLLPDT_POINTER:
 				if (cpuOutputNode->parameterList[parameterCountIndex].size==4)
-					functionCallFriendlyText+=RakNet::RakString("%p", cpuOutputNode->parameterList[parameterCountIndex].data.i);
+					functionCallFriendlyText+= SLNet::RakString("%p", cpuOutputNode->parameterList[parameterCountIndex].data.i);
 				else
-					functionCallFriendlyText+=RakNet::RakString("%p", cpuOutputNode->parameterList[parameterCountIndex].data.ll);
+					functionCallFriendlyText+= SLNet::RakString("%p", cpuOutputNode->parameterList[parameterCountIndex].data.ll);
 				break;
 			case SQLLPDT_INTEGER:
 				switch (cpuOutputNode->parameterList[parameterCountIndex].size)
 				{
 				case 1:
-					functionCallFriendlyText+=RakNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.c);
+					functionCallFriendlyText+= SLNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.c);
 					break;
 				case 2:
-					functionCallFriendlyText+=RakNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.s);
+					functionCallFriendlyText+= SLNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.s);
 					break;
 				case 4:
-					functionCallFriendlyText+=RakNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.i);
+					functionCallFriendlyText+= SLNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.i);
 					break;
 				case 8:
-					functionCallFriendlyText+=RakNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.ll);
+					functionCallFriendlyText+= SLNet::RakString("%i", cpuOutputNode->parameterList[parameterCountIndex].data.ll);
 					break;
 				}
 				break;
 			case SQLLPDT_REAL:
 				if (cpuOutputNode->parameterList[parameterCountIndex].size==sizeof(float))
-					functionCallFriendlyText+=RakNet::RakString("%f", cpuOutputNode->parameterList[parameterCountIndex].data.f);
+					functionCallFriendlyText+= SLNet::RakString("%f", cpuOutputNode->parameterList[parameterCountIndex].data.f);
 				else
-					functionCallFriendlyText+=RakNet::RakString("%d", cpuOutputNode->parameterList[parameterCountIndex].data.d);
+					functionCallFriendlyText+= SLNet::RakString("%d", cpuOutputNode->parameterList[parameterCountIndex].data.d);
 				break;
 			case SQLLPDT_TEXT:
 				functionCallFriendlyText+='"';
@@ -451,10 +464,10 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 				functionCallFriendlyText+='"';
 				break;
 			case SQLLPDT_IMAGE:
-				functionCallFriendlyText+=RakNet::RakString("<%i byte image>", cpuOutputNode->parameterList[parameterCountIndex].size, cpuOutputNode->parameterList[parameterCountIndex].data.cptr);
+				functionCallFriendlyText+= SLNet::RakString("<%i byte image>", cpuOutputNode->parameterList[parameterCountIndex].size, cpuOutputNode->parameterList[parameterCountIndex].data.cptr);
 				break;
 			case SQLLPDT_BLOB:
-				functionCallFriendlyText+=RakNet::RakString("<%i byte binary>", cpuOutputNode->parameterList[parameterCountIndex].size, cpuOutputNode->parameterList[parameterCountIndex].data.cptr);
+				functionCallFriendlyText+= SLNet::RakString("<%i byte binary>", cpuOutputNode->parameterList[parameterCountIndex].size, cpuOutputNode->parameterList[parameterCountIndex].data.cptr);
 				break;
 			}
 		}
@@ -463,10 +476,10 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 		
 		if (preparedStatements->insertIntoFunctionCalls==0)
 		{
-			rc = sqlite3_prepare_v2(dbHandle, "INSERT INTO "FUNCTION_CALL_TABLE" ("FUNCTION_CALL_FRIENDLY_TEXT", "FILE_COLUMN", "LINE_COLUMN", "TICK_COUNT_COLUMN", "AUTO_IP_COLUMN", "TIMESTAMP_NUMERIC_COLUMN" ,functionName) VALUES (?,?,?,?,?,?,?)", -1, &preparedStatements->insertIntoFunctionCalls, 0);
+			rc = sqlite3_prepare_v2(dbHandle, "INSERT INTO " FUNCTION_CALL_TABLE " (" FUNCTION_CALL_FRIENDLY_TEXT ", " FILE_COLUMN ", " LINE_COLUMN ", " TICK_COUNT_COLUMN ", " AUTO_IP_COLUMN ", " TIMESTAMP_NUMERIC_COLUMN " ,functionName) VALUES (?,?,?,?,?,?,?)", -1, &preparedStatements->insertIntoFunctionCalls, 0);
 			if (rc!=SQLITE_DONE && rc!=SQLITE_OK)
 			{
-				RakAssert("Failed INSERT INTO "FUNCTION_CALL_PARAMETERS_TABLE" in SQLiteServerLoggerPlugin.cpp" && 0);
+				RakAssert("Failed INSERT INTO " FUNCTION_CALL_PARAMETERS_TABLE " in SQLiteServerLoggerPlugin.cpp" && 0);
 			}
 		}
 		sqlite3_bind_text(preparedStatements->insertIntoFunctionCalls, 1, functionCallFriendlyText.C_String(), -1, SQLITE_TRANSIENT);
@@ -484,7 +497,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 		}
 //		sqlite3_finalize(statement);
 
-//		RakNet::RakString insertIntoFunctionCallsQuery("INSERT INTO 'functionCalls' ("FUNCTION_CALL_FRIENDLY_TEXT", "FILE_COLUMN", "LINE_COLUMN", "TICK_COUNT_COLUMN",functionName) VALUES ('%s','%s',%i,%i,'%s') ", functionCallFriendlyText.C_String(), file.C_String(), line, tickCount,tableName.C_String());
+//		SLNet::RakString insertIntoFunctionCallsQuery("INSERT INTO 'functionCalls' (" FUNCTION_CALL_FRIENDLY_TEXT ", " FILE_COLUMN ", " LINE_COLUMN ", " TICK_COUNT_COLUMN ",functionName) VALUES ('%s','%s',%i,%i,'%s') ", functionCallFriendlyText.C_String(), file.C_String(), line, tickCount,tableName.C_String());
 //		rc = sqlite3_exec(dbHandle,insertIntoFunctionCallsQuery.C_String(), 0, 0, &errorMsg);
 //		RakAssert(rc==SQLITE_OK);
 //		sqlite3_free(errorMsg);
@@ -554,7 +567,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 	{
 
 		sqlite3_stmt *pragmaTableInfo;
-		RakNet::RakString pragmaQuery("PRAGMA table_info(%s)",cpuOutputNode->tableName.C_String());
+		SLNet::RakString pragmaQuery("PRAGMA table_info(%s)",cpuOutputNode->tableName.C_String());
 		if (sqlite3_prepare_v2(
 			dbHandle, 
 			pragmaQuery.C_String(),
@@ -571,8 +584,8 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 		}
 
 		int rc = sqlite3_step(pragmaTableInfo);
-		DataStructures::List<RakNet::RakString> existingColumnNames;
-		DataStructures::List<RakNet::RakString> existingColumnTypes;
+		DataStructures::List<SLNet::RakString> existingColumnNames;
+		DataStructures::List<SLNet::RakString> existingColumnTypes;
 		char *errorMsg;
 		while (rc==SQLITE_ROW)
 		{
@@ -600,8 +613,8 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 			const int typeColumn=2;
 			RakAssert(strcmp(sqlite3_column_name(pragmaTableInfo,nameColumn),"name")==0);
 			RakAssert(strcmp(sqlite3_column_name(pragmaTableInfo,typeColumn),"type")==0);
-			RakNet::RakString columnName = sqlite3_column_text(pragmaTableInfo,nameColumn);
-			RakNet::RakString columnType = sqlite3_column_text(pragmaTableInfo,typeColumn);
+			SLNet::RakString columnName = sqlite3_column_text(pragmaTableInfo,nameColumn);
+			SLNet::RakString columnType = sqlite3_column_text(pragmaTableInfo,typeColumn);
 			existingColumnNames.Push(columnName, _FILE_AND_LINE_ );
 			existingColumnTypes.Push(columnType, _FILE_AND_LINE_ );
 
@@ -621,7 +634,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 		int existingColumnNamesIndex,insertingColumnNamesIndex;
 		if (existingColumnNames.Size()==0)
 		{
-			RakNet::RakString createQuery("CREATE TABLE %s (rowId_pk INTEGER PRIMARY KEY, "FILE_COLUMN" TEXT, "LINE_COLUMN" INTEGER, "TICK_COUNT_COLUMN" INTEGER, "AUTO_IP_COLUMN" TEXT, "TIMESTAMP_TEXT_COLUMN" TIMESTAMP DATE DEFAULT (datetime('now','localtime')), "TIMESTAMP_NUMERIC_COLUMN" NUMERIC",cpuOutputNode->tableName.C_String());
+			SLNet::RakString createQuery("CREATE TABLE %s (rowId_pk INTEGER PRIMARY KEY, " FILE_COLUMN " TEXT, " LINE_COLUMN " INTEGER, " TICK_COUNT_COLUMN " INTEGER, " AUTO_IP_COLUMN " TEXT, " TIMESTAMP_TEXT_COLUMN " TIMESTAMP DATE DEFAULT (datetime('now','localtime')), " TIMESTAMP_NUMERIC_COLUMN " NUMERIC",cpuOutputNode->tableName.C_String());
 
 			for (int i=0; i < cpuOutputNode->parameterCount; i++)
 			{
@@ -672,7 +685,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 				if (alreadyExists==false)
 				{
 					sqlite3_exec(dbHandle,
-						RakNet::RakString("ALTER TABLE %s ADD %s %s",
+						SLNet::RakString("ALTER TABLE %s ADD %s %s",
 						cpuOutputNode->tableName.C_String(),
 						cpuOutputNode->insertingColumnNames[insertingColumnNamesIndex].C_String(),
 						GetSqlDataTypeName2(cpuOutputNode->parameterList[insertingColumnNamesIndex].type)
@@ -687,7 +700,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 
 
 		// Insert new row
-		RakNet::RakString insertQuery("INSERT INTO %s (", cpuOutputNode->tableName.C_String());
+		SLNet::RakString insertQuery("INSERT INTO %s (", cpuOutputNode->tableName.C_String());
 		int parameterCountIndex;
 		for (parameterCountIndex=0; parameterCountIndex<cpuOutputNode->parameterCount; parameterCountIndex++)
 		{
@@ -696,7 +709,7 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 			insertQuery+=cpuOutputNode->insertingColumnNames[parameterCountIndex].C_String();
 		}
 		// Add file and line to the end
-		insertQuery+=", "FILE_COLUMN", "LINE_COLUMN", "TICK_COUNT_COLUMN", "AUTO_IP_COLUMN", "TIMESTAMP_NUMERIC_COLUMN" ) VALUES (";
+		insertQuery+=", " FILE_COLUMN ", " LINE_COLUMN ", " TICK_COUNT_COLUMN ", " AUTO_IP_COLUMN ", " TIMESTAMP_NUMERIC_COLUMN " ) VALUES (";
 
 		for (parameterCountIndex=0; parameterCountIndex<cpuOutputNode->parameterCount+5; parameterCountIndex++)
 		{
@@ -800,7 +813,7 @@ SQLiteServerLoggerPlugin::SQLiteServerLoggerPlugin()
 SQLiteServerLoggerPlugin::~SQLiteServerLoggerPlugin()
 {
 	StopCPUSQLThreads();
-	RakNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
 	CloseAllSessions();
 }
 void SQLiteServerLoggerPlugin::Update(void)
@@ -823,7 +836,7 @@ void SQLiteServerLoggerPlugin::Update(void)
 			CPUThreadOutputNode *outputNode = cpuThreadOutput->cpuOutputNodeArray[arrayIndex];
 			sqlThreadInput.cpuOutputNode=outputNode;
 			// bool alreadyHasLoggedInSession=false;
-			int sessionIndex;
+			unsigned int sessionIndex;
 			for (sessionIndex=0; sessionIndex < loggedInSessions.Size(); sessionIndex++)
 			{
 				if (loggedInSessions[sessionIndex].systemAddress==outputNode->packet->systemAddress &&
@@ -870,7 +883,7 @@ void SQLiteServerLoggerPlugin::Update(void)
 			if (idx==-1)
 			{
 				DeallocPacketUnified(outputNode->packet);
-				RakNet::OP_DELETE(outputNode,_FILE_AND_LINE_);
+				SLNet::OP_DELETE(outputNode,_FILE_AND_LINE_);
 			}
 			else
 			{
@@ -880,9 +893,9 @@ void SQLiteServerLoggerPlugin::Update(void)
 					sassy.sessionName=outputNode->dbIdentifier;
 					sassy.systemAddress=outputNode->packet->systemAddress;
 					sassy.referencedPointer=dbHandles[idx].dbHandle;
-					RakNet::TimeMS curTime = RakNet::GetTimeMS();
-					RakNet::TimeMS dbAge = curTime - dbHandles[idx].whenCreated;
-//					RakNet::TimeMS timeDelta = outputNode->clientSendingTime - curTime;
+					SLNet::TimeMS curTime = SLNet::GetTimeMS();
+					SLNet::TimeMS dbAge = curTime - dbHandles[idx].whenCreated;
+//					SLNet::TimeMS timeDelta = outputNode->clientSendingTime - curTime;
 					sassy.timestampDelta=dbAge - outputNode->clientSendingTime ;
 					// sassy.dbAgeWhenCreated=dbHandles[idx].whenCreated;					
 					loggedInSessions.Push(sassy, _FILE_AND_LINE_ );
@@ -896,14 +909,14 @@ void SQLiteServerLoggerPlugin::Update(void)
 			}
 		}
 
-//		RakNet::OP_DELETE_ARRAY(cpuThreadOutput->cpuOutputNodeArray);
-		RakNet::OP_DELETE(cpuThreadOutput,_FILE_AND_LINE_);
+//		SLNet::OP_DELETE_ARRAY(cpuThreadOutput->cpuOutputNodeArray);
+		SLNet::OP_DELETE(cpuThreadOutput,_FILE_AND_LINE_);
 	}
 
 	while (sqlLoggerThreadPool.HasOutputFast() && sqlLoggerThreadPool.HasOutput())
 	{
 		hadOutput=true;
-		RakNet::OP_DELETE(sqlLoggerThreadPool.GetOutput().cpuOutputNode,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(sqlLoggerThreadPool.GetOutput().cpuOutputNode,_FILE_AND_LINE_);
 	}
 
 	if (hadOutput)
@@ -919,22 +932,22 @@ PluginReceiveResult SQLiteServerLoggerPlugin::OnReceive(Packet *packet)
 	{
 	case ID_SQLLITE_LOGGER:
 		{
-			RakNet::BitStream bitStream(packet->data, packet->length, false);
+		SLNet::BitStream bitStream(packet->data, packet->length, false);
 			bitStream.IgnoreBytes(1);
-			RakNet::RakString dbIdentifier;
+			SLNet::RakString dbIdentifier;
 			bitStream.Read(dbIdentifier);
 
 			if (sessionManagementMode==CREATE_EACH_NAMED_DB_HANDLE)
 			{
 				unsigned char senderAddr[32];
-				packet->systemAddress.ToString(true,(char*) senderAddr);
+				packet->systemAddress.ToString(true,(char*) senderAddr, 32);
 				dbIdentifier+=':';
 				dbIdentifier+=senderAddr;
 			}
 
 			CPUThreadInput *ti = LockCpuThreadInput();
 			ti->cpuInputArray[ti->arraySize].packet=packet;
-		//	ti->cpuInputArray[ti->arraySize].whenMessageArrived=RakNet::GetTimeMS();
+		//	ti->cpuInputArray[ti->arraySize].whenMessageArrived=SLNet::GetTimeMS();
 			ti->cpuInputArray[ti->arraySize].dbIdentifier=dbIdentifier;
 			UnlockCpuThreadInput();
 
@@ -1003,7 +1016,7 @@ PluginReceiveResult SQLiteServerLoggerPlugin::OnReceive(Packet *packet)
 			SQLExecThreadInput input;			
 			input.dbHandle=dbHandles[idx].dbHandle;
 			input.packet=packet;
-			input.whenMessageArrived=RakNet::GetTimeMS()-dbHandles[idx].whenCreated;
+			input.whenMessageArrived=SLNet::GetTimeMS()-dbHandles[idx].whenCreated;
 			__sqlThreadPool.AddInput(ExecSQLLoggingThread, input);
 //			printf("Pending Queries: %i\n", __sqlThreadPool.InputSize());
 */
@@ -1014,7 +1027,7 @@ PluginReceiveResult SQLiteServerLoggerPlugin::OnReceive(Packet *packet)
 }
 void SQLiteServerLoggerPlugin::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
-	RakNet::RakString removedSession;
+	SLNet::RakString removedSession;
 	unsigned int i=0;
 	while (i < loggedInSessions.Size())
 	{
@@ -1107,12 +1120,12 @@ void SQLiteServerLoggerPlugin::CloseAllSessions(void)
 	loggedInSessions.Clear(false, _FILE_AND_LINE_);
 	CloseUnreferencedSessions();
 }
-unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(RakNet::RakString dbIdentifier)
+unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(SLNet::RakString dbIdentifier)
 {
 	if (sessionManagementMode!=CREATE_EACH_NAMED_DB_HANDLE && sessionManagementMode!=CREATE_SHARED_NAMED_DB_HANDLE)
 		return dbHandles.GetIndexOf(dbIdentifier);
 
-	RakNet::RakString filePath = newDatabaseFilePath;
+	SLNet::RakString filePath = newDatabaseFilePath;
 	if (createDirectoryForFile)
 	{
 		filePath+=dbIdentifier;
@@ -1120,18 +1133,18 @@ unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(RakNet::RakString dbIdenti
 		filePath.MakeFilePath();
 
 		time_t     now;
-		struct tm  *ts;
+		struct tm  ts;
 		char       buf[80];
 
 		/* Get the current time */
 		now = time(NULL);
 
 		/* Format and print the time, "ddd yyyy-mm-dd hh:mm:ss zzz" */
-		ts = localtime(&now);
-		strftime(buf, sizeof(buf), "__%a_%Y-%m-%d__%H;%M", ts);
+		localtime_s(&ts, &now);
+		strftime(buf, sizeof(buf), "__%a_%Y-%m-%d__%H;%M", &ts);
 
 		filePath+=buf;
-		filePath+=RakNet::RakString("__%i", RakNet::GetTimeMS());
+		filePath+= SLNet::RakString("__%i", SLNet::GetTimeMS());
 
 		filePath.MakeFilePath();
 	}
@@ -1140,9 +1153,9 @@ unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(RakNet::RakString dbIdenti
 	// With no file data, just creates the directory structure
 	WriteFileWithDirectories(filePath.C_String(), 0, 0);
 
-	RakNet::RakString fileSafeDbIdentifier = dbIdentifier;
+	SLNet::RakString fileSafeDbIdentifier = dbIdentifier;
 	fileSafeDbIdentifier.TerminateAtLastCharacter(':');
-	RakNet::RakString fileNameWithPath=filePath+fileSafeDbIdentifier;
+	SLNet::RakString fileNameWithPath=filePath+fileSafeDbIdentifier;
 	
 	// SQL Open this file, and register it
 	sqlite3 *database;
@@ -1196,7 +1209,7 @@ void SQLiteServerLoggerPlugin::StopCPUSQLThreads(void)
 		{
 			DeallocPacketUnified(cpuThreadInput->cpuInputArray[j].packet);
 		}
-		RakNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
 	}
 	cpuLoggerThreadPool.ClearInput();
 	for (i=0; i < cpuLoggerThreadPool.OutputSize(); i++)
@@ -1208,19 +1221,19 @@ void SQLiteServerLoggerPlugin::StopCPUSQLThreads(void)
 			DeallocPacketUnified(cpuThreadOutputNode->packet);
 			for (k=0; k < cpuThreadOutputNode->parameterCount; k++)
 				cpuThreadOutputNode->parameterList[k].Free();
-			RakNet::OP_DELETE(cpuThreadOutputNode,_FILE_AND_LINE_);
+			SLNet::OP_DELETE(cpuThreadOutputNode,_FILE_AND_LINE_);
 		}
-//		RakNet::OP_DELETE_ARRAY(cpuThreadOutput->cpuOutputNodeArray,_FILE_AND_LINE_);
-		RakNet::OP_DELETE(cpuThreadOutput,_FILE_AND_LINE_);
+//		SLNet::OP_DELETE_ARRAY(cpuThreadOutput->cpuOutputNodeArray,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(cpuThreadOutput,_FILE_AND_LINE_);
 	}
 	cpuLoggerThreadPool.ClearOutput();
 
 	sqlLoggerThreadPool.StopThreads();
 	for (i=0; i < sqlLoggerThreadPool.InputSize(); i++)
-		RakNet::OP_DELETE(sqlLoggerThreadPool.GetInputAtIndex(i).cpuOutputNode,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(sqlLoggerThreadPool.GetInputAtIndex(i).cpuOutputNode,_FILE_AND_LINE_);
 	sqlLoggerThreadPool.ClearInput();
 	for (i=0; i < sqlLoggerThreadPool.OutputSize(); i++)
-		RakNet::OP_DELETE(sqlLoggerThreadPool.GetOutputAtIndex(i).cpuOutputNode,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(sqlLoggerThreadPool.GetOutputAtIndex(i).cpuOutputNode,_FILE_AND_LINE_);
 	sqlLoggerThreadPool.ClearOutput();
 }
 void SQLiteServerLoggerPlugin::GetProcessingStatus(ProcessingStatus *processingStatus)
@@ -1241,9 +1254,9 @@ SQLiteServerLoggerPlugin::CPUThreadInput *SQLiteServerLoggerPlugin::LockCpuThrea
 {
 	if (cpuThreadInput==0)
 	{
-		cpuThreadInput=RakNet::OP_NEW<CPUThreadInput>(_FILE_AND_LINE_);
+		cpuThreadInput= SLNet::OP_NEW<CPUThreadInput>(_FILE_AND_LINE_);
 		cpuThreadInput->arraySize=0;
-		whenCpuThreadInputAllocated=RakNet::GetTimeMS();
+		whenCpuThreadInputAllocated= SLNet::GetTimeMS();
 	}
 	return cpuThreadInput;
 }
@@ -1253,7 +1266,7 @@ void SQLiteServerLoggerPlugin::ClearCpuThreadInput(void)
 	{
 		for (int i=0; i < cpuThreadInput->arraySize; i++)
 			DeallocPacketUnified(cpuThreadInput->cpuInputArray[i].packet);
-		RakNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
 		cpuThreadInput=0;
 	}
 }
@@ -1270,7 +1283,7 @@ void SQLiteServerLoggerPlugin::CancelLockCpuThreadInput(void)
 {
 	if (cpuThreadInput->arraySize==0)
 	{
-		RakNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
 		cpuThreadInput=0;
 	}
 }
@@ -1293,7 +1306,7 @@ void SQLiteServerLoggerPlugin::PushCpuThreadInput(void)
 }
 void SQLiteServerLoggerPlugin::PushCpuThreadInputIfNecessary(void)
 {
-	RakNet::TimeMS curTime = RakNet::GetTimeMS();
+	SLNet::TimeMS curTime = SLNet::GetTimeMS();
 	if (cpuThreadInput && curTime-whenCpuThreadInputAllocated>MAX_TIME_TO_BUFFER_PACKETS)
 		PushCpuThreadInput();
 }

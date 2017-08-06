@@ -1,23 +1,33 @@
-#include "RakPeerInterface.h"
-#include "SQLiteServerLoggerPlugin.h"
-#include "BitStream.h"
-#include "RakSleep.h"
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ */
 
-#include "Kbhit.h"
-#include "GetTime.h"
-#include "PacketizedTCP.h"
+#include "slikenet/peerinterface.h"
+#include "SQLiteServerLoggerPlugin.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/sleep.h"
+
+#include "slikenet/Kbhit.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/PacketizedTCP.h"
 
 
 int main(void)
 {
 	printf("Demonstration of SQLiteServerLoggerPlugin.\n");
 
-	RakNet::PacketizedTCP packetizedTCP;
-	RakNet::SQLiteServerLoggerPlugin loggerPlugin;
+	SLNet::PacketizedTCP packetizedTCP;
+	SLNet::SQLiteServerLoggerPlugin loggerPlugin;
 // 	printf("Enable DXT compression (y/n)? ");
-// 	loggerPlugin.SetEnableDXTCompression(getche()=='y');
+// 	loggerPlugin.SetEnableDXTCompression(_getche()=='y');
 	loggerPlugin.SetEnableDXTCompression(true);
-	loggerPlugin.SetSessionManagementMode(RakNet::SQLiteServerLoggerPlugin::CREATE_SHARED_NAMED_DB_HANDLE, true, "");
+	loggerPlugin.SetSessionManagementMode(SLNet::SQLiteServerLoggerPlugin::CREATE_SHARED_NAMED_DB_HANDLE, true, "");
 
 	/*
 //	printf("Enter path to DB file to create, or enter for memory.\n");
@@ -37,31 +47,31 @@ int main(void)
 	bool quit=false;
 	bool isProcessing=false;
 
-	RakNet::SQLiteServerLoggerPlugin::ProcessingStatus processingStatusNew;
-	RakNet::SQLiteServerLoggerPlugin::ProcessingStatus processingStatusOld;
+	SLNet::SQLiteServerLoggerPlugin::ProcessingStatus processingStatusNew;
+	SLNet::SQLiteServerLoggerPlugin::ProcessingStatus processingStatusOld;
 	memset(&processingStatusOld,0,sizeof(processingStatusOld));
 
-	RakNet::SystemAddress sa;
+	SLNet::SystemAddress sa;
 	while (quit==false || isProcessing==true)
 	{
-		RakNet::Packet *p;
+		SLNet::Packet *p;
 		for (p = packetizedTCP.Receive(); p; packetizedTCP.DeallocatePacket(p), p = packetizedTCP.Receive())
 		{
 			;
 		}
 		sa = packetizedTCP.HasNewIncomingConnection();
-		if (sa!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (sa!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("New incoming connection from %s\n", sa.ToString(true));
 		sa = packetizedTCP.HasLostConnection();
-		if (sa!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (sa!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("Lost connection from %s\n", sa.ToString(true));
 		sa = packetizedTCP.HasFailedConnectionAttempt();
 		sa = packetizedTCP.HasCompletedConnectionAttempt();
 		RakSleep(0);
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			if (getch()=='q')
+			if (_getch()=='q')
 			{
 				printf("Quitting as soon as threads finish.\n");
 				packetizedTCP.Stop();

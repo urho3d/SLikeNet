@@ -1,17 +1,22 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __MY_SQL_INTERFACE_H
 #define __MY_SQL_INTERFACE_H
 
-#include "RakString.h"
+#include "slikenet/string.h"
 
 struct st_mysql_res;
 struct st_mysql;
@@ -50,18 +55,18 @@ protected:
 	bool ExecuteQueryReadInt (const char * query, int *value);
 	void Commit(void);
 	void Rollback(void);
-	RakNet::RakString GetEscapedString(const char *input) const;
+	SLNet::RakString GetEscapedString(const char *input) const;
 
 	st_mysql *mySqlConnection;
 	char lastError[1024];
 
 	// Copy of connection parameters
-	RakNet::RakString _host;
-	RakNet::RakString _user;
-	RakNet::RakString _passwd;
-	RakNet::RakString _db;
+	SLNet::RakString _host;
+	SLNet::RakString _user;
+	SLNet::RakString _passwd;
+	SLNet::RakString _db;
 	unsigned int _port;
-	RakNet::RakString _unix_socket;
+	SLNet::RakString _unix_socket;
 	unsigned long _clientflag;
 
 };

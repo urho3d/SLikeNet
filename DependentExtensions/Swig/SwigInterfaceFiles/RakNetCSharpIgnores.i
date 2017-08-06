@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //----------Ignores----------------
 //This file specifies things that should be ignored by Swig
 //Typeically this is used for the following reasons: a C# replacement was made for the function, it is not supported by Swig

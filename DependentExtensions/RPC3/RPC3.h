@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,25 +22,21 @@
 
 // Most of the internals of the boost code to make this work
 #include "RPC3_Boost.h"
-#include "PluginInterface2.h"
-#include "PacketPriority.h"
-#include "RakNetTypes.h"
-#include "BitStream.h"
-#include "RakString.h"
-#include "NetworkIDObject.h"
-#include "DS_Hash.h"
-#include "DS_OrderedList.h"
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#endif
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/types.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/string.h"
+#include "slikenet/NetworkIDObject.h"
+#include "slikenet/DS_Hash.h"
+#include "slikenet/DS_OrderedList.h"
 
 /// \defgroup RPC_3_GROUP RPC3
 /// \brief Remote procedure calls, powered by the 3rd party library Boost
 /// \details
 /// \ingroup PLUGINS_GROUP
 
-namespace RakNet
+namespace SLNet
 {
 class RakPeerInterface;
 class NetworkIDManager;
@@ -106,7 +107,7 @@ public:
 		if (IsFunctionRegistered(uniqueIdentifier)) return false;
 		_RPC3::FunctionPointer fp;
 		fp= _RPC3::GetBoundPointer(functionPtr);
-		localFunctions.Push(uniqueIdentifier,RakNet::OP_NEW_1<LocalRPCFunction>( _FILE_AND_LINE_, fp ),_FILE_AND_LINE_);
+		localFunctions.Push(uniqueIdentifier, SLNet::OP_NEW_1<LocalRPCFunction>( _FILE_AND_LINE_, fp ),_FILE_AND_LINE_);
 		return true;
 	}
 
@@ -151,7 +152,7 @@ public:
 		LocalSlot *localSlot;
 		if (idx.IsInvalid())
 		{
-			localSlot = RakNet::OP_NEW<LocalSlot>(_FILE_AND_LINE_);
+			localSlot = SLNet::OP_NEW<LocalSlot>(_FILE_AND_LINE_);
 			localSlots.Push(sharedIdentifier, localSlot,_FILE_AND_LINE_);
 		}
 		else
@@ -174,7 +175,7 @@ public:
 	/// Send or stop sending a timestamp with all following calls to Call()
 	/// Use GetLastSenderTimestamp() to read the timestamp.
 	/// \param[in] timeStamp Non-zero to pass this timestamp using the ID_TIMESTAMP system. 0 to clear passing a timestamp.
-	void SetTimestamp(RakNet::Time timeStamp);
+	void SetTimestamp(SLNet::Time timeStamp);
 
 	/// Set parameters to pass to RakPeer::Send() for all following calls to Call()
 	/// Deafults to HIGH_PRIORITY, RELIABLE_ORDERED, ordering channel 0
@@ -184,7 +185,7 @@ public:
 	void SetSendParams(PacketPriority priority, PacketReliability reliability, char orderingChannel);
 
 	/// Set system to send to for all following calls to Call()
-	/// Defaults to RakNet::UNASSIGNED_SYSTEM_ADDRESS, broadcast=true
+	/// Defaults to SLNet::UNASSIGNED_SYSTEM_ADDRESS, broadcast=true
 	/// \param[in] systemAddress See RakPeer::Send()
 	/// \param[in] broadcast See RakPeer::Send()
 	void SetRecipientAddress(const SystemAddress &systemAddress, bool broadcast);
@@ -200,7 +201,7 @@ public:
 
 	/// If the last received function call has a timestamp included, it is stored and can be retrieved with this function.
 	/// \return 0 if the last call did not have a timestamp, else non-zero
-	RakNet::Time GetLastSenderTimestamp(void) const;
+	SLNet::Time GetLastSenderTimestamp(void) const;
 
 	/// Returns the system address of the last system to send us a received function call
 	/// Equivalent to the old system RPCParameters::sender
@@ -223,11 +224,11 @@ public:
 	/// 
 	/// Parameters passed to Call are processed as follows:
 	/// 1. If the parameter is not a pointer
-	/// 2. - And you overloaded RakNet::BitStream& operator<<(RakNet::BitStream& out, MyClass& in) then that will be used to do the serialization
+	/// 2. - And you overloaded SLNet::BitStream& operator<<(SLNet::BitStream& out, MyClass& in) then that will be used to do the serialization
 	/// 3. - Otherwise, it will use bitStream.Write(myClass); BitStream already defines specializations for NetworkIDObject, SystemAddress, other BitStreams
 	/// 4. If the parameter is a pointer
-	/// 5. - And the pointer can be converted to NetworkIDObject, then it will write bitStream.Write(myClass->GetNetworkID()); To make it also dereference the pointer, use RakNet::_RPC3::Deref(myClass)
-	/// 6. - And the pointer can not be converted to NetworkID, but it is a pointer to RakNet::RPC3, then it is skipped
+	/// 5. - And the pointer can be converted to NetworkIDObject, then it will write bitStream.Write(myClass->GetNetworkID()); To make it also dereference the pointer, use SLNet::_RPC3::Deref(myClass)
+	/// 6. - And the pointer can not be converted to NetworkID, but it is a pointer to SLNet::RPC3, then it is skipped
 	/// 7. Otherwise, the pointer is dereferenced and written as in step 2 and 3.
 	///
 	/// \note If you need endian swapping (Mac talking to PC for example), you pretty much need to define operator << and operator >> for all classes you want to serialize. Otherwise the member variables will not be endian swapped.
@@ -235,25 +236,25 @@ public:
 	///
 	/// \param[in] uniqueIdentifier parameter of the same name passed to RegisterFunction() on the remote system
 	bool Call(const char *uniqueIdentifier){
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		return SendCallOrSignal(uniqueIdentifier, 0, &bitStream, true);
 	}
 	template <class P1>
 	bool Call(const char *uniqueIdentifier, P1 &p1)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		return SendCallOrSignal(uniqueIdentifier, 1, &bitStream, true);
 	}
 	template <class P1, class P2>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		return SendCallOrSignal(uniqueIdentifier, 2, &bitStream, true);
 	}
 	template <class P1, class P2, class P3>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -261,7 +262,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -270,7 +271,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -280,7 +281,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -291,7 +292,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -303,7 +304,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -316,7 +317,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8, P9 &p9)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -331,7 +332,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
 	bool Call(const char *uniqueIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8, P9 &p9, P10 &p10)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -349,22 +350,22 @@ public:
 	struct CallExplicitParameters
 	{
 		CallExplicitParameters(
-			NetworkID _networkID=UNASSIGNED_NETWORK_ID, SystemAddress _systemAddress=RakNet::UNASSIGNED_SYSTEM_ADDRESS,
-			bool _broadcast=true, RakNet::Time _timeStamp=0, PacketPriority _priority=HIGH_PRIORITY,
+			NetworkID _networkID=UNASSIGNED_NETWORK_ID, SystemAddress _systemAddress= SLNet::UNASSIGNED_SYSTEM_ADDRESS,
+			bool _broadcast=true, SLNet::Time _timeStamp=0, PacketPriority _priority=HIGH_PRIORITY,
 			PacketReliability _reliability=RELIABLE_ORDERED, char _orderingChannel=0
 			) : networkID(_networkID), systemAddress(_systemAddress), broadcast(_broadcast), timeStamp(_timeStamp), priority(_priority), reliability(_reliability), orderingChannel(_orderingChannel)
 		{}
 		NetworkID networkID;
 		SystemAddress systemAddress;
 		bool broadcast;
-		RakNet::Time timeStamp;
+		SLNet::Time timeStamp;
 		PacketPriority priority;
 		PacketReliability reliability;
 		char orderingChannel;
 	};
 
 	/// Calls a remote function, using whatever was last passed to SetTimestamp(), SetSendParams(), SetRecipientAddress(), and SetRecipientObject()
-	/// Passed parameter(s), if any, are serialized using operator << with RakNet::BitStream. If you provide an overload it will be used, otherwise the seriailzation is equivalent to memcpy except for native RakNet types (NetworkIDObject, SystemAddress, etc.)
+	/// Passed parameter(s), if any, are serialized using operator << with SLNet::BitStream. If you provide an overload it will be used, otherwise the seriailzation is equivalent to memcpy except for native RakNet types (NetworkIDObject, SystemAddress, etc.)
 	/// If the type is a pointer to a type deriving from NetworkIDObject, then only the NetworkID is sent, and the object looked up on the remote system. Otherwise, the pointer is dereferenced and the contents serialized as usual.
 	/// \note The this pointer, for this instance of RPC3, is pushed as the last parameter on the stack. See RPC3Sample.cpp for an example of this
 	/// \note If the call fails on the remote system, you will get back ID_RPC_REMOTE_ERROR. packet->data[1] will contain one of the values of RPCErrorCodes. packet->data[2] and on will contain the name of the function.
@@ -558,20 +559,20 @@ public:
 	///
 	/// \param[in] sharedIdentifier parameter of the same name passed to RegisterSlot() on the remote system
 	bool Signal(const char *sharedIdentifier){
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		InvokeSignal(GetLocalSlotIndex(sharedIdentifier), &bitStream, true);
 		return SendCallOrSignal(sharedIdentifier, 0, &bitStream, false);
 	}
 	template <class P1>
 	bool Signal(const char *sharedIdentifier, P1 &p1)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		InvokeSignal(GetLocalSlotIndex(sharedIdentifier), &bitStream, true);
 		return SendCallOrSignal(sharedIdentifier, 1, &bitStream, false);
 	}
 	template <class P1, class P2>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		InvokeSignal(GetLocalSlotIndex(sharedIdentifier), &bitStream, true);
@@ -579,7 +580,7 @@ public:
 	}
 	template <class P1, class P2, class P3>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -588,7 +589,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -598,7 +599,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -609,7 +610,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -621,7 +622,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -634,7 +635,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -648,7 +649,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8, P9 &p9)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -663,7 +664,7 @@ public:
 	}
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
 	bool Signal(const char *sharedIdentifier, P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7, P8 &p8, P9 &p9, P10 &p10)	{
-		RakNet::BitStream bitStream;
+		SLNet::BitStream bitStream;
 		_RPC3::SerializeCallParameterBranch<P1>::type::apply(bitStream, p1);
 		_RPC3::SerializeCallParameterBranch<P2>::type::apply(bitStream, p2);
 		_RPC3::SerializeCallParameterBranch<P3>::type::apply(bitStream, p3);
@@ -681,14 +682,14 @@ public:
 	struct SignalExplicitParameters
 	{
 		SignalExplicitParameters(
-			SystemAddress _systemAddress=RakNet::UNASSIGNED_SYSTEM_ADDRESS,
-			bool _broadcast=true, RakNet::Time _timeStamp=0, PacketPriority _priority=HIGH_PRIORITY,
+			SystemAddress _systemAddress= SLNet::UNASSIGNED_SYSTEM_ADDRESS,
+			bool _broadcast=true, SLNet::Time _timeStamp=0, PacketPriority _priority=HIGH_PRIORITY,
 			PacketReliability _reliability=RELIABLE_ORDERED, char _orderingChannel=0
 			) : systemAddress(_systemAddress), broadcast(_broadcast), timeStamp(_timeStamp), priority(_priority), reliability(_reliability), orderingChannel(_orderingChannel)
 		{}
 		SystemAddress systemAddress;
 		bool broadcast;
-		RakNet::Time timeStamp;
+		SLNet::Time timeStamp;
 		PacketPriority priority;
 		PacketReliability reliability;
 		char orderingChannel;
@@ -819,10 +820,10 @@ public:
 
 	/// \internal
 	/// Sends the RPC call, with a given serialized function
-	bool SendCallOrSignal(RakString uniqueIdentifier, char parameterCount, RakNet::BitStream *serializedParameters, bool isCall);
+	bool SendCallOrSignal(RakString uniqueIdentifier, char parameterCount, SLNet::BitStream *serializedParameters, bool isCall);
 
 	/// Call a given signal with a bitstream representing the parameter list
-	void InvokeSignal(DataStructures::HashIndex functionIndex, RakNet::BitStream *serializedParameters, bool temporarilySetUSA);
+	void InvokeSignal(DataStructures::HashIndex functionIndex, SLNet::BitStream *serializedParameters, bool temporarilySetUSA);
 
 
 	protected:
@@ -844,25 +845,25 @@ public:
 	DataStructures::HashIndex GetLocalSlotIndex(const char *sharedIdentifier);
 //	bool GetRemoteFunctionIndex(const SystemAddress &systemAddress, RPCIdentifier identifier, unsigned int *outerIndex, unsigned int *innerIndex, bool isCall);
 
-	DataStructures::Hash<RakNet::RakString, LocalSlot*,256, RakNet::RakString::ToInteger> localSlots;
-	DataStructures::Hash<RakNet::RakString, LocalRPCFunction*,256, RakNet::RakString::ToInteger> localFunctions;
+	DataStructures::Hash<SLNet::RakString, LocalSlot*,256, SLNet::RakString::ToInteger> localSlots;
+	DataStructures::Hash<SLNet::RakString, LocalRPCFunction*,256, SLNet::RakString::ToInteger> localFunctions;
 
 // 	DataStructures::List<LocalSlot*> localSlots;
 // 	DataStructures::List<LocalRPCFunction> localFunctions;
 
 //	DataStructures::Map<SystemAddress, DataStructures::OrderedList<RPCIdentifier, RemoteRPCFunction, RPC3::RemoteRPCFunctionComp> *> remoteFunctions, remoteSlots;
-	RakNet::Time outgoingTimestamp;
+	SLNet::Time outgoingTimestamp;
 	PacketPriority outgoingPriority;
 	PacketReliability outgoingReliability;
 	char outgoingOrderingChannel;
 	SystemAddress outgoingSystemAddress;
 	bool outgoingBroadcast;
 	NetworkID outgoingNetworkID;
-	RakNet::BitStream outgoingExtraData;
+	SLNet::BitStream outgoingExtraData;
 
-	RakNet::Time incomingTimeStamp;
+	SLNet::Time incomingTimeStamp;
 	SystemAddress incomingSystemAddress;
-	RakNet::BitStream incomingExtraData;
+	SLNet::BitStream incomingExtraData;
 
 	NetworkIDManager *networkIdManager;
 	char currentExecution[512];
@@ -875,9 +876,5 @@ public:
 };
 
 } // End namespace
-
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
 
 #endif

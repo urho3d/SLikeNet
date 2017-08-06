@@ -1,4 +1,9 @@
-﻿using System.Reflection;
+﻿/*
+ * This file was taken from RakNet 4.082 without any modifications.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ */
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

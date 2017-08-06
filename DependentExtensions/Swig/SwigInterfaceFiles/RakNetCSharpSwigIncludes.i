@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //------------------------------Header includes for parsing by swig----------------------------
 //This is included in a different section than the C++ version of these includes so a macro was not made to include
 //it in both types

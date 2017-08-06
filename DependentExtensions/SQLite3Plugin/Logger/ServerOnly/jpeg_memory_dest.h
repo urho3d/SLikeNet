@@ -1,3 +1,8 @@
+/*
+ * This file was taken from RakNet 4.082 without any modifications.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ */
+
 // From http://www.codeguru.com/forum/archive/index.php/t-378333.html
 #include "jpeglib.h"
 /*

@@ -1,23 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_CLIENT_STEAM_IMPL_H
 #define __LOBBY_2_CLIENT_STEAM_IMPL_H
 
+#pragma warning( push )
+#pragma warning(disable:4127)	// conditional expression is constant (with Steamworks 1.23a)
 #include "steam_api.h"
+#pragma warning( pop )
 #include "Lobby2Client_Steam.h"
-#include "DS_Multilist.h"
-#include "SocketLayer.h"
-#include "DS_OrderedList.h"
+#include "slikenet/DS_Multilist.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/DS_OrderedList.h"
 
-namespace RakNet
+namespace SLNet
 {
 struct Lobby2Message;
 

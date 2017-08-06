@@ -24,6 +24,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
+/*
+ * This file was taken from RakNet 4.082.
+ * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
+ * Alternatively you are permitted to license the modifications under the Simplified BSD License.
+ */
  
 #if 0
 __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:06 cperciva Exp $");
@@ -43,6 +53,8 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:
 typedef int ssize_t;
 #include <wchar.h>
 #include <io.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 #define fseeko fseek
 static void err(int i, ...)
 {
@@ -105,7 +117,7 @@ bool ApplyPatch(char *old, unsigned int oldsize, char **_new, unsigned int *news
 //	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
 
 	/* Open patch file */
-//	if ((f = fopen(argv[3], "rb")) == NULL)
+//	if (fopen_s(&f, argv[3], "rb") != 0)
 //		err(1, "fopen(%s)", argv[3]);
 
 	/*
@@ -147,21 +159,21 @@ bool ApplyPatch(char *old, unsigned int oldsize, char **_new, unsigned int *news
 	/* Close patch file and re-open it via libbzip2 at the right places */
 //	if (fclose(f))
 //		err(1, "fclose(%s)", argv[3]);
-//	if ((cpf = fopen(argv[3], "rb")) == NULL)
+//	if (fopen_s(&cpf, argv[3], "rb") != 0)
 //		err(1, "fopen(%s)", argv[3]);
 //	if (fseeko(cpf, 32, SEEK_SET))
 //		err(1, "fseeko(%s, %lld)", argv[3],
 //		(long long)32);
 //	if ((cpfbz2 = BZ2_bzReadOpen(&cbz2err, cpf, 0, 0, NULL, 0)) == NULL)
 //		errx(1, "BZ2_bzReadOpen, bz2err = %d", cbz2err);
-//	if ((dpf = fopen(argv[3], "rb")) == NULL)
+//	if (fopen_s(&dpf, argv[3], "rb") != 0)
 //		err(1, "fopen(%s)", argv[3]);
 //	if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))
 //		err(1, "fseeko(%s, %lld)", argv[3],
 //		(long long)(32 + bzctrllen));
 //	if ((dpfbz2 = BZ2_bzReadOpen(&dbz2err, dpf, 0, 0, NULL, 0)) == NULL)
 //		errx(1, "BZ2_bzReadOpen, bz2err = %d", dbz2err);
-//	if ((epf = fopen(argv[3], "rb")) == NULL)
+//	if (fopen_s(&epf, argv[3], "rb") != 0)
 //		err(1, "fopen(%s)", argv[3]);
 //	if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))
 //		err(1, "fseeko(%s, %lld)", argv[3],
@@ -181,12 +193,12 @@ bool ApplyPatch(char *old, unsigned int oldsize, char **_new, unsigned int *news
 	if (decompress.Decompress((char*)patch+32+bzctrllen+bzdatalen, patchsize-(32+bzctrllen+bzdatalen), true)==false)
 		return false;
 
-//	if(((fd=open(argv[1],O_RDONLY | _O_BINARY,0))<0) ||
-//		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+//	if(((fd=_open(argv[1],O_RDONLY | _O_BINARY,0))<0) ||
+//		((oldsize=_lseek(fd,0,SEEK_END))==-1) ||
 //		((old=(unsigned char*)malloc(oldsize+1))==NULL) ||
-//		(lseek(fd,0,SEEK_SET)!=0) ||
-//		(read(fd,old,oldsize)!=oldsize) ||
-//		(close(fd)==-1)) err(1,"%s",argv[1]);
+//		(_lseek(fd,0,SEEK_SET)!=0) ||
+//		(_read(fd,old,oldsize)!=oldsize) ||
+//		(_close(fd)==-1)) err(1,"%s",argv[1]);
 //	if((_new=(unsigned char*)malloc(newsize+1))==NULL) err(1,NULL);
 	*_new = new char[*newsize+1];
 
@@ -256,8 +268,8 @@ bool ApplyPatch(char *old, unsigned int oldsize, char **_new, unsigned int *news
 //		err(1, "fclose(%s)", argv[3]);
 
 	/* Write the new file */
-//	if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||
-//		(write(fd,_new,newsize)!=newsize) || (close(fd)==-1))
+//	if(((fd=_open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||
+//		(_write(fd,_new,newsize)!=newsize) || (_close(fd)==-1))
 //		err(1,"%s",argv[2]);
 
 //	free(_new);
@@ -276,9 +288,9 @@ int TestPatchInMemory(int argc,char *argv[])
 	int res;
 	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
 
-	patchFile=fopen(argv[3], "rb");
-	newFile=fopen(argv[2], "wb");
-	oldFile=fopen(argv[1], "rb");
+	fopen_s(&patchFile, argv[3], "rb");
+	fopen_s(&newFile, argv[2], "wb");
+	fopen_s(&oldFile, argv[1], "rb");
 	fseeko(patchFile, 0, SEEK_END);
 	fseeko(oldFile, 0, SEEK_END);
 	patchSize=ftell(patchFile);
@@ -290,8 +302,17 @@ int TestPatchInMemory(int argc,char *argv[])
 	fread(patch, patchSize, 1, patchFile);
 	fread(old, oldSize, 1, oldFile);
 
-	res = ApplyPatch( old, oldSize, &_new, &newSize,patch, patchSize);
+	// #low Should not allocate memory in ApplyPatch and then free it in the caller again
+	// also return value looks inconsistent
+	res = (ApplyPatch( old, oldSize, &_new, &newSize,patch, patchSize) ? 1 : 0);
+	delete[] old;
+	delete[] patch;
 	fwrite(_new, newSize, 1, newFile);
+
+	if (res == 1) {
+		// if res == 0, _new was already cleared in ApplyPatch
+		delete[] _new;
+	}
 
 	fclose(patchFile);
 	fclose(newFile);
@@ -320,7 +341,7 @@ int PATCH_main(int argc,char * argv[])
 	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
 
 	/* Open patch file */
-	if ((f = fopen(argv[3], "rb")) == NULL)
+	if (fopen_s(&f, argv[3], "rb") != 0)
 		err(1, "fopen(%s)", argv[3]);
 
 	/*
@@ -358,21 +379,21 @@ int PATCH_main(int argc,char * argv[])
 	/* Close patch file and re-open it via libbzip2 at the right places */
 	if (fclose(f))
 		err(1, "fclose(%s)", argv[3]);
-	if ((cpf = fopen(argv[3], "rb")) == NULL)
+	if (fopen_s(&cpf, argv[3], "rb") != 0)
 		err(1, "fopen(%s)", argv[3]);
 	if (fseeko(cpf, 32, SEEK_SET))
 		err(1, "fseeko(%s, %lld)", argv[3],
 		(long long)32);
 	if ((cpfbz2 = BZ2_bzReadOpen(&cbz2err, cpf, 0, 0, NULL, 0)) == NULL)
 		errx(1, "BZ2_bzReadOpen, bz2err = %d", cbz2err);
-	if ((dpf = fopen(argv[3], "rb")) == NULL)
+	if (fopen_s(&dpf, argv[3], "rb") != 0)
 		err(1, "fopen(%s)", argv[3]);
 	if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))
 		err(1, "fseeko(%s, %lld)", argv[3],
 		(long long)(32 + bzctrllen));
 	if ((dpfbz2 = BZ2_bzReadOpen(&dbz2err, dpf, 0, 0, NULL, 0)) == NULL)
 		errx(1, "BZ2_bzReadOpen, bz2err = %d", dbz2err);
-	if ((epf = fopen(argv[3], "rb")) == NULL)
+	if (fopen_s(&epf, argv[3], "rb") != 0)
 		err(1, "fopen(%s)", argv[3]);
 	if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))
 		err(1, "fseeko(%s, %lld)", argv[3],
@@ -380,12 +401,12 @@ int PATCH_main(int argc,char * argv[])
 	if ((epfbz2 = BZ2_bzReadOpen(&ebz2err, epf, 0, 0, NULL, 0)) == NULL)
 		errx(1, "BZ2_bzReadOpen, bz2err = %d", ebz2err);
 
-	if(((fd=open(argv[1],O_RDONLY|O_BINARY,0))<0) ||
-		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+	if(((fd=_open(argv[1],O_RDONLY|O_BINARY,0))<0) ||
+		((oldsize=_lseek(fd,0,SEEK_END))==-1) ||
 		((old=(unsigned char*)malloc(oldsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,oldsize)!=oldsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[1]);
+		(_lseek(fd,0,SEEK_SET)!=0) ||
+		(_read(fd,old,oldsize)!=oldsize) ||
+		(_close(fd)==-1)) err(1,"%s",argv[1]);
 	if((_new=(unsigned char*)malloc(newsize+1))==NULL) err(1,NULL);
 
 	oldpos=0;newpos=0;
@@ -447,8 +468,8 @@ int PATCH_main(int argc,char * argv[])
 		err(1, "fclose(%s)", argv[3]);
 
 	/* Write the new file */
-	if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666))<0) ||
-		(write(fd,_new,newsize)!=newsize) || (close(fd)==-1))
+	if(((fd=_open(argv[2],O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666))<0) ||
+		(_write(fd,_new,newsize)!=newsize) || (_close(fd)==-1))
 		err(1,"%s",argv[2]);
 
 	free(_new);

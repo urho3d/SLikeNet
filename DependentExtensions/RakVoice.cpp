@@ -1,29 +1,34 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "RakVoice.h"
 #include "speex/speex.h"
 #include "speex/speex_preprocess.h"
-#include "BitStream.h"
-#include "PacketPriority.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "RakPeerInterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/peerinterface.h"
 #include <stdlib.h>
-#include "GetTime.h"
+#include "slikenet/GetTime.h"
 
 #ifdef _DEBUG
 #include <stdio.h>
 #endif
 
-using namespace RakNet;
+using namespace SLNet;
 
 //#define PRINT_DEBUG_INFO
 
@@ -33,7 +38,7 @@ using namespace RakNet;
 #include <stdio.h>
 #endif
 
-int RakNet::VoiceChannelComp( const RakNetGUID &key, VoiceChannel * const &data )
+int SLNet::VoiceChannelComp( const RakNetGUID &key, VoiceChannel * const &data )
 {
 	if (key < data->guid)
 		return -1;
@@ -84,11 +89,11 @@ void RakVoice::SetLoopbackMode(bool enabled)
 	if (enabled)
 	{
 		Packet p;
-		RakNet::BitStream out;
+		SLNet::BitStream out;
 		out.Write((unsigned char)ID_RAKVOICE_OPEN_CHANNEL_REQUEST);
 		out.Write((int32_t)sampleRate);
 		p.data=out.GetData();
-		p.systemAddress=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+		p.systemAddress= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 		p.guid=UNASSIGNED_RAKNET_GUID;
 		p.length=out.GetNumberOfBytesUsed();
 		OpenChannel(&p);
@@ -106,7 +111,7 @@ bool RakVoice::IsLoopbackMode(void) const
 void RakVoice::RequestVoiceChannel(RakNetGUID recipient)
 {
 	// Send a reliable ordered message to the other system to open a voice channel
-	RakNet::BitStream out;
+	SLNet::BitStream out;
 	out.Write((unsigned char)ID_RAKVOICE_OPEN_CHANNEL_REQUEST);
 	out.Write((int32_t)sampleRate);
 	SendUnified(&out, HIGH_PRIORITY, RELIABLE_ORDERED,0,recipient,false);	
@@ -116,13 +121,13 @@ void RakVoice::CloseVoiceChannel(RakNetGUID recipient)
 	FreeChannelMemory(recipient);
 	
 	// Send a message to the remote system telling them to close the channel
-	RakNet::BitStream out;
+	SLNet::BitStream out;
 	out.Write((unsigned char)ID_RAKVOICE_CLOSE_CHANNEL);
 	SendUnified(&out, HIGH_PRIORITY, RELIABLE_ORDERED,0,recipient,false);	
 }
 void RakVoice::CloseAllChannels(void)
 {
-	RakNet::BitStream out;
+	SLNet::BitStream out;
 	out.Write((unsigned char)ID_RAKVOICE_CLOSE_CHANNEL);
 
 	// Free the memory for all channels
@@ -329,7 +334,7 @@ void RakVoice::Update(void)
 	// First byte is ID for RakNet
 	tempOutput[0]=ID_RAKVOICE_DATA;
 	
-	RakNet::TimeMS currentTime = RakNet::GetTimeMS();
+	SLNet::TimeMS currentTime = SLNet::GetTimeMS();
 
 	// Size of VoiceChannel::incomingBuffer and VoiceChannel::outgoingBuffer arrays
 	unsigned totalBufferSize=bufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
@@ -482,7 +487,7 @@ printf("%i ", voicePacketsSent++);
 					// at +1, because the first byte in the buffer has the ID for RakNet.
 					memcpy(tempOutput+1, &channel->outgoingMessageNumber, sizeof(unsigned short));
 					channel->outgoingMessageNumber++;
-					RakNet::BitStream tempOutputBs((unsigned char*) tempOutput,bytesWritten+headerSize,false);
+					SLNet::BitStream tempOutputBs((unsigned char*) tempOutput,bytesWritten+headerSize,false);
 					SendUnified(&tempOutputBs, HIGH_PRIORITY, UNRELIABLE,0,channel->guid,false);
 
 					if (loopbackMode)
@@ -599,7 +604,7 @@ void RakVoice::OnOpenChannelRequest(Packet *packet)
 
 	OpenChannel(packet);
 
-	RakNet::BitStream out;
+	SLNet::BitStream out;
 	out.Write((unsigned char)ID_RAKVOICE_OPEN_CHANNEL_REPLY);
 	out.Write((int32_t)sampleRate);
 	SendUnified(&out, HIGH_PRIORITY, RELIABLE_ORDERED,0,packet->systemAddress,false);	
@@ -612,12 +617,12 @@ void RakVoice::OnOpenChannelReply(Packet *packet)
 }
 void RakVoice::OpenChannel(Packet *packet)
 {
-	RakNet::BitStream in(packet->data, packet->length, false);
+	SLNet::BitStream in(packet->data, packet->length, false);
 	in.IgnoreBits(8);
 
 	FreeChannelMemory(packet->guid);
 
-	VoiceChannel *channel=RakNet::OP_NEW<VoiceChannel>( _FILE_AND_LINE_ );
+	VoiceChannel *channel= SLNet::OP_NEW<VoiceChannel>( _FILE_AND_LINE_ );
 	channel->guid=packet->guid;
 	channel->isSendingVoiceData=false;
 	int sampleRate;
@@ -629,7 +634,7 @@ void RakVoice::OpenChannel(Packet *packet)
 #ifdef _DEBUG
 		RakAssert(0);
 #endif
-		RakNet::OP_DELETE(channel, _FILE_AND_LINE_);
+		SLNet::OP_DELETE(channel, _FILE_AND_LINE_);
 		return;
 	}
 
@@ -776,7 +781,7 @@ void RakVoice::FreeChannelMemory(unsigned index, bool removeIndex)
 	speex_preprocess_state_destroy((SpeexPreprocessState*)channel->pre_state);
 	rakFree_Ex(channel->incomingBuffer, _FILE_AND_LINE_ );
 	rakFree_Ex(channel->outgoingBuffer, _FILE_AND_LINE_ );
-	RakNet::OP_DELETE(channel, _FILE_AND_LINE_);
+	SLNet::OP_DELETE(channel, _FILE_AND_LINE_);
 	if (removeIndex)
 		voiceChannels.RemoveAtIndex(index);
 }

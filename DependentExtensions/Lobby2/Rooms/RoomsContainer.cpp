@@ -1,28 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "RoomsContainer.h"
 #include "ProfanityFilter.h"
-#include "RakAssert.h"
-#include "GetTime.h"
-#include "BitStream.h"
-#include "TableSerializer.h"
+#include "slikenet/assert.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/TableSerializer.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-static const RakNet::TimeMS MINIMUM_QUICK_JOIN_TIMEOUT=5000;
-static const RakNet::TimeMS MAXIMUM_QUICK_JOIN_TIMEOUT=60000 * 5;
+static const SLNet::TimeMS MINIMUM_QUICK_JOIN_TIMEOUT=5000;
+static const SLNet::TimeMS MAXIMUM_QUICK_JOIN_TIMEOUT=60000 * 5;
 static const int MAX_CUSTOM_QUERY_FIELDS=50;
-static const RakNet::TimeMS PROCESS_QUICK_JOINS_INTERVAL=1000;
+static const SLNet::TimeMS PROCESS_QUICK_JOINS_INTERVAL=1000;
 #define QUICK_JOIN_ROOM_NAME "Quick Join "
 
 
-using namespace RakNet;
+using namespace SLNet;
 
 DataStructures::Table::FilterQuery RoomQuery::fq[32];
 DataStructures::Table::Cell RoomQuery::cells[32];
@@ -79,7 +86,7 @@ int QuickJoinUser::SortByMinimumSlots( QuickJoinUser* const &key, QuickJoinUser*
 		return -1;
 	return -1;
 }
-void NetworkedQuickJoinUser::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void NetworkedQuickJoinUser::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	query.Serialize(writeToBitstream, bitStream);
 	bitStream->Serialize(writeToBitstream,timeout);
@@ -106,14 +113,14 @@ RoomsErrorCode Slots::Validate(void) const
 		return REC_SLOTS_VALIDATION_NEGATIVE_SPECTATOR_SLOTS;
 	return REC_SUCCESS;
 }
-void Slots::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void Slots::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bitStream->Serialize(writeToBitstream,publicSlots);
 	bitStream->Serialize(writeToBitstream,reservedSlots);
 	bitStream->Serialize(writeToBitstream,spectatorSlots);
 }
 // ----------------------------  InvitedUser  ----------------------------
-void InvitedUser::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void InvitedUser::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	if (room)
 		roomId=room->GetID();
@@ -126,7 +133,7 @@ void InvitedUser::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
 	bitStream->Serialize(writeToBitstream,invitedAsSpectator);
 }
 // ----------------------------  BannedUser  ----------------------------
-void BannedUser::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void BannedUser::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bitStream->Serialize(writeToBitstream, target);
 	bitStream->Serialize(writeToBitstream, reason);
@@ -140,7 +147,7 @@ void RoomMemberDescriptor::FromRoomMember(RoomMember *roomMember)
 	systemAddress=roomMember->roomsParticipant->GetSystemAddress();
 	guid=roomMember->roomsParticipant->GetGUID();
 }
-void RoomMemberDescriptor::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void RoomMemberDescriptor::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bitStream->Serialize(writeToBitstream, name);
 	bitStream->Serialize(writeToBitstream, roomMemberMode);
@@ -164,7 +171,7 @@ RemoveUserResult::~RemoveUserResult()
 
 }
 
-void RemoveUserResult::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void RemoveUserResult::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bitStream->Serialize(writeToBitstream,removedFromQuickJoin);
 	bitStream->Serialize(writeToBitstream,removedFromRoom);
@@ -191,7 +198,7 @@ void RemoveUserResult::Serialize(bool writeToBitstream, RakNet::BitStream *bitSt
 
 // ----------------------------  JoinedRoomResult  ----------------------------
 
-void JoinedRoomResult::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void JoinedRoomResult::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	if (acceptedInvitor)
 	{
@@ -245,7 +252,7 @@ void RoomDescriptor::FromRoom(Room *room, AllGamesRoomsContainer *agrc)
 		agrc->GetRoomProperties(room->GetID(), &r, &roomProperties);
 	}
 }
-void RoomDescriptor::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void RoomDescriptor::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bitStream->Serialize(writeToBitstream, roomLockState);
 	bitStream->Serialize(writeToBitstream, lobbyRoomId);
@@ -293,7 +300,7 @@ RoomsErrorCode RoomQuery::Validate(void)
 		return REC_ROOM_QUERY_INVALID_QUERIES_POINTER;
 	return REC_SUCCESS;
 }
-void RoomQuery::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void RoomQuery::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	bool hasQuery = numQueries!=0;
 	bitStream->Serialize(writeToBitstream,hasQuery);
@@ -311,7 +318,7 @@ void RoomQuery::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
 	}
 }
 // ----------------------------  RoomCreationParameters  ----------------------------
-void NetworkedRoomCreationParameters::Serialize(bool writeToBitstream, RakNet::BitStream *bitStream)
+void NetworkedRoomCreationParameters::Serialize(bool writeToBitstream, SLNet::BitStream *bitStream)
 {
 	slots.Serialize(writeToBitstream, bitStream);
 	bitStream->Serialize(writeToBitstream,hiddenFromSearches);
@@ -359,7 +366,7 @@ RoomCreationParameters::~RoomCreationParameters()
 {
 
 }
-RoomsErrorCode RoomCreationParameters::Validate(const DataStructures::List<RakNet::RakString> &otherRoomNames,
+RoomsErrorCode RoomCreationParameters::Validate(const DataStructures::List<SLNet::RakString> &otherRoomNames,
 												 ProfanityFilter *profanityFilter) const
 {
 	static size_t QUICK_JOIN_ROOM_NAME_LENGTH = strlen(QUICK_JOIN_ROOM_NAME);
@@ -371,7 +378,7 @@ RoomsErrorCode RoomCreationParameters::Validate(const DataStructures::List<RakNe
 		return REC_ROOM_CREATION_PARAMETERS_ROOM_NAME_IN_USE;
 	if (networkedRoomCreationParameters.slots.publicSlots+networkedRoomCreationParameters.slots.reservedSlots<1)
 		return REC_ROOM_CREATION_PARAMETERS_NO_PLAYABLE_SLOTS;
-	if (networkedRoomCreationParameters.roomName.SubStr(0,(unsigned int) QUICK_JOIN_ROOM_NAME_LENGTH)==QUICK_JOIN_ROOM_NAME)
+	if (networkedRoomCreationParameters.roomName.SubStr(0, QUICK_JOIN_ROOM_NAME_LENGTH)==QUICK_JOIN_ROOM_NAME)
 		return REC_ROOM_CREATION_PARAMETERS_RESERVED_QUICK_JOIN_ROOM_NAME;
 	return REC_SUCCESS;
 }
@@ -413,7 +420,7 @@ void RoomQuery::SetupNextQuery(const char *columnName,DataStructures::Table::Fil
 {
 	queries=(DataStructures::Table::FilterQuery *)fq;
 	fq[numQueries].cellValue=&cells[numQueries];
-	strcpy(fq[numQueries].columnName, columnName);
+	strcpy_s(fq[numQueries].columnName, columnName);
 	fq[numQueries].operation=op;
 }
 void RoomQuery::SetQueriesToStatic(void)
@@ -468,7 +475,7 @@ RoomsErrorCode AllGamesRoomsContainer::EnterRoom(RoomCreationParameters *roomCre
 	if (perGamesRoomsContainers.Has(roomCreationParameters->gameIdentifier)==false)
 		return REC_ENTER_ROOM_UNKNOWN_TITLE;
 	PerGameRoomsContainer *perGameRoomsContainer = perGamesRoomsContainers.Get(roomCreationParameters->gameIdentifier);
-	RoomsErrorCode roomsErrorCode = perGameRoomsContainer->JoinByFilter(roomMemberMode, roomCreationParameters->firstUser, (RakNet::RoomID) -1, query, joinRoomResult);
+	RoomsErrorCode roomsErrorCode = perGameRoomsContainer->JoinByFilter(roomMemberMode, roomCreationParameters->firstUser, (SLNet::RoomID) -1, query, joinRoomResult);
 
 	// Redundant, rooms plugin does this anyway
 //	if (roomsErrorCode==REC_SUCCESS)
@@ -503,7 +510,7 @@ RoomsErrorCode AllGamesRoomsContainer::JoinByFilter(GameIdentifier gameIdentifie
 	}
 	PerGameRoomsContainer *perGameRoomsContainer = perGamesRoomsContainers.Get(gameIdentifier);
 	joinRoomResult->agrc=this;
-	RoomsErrorCode rec = perGameRoomsContainer->JoinByFilter(roomMemberMode, roomsParticipant, (RakNet::RoomID) -1, query, joinRoomResult);
+	RoomsErrorCode rec = perGameRoomsContainer->JoinByFilter(roomMemberMode, roomsParticipant, (SLNet::RoomID) -1, query, joinRoomResult);
 	joinRoomResult->roomDescriptor.FromRoom(joinRoomResult->roomOutput, this);
 	return rec;
 }
@@ -576,7 +583,7 @@ void AllGamesRoomsContainer::DestroyRoomIfDead(Room *room)
 			break;
 	}
 }
-void AllGamesRoomsContainer::ChangeHandle(RakNet::RakString oldHandle, RakNet::RakString newHandle)
+void AllGamesRoomsContainer::ChangeHandle(SLNet::RakString oldHandle, SLNet::RakString newHandle)
 {
 	unsigned int i;
 	for (i=0; i < perGamesRoomsContainers.Size(); i++)
@@ -620,14 +627,14 @@ RoomsErrorCode AllGamesRoomsContainer::RemoveUser(RoomsParticipant* roomsPartici
 	removeUserResult->removedFromQuickJoin=true;
 	return REC_SUCCESS;
 }
-RoomsErrorCode AllGamesRoomsContainer::SendInvite(RoomsParticipant* roomsParticipant, RoomsParticipant* inviteeId, bool inviteToSpectatorSlot, RakNet::RakString subject, RakNet::RakString body)
+RoomsErrorCode AllGamesRoomsContainer::SendInvite(RoomsParticipant* roomsParticipant, RoomsParticipant* inviteeId, bool inviteToSpectatorSlot, SLNet::RakString subject, SLNet::RakString body)
 {
 	if (roomsParticipant->GetRoom()==0)
 		return REC_SEND_INVITE_UNKNOWN_ROOM_ID;
 
 	return roomsParticipant->GetRoom()->SendInvite(roomsParticipant, inviteeId, inviteToSpectatorSlot, subject, body);
 }
-RoomsErrorCode AllGamesRoomsContainer::AcceptInvite(RoomID roomId, Room **room, RoomsParticipant* roomsParticipant, RakNet::RakString inviteSender)
+RoomsErrorCode AllGamesRoomsContainer::AcceptInvite(RoomID roomId, Room **room, RoomsParticipant* roomsParticipant, SLNet::RakString inviteSender)
 {
 	*room = GetRoomByLobbyRoomID(roomId);
 	if (*room==0)
@@ -724,13 +731,13 @@ void AllGamesRoomsContainer::GetRoomProperties(RoomID roomId, Room **room, DataS
 		table->AddColumn(oldTable->ColumnName(i), oldTable->GetColumnType(i));
 	table->AddRow(roomId, oldTable->GetRowByID(roomId)->cells, true);
 }
-RoomsErrorCode AllGamesRoomsContainer::ChangeRoomName(RoomsParticipant* roomsParticipant, RakNet::RakString newRoomName, ProfanityFilter *profanityFilter)
+RoomsErrorCode AllGamesRoomsContainer::ChangeRoomName(RoomsParticipant* roomsParticipant, SLNet::RakString newRoomName, ProfanityFilter *profanityFilter)
 {
 	if (roomsParticipant->GetRoom()==0)
 		return REC_CHANGE_ROOM_NAME_UNKNOWN_ROOM_ID;
 
 	unsigned int i;
-	DataStructures::List<RakNet::RakString> roomNames;
+	DataStructures::List<SLNet::RakString> roomNames;
 	for (i=0; i < perGamesRoomsContainers.Size(); i++)
 	{
 		perGamesRoomsContainers[i]->GetRoomNames(roomNames);
@@ -795,21 +802,21 @@ RoomsErrorCode AllGamesRoomsContainer::AreAllMembersReady(RoomID roomId, Room **
 
 	return (RoomsErrorCode) (*room)->AreAllMembersReady((unsigned int) -1, allReady);
 }
-RoomsErrorCode AllGamesRoomsContainer::KickMember(RoomsParticipant* roomsParticipant, RoomsParticipant *kickedParticipant, RakNet::RakString reason)
+RoomsErrorCode AllGamesRoomsContainer::KickMember(RoomsParticipant* roomsParticipant, RoomsParticipant *kickedParticipant, SLNet::RakString reason)
 {
 	if (roomsParticipant->GetRoom()==0)
 		return REC_KICK_MEMBER_UNKNOWN_ROOM_ID;
 
 	return roomsParticipant->GetRoom()->KickMember(roomsParticipant, kickedParticipant, reason);
 }
-RoomsErrorCode AllGamesRoomsContainer::UnbanMember(RoomsParticipant* roomsParticipant, RakNet::RakString name)
+RoomsErrorCode AllGamesRoomsContainer::UnbanMember(RoomsParticipant* roomsParticipant, SLNet::RakString name)
 {
 	if (roomsParticipant->GetRoom()==0)
 		return REC_UNBAN_MEMBER_UNKNOWN_ROOM_ID;
 
 	return roomsParticipant->GetRoom()->UnbanMember(roomsParticipant, name);
 }
-RoomsErrorCode AllGamesRoomsContainer::GetBanReason( RoomID lobbyRoomId, Room **room, RakNet::RakString name, RakNet::RakString *reason)
+RoomsErrorCode AllGamesRoomsContainer::GetBanReason( RoomID lobbyRoomId, Room **room, SLNet::RakString name, SLNet::RakString *reason)
 {
 	*room = GetRoomByLobbyRoomID(lobbyRoomId);
 	if (*room==0)
@@ -817,7 +824,7 @@ RoomsErrorCode AllGamesRoomsContainer::GetBanReason( RoomID lobbyRoomId, Room **
 	return (*room)->GetBanReason(name, reason);
 }
 /*
-RoomsErrorCode AllGamesRoomsContainer::GetKickReason(RoomsParticipant* roomsParticipant, RakNet::RakString *kickReason)
+RoomsErrorCode AllGamesRoomsContainer::GetKickReason(RoomsParticipant* roomsParticipant, SLNet::RakString *kickReason)
 {
 	*room = GetRoomByLobbyRoomID(lobbyRoomId);
 	if (*room==0)
@@ -837,7 +844,7 @@ Room * AllGamesRoomsContainer::GetRoomByLobbyRoomID(RoomID lobbyRoomID)
 	}
 	return 0;
 }
-Room * AllGamesRoomsContainer::GetRoomByName(RakNet::RakString roomName)
+Room * AllGamesRoomsContainer::GetRoomByName(SLNet::RakString roomName)
 {
 	unsigned int i;
 	Room *room;
@@ -853,7 +860,7 @@ RoomsErrorCode AllGamesRoomsContainer::ProcessQuickJoins(
 												  DataStructures::List<QuickJoinUser*> &timeoutExpired,
 												  DataStructures::List<JoinedRoomResult> &joinedRoomMembers,
 												  DataStructures::List<QuickJoinUser*> &dereferencedPointers,
-												  RakNet::TimeMS elapsedTime)
+												  SLNet::TimeMS elapsedTime)
 {
 	unsigned int numRoomsCreated;
 	unsigned int i;
@@ -894,7 +901,7 @@ RoomsErrorCode PerGameRoomsContainer::CreateRoom(RoomCreationParameters *roomCre
 {
 	if (validate)
 	{
-		DataStructures::List<RakNet::RakString> otherRoomNames;
+		DataStructures::List<SLNet::RakString> otherRoomNames;
 		GetRoomNames(otherRoomNames);
 		RoomsErrorCode roomsErrorCode = roomCreationParameters->Validate(otherRoomNames, profanityFilter);
 		if (roomsErrorCode!=REC_SUCCESS)
@@ -984,7 +991,7 @@ int PerGameRoomsContainer::RoomsSortByTimeThenTotalSlots( Room* const &key, Room
 unsigned PerGameRoomsContainer::ProcessQuickJoins( DataStructures::List<QuickJoinUser*> &timeoutExpired,
 					   DataStructures::List<JoinedRoomResult> &joinedRoomMembers,
 					   DataStructures::List<QuickJoinUser*> &dereferencedPointers,
-					   RakNet::TimeMS elapsedTime,
+					   SLNet::TimeMS elapsedTime,
 					   RoomID startingRoomId)
 {
 	unsigned roomIndex, quickJoinIndex;
@@ -1004,7 +1011,7 @@ unsigned PerGameRoomsContainer::ProcessQuickJoins( DataStructures::List<QuickJoi
 	DataStructures::List<Room*> allRooms;
 	GetAllRooms(allRooms);
 
-	while (1)
+	for(;;)
 	{
 		// 1. Clear all quickJoinWorkingList from all rooms
 		for (roomIndex=0; roomIndex < allRooms.Size(); roomIndex++)
@@ -1198,7 +1205,7 @@ bool PerGameRoomsContainer::DestroyRoomIfDead(Room *room)
 	}
 	return false;
 }
-void PerGameRoomsContainer::ChangeHandle(RakNet::RakString oldHandle, RakNet::RakString newHandle)
+void PerGameRoomsContainer::ChangeHandle(SLNet::RakString oldHandle, SLNet::RakString newHandle)
 {
 	DataStructures::List<Room*> rooms;
 	GetAllRooms(rooms);
@@ -1287,7 +1294,7 @@ Room* PerGameRoomsContainer::GetRoomByLobbyRoomID(RoomID lobbyRoomID)
 
 	return (Room*) roomsTable.GetRowByID(lobbyRoomID)->cells[DefaultRoomColumns::TC_LOBBY_ROOM_PTR]->ptr;
 }
-Room * PerGameRoomsContainer::GetRoomByName(RakNet::RakString roomName)
+Room * PerGameRoomsContainer::GetRoomByName(SLNet::RakString roomName)
 {
 	DataStructures::List<Room*> rooms;
 	GetAllRooms(rooms);
@@ -1313,7 +1320,7 @@ void PerGameRoomsContainer::GetAllRooms(DataStructures::List<Room*> &rooms)
 		cur=cur->next;
 	}
 }
-void PerGameRoomsContainer::GetRoomNames(DataStructures::List<RakNet::RakString> &roomNames)
+void PerGameRoomsContainer::GetRoomNames(DataStructures::List<SLNet::RakString> &roomNames)
 {
 	DataStructures::Page<unsigned, DataStructures::Table::Row*, _TABLE_BPLUS_TREE_ORDER> *cur = roomsTable.GetRows().GetListHead();
 	int i;
@@ -1321,7 +1328,7 @@ void PerGameRoomsContainer::GetRoomNames(DataStructures::List<RakNet::RakString>
 	while (cur)
 	{
 		for (i=0; i < cur->size; i++)
-			roomNames.Insert(RakNet::RakString(cur->data[i]->cells[DefaultRoomColumns::TC_ROOM_NAME]->c), _FILE_AND_LINE_ );
+			roomNames.Insert(SLNet::RakString(cur->data[i]->cells[DefaultRoomColumns::TC_ROOM_NAME]->c), _FILE_AND_LINE_ );
 		cur=cur->next;
 	}
 }
@@ -1362,7 +1369,7 @@ Room::Room( RoomID _roomId, RoomCreationParameters *roomCreationParameters, Data
 	roomMemberList.Insert(roomMember, _FILE_AND_LINE_ );
 	tableRow->cells[DefaultRoomColumns::TC_ROOM_NAME]->Set(roomCreationParameters->networkedRoomCreationParameters.roomName.C_String());
 	tableRow->cells[DefaultRoomColumns::TC_ROOM_ID]->Set(lobbyRoomId);	
-	tableRow->cells[DefaultRoomColumns::TC_CREATION_TIME]->Set((int) RakNet::GetTimeMS());
+	tableRow->cells[DefaultRoomColumns::TC_CREATION_TIME]->Set((int)SLNet::GetTimeMS());
 	tableRow->cells[DefaultRoomColumns::TC_DESTROY_ON_MODERATOR_LEAVE]->Set((int) roomCreationParameters->networkedRoomCreationParameters.destroyOnModeratorLeave);
 	tableRow->cells[DefaultRoomColumns::TC_LOBBY_ROOM_PTR]->SetPtr(this);
 }
@@ -1434,7 +1441,7 @@ Slots Room::GetUsedSlots(void) const
 	}
 	return usedSlots;
 }
-RoomsErrorCode Room::SendInvite(RoomsParticipant* roomsParticipant, RoomsParticipant* inviteeId, bool inviteToSpectatorSlot, RakNet::RakString subject, RakNet::RakString body)
+RoomsErrorCode Room::SendInvite(RoomsParticipant* roomsParticipant, RoomsParticipant* inviteeId, bool inviteToSpectatorSlot, SLNet::RakString subject, SLNet::RakString body)
 {
 	RakAssert(roomDestroyed==false);
 
@@ -1507,7 +1514,7 @@ RoomsErrorCode Room::SendInvite(RoomsParticipant* roomsParticipant, RoomsPartici
 	inviteList.Insert(invitedUser, _FILE_AND_LINE_ );
 	return REC_SUCCESS;
 }
-RoomsErrorCode Room::AcceptInvite(RoomsParticipant* roomsParticipant, RakNet::RakString inviteSender)
+RoomsErrorCode Room::AcceptInvite(RoomsParticipant* roomsParticipant, SLNet::RakString inviteSender)
 {
 	RakAssert(roomDestroyed==false);
 
@@ -1532,7 +1539,7 @@ RoomsErrorCode Room::AcceptInvite(RoomsParticipant* roomsParticipant, RakNet::Ra
 	// Add the new roomOutput member
 	RoomMember* roomMember = new RoomMember;
 	roomMember->isReady=false;
-	roomMember->joinTime=RakNet::GetTimeMS();
+	roomMember->joinTime= SLNet::GetTimeMS();
 	roomMember->roomMemberMode=RMM_RESERVED;
 	roomMember->roomsParticipant=roomsParticipant;
 	roomsParticipant->SetRoom(this);
@@ -1685,7 +1692,7 @@ RoomsErrorCode Room::SetCustomRoomProperties(RoomsParticipant* roomsParticipant,
 
 	return REC_SUCCESS;
 }
-RoomsErrorCode Room::ChangeRoomName(RoomsParticipant* roomsParticipant, RakNet::RakString newRoomName, ProfanityFilter *profanityFilter)
+RoomsErrorCode Room::ChangeRoomName(RoomsParticipant* roomsParticipant, SLNet::RakString newRoomName, ProfanityFilter *profanityFilter)
 {
 	RakAssert(roomDestroyed==false);
 
@@ -1824,7 +1831,7 @@ RoomsErrorCode Room::AreAllMembersReady(unsigned int exceptThisIndex, bool *allR
 	*allReady=true;
 	return REC_SUCCESS;
 }
-RoomsErrorCode Room::KickMember(RoomsParticipant* roomsParticipant, RoomsParticipant *kickedParticipant, RakNet::RakString reason )
+RoomsErrorCode Room::KickMember(RoomsParticipant* roomsParticipant, RoomsParticipant *kickedParticipant, SLNet::RakString reason )
 {
 	RakAssert(roomDestroyed==false);
 
@@ -1856,7 +1863,7 @@ RoomsErrorCode Room::KickMember(RoomsParticipant* roomsParticipant, RoomsPartici
 
 	return REC_SUCCESS;
 }
-RoomsErrorCode Room::UnbanMember(RoomsParticipant* roomsParticipant, RakNet::RakString name)
+RoomsErrorCode Room::UnbanMember(RoomsParticipant* roomsParticipant, SLNet::RakString name)
 {
 	RakAssert(roomDestroyed==false);
 
@@ -1876,7 +1883,7 @@ RoomsErrorCode Room::UnbanMember(RoomsParticipant* roomsParticipant, RakNet::Rak
 
 	return REC_SUCCESS;
 }
-RoomsErrorCode Room::GetBanReason(RakNet::RakString name, RakNet::RakString *reason)
+RoomsErrorCode Room::GetBanReason(SLNet::RakString name, SLNet::RakString *reason)
 {
 	RakAssert(roomDestroyed==false);
 	unsigned int banIndex = GetBannedIndex(name);
@@ -1894,7 +1901,7 @@ RoomsErrorCode Room::LeaveRoom(RoomsParticipant* roomsParticipant, RemoveUserRes
 	return RemoveUser(roomsParticipant,removeUserResult);
 }
 /*
-RoomsErrorCode Room::GetKickReason(RoomsParticipant* roomsParticipant, RakNet::RakString *kickReason)
+RoomsErrorCode Room::GetKickReason(RoomsParticipant* roomsParticipant, SLNet::RakString *kickReason)
 {
 	RakAssert(roomDestroyed==false);
 
@@ -2167,7 +2174,7 @@ bool Room::IsInRoom(RoomsParticipant* roomsParticipant) const
 {
 	return GetRoomIndex(roomsParticipant)!=-1;
 }
-bool Room::HasInvite(RakNet::RakString roomsParticipant)
+bool Room::HasInvite(SLNet::RakString roomsParticipant)
 {
 	return GetFirstInviteIndex(roomsParticipant)!=-1;
 }
@@ -2189,7 +2196,7 @@ unsigned int Room::GetKickSlotIndex(RoomsParticipant* roomsParticipant) const
 	return -1;
 }
 */
-unsigned int Room::GetBannedIndex(RakNet::RakString username) const
+unsigned int Room::GetBannedIndex(SLNet::RakString username) const
 {
 	unsigned int i;
 	for (i=0; i < banList.Size(); i++)
@@ -2197,7 +2204,7 @@ unsigned int Room::GetBannedIndex(RakNet::RakString username) const
 			return i;
 	return (unsigned int) -1;
 }
-unsigned int Room::GetInviteIndex(RakNet::RakString invitee, RakNet::RakString invitor) const
+unsigned int Room::GetInviteIndex(SLNet::RakString invitee, SLNet::RakString invitor) const
 {
 	unsigned int i;
 	for (i=0; i < inviteList.Size(); i++)
@@ -2205,7 +2212,7 @@ unsigned int Room::GetInviteIndex(RakNet::RakString invitee, RakNet::RakString i
 			return i;
 	return (unsigned int) -1;
 }
-unsigned int Room::GetFirstInviteIndex(RakNet::RakString invitee) const
+unsigned int Room::GetFirstInviteIndex(SLNet::RakString invitee) const
 {
 	unsigned int i;
 	for (i=0; i < inviteList.Size(); i++)
@@ -2239,7 +2246,7 @@ bool Room::IsHiddenToParticipant(RoomsParticipant* roomsParticipant) const
 		return false;
 	return true;
 }
-void Room::ChangeHandle(RakNet::RakString oldHandle, RakNet::RakString newHandle)
+void Room::ChangeHandle(SLNet::RakString oldHandle, SLNet::RakString newHandle)
 {
 	if (oldHandle==newHandle)
 		return;
@@ -2280,8 +2287,8 @@ void AllGamesRoomsContainer::UnitTest(void)
 	DataStructures::Table::Cell cells[2];
 	filterQuery[0].cellValue=&cells[0];
 	filterQuery[1].cellValue=&cells[1];
-	strcpy(filterQuery[0].columnName, "LevelName");
-	strcpy(filterQuery[1].columnName, "FlagCaptureCount");
+	strcpy_s(filterQuery[0].columnName, "LevelName");
+	strcpy_s(filterQuery[1].columnName, "FlagCaptureCount");
 	filterQuery[0].operation=DataStructures::Table::QF_EQUAL;
 	filterQuery[1].operation=DataStructures::Table::QF_NOT_EQUAL;
 	cells[0].Set("DogFoodLevel");
@@ -2306,7 +2313,7 @@ void AllGamesRoomsContainer::UnitTest(void)
 	DataStructures::List<QuickJoinUser*> dereferencedPointers;
 	DataStructures::List<DataStructures::Table::Cell*> cellList;
 	DataStructures::List<InvitedUser*> invites;
-	RakNet::RakString kickReason;
+	SLNet::RakString kickReason;
 	cellList.Insert(&cells[0], _FILE_AND_LINE_ );
 	cellList.Insert(&cells[1], _FILE_AND_LINE_ );
 	customRoomProperties.AddRow(0, cellList);
@@ -2651,15 +2658,15 @@ void AllGamesRoomsContainer::UnitTest(void)
 	room = joinedRoomResult.roomOutput;
 	
 	// Kick member 2
-	RakNet::RakString banReason("Don't like you");
+	SLNet::RakString banReason("Don't like you");
 	roomsErrorCode = agrc.KickMember( &roomsParticipant1, &roomsParticipant2, banReason );
 	RakAssert(roomsErrorCode==REC_SUCCESS);
 
 	// Join by filter
-	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (RakNet::RoomID)-1, &roomQuery, &joinedRoomResult);
+	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (SLNet::RoomID)-1, &roomQuery, &joinedRoomResult);
 	RakAssert(roomsErrorCode==REC_JOIN_BY_FILTER_NO_ROOMS);
 
-	RakNet::RakString banReasonOut;
+	SLNet::RakString banReasonOut;
 	roomsErrorCode = agrc.GetBanReason( room->GetID(), &room, roomsParticipant2.GetName(), &banReasonOut );
 	RakAssert(roomsErrorCode==REC_SUCCESS);
 	RakAssert(banReasonOut==banReason);
@@ -2677,7 +2684,7 @@ void AllGamesRoomsContainer::UnitTest(void)
 	RakAssert(roomsErrorCode==REC_UNBAN_MEMBER_NOT_BANNED);
 
 	// Join by filter
-	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (RakNet::RoomID)-1, &roomQuery, &joinedRoomResult);
+	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (SLNet::RoomID)-1, &roomQuery, &joinedRoomResult);
 	RakAssert(roomsErrorCode==REC_SUCCESS);
 
 	// Set both members ready
@@ -2703,7 +2710,7 @@ void AllGamesRoomsContainer::UnitTest(void)
 	RakAssert(roomsErrorCode==REC_SUCCESS);
 
 	// Join by filter (should fail because hidden)
-	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (RakNet::RoomID)-1, &roomQuery, &joinedRoomResult);
+	roomsErrorCode = agrc.JoinByFilter( gameIdentifier1, RMM_ANY_PLAYABLE, &roomsParticipant2, (SLNet::RoomID)-1, &roomQuery, &joinedRoomResult);
 	RakAssert(roomsErrorCode==REC_JOIN_BY_FILTER_NO_ROOMS);
 
 }

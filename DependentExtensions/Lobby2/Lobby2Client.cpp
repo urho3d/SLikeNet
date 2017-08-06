@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Client.h"
-#include "RakAssert.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/assert.h"
+#include "slikenet/MessageIdentifiers.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 Lobby2Client::Lobby2Client()
 {
-	serverAddress=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+	serverAddress= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 }
 Lobby2Client::~Lobby2Client()
 {
@@ -36,7 +41,7 @@ void Lobby2Client::SendMsg(Lobby2Message *msg)
 	RakAssert(callbacks.Size());
 	msg->resultCode=L2RC_PROCESSING;
 
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	bs.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
 	bs.Write((MessageID)msg->GetID());
 	msg->Serialize(true,false,&bs);
@@ -74,7 +79,7 @@ void Lobby2Client::OnShutdown(void)
 }
 void Lobby2Client::OnMessage(Packet *packet)
 {
-	RakNet::BitStream bs(packet->data,packet->length,false);
+	SLNet::BitStream bs(packet->data,packet->length,false);
 	bs.IgnoreBytes(1); // ID_LOBBY2_SEND_MESSAGE
 	MessageID msgId;
 	bs.Read(msgId);
@@ -99,20 +104,20 @@ void Lobby2Client::OnMessage(Packet *packet)
 	}
 }
 /*
-void Lobby2Client::AddToIgnoreList(RakNet::RakString user)
+void Lobby2Client::AddToIgnoreList(SLNet::RakString user)
 {
 	ignoreList.Insert(user,user,false);
 }
-void Lobby2Client::RemoveFromIgnoreList(RakNet::RakString user)
+void Lobby2Client::RemoveFromIgnoreList(SLNet::RakString user)
 {
 	ignoreList.RemoveIfExists(user);
 }
-void Lobby2Client::SetIgnoreList(DataStructures::List<RakNet::RakString> users)
+void Lobby2Client::SetIgnoreList(DataStructures::List<SLNet::RakString> users)
 {
 	for (unsigned int i=0; i < users.Size(); i++)
 		ignoreList.Insert(users[i],users[i],false);
 }
-bool Lobby2Client::IsInIgnoreList(RakNet::RakString user) const
+bool Lobby2Client::IsInIgnoreList(SLNet::RakString user) const
 {
 	return ignoreList.HasData(user);
 }
@@ -120,7 +125,7 @@ void Lobby2Client::ClearIgnoreList(void)
 {
 	ignoreList.Clear(_FILE_AND_LINE_);
 }
-const DataStructures::OrderedList<RakNet::RakString, RakNet::RakString>* Lobby2Client::GetIgnoreList(void) const
+const DataStructures::OrderedList<SLNet::RakString, SLNet::RakString>* Lobby2Client::GetIgnoreList(void) const
 {
 	return &ignoreList;
 }

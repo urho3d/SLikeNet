@@ -1,26 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_SERVER_H
 #define __LOBBY_2_SERVER_H
 
-#include "Export.h"
-#include "RakNetTypes.h"
+#include "slikenet/Export.h"
+#include "slikenet/types.h"
 #include "Lobby2Plugin.h"
-#include "DS_OrderedList.h"
-#include "ThreadPool.h"
+#include "slikenet/DS_OrderedList.h"
+#include "slikenet/ThreadPool.h"
 #include "Lobby2Presence.h"
 
 //class PostgreSQLInterface;
 
-namespace RakNet
+namespace SLNet
 {
 	
 struct Lobby2Message;
@@ -34,7 +39,7 @@ struct Lobby2ServerCommand
 	bool deallocMsgWhenDone;
 	bool returnToSender;
 	unsigned int callerUserId;
-	RakNet::RakString callingUserName;
+	SLNet::RakString callingUserName;
 	DataStructures::List<SystemAddress> callerSystemAddresses;
 	DataStructures::List<RakNetGUID> callerGuids;
 	//SystemAddress requiredConnectionAddress;
@@ -45,7 +50,7 @@ struct Lobby2ServerCommand
 /// \details This is a plugin which will take incoming messages via Lobby2Client_PC::SendMsg(), process them, and send back the same messages with output and a result code
 /// Unlike the first implementation of the lobby server, this is a thin plugin that mostly just sends messages to threads and sends back the results.
 /// \ingroup LOBBY_2_SERVER
-class RAK_DLL_EXPORT Lobby2Server : public RakNet::Lobby2Plugin, public ThreadDataInterface
+class RAK_DLL_EXPORT Lobby2Server : public SLNet::Lobby2Plugin, public ThreadDataInterface
 {
 public:	
 	Lobby2Server();
@@ -56,9 +61,9 @@ public:
 	/// \return True on success, false on failure.
 	virtual bool ConnectToDB(const char *conninfo, int numWorkerThreads)=0;
 	/// \internal
-	virtual void AddInputFromThread(Lobby2Message *msg, unsigned int targetUserId, RakNet::RakString targetUserHandle)=0;
+	virtual void AddInputFromThread(Lobby2Message *msg, unsigned int targetUserId, SLNet::RakString targetUserHandle)=0;
 	/// \internal
-	virtual void AddOutputFromThread(Lobby2Message *msg, unsigned int targetUserId, RakNet::RakString targetUserHandle)=0;
+	virtual void AddOutputFromThread(Lobby2Message *msg, unsigned int targetUserId, SLNet::RakString targetUserHandle)=0;
 
 	/// \brief Lobby2Message encapsulates a user command, containing both input and output data
 	/// \details This will serialize and transmit that command
@@ -133,12 +138,12 @@ public:
 
 	/// Set the presence of a logged in user
 	/// \param[in] presence Presence info of this user
-	void SetPresence(const RakNet::Lobby2Presence &presence, RakNet::RakString userHandle);
+	void SetPresence(const SLNet::Lobby2Presence &presence, SLNet::RakString userHandle);
 
 	/// Get the presence of a logged in user, by handle
 	/// \param[out] presence Presence info of requested user
 	/// \param[in] userHandle Handle of the user
-	void GetPresence(RakNet::Lobby2Presence &presence, RakNet::RakString userHandle);
+	void GetPresence(SLNet::Lobby2Presence &presence, SLNet::RakString userHandle);
 
 	/// \internal Lets the plugin know that a user has logged on, so this user can be tracked and the message forwarded to RoomsPlugin
 	void OnLogin(Lobby2ServerCommand *command, bool calledFromThread);
@@ -153,7 +158,7 @@ public:
 		DataStructures::List<SystemAddress> systemAddresses;
 		DataStructures::List<RakNetGUID> guids;
 		unsigned int callerUserId;
-		RakNet::RakString userName;
+		SLNet::RakString userName;
 		Lobby2Presence presence;
 		bool allowMultipleLogins;
 	};
@@ -183,9 +188,9 @@ protected:
 	void ClearUsers(void);
 	unsigned int GetUserIndexBySystemAddress(SystemAddress systemAddress) const;
 	unsigned int GetUserIndexByGUID(RakNetGUID guid) const;
-	unsigned int GetUserIndexByUsername(RakNet::RakString userName) const;
+	unsigned int GetUserIndexByUsername(SLNet::RakString userName) const;
 	void StopThreads(void);
-	void SendRemoteLoginNotification(RakNet::RakString handle, const DataStructures::List<SystemAddress>& recipients);
+	void SendRemoteLoginNotification(SLNet::RakString handle, const DataStructures::List<SystemAddress>& recipients);
 
 	/// \internal
 	void RemoveUser(RakString userName);
@@ -210,7 +215,7 @@ protected:
 	SimpleMutex threadActionQueueMutex;
 
 	//DataStructures::List<PostgreSQLInterface *> connectionPool;
-	void SendUnifiedToMultiple( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses );
+	void SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses );
 };
 	
 }

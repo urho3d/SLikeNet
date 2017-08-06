@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -13,15 +18,17 @@
 
 
 #include "AutopatcherPostgreRepository.h"
-#include "AutopatcherPatchContext.h"
-#include "FileList.h"
+#include "slikenet/AutopatcherPatchContext.h"
+#include "slikenet/FileList.h"
 // libpq-fe.h is part of PostgreSQL which must be installed on this computer to use the PostgreRepository
 #include "libpq-fe.h"
 #include "CreatePatch.h"
-#include "AutopatcherPatchContext.h"
-// #include "DR_SHA1.h"
+#include "slikenet/AutopatcherPatchContext.h"
+// #include "slikenet/DR_SHA1.h"
 #include <stdlib.h>
-#include "LinuxStrings.h"
+#include "slikenet/LinuxStrings.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 // localtime
 #include <time.h>
 
@@ -45,7 +52,7 @@ static const unsigned HASH_LENGTH=sizeof(unsigned int);
 #define PQEXECPARAM_FORMAT_TEXT		0
 #define PQEXECPARAM_FORMAT_BINARY	1
 
-using namespace RakNet;
+using namespace SLNet;
 
 AutopatcherPostgreRepository::AutopatcherPostgreRepository()
 {
@@ -188,7 +195,7 @@ bool AutopatcherPostgreRepository::AddApplication(const char *applicationName, c
 	if (strlen(userName)>100)
 		return false;
 
-	sprintf(query, "INSERT INTO Applications (applicationName, userName) VALUES ('%s', '%s');", GetEscapedString(applicationName).C_String(), GetEscapedString(userName).C_String());
+	sprintf_s(query, "INSERT INTO Applications (applicationName, userName) VALUES ('%s', '%s');", GetEscapedString(applicationName).C_String(), GetEscapedString(userName).C_String());
 	PGresult *result;
 	//sqlCommandMutex.Lock();
 	bool b = ExecuteBlockingCommand(query, &result, false);
@@ -202,7 +209,7 @@ bool AutopatcherPostgreRepository::RemoveApplication(const char *applicationName
 	if (strlen(applicationName)>100)
 		return false;
 	
-	sprintf(query, "DELETE FROM Applications WHERE applicationName='%s';", GetEscapedString(applicationName).C_String());
+	sprintf_s(query, "DELETE FROM Applications WHERE applicationName='%s';", GetEscapedString(applicationName).C_String());
 	PGresult *result;
 	//sqlCommandMutex.Lock();
 	bool b = ExecuteBlockingCommand(query, &result, false);
@@ -217,8 +224,8 @@ bool AutopatcherPostgreRepository::GetChangelistSinceDate(const char *applicatio
 	char query[512];
 	if (strlen(applicationName)>100)
 		return false;
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, false)==false)
 	{
@@ -231,7 +238,7 @@ bool AutopatcherPostgreRepository::GetChangelistSinceDate(const char *applicatio
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
+		sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
 		return false;
 	}
 	char *res;
@@ -240,9 +247,9 @@ bool AutopatcherPostgreRepository::GetChangelistSinceDate(const char *applicatio
 	applicationID=atoi(res);
 	PQclear(result);
 	if (sinceDate!=0.0)
-		sprintf(query, "SELECT DISTINCT ON (filename) filename, fileLength, contentHash, createFile FROM FileVersionHistory WHERE applicationId=%i AND modificationDate > %f ORDER BY filename, fileId DESC;", applicationID, sinceDate);
+		sprintf_s(query, "SELECT DISTINCT ON (filename) filename, fileLength, contentHash, createFile FROM FileVersionHistory WHERE applicationId=%i AND modificationDate > %f ORDER BY filename, fileId DESC;", applicationID, sinceDate);
 	else
-		sprintf(query, "SELECT DISTINCT ON (filename) filename, fileLength, contentHash, createFile FROM FileVersionHistory WHERE applicationId=%i ORDER BY filename, fileId DESC;", applicationID);
+		sprintf_s(query, "SELECT DISTINCT ON (filename) filename, fileLength, contentHash, createFile FROM FileVersionHistory WHERE applicationId=%i ORDER BY filename, fileId DESC;", applicationID);
 
 	//sqlCommandMutex.Lock();
 	result = PQexecParams(pgConn, query,0,0,0,0,0,PQEXECPARAM_FORMAT_BINARY);
@@ -293,8 +300,8 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 	char query[512];
 	if (strlen(applicationName)>100)
 		return 0;
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, false)==false)
 	{
@@ -307,7 +314,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
+		sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
 		return 0;
 	}
 	char *res;
@@ -319,7 +326,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 	// Go through the input list.
 	unsigned inputIndex;
 	char *userHash, *contentHash;
-	RakNet::RakString userFilename;
+	SLNet::RakString userFilename;
 	// char *content;
 //	char *fileId, *fileLength;
 	char *patch;
@@ -339,8 +346,8 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 		if (userHash==0)
 		{
 			// If the user does not have a hash in the input list, get the contents of latest version of this named file and write it to the patch list
-		//	sprintf(query, "SELECT DISTINCT ON (filename) content FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
-			sprintf(query, "SELECT DISTINCT ON (filename) fileId, fileLength, changeSetID FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
+		//	sprintf_s(query, "SELECT DISTINCT ON (filename) content FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
+			sprintf_s(query, "SELECT DISTINCT ON (filename) fileId, fileLength, changeSetID FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
 			outTemp[0]=userFilename.C_String();
 			outLengths[0]=(int) userFilename.GetLength();
 			formats[0]=PQEXECPARAM_FORMAT_BINARY;
@@ -383,7 +390,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 				return 0;
 
 			// Get the hash and ID of the latest version of this file, by filename.
-			sprintf(query, "SELECT DISTINCT ON (filename) contentHash, fileId, fileLength FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
+			sprintf_s(query, "SELECT DISTINCT ON (filename) contentHash, fileId, fileLength FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text ORDER BY filename, fileId DESC;", applicationID);
 			outTemp[0]=userFilename.C_String();
 			outLengths[0]=(int)userFilename.GetLength();
 			formats[0]=PQEXECPARAM_FORMAT_BINARY;
@@ -414,7 +421,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 				if (memcmp(contentHash, userHash, HASH_LENGTH)!=0)
 				{
 					// Look up by user hash/filename/applicationID, returning the patch
-					sprintf(query, "SELECT patch, patchAlgorithm, fileId FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text AND contentHash=$2::bytea;", applicationID);
+					sprintf_s(query, "SELECT patch, patchAlgorithm, fileId FROM FileVersionHistory WHERE applicationId=%i AND filename=$1::text AND contentHash=$2::bytea;", applicationID);
 					outTemp[0]=userFilename.C_String();
 					outLengths[0]=(int)userFilename.GetLength();
 					formats[0]=PQEXECPARAM_FORMAT_TEXT;
@@ -442,10 +449,10 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 						/*
 						// Get 32000000 bytes at a time to workaround http://support.microsoft.com/kb/q201213
 						int fileIndex=0;
-						char *file = RakNet::OP_NEW char[fileLengthInt];
+						char *file = SLNet::OP_NEW char[fileLengthInt];
 						while (fileIndex < fileLengthInt)
 						{
-							sprintf(query, "SELECT substring(content from %i for 32000000) FROM FileVersionHistory WHERE fileId=$1::integer;", fileIndex, fileId);
+							sprintf_s(query, "SELECT substring(content from %i for 32000000) FROM FileVersionHistory WHERE fileId=$1::integer;", fileIndex, fileId);
 							patchResult = PQexecParams(pgConn, query,1,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 							if (IsResultSuccessful(patchResult, false)==false)
 							{
@@ -462,7 +469,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 */
 
 						/*
-						sprintf(query, "SELECT content FROM FileVersionHistory WHERE fileId=%i", fileIdInt);
+						sprintf_s(query, "SELECT content FROM FileVersionHistory WHERE fileId=%i", fileIdInt);
 						patchResult = PQexecParams(pgConn, query,0,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 						if (IsResultSuccessful(patchResult, false)==false)
 						{
@@ -478,7 +485,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 						// No patch, add the file
 						patchList->AddFile(userFilename,userFilename, 0, fileLengthInt, fileLengthInt, FileListNodeContext(PC_WRITE_FILE,fileIdInt,0,0), true);
 //						patchList->AddFile(userFilename, file, fileLengthInt, contentLength, FileListNodeContext(PC_WRITE_FILE,0), true);
-//						RakNet::OP_DELETE_ARRAY file;
+//						SLNet::OP_DELETE_ARRAY file;
 					}
 					else
 					{
@@ -507,7 +514,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 						char *temp;
 
 						if (useReference==false)
-							temp = RakNet::OP_NEW_ARRAY<char>(patchLength + HASH_LENGTH, _FILE_AND_LINE_ );
+							temp = SLNet::OP_NEW_ARRAY<char>(patchLength + HASH_LENGTH, _FILE_AND_LINE_ );
 						else
 							temp = 0;
 
@@ -532,7 +539,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 							patchList->AddFile(userFilename,userFilename, temp, HASH_LENGTH+patchLength, fileLengthInt, FileListNodeContext(PC_HASH_1_WITH_PATCH,fileIdInt,patchAlgorithm,patchIdInt),true );
 						}
 						PQclear(patchResult);
-						RakNet::OP_DELETE_ARRAY(temp, _FILE_AND_LINE_);
+						SLNet::OP_DELETE_ARRAY(temp, _FILE_AND_LINE_);
 					}
 				}
 				else
@@ -551,7 +558,7 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 
 	return 1;
 }
-bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
+bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(SLNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
 {
 	PGresult *result;
 	char query[1024];
@@ -567,7 +574,7 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 
 	if (applicationName.GetLength()==0)
 	{
-		strcpy(query, 		
+		strcpy_s(query, 		
 			"SELECT tbl1.applicationName, tbl4.* FROM  "
 			"(SELECT applicationID, applicationName FROM Applications) as tbl1, "
 			"(SELECT tbl2.applicationId, tbl2.fileId, tbl2.fileName, tbl2.fileLength, tbl2.contentHash, tbl2.createFile, tbl2.changeSetId, tbl2.content, tbl3.patch, tbl3.patchAlgorithm, tbl3.contentHash as priorHash FROM  "
@@ -588,7 +595,7 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 	}
 	else
 	{
-		strcpy(query, 
+		strcpy_s(query, 
 			"SELECT tbl2.fileId, tbl2.fileName, tbl2.fileLength, tbl2.contentHash, tbl2.createFile, tbl2.changeSetId, tbl2.content, tbl3.patch, tbl3.patchAlgorithm, tbl3.contentHash as priorHash FROM  "
 			"(SELECT * From FileVersionHistory WHERE changeSetId=(SELECT MAX(changeSetId) FROM Applications WHERE applicationName=$1::text)-1 AND changeSetId!=0 "
 			") as tbl2 "
@@ -623,7 +630,7 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 			// Lookup application if unspecified
 			PGresult *result3;
 
-			strcpy(query, 		
+			strcpy_s(query, 		
 				"SELECT applicationName FROM Applications as tbl1, "
 				"(SELECT applicationId From FileVersionHistory WHERE modificationDate=(select MAX(modificationDate) from FileVersionHistory LIMIT 1) LIMIT 1) as tbl2 "
 				"WHERE tbl1.applicationID=tbl2.applicationID;"
@@ -656,18 +663,18 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 		applicationName = PQgetvalue(result, 0, applicationNameColumnIndex);
 	}
 
-	RakNet::RakString escapedApplicationName2 = GetEscapedString(applicationName);
+	SLNet::RakString escapedApplicationName2 = GetEscapedString(applicationName);
 	PGresult *result2;
 	char *ts;
 	int numRows2;
 
 	// For the given application, get the highest file date
-	sprintf(query, 
+	sprintf_s(query, 
 		"SELECT modificationDate from FileVersionHistory WHERE changeSetId=(SELECT changeSetId FROM Applications WHERE applicationName='%s' AND changeSetId!=0 LIMIT 1)-1 LIMIT 1;"
 		, escapedApplicationName2.C_String());
 	if (ExecuteBlockingCommand(query, &result2, false)==false)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -695,12 +702,12 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 
 
 	// In SQL, SELECT (EXTRACT(EPOCH FROM now())) is equivalent to time() function
-	sprintf(query, 
+	sprintf_s(query, 
 		"SELECT modificationDate from FileVersionHistory WHERE changeSetId=(SELECT changeSetId FROM Applications WHERE applicationName='%s' AND changeSetId!=0 LIMIT 1)-2 LIMIT 1;"
 		, escapedApplicationName2.C_String());
 	if (ExecuteBlockingCommand(query, &result2, false)==false)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -708,7 +715,7 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 	numRows2 = PQntuples(result2);
 	if (numRows2==0)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -803,7 +810,7 @@ bool AutopatcherPostgreRepository::GetMostRecentChangelistWithPatches(RakNet::Ra
 	PQclear(result);
 	return true;
 }
-bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
+bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(SLNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
 {
 	PGresult *result;
 	char query[1024];
@@ -819,7 +826,7 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 
 	if (applicationName.GetLength()==0)
 	{
-		strcpy(query, 		
+		strcpy_s(query, 		
 			"SELECT tbl1.applicationName, tbl4.* FROM  "
 			"(SELECT applicationID, applicationName FROM Applications) as tbl1, "
 			"(SELECT tbl2.applicationId, tbl2.fileId, tbl2.fileName, tbl2.fileLength, tbl2.contentHash, tbl2.createFile, tbl2.changeSetId, tbl2.pathToContent, tbl3.patch, tbl3.patchAlgorithm, tbl3.contentHash as priorHash FROM  "
@@ -840,7 +847,7 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 	}
 	else
 	{
-		strcpy(query, 
+		strcpy_s(query, 
 			"SELECT tbl2.fileId, tbl2.fileName, tbl2.fileLength, tbl2.contentHash, tbl2.createFile, tbl2.changeSetId, tbl2.pathToContent, tbl3.patch, tbl3.patchAlgorithm, tbl3.contentHash as priorHash FROM  "
 			"(SELECT * From FileVersionHistory WHERE changeSetId=(SELECT MAX(changeSetId) FROM Applications WHERE applicationName=$1::text)-1 AND changeSetId!=0 "
 			") as tbl2 "
@@ -875,7 +882,7 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 			// Lookup application if unspecified
 			PGresult *result3;
 
-			strcpy(query, 		
+			strcpy_s(query, 		
 				"SELECT applicationName FROM Applications as tbl1, "
 				"(SELECT applicationId From FileVersionHistory WHERE modificationDate=(select MAX(modificationDate) from FileVersionHistory LIMIT 1) LIMIT 1) as tbl2 "
 				"WHERE tbl1.applicationID=tbl2.applicationID;"
@@ -908,18 +915,18 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 		applicationName = PQgetvalue(result, 0, applicationNameColumnIndex);
 	}
 
-	RakNet::RakString escapedApplicationName2 = GetEscapedString(applicationName);
+	SLNet::RakString escapedApplicationName2 = GetEscapedString(applicationName);
 	PGresult *result2;
 	char *ts;
 	int numRows2;
 
 	// For the given application, get the highest file date
-	sprintf(query, 
+	sprintf_s(query, 
 		"SELECT modificationDate from FileVersionHistory WHERE changeSetId=(SELECT changeSetId FROM Applications WHERE applicationName='%s' AND changeSetId!=0 LIMIT 1)-1 LIMIT 1;"
 		, escapedApplicationName2.C_String());
 	if (ExecuteBlockingCommand(query, &result2, false)==false)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -947,12 +954,12 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 
 
 	// In SQL, SELECT (EXTRACT(EPOCH FROM now())) is equivalent to time() function
-	sprintf(query, 
+	sprintf_s(query, 
 		"SELECT modificationDate from FileVersionHistory WHERE changeSetId=(SELECT changeSetId FROM Applications WHERE applicationName='%s' AND changeSetId!=0 LIMIT 1)-2 LIMIT 1;"
 		, escapedApplicationName2.C_String());
 	if (ExecuteBlockingCommand(query, &result2, false)==false)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -960,7 +967,7 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 	numRows2 = PQntuples(result2);
 	if (numRows2==0)
 	{
-		sprintf(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
+		sprintf_s(lastError,"ERROR: Query is bad in file %s at line %i in function GetMostRecentChangelistWithPatches\n",_FILE_AND_LINE_);
 		PQclear(result);
 		PQclear(result2);
 		return false;
@@ -1013,10 +1020,10 @@ bool AutopatcherPostgreRepository2::GetMostRecentChangelistWithPatches(RakNet::R
 				
 				// fileData is given to AddFile
 				char *pathToContent = PQgetvalue(result, rowIndex, pathToContentColumnIndex);
-				FILE *fp = fopen(pathToContent, "rb");
-				if (fp==0)
+				FILE *fp;
+				if (fopen_s(&fp, pathToContent, "rb") != 0)
 				{
-					sprintf(lastError,"ERROR: Cannot open file %s in file %s at line %i in function GetMostRecentChangelistWithPatches\n",pathToContent, _FILE_AND_LINE_);
+					sprintf_s(lastError,"ERROR: Cannot open file %s in file %s at line %i in function GetMostRecentChangelistWithPatches\n",pathToContent, _FILE_AND_LINE_);
 					PQclear(result);
 					return false;
 				}
@@ -1079,7 +1086,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 	filesOnHarddrive.AddFilesFromDirectory(applicationDirectory,"", true, false, true, FileListNodeContext(0,0,0,0));
 	if (filesOnHarddrive.fileList.Size()==0)
 	{
-		sprintf(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
+		sprintf_s(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
 		return false;
 	}
 
@@ -1091,8 +1098,8 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 	if (strlen(userName)>100)
 		return false;
 
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, false)==false)
 	{
@@ -1104,7 +1111,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
+		sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
 		return false;
 	}
 	char *res;
@@ -1124,7 +1131,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 	//sqlCommandMutex.Unlock();
 	PQclear(result);
 
-	sprintf(query, "UPDATE applications SET changeSetId = changeSetId + 1 where applicationID=%i; SELECT changeSetId FROM applications WHERE applicationID=%i;", applicationID, applicationID);
+	sprintf_s(query, "UPDATE applications SET changeSetId = changeSetId + 1 where applicationID=%i; SELECT changeSetId FROM applications WHERE applicationID=%i;", applicationID, applicationID);
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, true)==false)
 	{
@@ -1136,7 +1143,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: applicationID %i not found in UpdateApplicationFiles\n", applicationID);
+		sprintf_s(lastError,"ERROR: applicationID %i not found in UpdateApplicationFiles\n", applicationID);
 		Rollback();
 		return false;
 	}
@@ -1150,7 +1157,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 
 	// Gets all newest files
 	// TODO - This can be non-blocking
-	sprintf(query, "SELECT DISTINCT ON (filename) filename, contentHash, createFile FROM FileVersionHistory WHERE applicationID=%i ORDER BY filename, fileId DESC;", applicationID);
+	sprintf_s(query, "SELECT DISTINCT ON (filename) filename, contentHash, createFile FROM FileVersionHistory WHERE applicationID=%i ORDER BY filename, fileId DESC;", applicationID);
 	//sqlCommandMutex.Lock();
 	result = PQexecParams(pgConn, query,0,0,0,0,0,PQEXECPARAM_FORMAT_BINARY);
 	//sqlCommandMutex.Unlock();
@@ -1169,9 +1176,9 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 
 	unsigned fileListIndex;
 	int rowIndex;
-	RakNet::RakString hardDriveFilename;
+	SLNet::RakString hardDriveFilename;
 	char *hardDriveHash;
-	RakNet::RakString queryFilename;
+	SLNet::RakString queryFilename;
 	char *createFileResult;
 	char *hash;
 	bool addFile;
@@ -1258,7 +1265,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 			printf("Tagging deleted files %i/%i\n", fileListIndex+1, deletedFiles.fileList.Size());
 
 		// BUGGED
-		sprintf(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, $1::text,FALSE,%i,'%s');", applicationID, changeSetId, GetEscapedString(userName).C_String());
+		sprintf_s(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, $1::text,FALSE,%i,'%s');", applicationID, changeSetId, GetEscapedString(userName).C_String());
 		outTemp[0]=deletedFiles.fileList[fileListIndex].filename.C_String();
 		outLengths[0]=(int)deletedFiles.fileList[fileListIndex].filename.GetLength();
 		formats[0]=PQEXECPARAM_FORMAT_TEXT;
@@ -1303,12 +1310,12 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 		hardDriveDataLength=newFiles.fileList[fileListIndex].fileLengthBytes;
 
 		char path[MAX_PATH];
-		strcpy(path, applicationDirectory);
-		strcat(path, "/");
-		strcat(path, newFiles.fileList[fileListIndex].fullPathToFile);
+		strcpy_s(path, applicationDirectory);
+		strcat_s(path, "/");
+		strcat_s(path, newFiles.fileList[fileListIndex].fullPathToFile);
 
-		FILE *fp = fopen(path, "rb");
-		if (fp==0)
+		FILE *fp;
+		if (fopen_s(&fp, path, "rb") != 0)
 		{
 			newFiles.Clear();
 			PQclear(fileRows);
@@ -1320,7 +1327,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 		fread(hardDriveData,1,hardDriveDataLength,fp);
 		fclose(fp);
 
-		sprintf( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename=$1::text AND createFile=TRUE;", applicationID );
+		sprintf_s( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename=$1::text AND createFile=TRUE;", applicationID );
 		outTemp[0]=hardDriveFilename;
 		outLengths[0]=(int)strlen(hardDriveFilename);
 		formats[0]=PQEXECPARAM_FORMAT_TEXT;
@@ -1352,7 +1359,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 			outLengths[0]=fileIDLength;
 			
 			// The last query handled all the relevant comparisons
-			sprintf(query, "SELECT content from FileVersionHistory WHERE fileID=$1::int;" );
+			sprintf_s(query, "SELECT content from FileVersionHistory WHERE fileID=$1::int;" );
 			//sqlCommandMutex.Lock();
 			result = PQexecParams(pgConn, query,1,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 			//sqlCommandMutex.Unlock();
@@ -1386,7 +1393,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 			{
 				rakFree_Ex(hardDriveData, _FILE_AND_LINE_);
 
-				strcpy(lastError,"CreatePatch failed.\n");
+				strcpy_s(lastError,"CreatePatch failed.\n");
 				Rollback();
 
 				newFiles.Clear();
@@ -1406,7 +1413,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 			
 			//sqlCommandMutex.Lock();
 			char buff[256];
-			sprintf(buff, "UPDATE FileVersionHistory SET patch=$1::bytea, patchAlgorithm=0 where fileID=%s;", fileID);
+			sprintf_s(buff, "UPDATE FileVersionHistory SET patch=$1::bytea, patchAlgorithm=0 where fileID=%s;", fileID);
 			uploadResult = PQexecParams(pgConn, buff, 1,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 			
 			// Done with this patch data
@@ -1430,7 +1437,7 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 		PQclear(fileRows);
 
 		// Add totally new files
-		sprintf(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, content, contentHash, createFile, changeSetID, userName) "
+		sprintf_s(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, content, contentHash, createFile, changeSetID, userName) "
 			"VALUES ("
 			"%i,"
 			"$1::text,"
@@ -1506,7 +1513,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	filesOnHarddrive.AddFilesFromDirectory(applicationDirectory,"", true, false, true, FileListNodeContext(0,0,0,0));
 	if (filesOnHarddrive.fileList.Size()==0)
 	{
-		sprintf(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
+		sprintf_s(lastError,"ERROR: Can't find files at %s in UpdateApplicationFiles\n",applicationDirectory);
 		return false;
 	}
 
@@ -1518,8 +1525,8 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	if (strlen(userName)>100)
 		return false;
 
-	RakNet::RakString escapedApplicationName = GetEscapedString(applicationName);
-	sprintf(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
+	SLNet::RakString escapedApplicationName = GetEscapedString(applicationName);
+	sprintf_s(query, "SELECT applicationID FROM applications WHERE applicationName='%s';", escapedApplicationName.C_String());
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, false)==false)
 	{
@@ -1531,7 +1538,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
+		sprintf_s(lastError,"ERROR: %s not found in UpdateApplicationFiles\n",applicationName);
 		return false;
 	}
 	char *res;
@@ -1551,7 +1558,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	//sqlCommandMutex.Unlock();
 	PQclear(result);
 
-	sprintf(query, "UPDATE applications SET changeSetId = changeSetId + 1 where applicationID=%i; SELECT changeSetId FROM applications WHERE applicationID=%i;", applicationID, applicationID);
+	sprintf_s(query, "UPDATE applications SET changeSetId = changeSetId + 1 where applicationID=%i; SELECT changeSetId FROM applications WHERE applicationID=%i;", applicationID, applicationID);
 	//sqlCommandMutex.Lock();
 	if (ExecuteBlockingCommand(query, &result, true)==false)
 	{
@@ -1563,7 +1570,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	numRows = PQntuples(result);
 	if (numRows==0)
 	{
-		sprintf(lastError,"ERROR: applicationID %i not found in UpdateApplicationFiles\n", applicationID);
+		sprintf_s(lastError,"ERROR: applicationID %i not found in UpdateApplicationFiles\n", applicationID);
 		Rollback();
 		return false;
 	}
@@ -1577,7 +1584,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 
 	// Gets all newest files
 	// TODO - This can be non-blocking
-	sprintf(query, "SELECT DISTINCT ON (filename) filename, contentHash, createFile FROM FileVersionHistory WHERE applicationID=%i ORDER BY filename, fileId DESC;", applicationID);
+	sprintf_s(query, "SELECT DISTINCT ON (filename) filename, contentHash, createFile FROM FileVersionHistory WHERE applicationID=%i ORDER BY filename, fileId DESC;", applicationID);
 	//sqlCommandMutex.Lock();
 	result = PQexecParams(pgConn, query,0,0,0,0,0,PQEXECPARAM_FORMAT_BINARY);
 	//sqlCommandMutex.Unlock();
@@ -1596,9 +1603,9 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 
 	unsigned fileListIndex;
 	int rowIndex;
-	RakNet::RakString hardDriveFilename;
+	SLNet::RakString hardDriveFilename;
 	char *hardDriveHash;
-	RakNet::RakString queryFilename;
+	SLNet::RakString queryFilename;
 	char *createFileResult;
 	char *hash;
 	bool addFile;
@@ -1685,7 +1692,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 			printf("Tagging deleted files %i/%i\n", fileListIndex+1, deletedFiles.fileList.Size());
 
 		// BUGGED
-		sprintf(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, $1::text,FALSE,%i,'%s');", applicationID, changeSetId, GetEscapedString(userName).C_String());
+		sprintf_s(query, "INSERT INTO FileVersionHistory(applicationID, filename, createFile, changeSetID, userName) VALUES (%i, $1::text,FALSE,%i,'%s');", applicationID, changeSetId, GetEscapedString(userName).C_String());
 		outTemp[0]=deletedFiles.fileList[fileListIndex].filename.C_String();
 		outLengths[0]=(int)deletedFiles.fileList[fileListIndex].filename.GetLength();
 		formats[0]=PQEXECPARAM_FORMAT_TEXT;
@@ -1729,12 +1736,12 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 		hardDriveDataLength=newFiles.fileList[fileListIndex].fileLengthBytes;
 
 		char pathToNewContent[MAX_PATH];
-		strcpy(pathToNewContent, applicationDirectory);
-		strcat(pathToNewContent, "/");
-		strcat(pathToNewContent, newFiles.fileList[fileListIndex].fullPathToFile);
+		strcpy_s(pathToNewContent, applicationDirectory);
+		strcat_s(pathToNewContent, "/");
+		strcat_s(pathToNewContent, newFiles.fileList[fileListIndex].fullPathToFile);
 
 
-		sprintf( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename=$1::text AND createFile=TRUE;", applicationID );
+		sprintf_s( query, "SELECT fileID from FileVersionHistory WHERE applicationID=%i AND filename=$1::text AND createFile=TRUE;", applicationID );
 		outTemp[0]=hardDriveFilename;
 		outLengths[0]=(int)strlen(hardDriveFilename);
 		formats[0]=PQEXECPARAM_FORMAT_TEXT;
@@ -1755,8 +1762,8 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 		outLengths[0]=(int)strlen(hardDriveFilename);
 
 		/*
-		FILE *fp = fopen(pathToNewContent, "rb");
-		if (fp==0)
+		FILE *fp;
+		if (fopen_s(&fp, pathToNewContent, "rb") != 0)
 		{
 			newFiles.Clear();
 			PQclear(fileRows);
@@ -1779,7 +1786,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 			outLengths[0]=fileIDLength;
 
 			// The last query handled all the relevant comparisons
-			sprintf(query, "SELECT pathToContent from FileVersionHistory WHERE fileID=$1::int;" );
+			sprintf_s(query, "SELECT pathToContent from FileVersionHistory WHERE fileID=$1::int;" );
 			//sqlCommandMutex.Lock();
 			result = PQexecParams(pgConn, query,1,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 			//sqlCommandMutex.Unlock();
@@ -1814,7 +1821,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 			{
 //				rakFree_Ex(newContent, _FILE_AND_LINE_);
 
-				sprintf(lastError,"New file version cannot have the same path as the old file version. Path=%s.\n", pathToNewContent);
+				sprintf_s(lastError,"New file version cannot have the same path as the old file version. Path=%s.\n", pathToNewContent);
 				Rollback();
 
 				newFiles.Clear();
@@ -1828,7 +1835,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 			int makePatchResult=MakePatch(pathToOldContent, pathToNewContent, &patch, &patchLength, &patchAlgorithm);
 			if (makePatchResult < 0 || makePatchResult == 2)
 			{
-				strcpy(lastError,"MakePatch failed.\n");
+				strcpy_s(lastError,"MakePatch failed.\n");
 				Rollback();
 
 				newFiles.Clear();
@@ -1839,7 +1846,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 			if (makePatchResult ==1)
 			{
 				PQclear(result);
-				strcpy(lastError,"MakePatch skipped - No old version on disk.\n");
+				strcpy_s(lastError,"MakePatch skipped - No old version on disk.\n");
 			}
 			else
 			{
@@ -1850,7 +1857,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 					rakFree_Ex(oldContent, _FILE_AND_LINE_);
 					rakFree_Ex(newContent, _FILE_AND_LINE_);
 
-					strcpy(lastError,"CreatePatch failed.\n");
+					strcpy_s(lastError,"CreatePatch failed.\n");
 					Rollback();
 
 					newFiles.Clear();
@@ -1874,7 +1881,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 				//sqlCommandMutex.Lock();
 				formats[0]=PQEXECPARAM_FORMAT_BINARY;
 				char buff[256];
-				sprintf(buff, "UPDATE FileVersionHistory SET patch=$1::bytea, patchAlgorithm=%i where fileID=%s;", patchAlgorithm, fileID);
+				sprintf_s(buff, "UPDATE FileVersionHistory SET patch=$1::bytea, patchAlgorithm=%i where fileID=%s;", patchAlgorithm, fileID);
 				uploadResult = PQexecParams(pgConn, buff, 1,0,outTemp,outLengths,formats,PQEXECPARAM_FORMAT_BINARY);
 
 				// Done with this patch data
@@ -1903,7 +1910,7 @@ bool AutopatcherPostgreRepository2::UpdateApplicationFiles(const char *applicati
 	//	newContent=0;
 
 		// Add totally new files
-		sprintf(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, pathToContent, contentHash, createFile, changeSetID, userName) "
+		sprintf_s(query, "INSERT INTO FileVersionHistory (applicationID, filename, fileLength, pathToContent, contentHash, createFile, changeSetID, userName) "
 			"VALUES ("
 			"%i,"
 			"$1::text,"
@@ -1974,13 +1981,13 @@ int AutopatcherPostgreRepository2::MakePatch(const char *oldFile, const char *ne
 {
 	*patchAlgorithm=0;
 
-	FILE *fpOld = fopen(oldFile, "rb");
-	if (fpOld==0)
+	FILE *fpOld;
+	if (fopen_s(&fpOld, oldFile, "rb") != 0)
 		return 1;
 	fseek(fpOld, 0, SEEK_END);
 	int contentLengthOld = ftell(fpOld);
-	FILE *fpNew = fopen(newFile, "rb");
-	if (fpNew==0)
+	FILE *fpNew;
+	if (fopen_s(&fpNew, newFile, "rb") != 0)
 	{
 		fclose(fpOld);
 		return 2;
@@ -2038,9 +2045,9 @@ unsigned int AutopatcherPostgreRepository::GetPatchPart( const char *filename, u
 
 	bool firstBlock=startReadBytes==0;
 	if (firstBlock)
-		sprintf(query, "SELECT substring(patch from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead-HASH_LENGTH,context.flnc_extraData3);
+		sprintf_s(query, "SELECT substring(patch from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead-HASH_LENGTH,context.flnc_extraData3);
 	else
-		sprintf(query, "SELECT substring(patch from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1-HASH_LENGTH,numBytesToRead,context.flnc_extraData3);
+		sprintf_s(query, "SELECT substring(patch from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1-HASH_LENGTH,numBytesToRead,context.flnc_extraData3);
 
 
 	// CREATE NEW CONNECTION JUST FOR THIS QUERY
@@ -2066,7 +2073,7 @@ unsigned int AutopatcherPostgreRepository::GetPatchPart( const char *filename, u
 	{
 		PGresult *result2;
 		char query2[512];
-		sprintf(query2, "SELECT contentHash FROM FileVersionHistory WHERE fileId=%i;", context.flnc_extraData1);
+		sprintf_s(query2, "SELECT contentHash FROM FileVersionHistory WHERE fileId=%i;", context.flnc_extraData1);
 
 		result2 = PQexecParams(filePartConnection, query2,0,0,0,0,0,PQEXECPARAM_FORMAT_BINARY);
 
@@ -2102,7 +2109,7 @@ unsigned int AutopatcherPostgreRepository::GetFilePart( const char *filename, un
 		int contentLength;
 
 		// Seems that substring is 1 based for its index, so add 1 to startReadBytes
-		sprintf(query, "SELECT substring(content from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead,context.flnc_extraData1);
+		sprintf_s(query, "SELECT substring(content from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead,context.flnc_extraData1);
 
 		// CREATE NEW CONNECTION JUST FOR THIS QUERY
 		// This is because the autopatcher is sharing this class, but this is called from multiple threads and mysql is not threadsafe
@@ -2138,12 +2145,13 @@ unsigned int AutopatcherPostgreRepository2::GetFilePart( const char *filename, u
 
 		RakAssert(context.op==PC_WRITE_FILE)
 
-		sprintf(query, "SELECT pathToContent FROM FileVersionHistory WHERE fileId=%i;", context.flnc_extraData1);
+		sprintf_s(query, "SELECT pathToContent FROM FileVersionHistory WHERE fileId=%i;", context.flnc_extraData1);
 		bool res = ExecuteBlockingCommand(query, &result, true);
 		char *path;
 		path = PQgetvalue(result,0,0);
 
-		FILE *fp = fopen(path, "rb");
+		FILE *fp;
+		fopen_s(&fp, path, "rb");
 		fseek(fp, 0, SEEK_END);
 		unsigned int fileLength = ftell(fp);
 		fseek(fp, startReadBytes, SEEK_SET);

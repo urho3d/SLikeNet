@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -17,9 +22,9 @@
 #ifndef __SQL_LITE_CLIENT_LOGGER_RAKNET_STATISTICS_H_
 #define __SQL_LITE_CLIENT_LOGGER_RAKNET_STATISTICS_H_
 
-#include "PluginInterface2.h"
+#include "slikenet/PluginInterface2.h"
 
-namespace RakNet
+namespace SLNet
 {
 	/// \ingroup PACKETLOGGER_GROUP
 	/// \brief Packetlogger that outputs to a file
@@ -30,7 +35,7 @@ namespace RakNet
 		virtual ~SQLiteClientLogger_RakNetStatistics();
 		virtual void Update(void);
 	protected:
-		RakNet::TimeUS lastUpdate;
+		SLNet::TimeUS lastUpdate;
 	};
 }
 

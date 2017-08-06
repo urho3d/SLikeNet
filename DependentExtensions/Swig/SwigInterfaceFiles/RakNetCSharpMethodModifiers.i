@@ -1,3 +1,8 @@
+//
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+//
+
 //----------------------------Method modifiers---------------------
 //These modify the method types by default it uses just publix x, here you can specify ovverideds private functions
 //and such. Many times this is used to hide the helper functions from the user
