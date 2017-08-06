@@ -1,13 +1,23 @@
 #This file includes the global macros for the RakNet CMake files
 
+#
+# This file was taken from RakNet 4.082.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+#
+# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+#
+# This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+# license found in the license.txt file in the root directory of this source tree.
+#
+
 MACRO(STANDARDSUBPROJECT PROJECTNAME)#Many of the projects just need the cpp files compiled and the header added to the project, this avoids repeating code
 	project(${PROJECTNAME})
 	FILE(GLOB ALL_CPP_SRCS *.cpp)
 	FILE(GLOB ALL_HEADER_SRCS *.h)
-	FILE(GLOB READMES readme.txt Specification.txt)
 	include_directories(${RAKNETHEADERFILES} ./) 
 	FIXCOMPILEOPTIONS()
-	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${READMES})
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS})
 	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS})
 	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
 ENDMACRO(STANDARDSUBPROJECT)
@@ -16,10 +26,9 @@ MACRO(STANDARDSUBPROJECTWITHOPTIONS PROJECTNAME EXTRAINCLUDES EXTRASOURCES EXTRA
 	project(${PROJECTNAME})
 	FILE(GLOB ALL_CPP_SRCS *.cpp)
 	FILE(GLOB ALL_HEADER_SRCS *.h)
-	FILE(GLOB READMES readme.txt Specification.txt)
 	FIXCOMPILEOPTIONS()
 	include_directories(${RAKNETHEADERFILES} ./ ${EXTRAINCLUDES}) 
-	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES} ${READMES})
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES})
 	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS} ${EXTRALIBS})
 	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
 ENDMACRO(STANDARDSUBPROJECTWITHOPTIONS)
@@ -28,10 +37,9 @@ MACRO(STANDARDSUBPROJECTWITHOPTIONSSET PROJECTNAME)#Same as STANDARDSUBPROJECT b
 	project(${PROJECTNAME})
 	FILE(GLOB ALL_CPP_SRCS *.cpp)
 	FILE(GLOB ALL_HEADER_SRCS *.h)
-	FILE(GLOB READMES readme.txt Specification.txt)
 	FIXCOMPILEOPTIONS()
 	include_directories(${RAKNETHEADERFILES} ./ ${EXTRAINCLUDES}) 
-	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES} ${READMES})
+	add_executable(${PROJECTNAME} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${EXTRASOURCES})
 	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS} ${EXTRALIBS})
 	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
 ENDMACRO(STANDARDSUBPROJECTWITHOPTIONSSET) 
@@ -40,10 +48,9 @@ MACRO(STANDARDCSUBPROJECT PROJECTNAME)#Same as STANDARDSUBPROJECT but for C file
 	project(${PROJECTNAME})
 	FILE(GLOB ALL_C_SRCS *.c)
 	FILE(GLOB ALL_HEADER_SRCS *.h)
-	FILE(GLOB READMES readme.txt Specification.txt)
 	include_directories(${RAKNETHEADERFILES} ./) 
 	FIXCOMPILEOPTIONS()
-	add_executable(${PROJECTNAME} ${ALL_C_SRCS} ${ALL_HEADER_SRCS} ${READMES})
+	add_executable(${PROJECTNAME} ${ALL_C_SRCS} ${ALL_HEADER_SRCS})
 	target_link_libraries(${PROJECTNAME} ${RAKNET_COMMON_LIBS})
 	set_target_properties(${PROJECTNAME} PROPERTIES PROJECT_GROUP Samples)
 ENDMACRO(STANDARDCSUBPROJECT)
@@ -99,9 +106,5 @@ MACRO(FIXLINKOPTIONS)#Fix added link options that may cause problems
 		ENDIF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
 	ENDIF(WIN32 AND NOT UNIX)
 ENDMACRO(FIXLINKOPTIONS)
-
-MACRO(FINDREADMES)
-	FILE(GLOB READMES readme.txt)
-ENDMACRO(FINDREADMES)
 
 include(${RakNet_SOURCE_DIR}/CmakeIncludes/FindMacros.txt)#The macros for setting variables and performing finds

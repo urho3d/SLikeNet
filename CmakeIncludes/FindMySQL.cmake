@@ -9,6 +9,11 @@
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
+# Note: The referenced COPYING-CMAKE-SCRIPTS file was not present in the RakNet
+# repository. We also failed to get in touch with the copyright holder by mail
+# to clarify the situation. To the best of our knowledge the referenced license
+# is the Modified BSD License.
 
 if(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
    set(MYSQL_FOUND TRUE)

@@ -12,6 +12,11 @@ include(${RakNet_SOURCE_DIR}/CmakeIncludes/Ogre3D/FindPkgMacros.cmake)
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
+#
+# This file was taken from RakNet 4.082 without any modifications.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+
 # - Try to find OGRE
 # If you have multiple versions of Ogre installed, use the CMake or
 # the environment variable OGRE_HOME to point to the path where the

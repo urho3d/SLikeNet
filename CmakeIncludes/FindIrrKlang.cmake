@@ -10,14 +10,16 @@
 #
 #  Redistribution and use is allowed according to the terms of the New
 #  BSD license.
-#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#  For details see the accompanying FindIrrlicht CMake License.txt in the license directory
+#  in the root of the source tree.
 #
 
 
 if (IRRKLANG_LIBRARIES AND IRRKLANG_INCLUDE_DIRS)
   # in cache already
   set(IRRKLANG_FOUND TRUE)
-else (IRRKLANG_LIBRARIES AND IRRKLANG_INCLUDE_DIRS)
+else (IRRKLANG_LIBRARIES AND IRRKLANG_INCLUDE_DIRS)
+
   find_path(IRRKLANG_INCLUDE_DIR
     NAMES
       irrKlang.h
