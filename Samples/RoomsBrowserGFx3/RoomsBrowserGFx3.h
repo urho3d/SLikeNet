@@ -1,16 +1,21 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 #include "FxGameDelegate.h"
-#include "RakString.h"
+#include "slikenet/string.h"
 
 #define ACTIONSCRIPT_CALLABLE_HEADER(functionName) virtual void functionName(const FxDelegateArgs& pparams);
 #define ACTIONSCRIPT_CALLABLE_FUNCTION(className, functionName) \
@@ -36,7 +41,7 @@ public:
 
 	virtual const char *QueryPlatform(void) const=0;
 	virtual void SaveProperty(const char *propertyId, const char *propertyValue)=0;
-	virtual void LoadProperty(const char *propertyId, RakNet::RakString &propertyOut)=0;
+	virtual void LoadProperty(const char *propertyId, SLNet::RakString &propertyOut)=0;
 
 	// Calls from Flash
 	ACTIONSCRIPT_CALLABLE_HEADER(f2c_QueryPlatform);

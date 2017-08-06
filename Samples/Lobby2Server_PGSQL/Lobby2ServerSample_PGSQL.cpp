@@ -1,25 +1,32 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "Lobby2Message.h"
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "MessageIdentifiers.h"
-#include "Kbhit.h"
-#include "RakSleep.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
 #include "Lobby2Server_PGSQL.h"
 #include "Lobby2Message_PGSQL.h"
 #include "ProfanityFilter.h"
 #include <ctype.h>
 #include <stdlib.h>
-#include "Gets.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 
 #ifdef __INTEGRATE_LOBBY2_WITH_ROOMS_PLUGIN
@@ -27,11 +34,11 @@
 #endif
 
 //#define _ALSO_ACT_AS_NAT_PUNCH_SERVER
-#include "NatPunchthroughServer.h"
-#include "UDPProxyCoordinator.h"
-#include "UDPProxyServer.h"
-#include "NatTypeDetectionServer.h"
-#include "SocketLayer.h"
+#include "slikenet/NatPunchthroughServer.h"
+#include "slikenet/UDPProxyCoordinator.h"
+#include "slikenet/UDPProxyServer.h"
+#include "slikenet/NatTypeDetectionServer.h"
+#include "slikenet/SocketLayer.h"
 static const char *COORDINATOR_PASSWORD="Dummy Coordinator Password";
 #ifdef _ALSO_ACT_AS_NAT_PUNCH_SERVER
 
@@ -43,18 +50,18 @@ void main(void)
 	printf("Difficulty: Intermediate\n\n");
 
 	char serverPort[30];
-	RakNet::RakPeerInterface *rakPeer=RakNet::RakPeerInterface::GetInstance();
-	rakPeer->SetTimeoutTime(5000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-	//rakPeer->SetTimeoutTime(3000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+	SLNet::RakPeerInterface *rakPeer= SLNet::RakPeerInterface::GetInstance();
+	rakPeer->SetTimeoutTime(5000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+	//rakPeer->SetTimeoutTime(3000,SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 	puts("Enter the rakPeer port to listen on");
 	serverPort[0]=0;
 	Gets(serverPort,sizeof(serverPort));
 	if (serverPort[0]==0)
-		strcpy(serverPort, "61111");
+		strcpy_s(serverPort, "61111");
 
-	RakNet::SocketDescriptor socketDescriptor(atoi(serverPort),0);
+	SLNet::SocketDescriptor socketDescriptor(atoi(serverPort),0);
 	rakPeer->SetMaximumIncomingConnections(32);
-	if (rakPeer->Startup(32,&socketDescriptor, 1)!=RakNet::RAKNET_STARTED)
+	if (rakPeer->Startup(32,&socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 	{
 		printf("Startup call failed\n");
 		return;
@@ -63,17 +70,17 @@ void main(void)
 		printf("Started on port %i\n", socketDescriptor.port);
 	// Attach the plugin Lobby2Server
 	// The class factory will create messages with server functionality
-	RakNet::Lobby2Server_PGSQL lobby2Server;
+	SLNet::Lobby2Server_PGSQL lobby2Server;
 	rakPeer->AttachPlugin(&lobby2Server);
-	RakNet::Lobby2MessageFactory_PGSQL messageFactory;
+	SLNet::Lobby2MessageFactory_PGSQL messageFactory;
 	lobby2Server.SetMessageFactory(&messageFactory);
 
 	// This is optional:
 #ifdef __INTEGRATE_LOBBY2_WITH_ROOMS_PLUGIN
-	RakNet::RoomsPlugin roomsPluginServer;
+	SLNet::RoomsPlugin roomsPluginServer;
 	rakPeer->AttachPlugin(&roomsPluginServer);
 	lobby2Server.SetRoomsPlugin(&roomsPluginServer);
-	RakNet::ProfanityFilter profanityFilter;
+	SLNet::ProfanityFilter profanityFilter;
 	profanityFilter.AddWord("Penis");
 	roomsPluginServer.SetProfanityFilter(&profanityFilter);
 	roomsPluginServer.roomsContainer.AddTitle("Test Title Name");
@@ -82,11 +89,11 @@ void main(void)
 	printf("Enter database password:\n");
 	char connectionString[256],password[128];
 	char username[256];
-	strcpy(username, "postgres");
+	strcpy_s(username, "postgres");
 	password[0]=0;
 	Gets(password,sizeof(password));
-	if (password[0]==0) strcpy(password, "aaaa");
-	strcpy(connectionString, "user=");
+	if (password[0]==0) strcpy_s(password, "aaaa");
+	strcpy_s(connectionString, "user=");
 	strcat(connectionString, username);
 	strcat(connectionString, " password=");
 	strcat(connectionString, password);
@@ -100,7 +107,7 @@ void main(void)
 	printf("Lobby2Server started and waiting for connections\n");
 
 
-	RakNet::Lobby2Server::ConfigurationProperties c;
+	SLNet::Lobby2Server::ConfigurationProperties c;
 	c.requiresEmailAddressValidationToLogin=false;
 	c.requiresTitleToLogin=true;
 	c.accountRegistrationRequiresCDKey=false;
@@ -108,20 +115,20 @@ void main(void)
 	lobby2Server.SetConfigurationProperties(c);
 
 #ifdef _ALSO_ACT_AS_NAT_PUNCH_SERVER
-	RakNet::NatPunchthroughServer natPunchthroughServer;
-	RakNet::UDPProxyCoordinator udpProxyCoordinator;
-	RakNet::UDPProxyServer udpProxyServer;
-	RakNet::NatTypeDetectionServer natTypeDetectionServer;
+	SLNet::NatPunchthroughServer natPunchthroughServer;
+	SLNet::UDPProxyCoordinator udpProxyCoordinator;
+	SLNet::UDPProxyServer udpProxyServer;
+	SLNet::NatTypeDetectionServer natTypeDetectionServer;
 	udpProxyCoordinator.SetRemoteLoginPassword(COORDINATOR_PASSWORD);
 	rakPeer->AttachPlugin(&natPunchthroughServer);
 	rakPeer->AttachPlugin(&udpProxyServer);
 	rakPeer->AttachPlugin(&udpProxyCoordinator);
 	rakPeer->AttachPlugin(&natTypeDetectionServer);
 	char ipListStr[ MAXIMUM_NUMBER_OF_INTERNAL_IDS ][ 128 ];
-	RakNet::SystemAddress ipList[ MAXIMUM_NUMBER_OF_INTERNAL_IDS ];
+	SLNet::SystemAddress ipList[ MAXIMUM_NUMBER_OF_INTERNAL_IDS ];
 	for (int i=0; i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
 		ipList[i].ToString(false,ipListStr[i]);
-	RakNet::SocketLayer::GetMyIP( ipList );
+	SLNet::SocketLayer::GetMyIP( ipList );
 	natTypeDetectionServer.Startup(ipListStr[1], ipListStr[2], ipListStr[3]);
 	// Login proxy server to proxy coordinator
 	// Normally the proxy server is on a different computer. Here, we login to our own IP address since the plugin is on the same system
@@ -130,9 +137,9 @@ void main(void)
 	udpProxyServer.LoginToCoordinator(COORDINATOR_PASSWORD, rakPeer->GetMyBoundAddress());
 #endif
 
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	// Loop for input
-	while (1)
+	for(;;)
 	{
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 		{
@@ -165,5 +172,5 @@ void main(void)
 		//printf("%i ", lobby2Server.GetUsers().Size());
 	}
 
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 }

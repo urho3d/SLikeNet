@@ -1,35 +1,43 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "Lobby2Client_Steam.h" // If Lobby2Client_Steam.h is included before SocketLayer.h, then it will use the steam send functions
 #include "Lobby2Message_Steam.h"
-#include "RakNetTime.h"
-#include "RakSleep.h"
-#include "RakNetTypes.h"
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/time.h"
+#include "slikenet/sleep.h"
+#include "slikenet/types.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
 #include <windows.h>
-#include <Kbhit.h>
-#include "Gets.h"
-#include "FullyConnectedMesh2.h"
+#include <slikenet/Kbhit.h>
+#include "slikenet/Gets.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#pragma warning( push )
+#pragma warning(disable:4127)	// conditional expression is constant (with Steamworks 1.23a)
 #include "steam_api.h"
+#pragma warning( pop )
 
-using namespace RakNet;
+using namespace SLNet;
 
 Lobby2MessageFactory_Steam *messageFactory;
 Lobby2Client_Steam *lobby2Client;
-RakNet::RakPeerInterface *rakPeer;
-RakNet::FullyConnectedMesh2 *fcm2;
+SLNet::RakPeerInterface *rakPeer;
+SLNet::FullyConnectedMesh2 *fcm2;
 uint64_t lastRoom;
 
 void PrintCommands(void)
@@ -45,12 +53,12 @@ void PrintCommands(void)
 	printf("(Escape). Quit\n");
 }
 
-struct SteamResults : public RakNet::Lobby2Callbacks
+struct SteamResults : public SLNet::Lobby2Callbacks
 {
-	virtual void MessageResult(RakNet::Notification_Console_MemberJoinedRoom *message)
+	virtual void MessageResult(SLNet::Notification_Console_MemberJoinedRoom *message)
 	{
-		RakNet::Notification_Console_MemberJoinedRoom_Steam *msgSteam = (RakNet::Notification_Console_MemberJoinedRoom_Steam *) message;
-		RakNet::RakString msg;
+		SLNet::Notification_Console_MemberJoinedRoom_Steam *msgSteam = (SLNet::Notification_Console_MemberJoinedRoom_Steam *) message;
+		SLNet::RakString msg;
 		msgSteam->DebugMsg(msg);
 		printf("%s\n", msg.C_String());
 		// Guy with the lower ID connects to the guy with the higher ID
@@ -65,10 +73,10 @@ struct SteamResults : public RakNet::Lobby2Callbacks
 		}
 	}
 
-	virtual void MessageResult(RakNet::Console_SearchRooms *message)
+	virtual void MessageResult(SLNet::Console_SearchRooms *message)
 	{
-		RakNet::Console_SearchRooms_Steam *msgSteam = (RakNet::Console_SearchRooms_Steam *) message;
-		RakNet::RakString msg;
+		SLNet::Console_SearchRooms_Steam *msgSteam = (SLNet::Console_SearchRooms_Steam *) message;
+		SLNet::RakString msg;
 		msgSteam->DebugMsg(msg);
 		printf("%s\n", msg.C_String());
 		if (msgSteam->roomIds.GetSize()>0)
@@ -77,9 +85,9 @@ struct SteamResults : public RakNet::Lobby2Callbacks
 		}
 	}
 
-	virtual void ExecuteDefaultResult(RakNet::Lobby2Message *message)
+	virtual void ExecuteDefaultResult(SLNet::Lobby2Message *message)
 	{
-		RakNet::RakString out;
+		SLNet::RakString out;
 		message->DebugMsg(out);
 		printf("%s\n", out.C_String());
 	}
@@ -97,8 +105,8 @@ int main(int argc, char **argv)
 	}
 
 	SteamResults steamResults;
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
-	fcm2 = RakNet::FullyConnectedMesh2::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
+	fcm2 = SLNet::FullyConnectedMesh2::GetInstance();
 	messageFactory = new Lobby2MessageFactory_Steam;
 	lobby2Client = Lobby2Client_Steam::GetInstance();
 	lobby2Client->AddCallbackInterface(&steamResults);
@@ -110,7 +118,7 @@ int main(int argc, char **argv)
 	rakPeer->AttachPlugin(lobby2Client);
 	// Connect manually in Notification_Console_MemberJoinedRoom
 	fcm2->SetConnectOnNewRemoteConnection(false, "");
-	RakNet::Lobby2Message* msg = messageFactory->Alloc(RakNet::L2MID_Client_Login);
+	SLNet::Lobby2Message* msg = messageFactory->Alloc(SLNet::L2MID_Client_Login);
 	lobby2Client->SendMsg(msg);
 	if (msg->resultCode!=L2RC_PROCESSING && msg->resultCode!=L2RC_SUCCESS)
 	{
@@ -127,7 +135,7 @@ int main(int argc, char **argv)
 	char ch;
 	while(!quit)
 	{
-		RakNet::Packet *packet;
+		SLNet::Packet *packet;
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 		{
 			switch (packet->data[0])
@@ -181,11 +189,11 @@ int main(int argc, char **argv)
 
 			case ID_FCM2_NEW_HOST:
 				{
-					if (packet->systemAddress==RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+					if (packet->systemAddress== SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 						printf("Got new host (ourselves)");
 					else
 						printf("Got new host %s, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
-					RakNet::BitStream bs(packet->data,packet->length,false);
+					SLNet::BitStream bs(packet->data,packet->length,false);
 					bs.IgnoreBytes(1);
 					RakNetGUID oldHost;
 					bs.Read(oldHost);
@@ -204,16 +212,16 @@ int main(int argc, char **argv)
 			}
 
 		}
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=(char)getch();
+			ch=(char)_getch();
 
 			switch (ch)
 			{
 			case 'a':
 				{
 
-					RakNet::Lobby2Message* logoffMsg = messageFactory->Alloc(RakNet::L2MID_Console_SearchRooms);
+					SLNet::Lobby2Message* logoffMsg = messageFactory->Alloc(SLNet::L2MID_Console_SearchRooms);
 					lobby2Client->SendMsg(logoffMsg);
 					messageFactory->Dealloc(logoffMsg);
 				}
@@ -226,7 +234,7 @@ int main(int argc, char **argv)
 						printf("Not in a room\n");
 						break;
 					}
-					RakNet::Console_LeaveRoom_Steam* msg = (RakNet::Console_LeaveRoom_Steam*) messageFactory->Alloc(RakNet::L2MID_Console_LeaveRoom);
+					SLNet::Console_LeaveRoom_Steam* msg = (SLNet::Console_LeaveRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_LeaveRoom);
 					msg->roomId=lobby2Client->GetRoomID();
 					lobby2Client->SendMsg(msg);
 					messageFactory->Dealloc(msg);
@@ -241,7 +249,7 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					RakNet::Console_CreateRoom_Steam* msg = (RakNet::Console_CreateRoom_Steam*) messageFactory->Alloc(RakNet::L2MID_Console_CreateRoom);
+					SLNet::Console_CreateRoom_Steam* msg = (SLNet::Console_CreateRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_CreateRoom);
 					// set the name of the lobby if it's ours
 					char rgchLobbyName[256];
 					msg->roomIsPublic=true;
@@ -262,7 +270,7 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					RakNet::Console_JoinRoom_Steam* msg = (RakNet::Console_JoinRoom_Steam*) messageFactory->Alloc(RakNet::L2MID_Console_JoinRoom);
+					SLNet::Console_JoinRoom_Steam* msg = (SLNet::Console_JoinRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_JoinRoom);
 					printf("Enter room id, or enter for %" PRINTF_64_BIT_MODIFIER "u: ", lastRoom);
 					char str[256];
 					Gets(str, sizeof(str));
@@ -287,7 +295,7 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					RakNet::Console_GetRoomDetails_Steam* msg = (RakNet::Console_GetRoomDetails_Steam*) messageFactory->Alloc(RakNet::L2MID_Console_GetRoomDetails);
+					SLNet::Console_GetRoomDetails_Steam* msg = (SLNet::Console_GetRoomDetails_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_GetRoomDetails);
 					msg->roomId=lobby2Client->GetRoomID();
 					lobby2Client->SendMsg(msg);
 					messageFactory->Dealloc(msg);
@@ -302,7 +310,7 @@ int main(int argc, char **argv)
 						break;
 
 					}
-					RakNet::Console_SendRoomChatMessage_Steam* msg = (RakNet::Console_SendRoomChatMessage_Steam*) messageFactory->Alloc(RakNet::L2MID_Console_SendRoomChatMessage);
+					SLNet::Console_SendRoomChatMessage_Steam* msg = (SLNet::Console_SendRoomChatMessage_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_SendRoomChatMessage);
 					msg->message="Test chat message.";
 					msg->roomId=lobby2Client->GetRoomID();
 					lobby2Client->SendMsg(msg);
@@ -341,14 +349,14 @@ int main(int argc, char **argv)
 		RakSleep(30);
 	}
 	
-	RakNet::Lobby2Message* logoffMsg = messageFactory->Alloc(RakNet::L2MID_Client_Logoff);
+	SLNet::Lobby2Message* logoffMsg = messageFactory->Alloc(SLNet::L2MID_Client_Logoff);
 	lobby2Client->SendMsg(logoffMsg);
 	messageFactory->Dealloc(logoffMsg);
 	rakPeer->DetachPlugin(lobby2Client);
 	rakPeer->DetachPlugin(fcm2);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	Lobby2Client_Steam::DestroyInstance(lobby2Client);
-	RakNet::FullyConnectedMesh2::DestroyInstance(fcm2);
+	SLNet::FullyConnectedMesh2::DestroyInstance(fcm2);
 
 	return 1;
 }

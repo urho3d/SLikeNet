@@ -1,31 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #define INTERACTIVE
 
 #if defined(INTERACTIVE)
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "Gets.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Gets.h"
 
-#include "RakSleep.h"
+#include "slikenet/sleep.h"
 #include "RakVoice.h"
-#include "RakNetStatistics.h"
-#include "GetTime.h"
-#include "RakAssert.h"
+#include "slikenet/statistics.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/assert.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
@@ -49,9 +56,9 @@
 // define sample type. Only short(16 bits sound) is supported at the moment.
 typedef short SAMPLE;
 
-RakNet::RakPeerInterface *rakPeer=NULL;
+SLNet::RakPeerInterface *rakPeer=NULL;
 FMOD::System *fmodSystem=NULL;
-RakNet::RakVoice rakVoice;
+SLNet::RakVoice rakVoice;
 bool mute;
 
 void FMOD_ERRCHECK(FMOD_RESULT result)
@@ -73,9 +80,9 @@ struct myStat{
 };
 
 void LogStats(){
-	RakNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
+	SLNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
 	char buffer[1024];
-	StatisticsToString(rss,buffer,1);
+	StatisticsToString(rss,buffer,1024,1);
 	printf(buffer);
 
 }
@@ -127,14 +134,14 @@ int main(void)
 	char ch;
 
 	char port[256];
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 #if defined(INTERACTIVE)
 	printf("Enter local port: ");
 	Gets(port, sizeof(port));
 	if (port[0]==0)
 #endif
-		strcpy(port, "60000");
-	RakNet::SocketDescriptor socketDescriptor(atoi(port),0);
+		strcpy_s(port, "60000");
+	SLNet::SocketDescriptor socketDescriptor(atoi(port),0);
 
 	rakPeer->Startup(4, &socketDescriptor, 1);
 
@@ -145,12 +152,12 @@ int main(void)
 
 
 	// Initialize our connection with FMOD
-	if (!RakNet::FMODVoiceAdapter::Instance()->SetupAdapter(fmodSystem, &rakVoice)){
+	if (!SLNet::FMODVoiceAdapter::Instance()->SetupAdapter(fmodSystem, &rakVoice)){
 			printf("An error occurred while initializing FMOD sounds.\n");
 			exit(-1);
 		}
 
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	quit=false;
 #if defined(INTERACTIVE)
 	printf("(Q)uit. (C)onnect. (D)isconnect. (M)ute. ' ' for stats.\n");
@@ -162,9 +169,9 @@ int main(void)
 	while (!quit)
 	{
 #if defined(INTERACTIVE)
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='+'){
 				// Increase encoder complexity
 				int v = rakVoice.GetEncoderComplexity();
@@ -202,17 +209,17 @@ int main(void)
 				printf("\nEnter IP of remote system: ");
 				Gets(ip, sizeof(ip));
 				if (ip[0]==0)
-					strcpy(ip, "127.0.0.1");
+					strcpy_s(ip, "127.0.0.1");
 				printf("\nEnter port of remote system: ");
 				Gets(port, sizeof(port));
 				if (port[0]==0)
-					strcpy(port, "60000");
+					strcpy_s(port, "60000");
 				rakPeer->Connect(ip, atoi(port), 0,0);
 			}
 			else if (ch=='m')
 			{
 				mute=!mute;
-				RakNet::FMODVoiceAdapter::Instance()->SetMute(mute);
+				SLNet::FMODVoiceAdapter::Instance()->SetMute(mute);
 				if (mute)
 					printf("\nNow muted.\n");
 				else
@@ -225,8 +232,8 @@ int main(void)
 			else if (ch==' ')
 			{
 				char message[2048];
-				RakNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
-				StatisticsToString(rss, message, 2);
+				SLNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
+				StatisticsToString(rss, message, 2048, 2);
 				printf("%s", message);
 			}
 			else if (ch=='q')
@@ -259,19 +266,19 @@ int main(void)
 
 		fmodSystem->update();
 		// Update or connection with FMOD
-		RakNet::FMODVoiceAdapter::Instance()->Update();
+		SLNet::FMODVoiceAdapter::Instance()->Update();
 	//	LogStats();
 		RakSleep(20);
 
 	}
 
 	// Release any FMOD resources we used, and shutdown FMOD itself
-	RakNet::FMODVoiceAdapter::Instance()->Release();
+	SLNet::FMODVoiceAdapter::Instance()->Release();
 	fmodSystem->release();
 
 	rakPeer->Shutdown(300);
 	rakPeer->DetachPlugin(&rakVoice);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 
 	return 0;
 }

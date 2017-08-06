@@ -1,26 +1,31 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "FileOperations.h"
-#include "RakMemoryOverride.h"
-#include "ConsoleServer.h"
-#include "LogCommandParser.h"
-#include "RakNetCommandParser.h"
-#include "PacketLogger.h"
-#include "DS_List.h"
-#include "SocketLayer.h"
-#include "RakSleep.h"
-#include "TCPInterface.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/memoryoverride.h"
+#include "slikenet/ConsoleServer.h"
+#include "slikenet/LogCommandParser.h"
+#include "slikenet/commandparser.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/DS_List.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/sleep.h"
+#include "slikenet/TCPInterface.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 void* MyMalloc (size_t size)
 {
@@ -60,18 +65,18 @@ int main()
 	f->GetSockets(sockets);
 	f->ReleaseSockets(sockets);
 
-	// See RakMemoryOverride.h
+	// See memoryoverride.h
 	SetMalloc(MyMalloc);
 	SetRealloc(MyRealloc);
 	SetFree(MyFree);
 
-	char *cArray = RakNet::OP_NEW_ARRAY<char>(10,_FILE_AND_LINE_);
-	RakNet::OP_DELETE_ARRAY(cArray,_FILE_AND_LINE_);
+	char *cArray = SLNet::OP_NEW_ARRAY<char>(10,_FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(cArray,_FILE_AND_LINE_);
 
 	DataStructures::List<int> intList;
 	intList.Push(5, _FILE_AND_LINE_ );
 	
-	f->GetMTUSize(RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+	f->GetMTUSize(SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 	SystemAddress p1;
 	SystemAddress p2;
 	p1=p2;
@@ -83,7 +88,7 @@ int main()
 	LogCommandParser::DestroyInstance( c );
 	PacketLogger::DestroyInstance( d );
 	RakNetCommandParser::DestroyInstance( e );
-	RakNet::RakPeerInterface::DestroyInstance( f );
+	SLNet::RakPeerInterface::DestroyInstance( f );
 	TCPInterface::DestroyInstance( g );
 
 	return 0;

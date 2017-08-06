@@ -1,3 +1,14 @@
+#
+# This file was taken from RakNet 4.082.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+#
+# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+#
+# This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+# license found in the license.txt file in the root directory of this source tree.
+#
+
 cmake_minimum_required(VERSION 2.6)
 project(AutopatcherServer)
 
@@ -9,7 +20,7 @@ IF(WIN32 AND NOT UNIX)
 	SOURCE_GROUP("Source Files" FILES ${AUTOSRC})
 	SOURCE_GROUP(Main "AutopatcherServerTest.cpp")
 	include_directories(${RAKNETHEADERFILES} ./ ${AutopatcherPostgreRepository_SOURCE_DIR} ${PostgreSQLInterface_SOURCE_DIR} ${Autopatcher_SOURCE_DIR} ${BZip2_SOURCE_DIR}) 
-	add_executable(AutopatcherServer_PostgreSQL "AutopatcherServerTest.cpp" ${AUTOSRC} ${BZSRC} readme.txt)
+	add_executable(AutopatcherServer_PostgreSQL "AutopatcherServerTest.cpp" ${AUTOSRC} ${BZSRC})
 	target_link_libraries(AutopatcherServer_PostgreSQL ${RAKNET_COMMON_LIBS} AutopatcherPostgreRepository)
 	VSUBFOLDER(AutopatcherServer_PostgreSQL "Samples/AutoPatcher/Server/PostgreSQL")
 ELSE(WIN32 AND NOT UNIX)

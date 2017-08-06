@@ -1,25 +1,30 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "Rand.h" // randomMT
-#include "MessageIdentifiers.h" // Enumerations
-#include "RakNetTypes.h" // SystemAddress
+#include "slikenet/peerinterface.h"
+#include "slikenet/Rand.h" // randomMT
+#include "slikenet/MessageIdentifiers.h" // Enumerations
+#include "slikenet/types.h" // SystemAddress
 #include <cstdio>
-using namespace RakNet;
+using namespace SLNet;
 
 #ifdef _WIN32
-#include "Kbhit.h"
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/Kbhit.h"
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -44,7 +49,7 @@ int main(void)
 	unsigned index, connectionCount;
 	unsigned char ch;
 	SystemAddress serverID;
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	unsigned short numberOfSystems;
 	int sender;
 	
@@ -59,20 +64,20 @@ int main(void)
 	printf("Dropped Connection Test.\n");
 
 	unsigned short serverPort = 20000;
-	server=RakNet::RakPeerInterface::GetInstance();
+	server= SLNet::RakPeerInterface::GetInstance();
 //	server->InitializeSecurity(0,0,0,0);
-	RakNet::SocketDescriptor socketDescriptor(serverPort,0);
+	SLNet::SocketDescriptor socketDescriptor(serverPort,0);
 	server->Startup(NUMBER_OF_CLIENTS, &socketDescriptor, 1);
 	server->SetMaximumIncomingConnections(NUMBER_OF_CLIENTS);
 	server->SetTimeoutTime(10000,UNASSIGNED_SYSTEM_ADDRESS);
 
 	for (index=0; index < NUMBER_OF_CLIENTS; index++)
 	{
-		clients[index]=RakNet::RakPeerInterface::GetInstance();
-		RakNet::SocketDescriptor socketDescriptor2(serverPort+1+index,0);
+		clients[index]= SLNet::RakPeerInterface::GetInstance();
+		SLNet::SocketDescriptor socketDescriptor2(serverPort+1+index,0);
 		clients[index]->Startup(1, &socketDescriptor2, 1);
 		clients[index]->Connect("127.0.0.1", serverPort, 0, 0);
-		clients[index]->SetTimeoutTime(5000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+		clients[index]->SetTimeoutTime(5000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 
 		#ifdef _WIN32
 				Sleep(10);
@@ -84,16 +89,16 @@ int main(void)
 
 	ShowHelp();
 
-	while (1)
+	for(;;)
 	{
 		// User input
-		if (kbhit())
+		if (_kbhit())
 		{
 #ifndef _WIN32
 			Gets(buff,sizeof(buff));
 			ch=buff[0];
 #else
-			ch=getch();
+			ch=_getch();
 #endif			
 
 			if (ch=='d' || ch=='D')
@@ -170,7 +175,7 @@ int main(void)
 
 		// Parse messages
 		
-		while (1)
+		for(;;)
 		{
 			p = server->Receive();
 			sender=NUMBER_OF_CLIENTS;
@@ -192,7 +197,7 @@ int main(void)
 				switch (p->data[0])
 				{
 				case ID_CONNECTION_REQUEST_ACCEPTED:
-					printf("%i: %ID_CONNECTION_REQUEST_ACCEPTED from %i.\n",sender, p->systemAddress.GetPort());
+					printf("%i: ID_CONNECTION_REQUEST_ACCEPTED from %i.\n",sender, p->systemAddress.GetPort());
 					serverID=p->systemAddress;
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
@@ -233,10 +238,10 @@ int main(void)
 		/*
 		// Have everyone send a reliable packet so dropped connections are noticed.
 		ch=255;
-		server->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+		server->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
 		for (index=0; index < NUMBER_OF_CLIENTS; index++)
-			clients[index]->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			clients[index]->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 			*/
 
 		// Sleep so this loop doesn't take up all the CPU time
@@ -249,8 +254,8 @@ int main(void)
 
 	}
 
-	RakNet::RakPeerInterface::DestroyInstance(server);
+	SLNet::RakPeerInterface::DestroyInstance(server);
 	for (index=0; index < NUMBER_OF_CLIENTS; index++)
-		RakNet::RakPeerInterface::DestroyInstance(clients[index]);
+		SLNet::RakPeerInterface::DestroyInstance(clients[index]);
 	return 1;
 }

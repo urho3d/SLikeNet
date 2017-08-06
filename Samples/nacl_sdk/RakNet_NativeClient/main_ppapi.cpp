@@ -3,9 +3,14 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
@@ -16,10 +21,10 @@
 
 // KMJ
 #include "ppapi/c/private/ppb_udp_socket_private.h"
-#include "RakPeerInterface.h"
-#include "RakNetTypes.h"
-#include "RakSleep.h"
-using namespace RakNet;
+#include "slikenet/peerinterface.h"
+#include "slikenet/types.h"
+#include "slikenet/sleep.h"
+using namespace SLNet;
 
 /// The Instance class.  One of these exists for each instance of your NaCl
 /// module on the web page.  The browser will ask the Module object to create

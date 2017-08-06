@@ -1,32 +1,39 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "BitStream.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
 #include <stdlib.h> // For atoi
 #include <cstring> // For strlen
-#include "RakNetStatistics.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "MTUSize.h"
+#include "slikenet/statistics.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/MTUSize.h"
 #include <stdio.h>
-#include "Kbhit.h"
-#include "RakSleep.h"
-#include "Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 bool quit;
 bool sentPacket=false;
 
 #define BIG_PACKET_SIZE 83296256
 
-using namespace RakNet;
+using namespace SLNet;
 
 RakPeerInterface *client, *server;
 char *text;
@@ -50,23 +57,23 @@ int main(void)
 
 	if (ch=='c')
 	{
-		client=RakNet::RakPeerInterface::GetInstance();
+		client= SLNet::RakPeerInterface::GetInstance();
 		printf("Working as client\n");
 		printf("Enter remote IP: ");
 		Gets(text,BIG_PACKET_SIZE);
 		if (text[0]==0)
-			strcpy(text, "natpunch.jenkinssoftware.com"); // dx in Europe
+			strcpy_s(text, BIG_PACKET_SIZE, "natpunch.jenkinssoftware.com"); // dx in Europe
 	}
 	else if (ch=='s')
 	{
-		server=RakNet::RakPeerInterface::GetInstance();
+		server= SLNet::RakPeerInterface::GetInstance();
 		printf("Working as server\n");
 	}
 	else
 	{
-		client=RakNet::RakPeerInterface::GetInstance();
-		server=RakNet::RakPeerInterface::GetInstance();;
-		strcpy(text, "127.0.0.1");
+		client= SLNet::RakPeerInterface::GetInstance();
+		server= SLNet::RakPeerInterface::GetInstance();;
+		strcpy_s(text, BIG_PACKET_SIZE, "127.0.0.1");
 	}
 
 	// Test IPV6
@@ -76,8 +83,8 @@ int main(void)
 
 	if (server)
 	{
-		server->SetTimeoutTime(5000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-		RakNet::SocketDescriptor socketDescriptor(3000,0);
+		server->SetTimeoutTime(5000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+		SLNet::SocketDescriptor socketDescriptor(3000,0);
 		socketDescriptor.socketFamily=socketFamily;
 		server->SetMaximumIncomingConnections(4);
 		StartupResult sr;
@@ -93,8 +100,8 @@ int main(void)
 	}
 	if (client)
 	{
-		client->SetTimeoutTime(5000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-		RakNet::SocketDescriptor socketDescriptor(0,0);
+		client->SetTimeoutTime(5000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+		SLNet::SocketDescriptor socketDescriptor(0,0);
 		socketDescriptor.socketFamily=socketFamily;
 		StartupResult sr;
 		sr=client->Startup(4, &socketDescriptor, 1);
@@ -132,11 +139,11 @@ int main(void)
 // 	if (server)
 // 		server->ApplyNetworkSimulator(.01, 0, 0);
 
-	RakNet::TimeMS start,stop;
+	SLNet::TimeMS start,stop;
 
-	RakNet::TimeMS nextStatTime = RakNet::GetTimeMS() + 1000;
-	RakNet::Packet *packet;
-	start=RakNet::GetTimeMS();
+	SLNet::TimeMS nextStatTime = SLNet::GetTimeMS() + 1000;
+	SLNet::Packet *packet;
+	start= SLNet::GetTimeMS();
 	while (!quit)
 	{
 		if (server)
@@ -146,7 +153,7 @@ int main(void)
 				if (packet->data[0]==ID_NEW_INCOMING_CONNECTION || packet->data[0]==253)
 				{
 					printf("Starting send\n");
-					start=RakNet::GetTimeMS();
+					start= SLNet::GetTimeMS();
 					if (BIG_PACKET_SIZE<=100000)
 					{
 						for (int i=0; i < BIG_PACKET_SIZE; i++)
@@ -156,7 +163,7 @@ int main(void)
 						text[0]=(unsigned char) 255;
 					server->Send(text, BIG_PACKET_SIZE, LOW_PRIORITY, RELIABLE_ORDERED_WITH_ACK_RECEIPT, 0, packet->systemAddress, false);
 					// Keep the stat from updating until the messages move to the thread or it quits right away
-					nextStatTime=RakNet::GetTimeMS()+1000;
+					nextStatTime= SLNet::GetTimeMS()+1000;
 				}
 				if (packet->data[0]==ID_CONNECTION_LOST)
 					printf("ID_CONNECTION_LOST from %s\n", packet->systemAddress.ToString());
@@ -168,15 +175,15 @@ int main(void)
 					printf("ID_CONNECTION_REQUEST_ACCEPTED from %s\n", packet->systemAddress.ToString());
 			}
 
-			if (kbhit())
+			if (_kbhit())
 			{
-				char ch=getch();
+				char ch=_getch();
 				if (ch==' ')
 				{
 					printf("Sending medium priority message\n");
 					char t[1];
 					t[0]=(unsigned char) 254;
-					server->Send(t, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					server->Send(t, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 				}
 				if (ch=='q')
 					quit=true;
@@ -189,7 +196,7 @@ int main(void)
 			{
 				if (packet->data[0]==ID_DOWNLOAD_PROGRESS)
 				{
-					RakNet::BitStream progressBS(packet->data, packet->length, false);
+					SLNet::BitStream progressBS(packet->data, packet->length, false);
 					progressBS.IgnoreBits(8); // ID_DOWNLOAD_PROGRESS
 					unsigned int progress;
 					unsigned int total;
@@ -235,7 +242,7 @@ int main(void)
 						{
 							printf("Rerequesting send.\n");
 							unsigned char ch=(unsigned char) 253;
-							client->Send((const char*) &ch, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+							client->Send((const char*) &ch, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 						else
 						{
@@ -257,7 +264,7 @@ int main(void)
 					printf("ID_NEW_INCOMING_CONNECTION from %s\n", packet->systemAddress.ToString());
 				else if (packet->data[0]==ID_CONNECTION_REQUEST_ACCEPTED)
 				{
-					start=RakNet::GetTimeMS();
+					start= SLNet::GetTimeMS();
 					printf("ID_CONNECTION_REQUEST_ACCEPTED from %s\n", packet->systemAddress.ToString());
 				}
 				else if (packet->data[0]==ID_CONNECTION_ATTEMPT_FAILED)
@@ -268,9 +275,9 @@ int main(void)
 			}
 		}
 
-		if (RakNet::GetTimeMS() > nextStatTime)
+		if (SLNet::GetTimeMS() > nextStatTime)
 		{
-			nextStatTime=RakNet::GetTimeMS()+1000;
+			nextStatTime= SLNet::GetTimeMS()+1000;
 			RakNetStatistics rssSender;
 			RakNetStatistics rssReceiver;
 			if (server)
@@ -283,7 +290,7 @@ int main(void)
 					for (i=0; i < numSystems; i++)
 					{
 						server->GetStatistics(server->GetSystemAddressFromIndex(i), &rssSender);
-						StatisticsToString(&rssSender, text,2);
+						StatisticsToString(&rssSender, text, BIG_PACKET_SIZE, 2);
 						printf("==== System %i ====\n", i+1);
 						printf("%s\n\n", text);
 					}
@@ -292,20 +299,20 @@ int main(void)
 			if (client && server==0 && client->GetGUIDFromIndex(0)!=UNASSIGNED_RAKNET_GUID)
 			{
 				client->GetStatistics(client->GetSystemAddressFromIndex(0), &rssReceiver);
-				StatisticsToString(&rssReceiver, text,2);
+				StatisticsToString(&rssReceiver, text,BIG_PACKET_SIZE, 2);
 				printf("%s\n\n", text);
 			}
 		}
 
 		RakSleep(100);
 	}
-	stop=RakNet::GetTimeMS();
+	stop= SLNet::GetTimeMS();
 	double seconds = (double)(stop-start)/1000.0;
 
 	if (server)
 	{
 		RakNetStatistics *rssSender2=server->GetStatistics(server->GetSystemAddressFromIndex(0));
-		StatisticsToString(rssSender2, text, 1);
+		StatisticsToString(rssSender2, text, BIG_PACKET_SIZE, 1);
 		printf("%s", text);
 	}
 
@@ -313,8 +320,8 @@ int main(void)
 	Gets(text,BIG_PACKET_SIZE);
 
 	delete []text;
-	RakNet::RakPeerInterface::DestroyInstance(client);
-	RakNet::RakPeerInterface::DestroyInstance(server);
+	SLNet::RakPeerInterface::DestroyInstance(client);
+	SLNet::RakPeerInterface::DestroyInstance(server);
 
 	return 0;
 }

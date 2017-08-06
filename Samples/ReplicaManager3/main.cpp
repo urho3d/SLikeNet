@@ -1,34 +1,41 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // Demonstrates ReplicaManager 3: A system to automatically create, destroy, and serialize objects
 
-#include "StringTable.h"
-#include "RakPeerInterface.h"
+#include "slikenet/StringTable.h"
+#include "slikenet/peerinterface.h"
 
 #include <stdio.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <string.h>
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "ReplicaManager3.h"
-#include "NetworkIDManager.h"
-#include "RakSleep.h"
-#include "FormatString.h"
-#include "RakString.h"
-#include "GetTime.h"
-#include "SocketLayer.h"
-#include "Getche.h"
-#include "Rand.h"
-#include "VariableDeltaSerializer.h"
-#include "Gets.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/ReplicaManager3.h"
+#include "slikenet/NetworkIDManager.h"
+#include "slikenet/sleep.h"
+#include "slikenet/FormatString.h"
+#include "slikenet/string.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/Getche.h"
+#include "slikenet/Rand.h"
+#include "slikenet/VariableDeltaSerializer.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 enum
 {
@@ -37,52 +44,52 @@ enum
 	P2P
 } topology;
 
-// ReplicaManager3 is in the namespace RakNet
-using namespace RakNet;
+// ReplicaManager3 is in the namespace SLNet
+using namespace SLNet;
 
 struct SampleReplica : public Replica3
 {
 	SampleReplica() {var1Unreliable=0; var2Unreliable=0; var3Reliable=0; var4Reliable=0;}
 	~SampleReplica() {}
-	virtual RakNet::RakString GetName(void) const=0;
-	virtual void WriteAllocationID(RakNet::Connection_RM3 *destinationConnection, RakNet::BitStream *allocationIdBitstream) const {
+	virtual SLNet::RakString GetName(void) const=0;
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {
 		allocationIdBitstream->Write(GetName());
 	}
-	void PrintStringInBitstream(RakNet::BitStream *bs)
+	void PrintStringInBitstream(SLNet::BitStream *bs)
 	{
 		if (bs->GetNumberOfBitsUsed()==0)
 			return;
-		RakNet::RakString rakString;
+		SLNet::RakString rakString;
 		bs->Read(rakString);
 		printf("Receive: %s\n", rakString.C_String());
 	}
 
-	virtual void SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection)	{
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)	{
 		
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call adds another remote system to track
 		variableDeltaSerializer.AddRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
 
-		constructionBitstream->Write(GetName() + RakNet::RakString(" SerializeConstruction"));
+		constructionBitstream->Write(GetName() + SLNet::RakString(" SerializeConstruction"));
 	}
-	virtual bool DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
 		PrintStringInBitstream(constructionBitstream);
 		return true;
 	}
-	virtual void SerializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *destinationConnection)	{
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)	{
 		
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call removes a remote system
 		variableDeltaSerializer.RemoveRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
 
-		destructionBitstream->Write(GetName() + RakNet::RakString(" SerializeDestruction"));
+		destructionBitstream->Write(GetName() + SLNet::RakString(" SerializeDestruction"));
 		
 	}
-	virtual bool DeserializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
 		PrintStringInBitstream(destructionBitstream);
 		return true;
 	}
-	virtual void DeallocReplica(RakNet::Connection_RM3 *sourceConnection) {
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {
 		delete this;
 	}
 
@@ -101,7 +108,7 @@ struct SampleReplica : public Replica3
 		serializeParameters->pro[0].reliability=UNRELIABLE_WITH_ACK_RECEIPT;
 		// Sending unreliably with an ack receipt requires the receipt number, and that you inform the system of ID_SND_RECEIPT_ACKED and ID_SND_RECEIPT_LOSS
 		serializeParameters->pro[0].sendReceipt=replicaManager->GetRakPeerInterface()->IncrementNextSendReceipt();
-		serializeParameters->messageTimestamp=RakNet::GetTime();
+		serializeParameters->messageTimestamp= SLNet::GetTime();
 
 		// Begin writing all variables to be sent UNRELIABLE_WITH_ACK_RECEIPT 
 		variableDeltaSerializer.BeginUnreliableAckedSerialize(
@@ -135,7 +142,7 @@ struct SampleReplica : public Replica3
 		// Use RM3SR_SERIALIZED_ALWAYS instead of RM3SR_SERIALIZED_ALWAYS_IDENTICALLY to support sending different data to different system, which is needed when using unreliable and dirty variable resends
 		return RM3SR_SERIALIZED_ALWAYS;
 	}
-	virtual void Deserialize(RakNet::DeserializeParameters *deserializeParameters) {
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {
 
 		VariableDeltaSerializer::DeserializationContext deserializationContext;
 
@@ -157,20 +164,20 @@ struct SampleReplica : public Replica3
 		variableDeltaSerializer.EndDeserialize(&deserializationContext);
 	}
 
-	virtual void SerializeConstructionRequestAccepted(RakNet::BitStream *serializationBitstream, RakNet::Connection_RM3 *requestingConnection)	{
-		serializationBitstream->Write(GetName() + RakNet::RakString(" SerializeConstructionRequestAccepted"));
+	virtual void SerializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)	{
+		serializationBitstream->Write(GetName() + SLNet::RakString(" SerializeConstructionRequestAccepted"));
 	}
-	virtual void DeserializeConstructionRequestAccepted(RakNet::BitStream *serializationBitstream, RakNet::Connection_RM3 *acceptingConnection) {
+	virtual void DeserializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *acceptingConnection) {
 		PrintStringInBitstream(serializationBitstream);
 	}
-	virtual void SerializeConstructionRequestRejected(RakNet::BitStream *serializationBitstream, RakNet::Connection_RM3 *requestingConnection)	{
-		serializationBitstream->Write(GetName() + RakNet::RakString(" SerializeConstructionRequestRejected"));
+	virtual void SerializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)	{
+		serializationBitstream->Write(GetName() + SLNet::RakString(" SerializeConstructionRequestRejected"));
 	}
-	virtual void DeserializeConstructionRequestRejected(RakNet::BitStream *serializationBitstream, RakNet::Connection_RM3 *rejectingConnection) {
+	virtual void DeserializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *rejectingConnection) {
 		PrintStringInBitstream(serializationBitstream);
 	}
 
-	virtual void OnPoppedConnection(RakNet::Connection_RM3 *droppedConnection)
+	virtual void OnPoppedConnection(SLNet::Connection_RM3 *droppedConnection)
 	{
 		// Same as in SerializeDestruction(), no longer track this system
 		variableDeltaSerializer.RemoveRemoteSystemVariableHistory(droppedConnection->GetRakNetGUID());
@@ -217,67 +224,67 @@ struct SampleReplica : public Replica3
 };
 
 struct ClientCreatible_ClientSerialized : public SampleReplica {
-	virtual RakNet::RakString GetName(void) const {return RakNet::RakString("ClientCreatible_ClientSerialized");}
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatible_ClientSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ClientConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ClientConstruction(sourceConnection,topology!=CLIENT);
 	}
 
-	virtual RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ClientSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Client(droppedConnection);
 	}
 };
 struct ServerCreated_ClientSerialized : public SampleReplica {
-	virtual RakNet::RakString GetName(void) const {return RakNet::RakString("ServerCreated_ClientSerialized");}
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ServerCreated_ClientSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ServerConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ServerConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ClientSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Server(droppedConnection);
 	}
 };
 struct ClientCreatible_ServerSerialized : public SampleReplica {
-	virtual RakNet::RakString GetName(void) const {return RakNet::RakString("ClientCreatible_ServerSerialized");}
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatible_ServerSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		if (topology==CLIENT)
 			return RM3SR_DO_NOT_SERIALIZE;
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ClientConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ClientConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ServerSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Client(droppedConnection);
 	}
 };
 struct ServerCreated_ServerSerialized : public SampleReplica {
-	virtual RakNet::RakString GetName(void) const {return RakNet::RakString("ServerCreated_ServerSerialized");}
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ServerCreated_ServerSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		if (topology==CLIENT)
@@ -285,31 +292,31 @@ struct ServerCreated_ServerSerialized : public SampleReplica {
 
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ServerConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ServerConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ServerSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Server(droppedConnection);
 	}
 };
 struct P2PReplica : public SampleReplica {
-	virtual RakNet::RakString GetName(void) const {return RakNet::RakString("P2PReplica");}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("P2PReplica");}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_PeerToPeer(destinationConnection);
 	}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_PeerToPeer(sourceConnection);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_PeerToPeer(destinationConnection);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_PeerToPeer(droppedConnection);
 	}
 };
@@ -322,9 +329,9 @@ public:
 	// See documentation - Makes all messages between ID_REPLICA_MANAGER_DOWNLOAD_STARTED and ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE arrive in one tick
 	bool QueryGroupDownloadMessages(void) const {return true;}
 
-	virtual Replica3 *AllocReplica(RakNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
+	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
 	{
-		RakNet::RakString typeName;
+		SLNet::RakString typeName;
 		allocationId->Read(typeName);
 		if (typeName=="ClientCreatible_ClientSerialized") return new ClientCreatible_ClientSerialized;
 		if (typeName=="ServerCreated_ClientSerialized") return new ServerCreated_ClientSerialized;
@@ -349,7 +356,7 @@ class ReplicaManager3Sample : public ReplicaManager3
 int main(void)
 {
 	char ch;
-	RakNet::SocketDescriptor sd;
+	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	char ip[128];
 	static const int SERVER_PORT=12345;
@@ -358,7 +365,7 @@ int main(void)
 	// ReplicaManager3 requires NetworkIDManager to lookup pointers from numbers.
 	NetworkIDManager networkIdManager;
 	// Each application has one instance of RakPeerInterface
-	RakNet::RakPeerInterface *rakPeer;
+	SLNet::RakPeerInterface *rakPeer;
 	// The system that performs most of our functionality for this demo
 	ReplicaManager3Sample replicaManager;
 
@@ -368,9 +375,9 @@ int main(void)
 	printf("Difficulty: Intermediate\n\n");
 
 	printf("Start as (c)lient, (s)erver, (p)eer? ");
-	ch=getche();
+	ch=_getche();
 
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 	if (ch=='c' || ch=='C')
 	{
 		topology=CLIENT;
@@ -402,7 +409,7 @@ int main(void)
 		printf("Enter server IP: ");
 		Gets(ip, sizeof(ip));
 		if (ip[0]==0)
-			strcpy(ip, "127.0.0.1");
+			strcpy_s(ip, "127.0.0.1");
 		rakPeer->Connect(ip,SERVER_PORT,0,0,0);
 		printf("Connecting...\n");
 	}
@@ -410,7 +417,7 @@ int main(void)
 	printf("Commands:\n(Q)uit\n'C'reate objects\n'R'andomly change variables in my objects\n'D'estroy my objects\n");
 
 	// Enter infinite loop to run the system
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	bool quit=false;
 	while (!quit)
 	{
@@ -441,7 +448,7 @@ int main(void)
 			case ID_ADVERTISE_SYSTEM:
 				// The first conditional is needed because ID_ADVERTISE_SYSTEM may be from a system we are connected to, but replying on a different address.
 				// The second conditional is because AdvertiseSystem also sends to the loopback
-				if (rakPeer->GetSystemAddressFromGuid(packet->guid)==RakNet::UNASSIGNED_SYSTEM_ADDRESS &&
+				if (rakPeer->GetSystemAddressFromGuid(packet->guid)== SLNet::UNASSIGNED_SYSTEM_ADDRESS &&
 					rakPeer->GetMyGUID()!=packet->guid)
 				{
 					printf("Connecting to %s\n", packet->systemAddress.ToString(true));
@@ -466,9 +473,9 @@ int main(void)
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='q' || ch=='Q')
 			{
 				printf("Quitting.\n");
@@ -508,9 +515,9 @@ int main(void)
 				// 	A. Send a packet to tell other systems to delete these objects
 				// 	B. Delete these objects on my own system
 				replicaManager.GetReplicasCreatedByMe(replicaListOut);
-				replicaManager.BroadcastDestructionList(replicaListOut, RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+				replicaManager.BroadcastDestructionList(replicaListOut, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 				for (unsigned int i=0; i < replicaListOut.Size(); i++)
-					RakNet::OP_DELETE(replicaListOut[i], _FILE_AND_LINE_);
+					SLNet::OP_DELETE(replicaListOut[i], _FILE_AND_LINE_);
 			}
 
 		}
@@ -518,11 +525,11 @@ int main(void)
 		RakSleep(30);
 		for (int i=0; i < 4; i++)
 		{
-			if (rakPeer->GetInternalID(RakNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=SERVER_PORT+i)
+			if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=SERVER_PORT+i)
 				rakPeer->AdvertiseSystem("255.255.255.255", SERVER_PORT+i, 0,0,0);
 		}
 	}
 
 	rakPeer->Shutdown(100,0);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 }

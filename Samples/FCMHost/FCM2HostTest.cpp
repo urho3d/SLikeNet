@@ -1,42 +1,47 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "RakNetTypes.h"
-#include "RakSleep.h"
-#include "FullyConnectedMesh2.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/types.h"
+#include "slikenet/sleep.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ConnectionGraph2.h"
 #include <assert.h>
-#include "SocketLayer.h"
-#include "Kbhit.h"
-#include "PacketLogger.h"
-#include "BitStream.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
-RakNet::RakPeerInterface *rakPeer;
+SLNet::RakPeerInterface *rakPeer;
 
 int main()
 {
 	FullyConnectedMesh2 fcm2;
 	ConnectionGraph2 cg2;
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	rakPeer->AttachPlugin(&fcm2);
 	rakPeer->AttachPlugin(&cg2);
 	fcm2.SetAutoparticipateConnections(true);
-	RakNet::SocketDescriptor sd;
+	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	sd.port=60000;
 	while (IRNS2_Berkley::IsPortInUse(sd.port, sd.hostAddress, sd.socketFamily, SOCK_DGRAM)==true)
@@ -44,19 +49,19 @@ int main()
 	StartupResult sr = rakPeer->Startup(8,&sd,1);
 	RakAssert(sr==RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(8);
-	rakPeer->SetTimeoutTime(1000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+	rakPeer->SetTimeoutTime(1000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	printf("Started on %s\n", rakPeer->GetMyBoundAddress().ToString(true));
-	BitStream contextBs;
-	contextBs.Write(RakString("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString()));
-	fcm2.SetMyContext(&contextBs);
+// 	BitStream contextBs;
+// 	contextBs.Write(RakString("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString()));
+// 	fcm2.SetMyContext(&contextBs);
 
 //	PacketLogger packetLogger;
 //	rakPeer->AttachPlugin(&packetLogger);
 //	packetLogger.SetLogDirectMessages(false);
 
 	bool quit=false;
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	char ch;
 	while (!quit)
 	{
@@ -98,7 +103,7 @@ int main()
 					printf("Got new host (ourselves)");
 				else
 					printf("Got new host %s, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
-					RakNet::BitStream bs(packet->data,packet->length,false);
+				SLNet::BitStream bs(packet->data,packet->length,false);
 					bs.IgnoreBytes(1);
 					RakNetGUID oldHost;
 					bs.Read(oldHost);
@@ -113,7 +118,7 @@ int main()
 // 			case ID_REMOTE_NEW_INCOMING_CONNECTION:
 // 				{
 // 					uint32_t count;
-// 					RakNet::BitStream bsIn(packet->data, packet->length,false);
+// 					SLNet::BitStream bsIn(packet->data, packet->length,false);
 // 					bsIn.IgnoreBytes(1);
 // 					bsIn.Read(count);
 // 					SystemAddress sa;
@@ -131,23 +136,23 @@ int main()
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch==' ')
 			{
 
 				DataStructures::List<RakNetGUID> participantList;
 				fcm2.GetParticipantList(participantList);
 				printf("%i participants\n", participantList.Size());
-				for (int i=0; i < participantList.Size(); i++)
-				{
-					BitStream userContext;
-					fcm2.GetParticipantContext(participantList[i], &userContext);
-					RakString str;
-					userContext.Read(str);
-					printf("%i. %s: %s", i+1, participantList[i].ToString(), str.C_String());
-				}
+// 				for (unsigned i=0; i < participantList.Size(); i++)
+// 				{
+// 					BitStream userContext;
+// 					fcm2.GetParticipantContext(participantList[i], &userContext);
+// 					RakString str;
+// 					userContext.Read(str);
+// 					printf("%u. %s: %s", i+1, participantList[i].ToString(), str.C_String());
+// 				}
 			}
 			if (ch=='q' || ch=='Q')
 			{
@@ -159,11 +164,11 @@ int main()
 		RakSleep(30);
 		for (int i=0; i < 32; i++)
 		{
-			if (rakPeer->GetInternalID(RakNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
+			if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
 				rakPeer->AdvertiseSystem("255.255.255.255", 60000+i, 0,0,0);
 		}
 	}
 
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	return 0;
 }

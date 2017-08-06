@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <WinSock2.h>
@@ -23,8 +28,22 @@ void main_sockets(void)
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = 0;
 	int j = bind(sock,(struct sockaddr *) &serverAddr,sizeof(serverAddr));
-	struct hostent * phe = gethostbyname( "masterserver2.raknet.com" );
-	memcpy( &serverAddr.sin_addr.s_addr, phe->h_addr_list[ 0 ], sizeof( struct in_addr ) );
+	struct addrinfo *curAddress = NULL;
+
+	// #low disabled (aka: main_sockets() not called) and not IPv6 aware / missing error check for err
+	int err = getaddrinfo("masterserver2.raknet.com", NULL, NULL, &curAddress);
+
+	// get the (first) IPv4 address
+	while (curAddress != NULL) {
+		if (curAddress->ai_family == AF_INET) {
+			break; // found an IPv4 address
+		}
+		curAddress = curAddress->ai_next;
+	}
+
+	// #low error handling if curAddress == NULL
+
+	serverAddr.sin_addr.s_addr = ((struct sockaddr_in *)curAddress->ai_addr)->sin_addr.s_addr;
 	serverAddr.sin_port        = htons(80);
 	connect(sock, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
 	const char *postRequest =
@@ -42,20 +61,20 @@ void main_sockets(void)
 	printf(outputBuffer);
 }
 
-#include "TCPInterface.h"
-#include "RakString.h"
-#include "RakSleep.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/string.h"
+#include "slikenet/sleep.h"
 #include "jansson.h"
-#include "GetTime.h"
+#include "slikenet/GetTime.h"
 
 #define MASTER_SERVER_ADDRESS "masterserver2.raknet.com"
 #define MASTER_SERVER_PORT 80
 //#define MASTER_SERVER_ADDRESS "localhost"
 //#define MASTER_SERVER_PORT 8080
-using namespace RakNet;
+using namespace SLNet;
 void main_RakNet_Post(void)
 {
-	TCPInterface *tcp = RakNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
+	TCPInterface *tcp = SLNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
 	tcp->Start(0, 64);
 	tcp->Connect(MASTER_SERVER_ADDRESS, MASTER_SERVER_PORT, true);
 
@@ -76,8 +95,8 @@ void main_RakNet_Post(void)
 	SystemAddress serverAddr = tcp->HasCompletedConnectionAttempt();
 	tcp->Send(rspost.C_String(), rspost.GetLength(), serverAddr, false);
 
-	RakNet::Time timeout = RakNet::GetTime()+2000;
-	while (RakNet::GetTime() < timeout) 
+	SLNet::Time timeout = SLNet::GetTime()+2000;
+	while (SLNet::GetTime() < timeout)
 	{
 		Packet *p = tcp->Receive();
 		if (p)
@@ -93,13 +112,13 @@ void main_RakNet_Post(void)
 	tcp->Stop();
 }
 
-#include "HTTPConnection2.h"
+#include "slikenet/HTTPConnection2.h"
 void main_RakNet_Get(void)
 {
 	HTTPConnection2 *httpConnection2;
 	httpConnection2 = HTTPConnection2::GetInstance();
 
-	TCPInterface *tcp = RakNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
+	TCPInterface *tcp = SLNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
 	tcp->Start(0, 64);
 	tcp->AttachPlugin(httpConnection2);
 
@@ -108,7 +127,7 @@ void main_RakNet_Get(void)
 		RakString(MASTER_SERVER_ADDRESS "/testServer?__gameId=MotoGP_13"));
 	httpConnection2->TransmitRequest(rsRequest, MASTER_SERVER_ADDRESS, MASTER_SERVER_PORT);
 
-	while (1)
+	for(;;)
 	{
 		// The following code is TCP operations for talking to the master server, and parsing the reply
 		SystemAddress sa;
@@ -136,7 +155,7 @@ void main_RakNet_Get(void)
 		RakString hostTransmitted;
 		RakString responseReceived;
 		SystemAddress hostReceived;
-		int contentOffset;
+		ptrdiff_t contentOffset;
 		if (httpConnection2->GetResponse(stringTransmitted, hostTransmitted, responseReceived, hostReceived, contentOffset))
 		{
 			if (responseReceived.IsEmpty()==false)
@@ -154,7 +173,7 @@ void main_RakNet_Get(void)
 					json_t *root = json_loads(responseReceived.C_String() + contentOffset, JSON_REJECT_DUPLICATES, &error);
 					if (!root)
 					{
-						printf("Error parsing JSON\n", __LINE__);
+						printf("Error parsing JSON\n");
 						printf(responseReceived.C_String());
 					}
 					else
@@ -163,7 +182,7 @@ void main_RakNet_Get(void)
 						while (iter)
 						{
 							const char *firstKey = json_object_iter_key(iter);
-							if (stricmp(firstKey, "GET")==0)
+							if (_stricmp(firstKey, "GET")==0)
 							{
 								json_t* jsonArray = json_object_iter_value(iter);
 								size_t arraySize = json_array_size(jsonArray);
@@ -174,7 +193,7 @@ void main_RakNet_Get(void)
 									//RakAssert(cityNameVal->type==JSON_STRING);
 									//RakString val = RakString::NonVariadic(json_string_value(cityNameVal)).URLDecode();
 
-									printf("gameId: %i.\n", json_integer_value(gameIdVal));
+									printf("gameId: %" JSON_INTEGER_FORMAT ".\n", json_integer_value(gameIdVal));
 								}
 
 								if (arraySize==0)
@@ -182,7 +201,7 @@ void main_RakNet_Get(void)
 
 								break;
 							}
-							else if (stricmp(firstKey, "POST")==0)
+							else if (_stricmp(firstKey, "POST")==0)
 							{
 								
 								break;

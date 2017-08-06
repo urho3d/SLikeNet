@@ -1,22 +1,29 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "RakSleep.h"
-#include "RelayPlugin.h"
-#include "Gets.h"
-#include "Kbhit.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/sleep.h"
+#include "slikenet/RelayPlugin.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 int main(void)
 {
@@ -25,7 +32,7 @@ int main(void)
 
 	char str[64], str2[64];
 
-	RakNet::RakPeerInterface *peer=RakNet::RakPeerInterface::GetInstance();
+	SLNet::RakPeerInterface *peer= SLNet::RakPeerInterface::GetInstance();
 	RelayPlugin *relayPlugin = RelayPlugin::GetInstance();
 	peer->AttachPlugin(relayPlugin);
 
@@ -34,13 +41,13 @@ int main(void)
 	puts("Enter the port to listen on");
 	Gets(listenPort,sizeof(listenPort));
 	if (listenPort[0]==0)
-		strcpy(listenPort, "1234");
+		strcpy_s(listenPort, "1234");
 
 	relayPlugin->SetAcceptAddParticipantRequests(true);
 
 	// Connecting the client is very simple.  0 means we don't care about
 	// a connectionValidationInteger, and false for low priority threads
-	RakNet::SocketDescriptor socketDescriptor(atoi(listenPort),0);
+	SLNet::SocketDescriptor socketDescriptor(atoi(listenPort),0);
 	socketDescriptor.socketFamily=AF_INET;
 	peer->Startup(8,&socketDescriptor, 1);
 	peer->SetMaximumIncomingConnections(8);
@@ -54,14 +61,14 @@ int main(void)
 		puts("Enter the port to connect to");
 		Gets(serverPort,sizeof(serverPort));
 		if (serverPort[0]==0)
-			strcpy(serverPort, "1234");
+			strcpy_s(serverPort, "1234");
 
-		RakNet::ConnectionAttemptResult car = peer->Connect(ip, atoi(serverPort), 0, 0);
-		RakAssert(car==RakNet::CONNECTION_ATTEMPT_STARTED);
+		SLNet::ConnectionAttemptResult car = peer->Connect(ip, atoi(serverPort), 0, 0);
+		RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
 	}
 
 	peer->SetTimeoutTime(30000, UNASSIGNED_SYSTEM_ADDRESS);
-	peer->GetGuidFromSystemAddress(UNASSIGNED_SYSTEM_ADDRESS).ToString(str);
+	peer->GetGuidFromSystemAddress(UNASSIGNED_SYSTEM_ADDRESS).ToString(str, 64);
 	printf("My GUID is %s\n", str);
 
 	printf("(A)ddParticipantRequestFromClient\n");
@@ -74,11 +81,11 @@ int main(void)
 	printf("(Q)uit\n");
 
 	char name[128];
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
-			char ch = getch();
+			char ch = _getch();
 			if (ch=='a' || ch=='A')
 			{
 				printf("Enter name of participant: ");
@@ -158,8 +165,8 @@ int main(void)
 		Packet *packet;
 		for (packet=peer->Receive(); packet; peer->DeallocatePacket(packet), packet=peer->Receive())
 		{
-			packet->guid.ToString(str);
-			packet->systemAddress.ToString(true,str2);
+			packet->guid.ToString(str, 64);
+			packet->systemAddress.ToString(true,str2,64);
 			if (packet->data[0]==ID_NEW_INCOMING_CONNECTION)
 			{
 				printf("ID_NEW_INCOMING_CONNECTION from %s on %s\n", str, str2);

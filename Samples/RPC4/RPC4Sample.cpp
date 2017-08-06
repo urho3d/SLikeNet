@@ -1,52 +1,59 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RPC4Plugin.h"
-#include "RakPeerInterface.h"
+#include "slikenet/RPC4Plugin.h"
+#include "slikenet/peerinterface.h"
 #include <stdio.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <string.h>
 #include <stdlib.h>
-#include "RakSleep.h"
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "Gets.h"
+#include "slikenet/sleep.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 RakPeerInterface *rakPeer;
 
-void CFunc1( RakNet::BitStream *bitStream, Packet *packet )
+void CFunc1(SLNet::BitStream *bitStream, Packet *packet )
 {
 	printf("CFunc1 ");
-	RakNet::RakString data;
+	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();
 	bool read = bitStream->ReadCompressed(data);
 	RakAssert(read);
 	printf("%s\n", data.C_String());
 };
 
-void CFunc2( RakNet::BitStream *bitStream, Packet *packet )
+void CFunc2(SLNet::BitStream *bitStream, Packet *packet )
 {
 	printf("CFunc2 ");
-	RakNet::RakString data;
+	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();
 	bool read = bitStream->ReadCompressed(data);
 	RakAssert(read);
 	printf("%s\n", data.C_String());
 };
 
-void CFunc3( RakNet::BitStream *bitStream, RakNet::BitStream *returnData, Packet *packet )
+void CFunc3(SLNet::BitStream *bitStream, SLNet::BitStream *returnData, Packet *packet )
 {
 	printf("CFunc3 ");
-	RakNet::RakString data;
+	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();
 	bool read = bitStream->ReadCompressed(data);
 	RakAssert(read);
@@ -59,7 +66,7 @@ int main(void)
 	printf("Demonstration of the RPC4 plugin.\n");
 	printf("Difficulty: Beginner\n\n");
 
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	
 	// Holds user data
 	char ip[64], serverPort[30], clientPort[30];
@@ -68,9 +75,9 @@ int main(void)
 	puts("Enter the port to listen on");
 	Gets(clientPort,sizeof(clientPort));
 	if (clientPort[0]==0)
-		strcpy(clientPort, "0");
+		strcpy_s(clientPort, "0");
 	
-	RakNet::SocketDescriptor sd1(atoi(clientPort),0);
+	SLNet::SocketDescriptor sd1(atoi(clientPort),0);
 	rakPeer->Startup(8,&sd1,1);
 	rakPeer->SetMaximumIncomingConnections(8);
 
@@ -84,7 +91,7 @@ int main(void)
 	rpc.RegisterSlot("Event1", CFunc2, 0);
 	rpc.RegisterBlockingFunction("Blocking", CFunc3);
 
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	if (ip[0])
 	{
 		puts("Enter the port to connect to");
@@ -96,7 +103,7 @@ int main(void)
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 			;
 
-		RakNet::BitStream testBs;
+		SLNet::BitStream testBs;
 		testBs.WriteCompressed("testData");
 	//	rpc.Signal("Event1", &testBs, HIGH_PRIORITY,RELIABLE_ORDERED,0,rakPeer->GetSystemAddressFromIndex(0),false, true);
 
@@ -105,10 +112,10 @@ int main(void)
 			;
 
 		// Needs 2 program instances, because while the call is blocking rakPeer2->Receive() isn't getting called
-		RakNet::BitStream testBlockingReturn;
+		SLNet::BitStream testBlockingReturn;
 		rpc.CallBlocking("Blocking", &testBs, HIGH_PRIORITY,RELIABLE_ORDERED,0,rakPeer->GetSystemAddressFromIndex(0),&testBlockingReturn);
 
-		RakNet::RakString data;
+		SLNet::RakString data;
 		bool read = testBlockingReturn.ReadCompressed(data);
 		printf("%s\n", data.C_String());
 	}
@@ -116,7 +123,7 @@ int main(void)
 	{
 		printf("Waiting for connections.\n");
 
-		while (1)
+		for(;;)
 		{
 			RakSleep(100);
 			for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
@@ -126,7 +133,7 @@ int main(void)
 	
 
 	rakPeer->Shutdown(100,0);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 
 	return 1;
 }

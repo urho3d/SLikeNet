@@ -1,29 +1,34 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 /// \brief Tests connecting two peers at the same time with the internet simulator running.
 
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "PacketLogger.h"
-#include "Rand.h"
-#include "Kbhit.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/Rand.h"
+#include "slikenet/Kbhit.h"
 #include <stdio.h> // Printf
-#include "RakSleep.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "GetTime.h"
+#include "slikenet/sleep.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 int main()
 {
@@ -43,7 +48,7 @@ int main()
 	SocketDescriptor sd2(2000,0);
 	unsigned short numSystems[2];
 
-	while (1)
+	for(;;)
 	{
 		gotConnectionRequestAccepted[0]=0;
 		gotConnectionRequestAccepted[1]=0;

@@ -1,21 +1,26 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __LOBBY_2_CLIENT_GFX3_IMPL_H
 #define __LOBBY_2_CLIENT_GFX3_IMPL_H
 
-#include "WindowsIncludes.h"
-#include "RakNetTypes.h"
+#include "slikenet/WindowsIncludes.h"
+#include "slikenet/types.h"
 #include "FxGameDelegate.h"
 #include "Lobby2Message.h"
-#include "PluginInterface2.h"
+#include "slikenet/PluginInterface2.h"
 
 #define ACTIONSCRIPT_CALLABLE_HEADER(functionName) virtual void functionName(const FxDelegateArgs& pparams);
 #define ACTIONSCRIPT_CALLABLE_FUNCTION(className, functionName) \
@@ -25,16 +30,16 @@ void functionName(const FxDelegateArgs& pparams) \
 } \
 void className::functionName(const FxDelegateArgs& pparams)
 
-namespace RakNet {
+namespace SLNet {
 
 // GFxPlayerTinyD3D9.cpp has an instance of this class, and callls the corresponding 3 function
 // This keeps the patching code out of the GFx sample as much as possible
-class Lobby2ClientGFx3Impl : public FxDelegateHandler, public RakNet::Lobby2Callbacks, public PluginInterface2
+class Lobby2ClientGFx3Impl : public FxDelegateHandler, public SLNet::Lobby2Callbacks, public PluginInterface2
 {
 public:
 	Lobby2ClientGFx3Impl();
 	~Lobby2ClientGFx3Impl();
-	void Init(RakNet::Lobby2Client *_lobby2Client, RakNet::Lobby2MessageFactory *_messageFactory, RakPeerInterface *_rakPeer, GPtr<FxDelegate> pDelegate, GPtr<GFxMovieView> pMovie);
+	void Init(SLNet::Lobby2Client *_lobby2Client, SLNet::Lobby2MessageFactory *_messageFactory, RakPeerInterface *_rakPeer, GPtr<FxDelegate> pDelegate, GPtr<GFxMovieView> pMovie);
 	void Update(void);
 	void Shutdown(void);
 
@@ -97,74 +102,74 @@ public:
 	ACTIONSCRIPT_CALLABLE_HEADER(f2c_Clans_GetMembers);
 	ACTIONSCRIPT_CALLABLE_HEADER(f2c_Clans_GetList);
 	// Callbacks from lobby
-	virtual void MessageResult(RakNet::CDKey_GetStatus *message);
-	virtual void MessageResult(RakNet::System_DeleteAccount *message);
-	virtual void MessageResult(RakNet::Client_Login *message);
-	virtual void MessageResult(RakNet::System_CreateDatabase *message);
-	virtual void MessageResult(RakNet::System_CreateTitle *message);
-	virtual void MessageResult(RakNet::Client_ValidateHandle *message);
-	virtual void MessageResult(RakNet::Client_RegisterAccount *message);
-	virtual void MessageResult(RakNet::Client_UpdateAccount *message);
-	virtual void MessageResult(RakNet::Client_ChangeHandle *message);
-	virtual void MessageResult(RakNet::Client_GetAccountDetails *message);
-	virtual void MessageResult(RakNet::Client_StartIgnore *message);
-	virtual void MessageResult(RakNet::Client_StopIgnore *message);
-	virtual void MessageResult(RakNet::Client_GetIgnoreList *message);
-	virtual void MessageResult(RakNet::Client_GetPasswordRecoveryQuestionByHandle *message);
-	virtual void MessageResult(RakNet::Client_GetPasswordByPasswordRecoveryAnswer *message);
-	virtual void MessageResult(RakNet::Friends_SendInvite *message);
-	virtual void MessageResult(RakNet::Friends_AcceptInvite *message);
-	virtual void MessageResult(RakNet::Friends_RejectInvite *message);
-	virtual void MessageResult(RakNet::Friends_Remove *message);
-	virtual void MessageResult(RakNet::Friends_GetInvites *message);
-	virtual void MessageResult(RakNet::Friends_GetFriends *message);
-	virtual void MessageResult(RakNet::Emails_Send *message);
-	virtual void MessageResult(RakNet::Emails_Delete *message);
-	virtual void MessageResult(RakNet::Emails_SetStatus *message);
-	virtual void MessageResult(RakNet::Emails_Get *message);
-	virtual void MessageResult(RakNet::Clans_Create *message);
-	virtual void MessageResult(RakNet::Clans_SetProperties *message);
-	virtual void MessageResult(RakNet::Clans_GetProperties *message);
-	virtual void MessageResult(RakNet::Clans_SetMyMemberProperties *message);
-	virtual void MessageResult(RakNet::Clans_GrantLeader *message);
-	virtual void MessageResult(RakNet::Clans_SetSubleaderStatus *message);
-	virtual void MessageResult(RakNet::Clans_SetMemberRank *message);
-	virtual void MessageResult(RakNet::Clans_GetMemberProperties *message);
-	virtual void MessageResult(RakNet::Clans_ChangeHandle *message);
-	virtual void MessageResult(RakNet::Clans_Leave *message);
-	virtual void MessageResult(RakNet::Clans_Get *message);
-	virtual void MessageResult(RakNet::Clans_SendJoinInvitation *message);
-	virtual void MessageResult(RakNet::Clans_WithdrawJoinInvitation *message);
-	virtual void MessageResult(RakNet::Clans_AcceptJoinInvitation *message);
-	virtual void MessageResult(RakNet::Clans_RejectJoinInvitation *message);
-	virtual void MessageResult(RakNet::Clans_DownloadInvitationList *message);
-	virtual void MessageResult(RakNet::Clans_SendJoinRequest *message);
-	virtual void MessageResult(RakNet::Clans_WithdrawJoinRequest *message);
-	virtual void MessageResult(RakNet::Clans_AcceptJoinRequest *message);
-	virtual void MessageResult(RakNet::Clans_RejectJoinRequest *message);
-	virtual void MessageResult(RakNet::Clans_DownloadRequestList *message);
-	virtual void MessageResult(RakNet::Clans_KickAndBlacklistUser *message);
-	virtual void MessageResult(RakNet::Clans_UnblacklistUser *message);
-	virtual void MessageResult(RakNet::Clans_GetBlacklist *message);
-	virtual void MessageResult(RakNet::Clans_GetMembers *message);
-	virtual void MessageResult(RakNet::Clans_GetList *message);
+	virtual void MessageResult(SLNet::CDKey_GetStatus *message);
+	virtual void MessageResult(SLNet::System_DeleteAccount *message);
+	virtual void MessageResult(SLNet::Client_Login *message);
+	virtual void MessageResult(SLNet::System_CreateDatabase *message);
+	virtual void MessageResult(SLNet::System_CreateTitle *message);
+	virtual void MessageResult(SLNet::Client_ValidateHandle *message);
+	virtual void MessageResult(SLNet::Client_RegisterAccount *message);
+	virtual void MessageResult(SLNet::Client_UpdateAccount *message);
+	virtual void MessageResult(SLNet::Client_ChangeHandle *message);
+	virtual void MessageResult(SLNet::Client_GetAccountDetails *message);
+	virtual void MessageResult(SLNet::Client_StartIgnore *message);
+	virtual void MessageResult(SLNet::Client_StopIgnore *message);
+	virtual void MessageResult(SLNet::Client_GetIgnoreList *message);
+	virtual void MessageResult(SLNet::Client_GetPasswordRecoveryQuestionByHandle *message);
+	virtual void MessageResult(SLNet::Client_GetPasswordByPasswordRecoveryAnswer *message);
+	virtual void MessageResult(SLNet::Friends_SendInvite *message);
+	virtual void MessageResult(SLNet::Friends_AcceptInvite *message);
+	virtual void MessageResult(SLNet::Friends_RejectInvite *message);
+	virtual void MessageResult(SLNet::Friends_Remove *message);
+	virtual void MessageResult(SLNet::Friends_GetInvites *message);
+	virtual void MessageResult(SLNet::Friends_GetFriends *message);
+	virtual void MessageResult(SLNet::Emails_Send *message);
+	virtual void MessageResult(SLNet::Emails_Delete *message);
+	virtual void MessageResult(SLNet::Emails_SetStatus *message);
+	virtual void MessageResult(SLNet::Emails_Get *message);
+	virtual void MessageResult(SLNet::Clans_Create *message);
+	virtual void MessageResult(SLNet::Clans_SetProperties *message);
+	virtual void MessageResult(SLNet::Clans_GetProperties *message);
+	virtual void MessageResult(SLNet::Clans_SetMyMemberProperties *message);
+	virtual void MessageResult(SLNet::Clans_GrantLeader *message);
+	virtual void MessageResult(SLNet::Clans_SetSubleaderStatus *message);
+	virtual void MessageResult(SLNet::Clans_SetMemberRank *message);
+	virtual void MessageResult(SLNet::Clans_GetMemberProperties *message);
+	virtual void MessageResult(SLNet::Clans_ChangeHandle *message);
+	virtual void MessageResult(SLNet::Clans_Leave *message);
+	virtual void MessageResult(SLNet::Clans_Get *message);
+	virtual void MessageResult(SLNet::Clans_SendJoinInvitation *message);
+	virtual void MessageResult(SLNet::Clans_WithdrawJoinInvitation *message);
+	virtual void MessageResult(SLNet::Clans_AcceptJoinInvitation *message);
+	virtual void MessageResult(SLNet::Clans_RejectJoinInvitation *message);
+	virtual void MessageResult(SLNet::Clans_DownloadInvitationList *message);
+	virtual void MessageResult(SLNet::Clans_SendJoinRequest *message);
+	virtual void MessageResult(SLNet::Clans_WithdrawJoinRequest *message);
+	virtual void MessageResult(SLNet::Clans_AcceptJoinRequest *message);
+	virtual void MessageResult(SLNet::Clans_RejectJoinRequest *message);
+	virtual void MessageResult(SLNet::Clans_DownloadRequestList *message);
+	virtual void MessageResult(SLNet::Clans_KickAndBlacklistUser *message);
+	virtual void MessageResult(SLNet::Clans_UnblacklistUser *message);
+	virtual void MessageResult(SLNet::Clans_GetBlacklist *message);
+	virtual void MessageResult(SLNet::Clans_GetMembers *message);
+	virtual void MessageResult(SLNet::Clans_GetList *message);
 
-	virtual void MessageResult(RakNet::Notification_Client_RemoteLogin *message);
-	virtual void MessageResult(RakNet::Notification_Client_IgnoreStatus *message);
-	virtual void MessageResult(RakNet::Notification_Friends_StatusChange *message);
-	virtual void MessageResult(RakNet::Notification_User_ChangedHandle *message);
-	virtual void MessageResult(RakNet::Notification_Friends_CreatedClan *message);
-	virtual void MessageResult(RakNet::Notification_Emails_Received *message);
-	virtual void MessageResult(RakNet::Notification_Clans_GrantLeader *message);
-	virtual void MessageResult(RakNet::Notification_Clans_SetSubleaderStatus *message);
-	virtual void MessageResult(RakNet::Notification_Clans_SetMemberRank *message);
-	virtual void MessageResult(RakNet::Notification_Clans_ChangeHandle *message);
-	virtual void MessageResult(RakNet::Notification_Clans_Leave *message);
-	virtual void MessageResult(RakNet::Notification_Clans_PendingJoinStatus *message);
-	virtual void MessageResult(RakNet::Notification_Clans_NewClanMember *message);
-	virtual void MessageResult(RakNet::Notification_Clans_KickAndBlacklistUser *message);
-	virtual void MessageResult(RakNet::Notification_Clans_UnblacklistUser *message);
-	virtual void MessageResult(RakNet::Notification_Clans_Destroyed *message);
+	virtual void MessageResult(SLNet::Notification_Client_RemoteLogin *message);
+	virtual void MessageResult(SLNet::Notification_Client_IgnoreStatus *message);
+	virtual void MessageResult(SLNet::Notification_Friends_StatusChange *message);
+	virtual void MessageResult(SLNet::Notification_User_ChangedHandle *message);
+	virtual void MessageResult(SLNet::Notification_Friends_CreatedClan *message);
+	virtual void MessageResult(SLNet::Notification_Emails_Received *message);
+	virtual void MessageResult(SLNet::Notification_Clans_GrantLeader *message);
+	virtual void MessageResult(SLNet::Notification_Clans_SetSubleaderStatus *message);
+	virtual void MessageResult(SLNet::Notification_Clans_SetMemberRank *message);
+	virtual void MessageResult(SLNet::Notification_Clans_ChangeHandle *message);
+	virtual void MessageResult(SLNet::Notification_Clans_Leave *message);
+	virtual void MessageResult(SLNet::Notification_Clans_PendingJoinStatus *message);
+	virtual void MessageResult(SLNet::Notification_Clans_NewClanMember *message);
+	virtual void MessageResult(SLNet::Notification_Clans_KickAndBlacklistUser *message);
+	virtual void MessageResult(SLNet::Notification_Clans_UnblacklistUser *message);
+	virtual void MessageResult(SLNet::Notification_Clans_Destroyed *message);
 
 
 	static void	OpenSite(const FxDelegateArgs& pparams);
@@ -178,11 +183,11 @@ public:
 	GPtr<FxDelegate> delegate;
 	GPtr<GFxMovieView>      movie;
 
-	RakNet::Lobby2Client *lobby2Client;
-	RakNet::Lobby2MessageFactory *messageFactory;
-	RakNet::RakPeerInterface *rakPeer;
+	SLNet::Lobby2Client *lobby2Client;
+	SLNet::Lobby2MessageFactory *messageFactory;
+	SLNet::RakPeerInterface *rakPeer;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif // __LOBBY_2_CLIENT_GFX3_IMPL_H

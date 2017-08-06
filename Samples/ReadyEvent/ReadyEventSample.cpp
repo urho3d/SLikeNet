@@ -1,31 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "ReadyEvent.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/ReadyEvent.h"
 #include <assert.h>
-#include "Kbhit.h"
-#include "RakSleep.h"
-#include "SocketLayer.h"
-#include "FullyConnectedMesh2.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ConnectionGraph2.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 void PrintConnections();
 
-using namespace RakNet;
+using namespace SLNet;
 
 RakPeerInterface *rakPeer;
 ReadyEvent readyEventPlugin;
@@ -75,10 +82,10 @@ int main(void)
 
 	char str[128];
 	char ch=0;
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
-			ch=getch();
+		if (_kbhit())
+			ch=_getch();
 
 		if (ch=='s' || ch=='S')
 		{
@@ -100,14 +107,14 @@ int main(void)
 		{
 			ch=0;
 			printf("Which IP? (Press enter for 127.0.0.1)");
-			gets(str);
+			gets_s(str);
 			if (str[0]==0)
-				strcpy(str, "127.0.0.1");
+				strcpy_s(str, "127.0.0.1");
 			char port[64];
 			printf("Which port? (Press enter for 60000)");
-			gets(port);
+			gets_s(port);
 			if (port[0]==0)
-				strcpy(port, "60000");
+				strcpy_s(port, "60000");
 			ConnectionAttemptResult car = rakPeer->Connect(str, atoi(port), 0, 0, 0);
 			RakAssert(car==CONNECTION_ATTEMPT_STARTED);
 			printf("Connecting.\n");
@@ -208,7 +215,7 @@ int main(void)
 				break;
 			case ID_ALREADY_CONNECTED:
 				// Connection lost normally
-				printf("ID_ALREADY_CONNECTED with guid %" PRINTF_64_BIT_MODIFIER "u\n", p->guid);
+				printf("ID_ALREADY_CONNECTED with guid %" PRINTF_64_BIT_MODIFIER "u\n", p->guid.g);
 				break;
 			case ID_INCOMPATIBLE_PROTOCOL_VERSION:
 				printf("ID_INCOMPATIBLE_PROTOCOL_VERSION\n");

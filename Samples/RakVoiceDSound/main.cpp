@@ -1,32 +1,39 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #define INTERACTIVE
 
 #if defined(INTERACTIVE)
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
-#include "RakSleep.h"
+#include "slikenet/sleep.h"
 #include "RakVoice.h"
-#include "RakNetStatistics.h"
-#include "GetTime.h"
-#include "RakAssert.h"
-#include "Gets.h"
+#include "slikenet/statistics.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/assert.h"
+#include "slikenet/Gets.h"
 #include "DSoundVoiceAdapter.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // Reads and writes per second of the sound data
 // Speex only supports these 3 values
@@ -39,13 +46,13 @@
 // define sample type. Only short(16 bits sound) is supported at the moment.
 typedef short SAMPLE;
 
-RakNet::RakPeerInterface *rakPeer=NULL;
-RakNet::RakVoice rakVoice;
+SLNet::RakPeerInterface *rakPeer=NULL;
+SLNet::RakVoice rakVoice;
 
 struct myStat{
-	unsigned int time;
-	unsigned int bitsRec;
-	unsigned int bitsSent;
+	uint64_t time;
+	uint64_t bitsRec;
+	uint64_t bitsSent;
 };
 
 // Keeps a record of the last 20 calls, to give a faster response to traffic change
@@ -57,23 +64,23 @@ void LogStats(){
 		data[i] = data[i+1];
 	}
 
-	RakNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
-	unsigned int currTime = RakNet::GetTimeMS();
+	SLNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
+	unsigned int currTime = SLNet::GetTimeMS();
 
 	data[numStats-1].time = currTime;
-	data[numStats-1].bitsSent = BYTES_TO_BITS(rss->runningTotal[RakNet::USER_MESSAGE_BYTES_SENT]);
-	data[numStats-1].bitsRec = BYTES_TO_BITS(rss->runningTotal[RakNet::USER_MESSAGE_BYTES_RECEIVED_PROCESSED]);
+	data[numStats-1].bitsSent = BYTES_TO_BITS(rss->runningTotal[SLNet::USER_MESSAGE_BYTES_SENT]);
+	data[numStats-1].bitsRec = BYTES_TO_BITS(rss->runningTotal[SLNet::USER_MESSAGE_BYTES_RECEIVED_PROCESSED]);
 
 	float totalTime = (data[numStats-1].time - data[0].time) / 1000.f ;
-	unsigned int totalBitsSent = data[numStats-1].bitsSent - data[0].bitsSent;
-	unsigned int totalBitsRec = data[numStats-1].bitsRec - data[0].bitsRec;
+	uint64_t totalBitsSent = data[numStats-1].bitsSent - data[0].bitsSent;
+	uint64_t totalBitsRec = data[numStats-1].bitsRec - data[0].bitsRec;
 	float bpsSent = totalBitsSent/totalTime;
 	float bpsRec = totalBitsRec/totalTime;
-	float avgBpsSent = rss->valueOverLastSecond[RakNet::USER_MESSAGE_BYTES_SENT];
-	float avgBpsRec = rss->valueOverLastSecond[RakNet::USER_MESSAGE_BYTES_RECEIVED_PROCESSED];
+	float avgBpsSent = static_cast<float>(rss->valueOverLastSecond[SLNet::USER_MESSAGE_BYTES_SENT]);
+	float avgBpsRec = static_cast<float>(rss->valueOverLastSecond[SLNet::USER_MESSAGE_BYTES_RECEIVED_PROCESSED]);
 
-	printf("avgKbpsSent=%02.1f avgKbpsRec=%02.1f kbpsSent=%02.1f kbpsRec=%02.1f    \r", avgBpsSent/1000, avgBpsRec/1000, bpsSent/1000 , bpsRec/1000, rakVoice.GetBufferedBytesToReturn(RakNet::UNASSIGNED_RAKNET_GUID));
-	//printf("MsgBuf=%6i SndBuf=%10i RcvBuf=%10i    \r", rakVoice.GetRakPeerInterface()->GetStatistics(RakNet::UNASSIGNED_SYSTEM_ADDRESS)->messageSendBuffer[HIGH_PRIORITY], rakVoice.GetBufferedBytesToSend(RakNet::UNASSIGNED_SYSTEM_ADDRESS), rakVoice.GetBufferedBytesToReturn(RakNet::UNASSIGNED_SYSTEM_ADDRESS));
+	printf("avgKbpsSent=%02.1f avgKbpsRec=%02.1f kbpsSent=%02.1f kbpsRec=%02.1f    \r", avgBpsSent/1000, avgBpsRec/1000, bpsSent/1000 , bpsRec/1000);
+	//printf("MsgBuf=%6i SndBuf=%10i RcvBuf=%10i    \r", rakVoice.GetRakPeerInterface()->GetStatistics(SLNet::UNASSIGNED_SYSTEM_ADDRESS)->messageSendBuffer[HIGH_PRIORITY], rakVoice.GetBufferedBytesToSend(SLNet::UNASSIGNED_SYSTEM_ADDRESS), rakVoice.GetBufferedBytesToReturn(SLNet::UNASSIGNED_SYSTEM_ADDRESS));
 }
 
 // Prints the current encoder parameters
@@ -139,14 +146,14 @@ int main(void)
 	char ch;
 
 	char port[256];
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 #if defined(INTERACTIVE)
 	printf("Enter local port: ");
 	Gets(port, sizeof(port));
 	if (port[0]==0)
 #endif
-		strcpy(port, "60000");
-	RakNet::SocketDescriptor socketDescriptor(atoi(port),0);
+		strcpy_s(port, "60000");
+	SLNet::SocketDescriptor socketDescriptor(atoi(port),0);
 
 	rakPeer->Startup(4, &socketDescriptor, 1);
 
@@ -156,13 +163,13 @@ int main(void)
 	rakVoice.Init(SAMPLE_RATE, FRAMES_PER_BUFFER*sizeof(SAMPLE));
 
 	// Initialize our connection with DirectSound
-	if (!RakNet::DSoundVoiceAdapter::Instance()->SetupAdapter(&rakVoice, GetConsoleHwnd(), DSSCL_EXCLUSIVE))
+	if (!SLNet::DSoundVoiceAdapter::Instance()->SetupAdapter(&rakVoice, GetConsoleHwnd(), DSSCL_EXCLUSIVE))
 	{
 		printf("An error occurred while initializing DirectSound.\n");
 		exit(-1);
 	}
 
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	quit=false;
 #if defined(INTERACTIVE)
 	printf("(Q)uit. (C)onnect. (D)isconnect. (M)ute. ' ' for stats.\n");
@@ -174,9 +181,9 @@ int main(void)
 	while (!quit)
 	{
 #if defined(INTERACTIVE)
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='+'){
 				// Increase encoder complexity
 				int v = rakVoice.GetEncoderComplexity();
@@ -214,17 +221,17 @@ int main(void)
 				printf("\nEnter IP of remote system: ");
 				Gets(ip, sizeof(ip));
 				if (ip[0]==0)
-					strcpy(ip, "127.0.0.1");
+					strcpy_s(ip, "127.0.0.1");
 				printf("\nEnter port of remote system: ");
 				Gets(port, sizeof(port));
 				if (port[0]==0)
-					strcpy(port, "60000");
+					strcpy_s(port, "60000");
 				rakPeer->Connect(ip, atoi(port), 0,0);
 			}
 			else if (ch=='m')
 			{
 				mute=!mute;
-				RakNet::DSoundVoiceAdapter::Instance()->SetMute(mute);
+				SLNet::DSoundVoiceAdapter::Instance()->SetMute(mute);
 				if (mute)
 					printf("\nNow muted.\n");
 				else
@@ -237,8 +244,8 @@ int main(void)
 			else if (ch==' ')
 			{
 				char message[2048];
-				RakNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
-				StatisticsToString(rss, message, 2);
+				SLNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
+				StatisticsToString(rss, message, 2048, 2);
 				printf("%s", message);
 			}
 			else if (ch=='q')
@@ -270,17 +277,17 @@ int main(void)
 		}
 		
 		// Update our connection with DirectSound
-		RakNet::DSoundVoiceAdapter::Instance()->Update();
+		SLNet::DSoundVoiceAdapter::Instance()->Update();
 
 		LogStats();
 		RakSleep(20);
 	}
 
 	// Release any FMOD resources we used, and shutdown FMOD itself
-	RakNet::DSoundVoiceAdapter::Instance()->Release();
+	SLNet::DSoundVoiceAdapter::Instance()->Release();
 
 	rakPeer->Shutdown(300);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 
 	return 0;
 }

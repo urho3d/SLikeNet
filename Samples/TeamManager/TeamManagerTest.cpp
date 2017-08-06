@@ -1,31 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "FullyConnectedMesh2.h"
-#include "TeamManager.h"
-#include "Kbhit.h"
-#include "RakSleep.h"
-#include "RakNetTypes.h"
-#include "BitStream.h"
-#include "SocketLayer.h"
-#include "ReplicaManager3.h"
-#include "NetworkIDManager.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/TeamManager.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
+#include "slikenet/types.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/ReplicaManager3.h"
+#include "slikenet/NetworkIDManager.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // Used by TeamManager to call SetHost() automatically when the current host peer drops
 // Also used to determine who the host is for the purposes of serializing objects to new systems
@@ -45,20 +50,20 @@ class Team : public Replica3
 public:
 	Team() {tmTeam.SetOwner(this);}
 	virtual ~Team() {}
-	virtual void WriteAllocationID(RakNet::Connection_RM3 *destinationConnection, RakNet::BitStream *allocationIdBitstream) const {}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3CS_ALREADY_EXISTS_REMOTELY; return RM3CS_ALREADY_EXISTS_REMOTELY_DO_NOT_CONSTRUCT;}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {return false;}
-	virtual void SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstructionExisting(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection) {tmTeam.SerializeConstruction(constructionBitstream);};
-	virtual void DeserializeConstructionExisting(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection) {tmTeam.DeserializeConstruction(teamManager, constructionBitstream);};
-	virtual void SerializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual RakNet::RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {return RM3AOPC_DO_NOTHING;}
-	virtual void DeallocReplica(RakNet::Connection_RM3 *sourceConnection) {}
-	virtual RakNet::RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3QSR_CALL_SERIALIZE; return RM3QSR_DO_NOT_CALL_SERIALIZE;}
-	virtual RM3SerializationResult Serialize(RakNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[0].WriteCompressed(teamName); return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(RakNet::DeserializeParameters *deserializeParameters) {deserializeParameters->serializationBitstream[0].ReadCompressed(teamName);}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3CS_ALREADY_EXISTS_REMOTELY; return RM3CS_ALREADY_EXISTS_REMOTELY_DO_NOT_CONSTRUCT;}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return false;}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
+	virtual void SerializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {tmTeam.SerializeConstruction(constructionBitstream);};
+	virtual void DeserializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {tmTeam.DeserializeConstruction(teamManager, constructionBitstream);};
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return RM3AOPC_DO_NOTHING;}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3QSR_CALL_SERIALIZE; return RM3QSR_DO_NOT_CALL_SERIALIZE;}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[0].WriteCompressed(teamName); return RM3SR_BROADCAST_IDENTICALLY;}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {deserializeParameters->serializationBitstream[0].ReadCompressed(teamName);}
 
 	// The actual team data
 	TM_Team tmTeam;
@@ -74,23 +79,23 @@ class User : public Replica3
 public:
 	User() {tmTeamMember.SetOwner(this);}
 	virtual ~User() {}
-	virtual void WriteAllocationID(RakNet::Connection_RM3 *destinationConnection, RakNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("User");}
-	virtual RM3ConstructionState QueryConstruction(RakNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {return QueryConstruction_PeerToPeer(destinationConnection);}
-	virtual bool QueryRemoteConstruction(RakNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *destinationConnection) {
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("User");}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {return QueryConstruction_PeerToPeer(destinationConnection);}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return true;}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
 		// teamMember must be serialized later than teams. This is accomplished by registering teams first with ReplicaManager3
 		tmTeamMember.SerializeConstruction(constructionBitstream);
 	}
-	virtual bool DeserializeConstruction(RakNet::BitStream *constructionBitstream, RakNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
 		return tmTeamMember.DeserializeConstruction(teamManager, constructionBitstream);
 	}
-	virtual void SerializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(RakNet::BitStream *destructionBitstream, RakNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual RakNet::RM3ActionOnPopConnection QueryActionOnPopConnection(RakNet::Connection_RM3 *droppedConnection) const {return QueryActionOnPopConnection_PeerToPeer(droppedConnection);}
-	virtual void DeallocReplica(RakNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual RakNet::RM3QuerySerializationResult QuerySerialization(RakNet::Connection_RM3 *destinationConnection) {return QuerySerialization_PeerToPeer(destinationConnection);}
-	virtual RM3SerializationResult Serialize(RakNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[1].Write(userName); return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(RakNet::DeserializeParameters *deserializeParameters) {if (deserializeParameters->bitstreamWrittenTo[1]) deserializeParameters->serializationBitstream[1].Read(userName);}
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return QueryActionOnPopConnection_PeerToPeer(droppedConnection);}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {return QuerySerialization_PeerToPeer(destinationConnection);}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[1].Write(userName); return RM3SR_BROADCAST_IDENTICALLY;}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {if (deserializeParameters->bitstreamWrittenTo[1]) deserializeParameters->serializationBitstream[1].Read(userName);}
 
 	void PrintTeamStatus(void)
 	{
@@ -136,7 +141,7 @@ class SampleConnectionRM3 : public Connection_RM3
 public:
 	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid) {}
 	virtual ~SampleConnectionRM3() {}
-	virtual Replica3 *AllocReplica(RakNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3) {RakString objectType; allocationIdBitstream->Read(objectType); if (objectType=="User") return new User; return 0;}
+	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3) {RakString objectType; allocationIdBitstream->Read(objectType); if (objectType=="User") return new User; return 0;}
 };
 
 // Required to derive from ReplicaManager3 as a class factory pattern to create SampleConnectionRM3
@@ -198,7 +203,7 @@ int main(void)
 	printf("This project demonstrates an in-game lobby using the team manager plugin.\n");
 	printf("Difficulty: Intermediate\n\n");
 
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	fullyConnectedMesh2=FullyConnectedMesh2::GetInstance();
 	teamManager=TeamManager::GetInstance();
 	networkIDManager = NetworkIDManager::GetInstance();
@@ -269,7 +274,7 @@ int main(void)
 	teamManager->GetWorldAtIndex(0)->ReferenceTeamMember(&user->tmTeamMember,user->GetNetworkID());
 	
 	// Startup RakNet
-	RakNet::SocketDescriptor sd;
+	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	sd.port=60000;
 	while (IRNS2_Berkley::IsPortInUse(sd.port, sd.hostAddress, sd.socketFamily, SOCK_DGRAM)==true)
@@ -277,13 +282,13 @@ int main(void)
 	StartupResult sr = rakPeer->Startup(8,&sd,1);
 	RakAssert(sr==RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(8);
-	rakPeer->SetTimeoutTime(30000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+	rakPeer->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	printf("Started on %s\n", rakPeer->GetMyBoundAddress().ToString(true));
 
 	for (int i=0; i < 32; i++)
 	{
-		if (rakPeer->GetInternalID(RakNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
+		if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
 			rakPeer->AdvertiseSystem("255.255.255.255", 60000+i, 0,0,0);
 	}
 
@@ -339,7 +344,7 @@ int main(void)
 						printf("Got new host (ourselves)");
 					else
 						printf("Got new host %s, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());
-					RakNet::BitStream bs(packet->data,packet->length,false);
+					SLNet::BitStream bs(packet->data,packet->length,false);
 					bs.IgnoreBytes(1);
 					RakNetGUID oldHost;
 					bs.Read(oldHost);
@@ -383,9 +388,9 @@ int main(void)
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 
 			if (ch=='A' || ch=='a')
 			{
@@ -398,7 +403,7 @@ int main(void)
 				printf("Request specific team\n");
 				char buff1[256];
 				printf("Enter team index (0-2): ");
-				gets(buff1);
+				gets_s(buff1);
 				if (buff1[0]!=0 && buff1[0]>='0' && buff1[0]<='2')
 				{
 					success = user->tmTeamMember.RequestTeam(TeamSelection::SpecificTeam(&(teams[buff1[0]-'0'].tmTeam)));
@@ -414,10 +419,10 @@ int main(void)
 				printf("Request team switch\n");
 				char buff1[256];
 				printf("Enter team index to join (0-2): ");
-				gets(buff1);
+				gets_s(buff1);
 				char buff2[256];
 				printf("Enter team index to leave (0-2) or leave empty for all: ");
-				gets(buff2);
+				gets_s(buff2);
 				if (buff1[0]!=0 && buff1[0]>='0' && buff1[0]<='2' &&
 					(buff2[0]==0 || (buff2[0]>='0' && buff2[0]<='2')))
 				{
@@ -437,7 +442,7 @@ int main(void)
 				printf("Cancel request team\n");
 				char buff1[256];
 				printf("Enter team index to cancel (0-2) or leave empty for all: ");
-				gets(buff1);
+				gets_s(buff1);
 				if ((buff1[0]!=0 && buff1[0]>='0' && buff1[0]<='2') || buff1[0]==0)
 				{
 					if (buff1[0])
@@ -456,7 +461,7 @@ int main(void)
 				printf("Leave specific team\n");
 				char buff1[256];
 				printf("Enter team index to leave (0-2): ");
-				gets(buff1);
+				gets_s(buff1);
 				if (buff1[0]!=0 && buff1[0]>='0' && buff1[0]<='2')
 				{
 					success = user->tmTeamMember.LeaveTeam(&(teams[buff1[0]-'0'].tmTeam),0);
@@ -480,10 +485,10 @@ int main(void)
 				printf("Set team member limit\n");
 				char buff1[256];
 				printf("Enter team index to operate on (0-2): ");
-				gets(buff1);
+				gets_s(buff1);
 				char buff2[256];
 				printf("Enter limit (0-9): ");
-				gets(buff2);
+				gets_s(buff2);
 				if (buff1[0]!=0 && buff1[0]>='0' && buff1[0]<='2' &&
 					buff2[0]!=0 && buff2[0]>='0' && buff2[0]<='9')
 				{
@@ -548,11 +553,11 @@ int main(void)
 
 	rakPeer->Shutdown(100);
 	replicaManager3->Clear();
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	delete replicaManager3;
-	RakNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2);
-	RakNet::TeamManager::DestroyInstance(teamManager);
-	RakNet::NetworkIDManager::DestroyInstance(networkIDManager);
+	SLNet::FullyConnectedMesh2::DestroyInstance(fullyConnectedMesh2);
+	SLNet::TeamManager::DestroyInstance(teamManager);
+	SLNet::NetworkIDManager::DestroyInstance(networkIDManager);
 
 	for (unsigned int i=0; i < TEAM_TYPES_COUNT; i++)
 	{

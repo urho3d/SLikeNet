@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // Windows only sample to catch unhandled exceptions and email a minidump.
@@ -35,12 +40,17 @@
 // The third way is save build labels or branches in source control and get that version (you only need source code + .exe + .pdb) before debugging.
 // After debugging, restore your previous work.
 
-#include "SocketLayer.h"
+#include "slikenet/SocketLayer.h"
 #include "CrashReporter.h" // This is the only required file for the crash reporter.  You must link in Dbghelp.lib
 #include <stdio.h> // Printf, for the sample code
-#include "Kbhit.h" // getch, for the sample code
+#include "slikenet/Kbhit.h" // getch, for the sample code
+#pragma warning(push)
+// disable warning 4091 (triggers for enum typedefs in DbgHelp.h in Windows SDK 7.1 and Windows SDK 8.1)
+#pragma warning(disable:4091)
 #include <DbgHelp.h>
-#include "Gets.h"
+#pragma warning(pop)
+
+#include "slikenet/Gets.h"
 
 void function1(int a)
 {
@@ -64,7 +74,7 @@ void RunGame(void)
 
 // If you don't plan to debug the crash reporter itself, you can remove _DEBUG_CRASH_REPORTER
 #ifdef _DEBUG_CRASH_REPORTER
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 extern void DumpMiniDump(PEXCEPTION_POINTERS excpInfo);
 #endif
 
@@ -76,28 +86,28 @@ void main(void)
 	printf("If so desired, it will generate a minidump which can be opened in visual studio\n");
 	printf("to debug the crash.\n\n");
 
-	RakNet::CrashReportControls controls;
+	SLNet::CrashReportControls controls;
 	controls.actionToTake=0;
 
 	printf("Send an email? (y/n)\n");
-	if (getch()=='y')
+	if (_getch()=='y')
 	{
 		printf("Attach the mini-dump to the email? (y/n)\n");
-		if (getch()=='y')
-			controls.actionToTake|=RakNet::AOC_EMAIL_WITH_ATTACHMENT;
+		if (_getch()=='y')
+			controls.actionToTake|= SLNet::AOC_EMAIL_WITH_ATTACHMENT;
 		else
-			controls.actionToTake|=RakNet::AOC_EMAIL_NO_ATTACHMENT;
+			controls.actionToTake|= SLNet::AOC_EMAIL_NO_ATTACHMENT;
 	}
 	printf("Write mini-dump to disk? (y/n)\n");
-	if (getch()=='y')
-		controls.actionToTake|=RakNet::AOC_WRITE_TO_DISK;
+	if (_getch()=='y')
+		controls.actionToTake|= SLNet::AOC_WRITE_TO_DISK;
 	printf("Handle crashes in silent mode (no prompts)? (y/n)\n");
-	if (getch()=='y')
-		controls.actionToTake|=RakNet::AOC_SILENT_MODE;
+	if (_getch()=='y')
+		controls.actionToTake|= SLNet::AOC_SILENT_MODE;
 
-	if ((controls.actionToTake & RakNet::AOC_EMAIL_WITH_ATTACHMENT) || (controls.actionToTake & RakNet::AOC_EMAIL_NO_ATTACHMENT))
+	if ((controls.actionToTake & SLNet::AOC_EMAIL_WITH_ATTACHMENT) || (controls.actionToTake & SLNet::AOC_EMAIL_NO_ATTACHMENT))
 	{
-		if (controls.actionToTake & RakNet::AOC_SILENT_MODE)
+		if (controls.actionToTake & SLNet::AOC_SILENT_MODE)
 		{
 			printf("Enter SMTP Server: ");
 			Gets(controls.SMTPServer,sizeof(controls.SMTPServer));
@@ -119,14 +129,14 @@ void main(void)
 		printf("Enter subject prefix, if any: ");
 		Gets(controls.emailSubjectPrefix,sizeof(controls.emailSubjectPrefix));
 
-		if ((controls.actionToTake & RakNet::AOC_SILENT_MODE)==0)
+		if ((controls.actionToTake & SLNet::AOC_SILENT_MODE)==0)
 		{
 			printf("Enter text to write in email body: ");
 			Gets(controls.emailBody,sizeof(controls.emailBody));
 		}
 	}
 	
-	if (controls.actionToTake & RakNet::AOC_WRITE_TO_DISK)
+	if (controls.actionToTake & SLNet::AOC_WRITE_TO_DISK)
 	{
 		printf("Enter disk path to write to (ENTER for current directory): ");
 		Gets(controls.pathToMinidump,sizeof(controls.pathToMinidump));
@@ -142,7 +152,7 @@ void main(void)
 	controls.minidumpType=MiniDumpWithDataSegs;
 
 	// You must call Start before any crashes will be reported.
-	RakNet::CrashReporter::Start(&controls);
+	SLNet::CrashReporter::Start(&controls);
 	printf("Crash reporter started.\n");
 
 // If you don't plan to debug the crash reporter itself, you can remove the __try within _DEBUG_CRASH_REPORTER

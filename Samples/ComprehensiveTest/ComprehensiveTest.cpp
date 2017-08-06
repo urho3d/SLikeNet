@@ -1,27 +1,34 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "BitStream.h"
+#include "slikenet/BitStream.h"
 #include <stdlib.h> // For atoi
 #include <cstring> // For strlen
-#include "Rand.h"
-#include "RakNetStatistics.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/Rand.h"
+#include "slikenet/statistics.h"
+#include "slikenet/MessageIdentifiers.h"
 #include <stdio.h>
-#include "GetTime.h"
-using namespace RakNet;
+#include "slikenet/GetTime.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
+using namespace SLNet;
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #include <cstdio>
@@ -51,9 +58,9 @@ int main(void)
 
 	for (i=0; i < NUM_PEERS; i++)
 	{
-		peers[i]=RakNet::RakPeerInterface::GetInstance();
+		peers[i]= SLNet::RakPeerInterface::GetInstance();
 		peers[i]->SetMaximumIncomingConnections(CONNECTIONS_PER_SYSTEM);
-		RakNet::SocketDescriptor socketDescriptor(60000+i, 0);
+		SLNet::SocketDescriptor socketDescriptor(60000+i, 0);
 		peers[i]->Startup(NUM_PEERS, &socketDescriptor, 1);
 		peers[i]->SetOfflinePingResponse("Offline Ping Data", (int)strlen("Offline Ping Data")+1);
 	}
@@ -63,8 +70,8 @@ int main(void)
 		peers[i]->Connect("127.0.0.1", 60000+(randomMT()%NUM_PEERS), 0, 0);		
 	}
 
-	RakNet::TimeMS endTime = RakNet::GetTimeMS()+600000;
-	while (RakNet::GetTimeMS()<endTime)
+	SLNet::TimeMS endTime = SLNet::GetTimeMS()+600000;
+	while (SLNet::GetTimeMS()<endTime)
 	{
 		nextAction = frandomMT();
 
@@ -72,7 +79,7 @@ int main(void)
 		{
 			// Initialize
 			peerIndex=randomMT()%NUM_PEERS;
-			RakNet::SocketDescriptor socketDescriptor(60000+peerIndex, 0);
+			SLNet::SocketDescriptor socketDescriptor(60000+peerIndex, 0);
 			peers[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 			peers[peerIndex]->Connect("127.0.0.1", 60000+randomMT() % NUM_PEERS, 0, 0);
 		}
@@ -118,24 +125,24 @@ int main(void)
 			bool broadcast;
 
 		//	data[0]=ID_RESERVED1+(randomMT()%10);
-			data[0]=ID_USER_PACKET_ENUM;
+			data[0]=static_cast<unsigned char>(ID_USER_PACKET_ENUM);
 			dataLength=3+(randomMT()%8000);
 //			dataLength=600+(randomMT()%7000);
 			priority=(PacketPriority)(randomMT()%(int)NUMBER_OF_PRIORITIES);
 			reliability=(PacketReliability)(randomMT()%((int)RELIABLE_SEQUENCED+1));
 			orderingChannel=randomMT()%32;
 			if ((randomMT()%NUM_PEERS)==0)
-				target=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+				target= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 			else
 				target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
 
-			broadcast=(bool)(randomMT()%2);
+			broadcast=(randomMT()%2)?true:false;
 #ifdef _VERIFY_RECIPIENTS
 			broadcast=false; // Temporarily in so I can check recipients
 #endif
 
 			peerIndex=randomMT()%NUM_PEERS;
-			sprintf(data+3, "dataLength=%i priority=%i reliability=%i orderingChannel=%i target=%i broadcast=%i\n", dataLength, priority, reliability, orderingChannel, target.GetPort(), broadcast);
+			sprintf_s(data+3, 8093, "dataLength=%i priority=%i reliability=%i orderingChannel=%i target=%i broadcast=%i\n", dataLength, priority, reliability, orderingChannel, target.GetPort(), broadcast);
 			//unsigned short localPort=60000+i;
 #ifdef _VERIFY_RECIPIENTS
 			memcpy((char*)data+1, (char*)&target.port, sizeof(unsigned short));
@@ -160,15 +167,15 @@ int main(void)
 			orderingChannel=randomMT()%32;
 			peerIndex=randomMT()%NUM_PEERS;
 			if ((randomMT()%NUM_PEERS)==0)
-				target=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+				target= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 			else
 				target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
-			broadcast=(bool)(randomMT()%2);
+			broadcast=(randomMT()%2)?true:false;
 #ifdef _VERIFY_RECIPIENTS
 			broadcast=false; // Temporarily in so I can check recipients
 #endif
 
-			sprintf(data+3, "dataLength=%i priority=%i reliability=%i orderingChannel=%i target=%i broadcast=%i\n", dataLength, priority, reliability, orderingChannel, target.GetPort(), broadcast);
+			sprintf_s(data+3, 8093, "dataLength=%i priority=%i reliability=%i orderingChannel=%i target=%i broadcast=%i\n", dataLength, priority, reliability, orderingChannel, target.GetPort(), broadcast);
 #ifdef _VERIFY_RECIPIENTS
 			memcpy((char*)data, (char*)&target.port, sizeof(unsigned short));
 #endif
@@ -180,13 +187,13 @@ int main(void)
 			SystemAddress target;
 			peerIndex=randomMT()%NUM_PEERS;
 			target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
-			peers[peerIndex]->CloseConnection(target, (bool)(randomMT()%2), 0);
+			peers[peerIndex]->CloseConnection(target, (randomMT()%2)?true:false, 0);
 		}
 		else if (nextAction < .20f)
 		{
 			// Offline Ping
 			peerIndex=randomMT()%NUM_PEERS;
-			peers[peerIndex]->Ping("127.0.0.1", 60000+(randomMT()%NUM_PEERS), (bool)(randomMT()%2));
+			peers[peerIndex]->Ping("127.0.0.1", 60000+(randomMT()%NUM_PEERS), (randomMT()%2)?true:false);
 		}
 		else if (nextAction < .21f)
 		{
@@ -211,7 +218,7 @@ int main(void)
 			rss=peers[peerIndex]->GetStatistics(mySystemAddress);
 			if (rss)
 			{
-				StatisticsToString(rss, data, 0);
+				StatisticsToString(rss, data, 8096, 0);
 #ifdef _DO_PRINTF
 				printf("Statistics for local system %i:\n%s", mySystemAddress.GetPort(), data);
 #endif
@@ -220,7 +227,7 @@ int main(void)
 			rss=peers[peerIndex]->GetStatistics(target);
 			if (rss)
 			{
-				StatisticsToString(rss, data, 0);
+				StatisticsToString(rss, data, 8096, 0);
 #ifdef _DO_PRINTF
 				printf("Statistics for target system %i:\n%s", target.GetPort(), data);
 #endif
@@ -239,7 +246,7 @@ int main(void)
 
 
 	for (i=0; i < NUM_PEERS; i++)
-		RakNet::RakPeerInterface::DestroyInstance(peers[i]);
+		SLNet::RakPeerInterface::DestroyInstance(peers[i]);
 
 	return 0;
 }

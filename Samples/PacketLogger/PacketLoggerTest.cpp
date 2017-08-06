@@ -1,34 +1,39 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "Gets.h"
-#include "PacketLogger.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Gets.h"
+#include "slikenet/PacketLogger.h"
 #include <assert.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #endif
 
 static const int NUM_PEERS=2;
-RakNet::RakPeerInterface *rakPeer[NUM_PEERS];
-RakNet::PacketLogger messageHandler[NUM_PEERS];
+SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
+SLNet::PacketLogger messageHandler[NUM_PEERS];
 void PrintConnections(void);
 
 int main(void)
@@ -36,7 +41,7 @@ int main(void)
 	int i;
 	
 	for (i=0; i < NUM_PEERS; i++)
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("Packet Logger Test.\n");
 	printf("Displays all packets being sent or received.\n");
@@ -66,7 +71,7 @@ int main(void)
 	// Initialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 
@@ -87,7 +92,7 @@ int main(void)
 #endif
 
 	for (i=0; i < NUM_PEERS; i++)
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
 	printf("Press enter to continue.\n");
 	char temp[256];

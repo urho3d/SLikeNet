@@ -1,37 +1,44 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // Common includes
 #include <stdio.h>
 #include <stdlib.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "PacketizedTCP.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/PacketizedTCP.h"
 
 // Client only includes
-#include "FileListTransferCBInterface.h"
-#include "FileListTransfer.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/FileListTransfer.h"
 #include "AutopatcherClient.h"
-#include "AutopatcherPatchContext.h"
-#include "Gets.h"
-#include "RakSleep.h"
+#include "slikenet/AutopatcherPatchContext.h"
+#include "slikenet/Gets.h"
+#include "slikenet/sleep.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 char WORKING_DIRECTORY[MAX_PATH];
 char PATH_TO_XDELTA_EXE[MAX_PATH];
 
-class TestCB : public RakNet::AutopatcherClientCBInterface
+class TestCB : public SLNet::AutopatcherClientCBInterface
 {
 public:
 	virtual bool OnFile(OnFileStruct *onFileStruct)
@@ -87,17 +94,17 @@ public:
 		else
 		{
 			char buff[128];
-			RakNet::TimeUS time = RakNet::GetTimeUS();
+			SLNet::TimeUS time = SLNet::GetTimeUS();
 #if defined(_WIN32)
-			sprintf(buff, "%I64u", time);
+			sprintf_s(buff, "%I64u", time);
 #else
-			sprintf(buff, "%llu", (long long unsigned int) time);
+			sprintf_s(buff, "%llu", (long long unsigned int) time);
 #endif
 
 			char pathToPatch1[MAX_PATH], pathToPatch2[MAX_PATH];
-			sprintf(pathToPatch1, "%s/patchClient_%s.tmp", WORKING_DIRECTORY, buff);
-			FILE *fpPatch = fopen(pathToPatch1, "wb");
-			if (fpPatch==0)
+			sprintf_s(pathToPatch1, "%s/patchClient_%s.tmp", WORKING_DIRECTORY, buff);
+			FILE *fpPatch;
+			if (fopen_s(&fpPatch, pathToPatch1, "wb")!=0)
 				return PC_ERROR_PATCH_TARGET_MISSING;
 			fwrite(patchContents, 1, patchSize, fpPatch);
 			fclose(fpPatch);
@@ -108,7 +115,7 @@ public:
 			_snprintf(commandLine, sizeof(commandLine)-1, "-d -f -s %s patchClient_%s.tmp newFile_%s.tmp", oldFilePath, buff, buff);
 			commandLine[511]=0;
 
-			SHELLEXECUTEINFO shellExecuteInfo;
+			SHELLEXECUTEINFOA shellExecuteInfo;
 			shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 			shellExecuteInfo.fMask = SEE_MASK_NOASYNC | SEE_MASK_NO_CONSOLE;
 			shellExecuteInfo.hwnd = NULL;
@@ -118,21 +125,23 @@ public:
 			shellExecuteInfo.lpDirectory = WORKING_DIRECTORY;
 			shellExecuteInfo.nShow = SW_SHOWNORMAL;
 			shellExecuteInfo.hInstApp = NULL;
-			ShellExecuteEx(&shellExecuteInfo);
+			ShellExecuteExA(&shellExecuteInfo);
 
 			// ShellExecute(NULL, "open", PATH_TO_XDELTA_EXE, commandLine, WORKING_DIRECTORY, SW_SHOWNORMAL);
 
-			sprintf(pathToPatch2, "%s/newFile_%s.tmp", WORKING_DIRECTORY, buff);
-			fpPatch = fopen(pathToPatch2, "r+b");
-			RakNet::TimeUS stopWaiting = time + 60000000;
-			while (fpPatch==0 && RakNet::GetTimeUS() < stopWaiting)
+			sprintf_s(pathToPatch2, "%s/newFile_%s.tmp", WORKING_DIRECTORY, buff);
+			errno_t error = fopen_s(&fpPatch, pathToPatch2, "r+b");
+			SLNet::TimeUS stopWaiting = time + 60000000;
+			while (error!=0 && SLNet::GetTimeUS() < stopWaiting)
 			{
 				RakSleep(1000);
-				fpPatch = fopen(pathToPatch2, "r+b");
+				error = fopen_s(&fpPatch, pathToPatch2, "r+b");
 			}
-			if (fpPatch==0)
+			if (error!=0)
 			{
-				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch2, errno, strerror(errno), commandLine);
+				char buff[1024];
+				strerror_s(buff, errno);
+				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch2, errno, buff, commandLine);
 				return PC_ERROR_PATCH_TARGET_MISSING;
 			}
 		
@@ -145,7 +154,7 @@ public:
 
 			int unlinkRes1 = _unlink(pathToPatch1);
 			int unlinkRes2 = _unlink(pathToPatch2);
-			while ((unlinkRes1!=0 || unlinkRes2!=0) && RakNet::GetTimeUS() < stopWaiting)
+			while ((unlinkRes1!=0 || unlinkRes2!=0) && SLNet::GetTimeUS() < stopWaiting)
 			{
 				RakSleep(1000);
 				if (unlinkRes1!=0)
@@ -154,10 +163,16 @@ public:
 					unlinkRes2 = _unlink(pathToPatch2);
 			}
 
-			if (unlinkRes1!=0)
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch1, errno, strerror(errno));
-			if (unlinkRes2!=0)
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch2, errno, strerror(errno));
+			if (unlinkRes1!=0) {
+				char buff[1024];
+				strerror_s(buff, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch1, errno, buff);
+			}
+			if (unlinkRes2!=0) {
+				char buff[1024];
+				strerror_s(buff, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch2, errno, buff);
+			}
 
 			return PC_WRITE_FILE;
 		}
@@ -174,9 +189,9 @@ int main(int argc, char **argv)
 	printf("Difficulty: Intermediate\n\n");
 
 	printf("Client starting...");
-	RakNet::SystemAddress serverAddress=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
-	RakNet::AutopatcherClient autopatcherClient;
-	RakNet::FileListTransfer fileListTransfer;
+	SLNet::SystemAddress serverAddress= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
+	SLNet::AutopatcherClient autopatcherClient;
+	SLNet::FileListTransfer fileListTransfer;
 	autopatcherClient.SetFileListTransferPlugin(&fileListTransfer);
 	unsigned short localPort=0;
 	if (argc>=6)
@@ -184,7 +199,7 @@ int main(int argc, char **argv)
 		localPort=atoi(argv[5]);
 	}
 #ifdef USE_TCP
-	RakNet::PacketizedTCP packetizedTCP;
+	SLNet::PacketizedTCP packetizedTCP;
 	if (packetizedTCP.Start(localPort,1)==false)
 	{
 		printf("Failed to start TCP. Is the port already in use?");
@@ -193,9 +208,9 @@ int main(int argc, char **argv)
 	packetizedTCP.AttachPlugin(&autopatcherClient);
 	packetizedTCP.AttachPlugin(&fileListTransfer);
 #else
-	RakNet::RakPeerInterface *rakPeer;
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
-	RakNet::SocketDescriptor socketDescriptor(localPort,0);
+	SLNet::RakPeerInterface *rakPeer;
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
+	SLNet::SocketDescriptor socketDescriptor(localPort,0);
 	rakPeer->Startup(1,&socketDescriptor, 1);
 	// Plugin will send us downloading progress notifications if a file is split to fit under the MTU 10 or more times
 	rakPeer->SetSplitMessageProgressInterval(10);
@@ -209,11 +224,11 @@ int main(int argc, char **argv)
 		printf("Enter server IP: ");
 		Gets(buff,sizeof(buff));
 		if (buff[0]==0)
-			//strcpy(buff, "natpunch.jenkinssoftware.com");
-			strcpy(buff, "127.0.0.1");
+			//strcpy_s(buff, "natpunch.jenkinssoftware.com");
+			strcpy_s(buff, "127.0.0.1");
 	}
 	else
-		strcpy(buff, argv[1]);
+		strcpy_s(buff, argv[1]);
 
 #ifdef USE_TCP
 	packetizedTCP.Connect(buff,60000,false);
@@ -229,21 +244,21 @@ int main(int argc, char **argv)
 		Gets(appDir,sizeof(appDir));
 		if (appDir[0]==0)
 		{
-			strcpy(appDir, "D:/temp2");
+			strcpy_s(appDir, "D:/temp2");
 		}
 	}
 	else
-		strcpy(appDir, argv[2]);
+		strcpy_s(appDir, argv[2]);
 	char appName[512];
 	if (argc<4)
 	{
 		printf("Enter application name: ");
 		Gets(appName,sizeof(appName));
 		if (appName[0]==0)
-			strcpy(appName, "TestApp");
+			strcpy_s(appName, "TestApp");
 	}
 	else
-		strcpy(appName, argv[3]);
+		strcpy_s(appName, argv[3]);
 
 	bool patchImmediately=argc>=5 && argv[4][0]=='1';
 	
@@ -253,14 +268,14 @@ int main(int argc, char **argv)
 		Gets(PATH_TO_XDELTA_EXE, sizeof(PATH_TO_XDELTA_EXE));
 		// https://code.google.com/p/xdelta/downloads/list
 		if (PATH_TO_XDELTA_EXE[0]==0)
-			strcpy(PATH_TO_XDELTA_EXE, "c:/xdelta3-3.0.6-win32.exe");
+			strcpy_s(PATH_TO_XDELTA_EXE, "c:/xdelta3-3.0.6-win32.exe");
 
 		if (PATH_TO_XDELTA_EXE[0])
 		{
 			printf("Enter working directory to store temporary files: ");
 			Gets(WORKING_DIRECTORY, sizeof(WORKING_DIRECTORY));
 			if (WORKING_DIRECTORY[0]==0)
-				GetTempPath(MAX_PATH, WORKING_DIRECTORY);
+				GetTempPathA(MAX_PATH, WORKING_DIRECTORY);
 			if (WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=='\\' || WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=='/')
 				WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=0;
 		}
@@ -271,22 +286,22 @@ int main(int argc, char **argv)
 		printf("Hit 'q' to quit, 'c' to cancel the patch.\n");
 
 	char ch;
-	RakNet::Packet *p;
-	while (1)
+	SLNet::Packet *p;
+	for(;;)
 	{
 #ifdef USE_TCP
-		RakNet::SystemAddress notificationAddress;
+		SLNet::SystemAddress notificationAddress;
 		notificationAddress=packetizedTCP.HasCompletedConnectionAttempt();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 		{
 			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
 			serverAddress=notificationAddress;
 		}
 		notificationAddress=packetizedTCP.HasNewIncomingConnection();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_NEW_INCOMING_CONNECTION\n");
 		notificationAddress=packetizedTCP.HasLostConnection();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_CONNECTION_LOST\n");
 
 
@@ -296,9 +311,9 @@ int main(int argc, char **argv)
 			if (p->data[0]==ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR)
 			{
 				char buff[256];
-				RakNet::BitStream temp(p->data, p->length, false);
+				SLNet::BitStream temp(p->data, p->length, false);
 				temp.IgnoreBits(8);
-				RakNet::StringCompressor::Instance()->DecodeString(buff, 256, &temp);
+				SLNet::StringCompressor::Instance()->DecodeString(buff, 256, &temp);
 				printf("ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR\n");
 				printf("%s\n", buff);
 			}
@@ -310,7 +325,8 @@ int main(int argc, char **argv)
 			{
 				printf("ID_AUTOPATCHER_FINISHED with server time %f\n", autopatcherClient.GetServerDate());
 				double srvDate=autopatcherClient.GetServerDate();
-				FILE *fp = fopen("srvDate", "wb");
+				FILE *fp;
+				fopen_s(&fp, "srvDate", "wb");
 				fwrite(&srvDate,sizeof(double),1,fp);
 				fclose(fp);
 			}
@@ -340,9 +356,9 @@ int main(int argc, char **argv)
 			else if (p->data[0]==ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR)
 			{
 				char buff[256];
-				RakNet::BitStream temp(p->data, p->length, false);
+				SLNet::BitStream temp(p->data, p->length, false);
 				temp.IgnoreBits(8);
-				RakNet::StringCompressor::Instance()->DecodeString(buff, 256, &temp);
+				SLNet::StringCompressor::Instance()->DecodeString(buff, 256, &temp);
 				printf("ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR\n");
 				printf("%s\n", buff);
 			}
@@ -354,7 +370,8 @@ int main(int argc, char **argv)
 			{
 				printf("ID_AUTOPATCHER_FINISHED with server time %f\n", autopatcherClient.GetServerDate());
 				double srvDate=autopatcherClient.GetServerDate();
-				FILE *fp = fopen("srvDate", "wb");
+				FILE *fp;
+				fopen_s(&fp, "srvDate", "wb");
 				fwrite(&srvDate,sizeof(double),1,fp);
 				fclose(fp);
 			}
@@ -366,8 +383,8 @@ int main(int argc, char **argv)
 		}
 #endif
 
-		if (kbhit())
-			ch=getch();
+		if (_kbhit())
+			ch=_getch();
 		else
 			ch=0;
 
@@ -389,12 +406,12 @@ int main(int argc, char **argv)
 			rakPeer->CloseConnection(serverAddress, true);
 #endif
 		}
-		else if (ch=='p' || (serverAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS && patchImmediately==true) || ch=='f')
+		else if (ch=='p' || (serverAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS && patchImmediately==true) || ch=='f')
 		{
 			patchImmediately=false;
 			char restartFile[512];
-			strcpy(restartFile, appDir);
-			strcat(restartFile, "/autopatcherRestart.txt");
+			strcpy_s(restartFile, appDir);
+			strcat_s(restartFile, "/autopatcherRestart.txt");
 
 			double lastUpdateDate;
 			if (ch=='f')
@@ -403,8 +420,8 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				FILE *fp = fopen("srvDate", "rb");
-				if (fp)
+				FILE *fp;
+				if (fopen_s(&fp, "srvDate", "rb") == 0)
 				{
 					fread(&lastUpdateDate, sizeof(lastUpdateDate), 1, fp);
 					fclose(fp);
@@ -438,7 +455,7 @@ int main(int argc, char **argv)
 	packetizedTCP.Stop();
 #else
 	rakPeer->Shutdown(500,0);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 #endif
 	return 1;
 }

@@ -3,9 +3,14 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "pch.h"
@@ -100,8 +105,8 @@ void WinPhone8::OnWindowClosed(CoreWindow^ sender, CoreWindowEventArgs^ args)
 	m_windowClosed = true;
 }
 
-#include "RakPeerInterface.h"
-using namespace RakNet;
+#include "slikenet/peerinterface.h"
+using namespace SLNet;
 #define DEFAULT_SERVER_PORT 61111
 #define DEFAULT_SERVER_ADDRESS "natpunch.jenkinssoftware.com"
 

@@ -1,39 +1,44 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "RakNetTypes.h"
-#include "RakSleep.h"
-#include "FullyConnectedMesh2.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/types.h"
+#include "slikenet/sleep.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ConnectionGraph2.h"
 #include <assert.h>
-#include "SocketLayer.h"
-#include "Kbhit.h"
-#include "PacketLogger.h"
-#include "Gets.h"
-#include "BitStream.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/Gets.h"
+#include "slikenet/BitStream.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 #define NUM_PEERS 4
-RakNet::RakPeerInterface *rakPeer[NUM_PEERS];
+SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
 
 class FullyConnectedMesh2_UserData : public FullyConnectedMesh2
 {
-	virtual void WriteVJCUserData(RakNet::BitStream *bsOut) {bsOut->Write(RakString("WriteVJCUserData test"));}
-	virtual void WriteVJSUserData(RakNet::BitStream *bsOut, RakNetGUID userGuid) {bsOut->Write(RakString("WriteVJSUserData test, userGuid=%s", userGuid.ToString()));}
+	virtual void WriteVJCUserData(SLNet::BitStream *bsOut) {bsOut->Write(RakString("WriteVJCUserData test"));}
+	virtual void WriteVJSUserData(SLNet::BitStream *bsOut, RakNetGUID userGuid) {bsOut->Write(RakString("WriteVJSUserData test, userGuid=%s", userGuid.ToString()));}
 };
 
 int main()
@@ -42,17 +47,17 @@ int main()
 
 	for (int i=0; i < NUM_PEERS; i++)
 	{
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 		rakPeer[i]->AttachPlugin(&fcm2[i]);
 		fcm2[i].SetAutoparticipateConnections(false);
 		fcm2[i].SetConnectOnNewRemoteConnection(false, "");
-		RakNet::SocketDescriptor sd;
+		SLNet::SocketDescriptor sd;
 		sd.port=60000+i;
 		StartupResult sr = rakPeer[i]->Startup(NUM_PEERS,&sd,1);
 		RakAssert(sr==RAKNET_STARTED);
 		rakPeer[i]->SetMaximumIncomingConnections(NUM_PEERS);
-		rakPeer[i]->SetTimeoutTime(1000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-		printf("%i. Our guid is %s\n", i, rakPeer[i]->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+		rakPeer[i]->SetTimeoutTime(1000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+		printf("%i. Our guid is %s\n", i, rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	}
 	
 	RakSleep(100);
@@ -72,7 +77,7 @@ int main()
 	
 
 	bool quit=false;
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	char ch;
 	while (!quit)
 	{
@@ -123,7 +128,7 @@ int main()
 
 				case ID_FCM2_VERIFIED_JOIN_CAPABLE:
 					{
-						RakNet::BitStream bs(packet->data,packet->length,false);
+						SLNet::BitStream bs(packet->data,packet->length,false);
 						FullyConnectedMesh2::SkipToVJCUserData(&bs);
 						RakString testStr;
 						bs.Read(testStr);
@@ -138,7 +143,7 @@ int main()
 					{
 						bool thisSystemAccepted;
 						DataStructures::List<RakNetGUID> systemsAccepted;
-						RakNet::BitStream additionalData;
+						SLNet::BitStream additionalData;
 						fcm2[peerIndex].GetVerifiedJoinAcceptedAdditionalData(packet, &thisSystemAccepted, systemsAccepted, &additionalData);
 						if (thisSystemAccepted)
 						{
@@ -161,9 +166,9 @@ int main()
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='q' || ch=='Q')
 			{
 				printf("Quitting.\n");
@@ -177,7 +182,7 @@ int main()
 
 	for (int i=0; i < NUM_PEERS; i++)
 	{
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 	}
 	return 0;
 }

@@ -1,3 +1,14 @@
+#
+# This file was taken from RakNet 4.082.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+#
+# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+#
+# This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+# license found in the license.txt file in the root directory of this source tree.
+#
+
 cmake_minimum_required(VERSION 2.6)
 GETCURRENTFOLDER()
 FINDPORTAUDIO()
@@ -16,7 +27,7 @@ IF(WIN32 AND NOT UNIX)
 	SOURCE_GROUP(PortAudio FILES ${PORTAUDIOFILES})
 	ADDCPPDEF(HAVE_CONFIG_H)
 	include_directories(${RAKNETHEADERFILES} ./ ${PORTAUDIO_INCLUDE_DIR} ${RakNet_SOURCE_DIR}/DependentExtensions ${speex_SOURCE_DIR}/include ${portaudio_SOURCE_DIR} ${speex_SOURCE_DIR}/win32) 
-	add_executable(${current_folder} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${PORTAUDIOFILES} ${SPEEXFILES} readme.txt)
+	add_executable(${current_folder} ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} ${PORTAUDIOFILES} ${SPEEXFILES})
 	target_link_libraries(${current_folder} ${RAKNET_COMMON_LIBS})
 	VSUBFOLDER(${current_folder} Samples/Voice)
 ELSE(WIN32 AND NOT UNIX)

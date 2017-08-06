@@ -1,16 +1,21 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <stdio.h>
 #if defined(_WIN32)
-#include "WindowsIncludes.h" // Sleep and CreateProcess
+#include "slikenet/WindowsIncludes.h" // Sleep and CreateProcess
 #include <process.h> // system
 #else
 #include <unistd.h> // usleep
@@ -21,7 +26,9 @@
 #include <unistd.h>
 #endif
 
-#include "Gets.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #include <iostream>
 
@@ -41,8 +48,7 @@ int main(int argc, char **argv)
 
 	bool deleteFile=false;
 	FILE *fp;
-	fp = fopen(argv[1], "rt");
-	if (fp==0)
+	if (fopen_s(&fp, argv[1], "rt") != 0)
 	{
 		printf("Error: Cannot open %s\n", argv[1]);
 		return 1;
@@ -71,14 +77,14 @@ int main(int argc, char **argv)
 		{
 #ifdef _WIN32
 			PROCESS_INFORMATION pi;
-			STARTUPINFO si;
+			STARTUPINFOA si;
 
 			// Set up the start up info struct.
-			memset(&si, 0,  sizeof(STARTUPINFO));
-			si.cb = sizeof(STARTUPINFO);
+			memset(&si, 0,  sizeof(STARTUPINFOA));
+			si.cb = sizeof(STARTUPINFOA);
 
 			// Launch the child process.
-			if (!CreateProcess(
+			if (!CreateProcessA(
 				NULL,
 				buff+15,
 				NULL, NULL,
@@ -94,7 +100,7 @@ int main(int argc, char **argv)
 #else
             char PathName[255];
 
-            strcpy(PathName, buff+15);
+            strcpy_s(PathName, buff+15);
 
             system(PathName);  //This actually runs the application.
 #endif
@@ -114,6 +120,10 @@ int main(int argc, char **argv)
 	// Done!
 	if (deleteFile)
 	{
+#ifdef _WIN32
+		_unlink(argv[1]);
+#else
 		unlink(argv[1]);
+#endif
 	}
 }

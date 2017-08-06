@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // To compile link with Dbghelp.lib
@@ -13,18 +18,24 @@
 #ifdef WIN32
 
 #include <stdio.h>
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
+#pragma warning(push)
+// disable warning 4091 (triggers for enum typedefs in DbgHelp.h in Windows SDK 7.1 and Windows SDK 8.1)
+#pragma warning(disable:4091)
 #include <DbgHelp.h>
+#pragma warning(pop)
 #include <stdlib.h>
 #include <time.h>
 #include "SendFileTo.h"
 #include "CrashReporter.h"
-#include "EmailSender.h"
-#include "FileList.h"
-#include "FileOperations.h"
-#include "SimpleMutex.h"
+#include "slikenet/EmailSender.h"
+#include "slikenet/FileList.h"
+#include "slikenet/FileOperations.h"
+#include "slikenet/SimpleMutex.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 CrashReportControls CrashReporter::controls;
 
@@ -39,8 +50,8 @@ LONG ProcessException(struct _EXCEPTION_POINTERS *ExceptionInfo)
 	char appDescriptor[_MAX_PATH];
 	if ((CrashReporter::controls.actionToTake & AOC_SILENT_MODE) == 0)
 	{
-		sprintf(appDescriptor, "%s has crashed.\nGenerate a report?",  CrashReporter::controls.appName);
-		if (::MessageBox( NULL, appDescriptor, "Crash Reporter", MB_YESNO )==IDNO)
+		sprintf_s(appDescriptor, "%s has crashed.\nGenerate a report?",  CrashReporter::controls.appName);
+		if (::MessageBoxA( NULL, appDescriptor, "Crash Reporter", MB_YESNO )==IDNO)
 		{
 			return EXCEPTION_CONTINUE_SEARCH;
 		}
@@ -48,7 +59,7 @@ LONG ProcessException(struct _EXCEPTION_POINTERS *ExceptionInfo)
 
 	char dumpFilepath[_MAX_PATH];
 	char dumpFilename[_MAX_PATH];
-	sprintf(appDescriptor, "%s %s - %s %s", CrashReporter::controls.appName, CrashReporter::controls.appVersion, __DATE__, __TIME__);
+	sprintf_s(appDescriptor, "%s %s - %s %s", CrashReporter::controls.appName, CrashReporter::controls.appVersion, __DATE__, __TIME__);
 
 	if ((CrashReporter::controls.actionToTake & AOC_EMAIL_WITH_ATTACHMENT) ||
 		(CrashReporter::controls.actionToTake & AOC_WRITE_TO_DISK)
@@ -56,26 +67,26 @@ LONG ProcessException(struct _EXCEPTION_POINTERS *ExceptionInfo)
 	{
 		if (CrashReporter::controls.actionToTake & AOC_WRITE_TO_DISK)
 		{
-			strcpy(dumpFilepath, CrashReporter::controls.pathToMinidump);
+			strcpy_s(dumpFilepath, CrashReporter::controls.pathToMinidump);
 			WriteFileWithDirectories(dumpFilepath,0,0);
 			AddSlash(dumpFilepath);
 		}
 		else
 		{
 			// Write to a temporary directory if the user doesn't want the dump on the harddrive.
-			if (!GetTempPath( _MAX_PATH, dumpFilepath ))
+			if (!GetTempPathA( _MAX_PATH, dumpFilepath ))
 				dumpFilepath[0]=0;
 		}
 		unsigned i, dumpFilenameLen;
-		strcpy(dumpFilename, appDescriptor);
+		strcpy_s(dumpFilename, appDescriptor);
 		dumpFilenameLen=(unsigned) strlen(appDescriptor);
 		for (i=0; i < dumpFilenameLen; i++)
 			if (dumpFilename[i]==':' || dumpFilename[i]=='/' || dumpFilename[i]=='\\')
 				dumpFilename[i]='.'; // Remove illegal characters from filename
-		strcat(dumpFilepath, dumpFilename);
-		strcat(dumpFilepath, ".dmp");
+		strcat_s(dumpFilepath, dumpFilename);
+		strcat_s(dumpFilepath, ".dmp");
 
-		HANDLE hFile = CreateFile(dumpFilepath,GENERIC_WRITE, FILE_SHARE_READ,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		HANDLE hFile = CreateFileA(dumpFilepath,GENERIC_WRITE, FILE_SHARE_READ,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 		if (hFile==INVALID_HANDLE_VALUE)
 			return EXCEPTION_CONTINUE_SEARCH;
 
@@ -101,15 +112,15 @@ LONG ProcessException(struct _EXCEPTION_POINTERS *ExceptionInfo)
 	char subject[1204];
 	if (CrashReporter::controls.actionToTake & AOC_EMAIL_NO_ATTACHMENT)
 	{
-		strcpy(subject, CrashReporter::controls.emailSubjectPrefix);
-		strcat(subject, appDescriptor);
+		strcpy_s(subject, CrashReporter::controls.emailSubjectPrefix);
+		strcat_s(subject, appDescriptor);
 
 		if (CrashReporter::controls.actionToTake & AOC_SILENT_MODE)
 		{
-		sprintf(silentModeEmailBody, "%s%s version %s has crashed.\r\nIt was compiled on %s %s.\r\n", CrashReporter::controls.emailBody, CrashReporter::controls.appName,CrashReporter::controls.appVersion, __DATE__, __TIME__);
+		sprintf_s(silentModeEmailBody, "%s%s version %s has crashed.\r\nIt was compiled on %s %s.\r\n", CrashReporter::controls.emailBody, CrashReporter::controls.appName,CrashReporter::controls.appVersion, __DATE__, __TIME__);
 
 			if (CrashReporter::controls.actionToTake & AOC_WRITE_TO_DISK)
-				sprintf(silentModeEmailBody+strlen(silentModeEmailBody), "Minidump written to %s \r\n", dumpFilepath);
+				sprintf_s(silentModeEmailBody+strlen(silentModeEmailBody), 1024-strlen(silentModeEmailBody), "Minidump written to %s \r\n", dumpFilepath);
 
 			// Silently send email with attachment
 			EmailSender emailSender;
@@ -133,16 +144,16 @@ LONG ProcessException(struct _EXCEPTION_POINTERS *ExceptionInfo)
 	}
 	else if (CrashReporter::controls.actionToTake & AOC_EMAIL_WITH_ATTACHMENT)
 	{
-		strcpy(subject, CrashReporter::controls.emailSubjectPrefix);
-		strcat(subject, dumpFilename);
-		strcat(dumpFilename, ".dmp");
+		strcpy_s(subject, CrashReporter::controls.emailSubjectPrefix);
+		strcat_s(subject, dumpFilename);
+		strcat_s(dumpFilename, ".dmp");
 
 		if (CrashReporter::controls.actionToTake & AOC_SILENT_MODE)
 		{
-			sprintf(silentModeEmailBody, "%s%s version %s has crashed.\r\nIt was compiled on %s %s.\r\n", CrashReporter::controls.emailBody, CrashReporter::controls.appName,CrashReporter::controls.appVersion, __DATE__, __TIME__);
+			sprintf_s(silentModeEmailBody, "%s%s version %s has crashed.\r\nIt was compiled on %s %s.\r\n", CrashReporter::controls.emailBody, CrashReporter::controls.appName,CrashReporter::controls.appVersion, __DATE__, __TIME__);
 
 			if (CrashReporter::controls.actionToTake & AOC_WRITE_TO_DISK)
-				sprintf(silentModeEmailBody+strlen(silentModeEmailBody), "Minidump written to %s \r\n", dumpFilepath);
+				sprintf_s(silentModeEmailBody+strlen(silentModeEmailBody), 1024-strlen(silentModeEmailBody), "Minidump written to %s \r\n", dumpFilepath);
 
 			// Silently send email with attachment
 			EmailSender emailSender;

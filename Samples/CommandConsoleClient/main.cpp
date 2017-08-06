@@ -1,41 +1,48 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #ifdef _WIN32
-#include "Kbhit.h"
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/Kbhit.h"
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <unistd.h> // usleep
 #include <strings.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 //linux doesn't have stricmp but strcasecmp is same functionality
 #define stricmp strcasecmp
 #endif
 
-#include "Gets.h"
+#include "slikenet/Gets.h"
 
 
 int main()
 {
-	RakNet::Packet *packet;
-	RakNet::RakPeerInterface *rakPeer;
+	SLNet::Packet *packet;
+	SLNet::RakPeerInterface *rakPeer;
 	bool isConnected=false;
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	char command[512];
 	printf("This sample demonstrates connecting to the command console.\n");
 	printf("using the RakNet transport protocol\n");
@@ -49,19 +56,19 @@ int main()
 	printf("/Disconnect\n");
 	printf("/Quit\n");
 	printf("Any other command goes to the remote console\n");
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
 			Gets(command,sizeof(command));
 
-			if (stricmp(command, "/quit")==0)
+			if (_stricmp(command, "/quit")==0)
 			{
 				printf("Goodbye.\n");
 				rakPeer->Shutdown(500, 0);
 				return 0;
 			}
-			else if (stricmp(command, "/disconnect")==0)
+			else if (_stricmp(command, "/disconnect")==0)
 			{
 				if (isConnected)
 				{
@@ -74,7 +81,7 @@ int main()
 					printf("Not currently connected.\n");
 				}
 			}
-			else if (stricmp(command, "/connect")==0)
+			else if (_stricmp(command, "/connect")==0)
 			{
 				if (isConnected)
 				{
@@ -98,19 +105,19 @@ int main()
 					Gets(localPort,sizeof(localPort));
 					if (localPort[0]==0)
 					{
-						strcpy(localPort, "0");
+						strcpy_s(localPort, "0");
 					}
 					printf("Enter console password (enter for none): ");
 					Gets(password,sizeof(password));
-					RakNet::SocketDescriptor socketDescriptor((int) atoi(localPort),0);
-					if (rakPeer->Startup(1, &socketDescriptor, 1)==RakNet::RAKNET_STARTED)
+					SLNet::SocketDescriptor socketDescriptor((int) atoi(localPort),0);
+					if (rakPeer->Startup(1, &socketDescriptor, 1)== SLNet::RAKNET_STARTED)
 					{
 						int passwordLen;
 						if (password[0])
 							passwordLen=(int) strlen(password)+1;
 						else
 							passwordLen=0;
-						if (rakPeer->Connect(ip, (int) atoi(remotePort), password, passwordLen)==RakNet::CONNECTION_ATTEMPT_STARTED)
+						if (rakPeer->Connect(ip, (int) atoi(remotePort), password, passwordLen)== SLNet::CONNECTION_ATTEMPT_STARTED)
 							printf("Connecting...\nNote: if the password is wrong the other system will ignore us.\n");
 						else
 						{
@@ -127,10 +134,10 @@ int main()
 			{
 				if (isConnected)
 				{
-					RakNet::BitStream str;
+					SLNet::BitStream str;
 					str.Write((unsigned char) ID_TRANSPORT_STRING);
 					str.Write(command, (int) strlen(command)+1);
-					rakPeer->Send(&str, MEDIUM_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					rakPeer->Send(&str, MEDIUM_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 				}
 				else
 				{

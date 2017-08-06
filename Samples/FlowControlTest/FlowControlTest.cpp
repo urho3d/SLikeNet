@@ -1,29 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "RakNetStatistics.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/statistics.h"
 #include <cstdio>
 #include <memory.h>
 #include <cstring>
 #include <stdlib.h>
-#include "Gets.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 #ifdef WIN32
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #else
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #endif
 
 int main(void)
@@ -36,9 +43,9 @@ int main(void)
 	int localPort, remotePort;
 	int packetSize;
 	int sendinterval;
-	RakNet::TimeMS time;
-	RakNet::Packet *p;
-	RakNet::TimeMS lastPacketReceipt, lastNotification, lastSend;
+	SLNet::TimeMS time;
+	SLNet::Packet *p;
+	SLNet::TimeMS lastPacketReceipt, lastNotification, lastSend;
 	#ifndef _WIN32
 	char buff[256];
 	#endif
@@ -54,18 +61,18 @@ int main(void)
 	Gets(buff,sizeof(buff));
 	ch=buff[0];
 #else
-	ch=getch();
+	ch=_getch();
 #endif
 	if (ch=='s' || ch=='S')
 	{
 		printf("Acting as server.\n");
-		rakServer=RakNet::RakPeerInterface::GetInstance();
+		rakServer= SLNet::RakPeerInterface::GetInstance();
 		rakClient=0;
 	}
 	else
 	{
 		printf("Acting as client.\n");
-		rakClient=RakNet::RakPeerInterface::GetInstance();
+		rakClient= SLNet::RakPeerInterface::GetInstance();
 		rakServer=0;
 	}
 
@@ -83,7 +90,7 @@ int main(void)
 
 	if (rakServer)
 	{
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakServer->Startup(100, &socketDescriptor, 1);
 		rakServer->SetMaximumIncomingConnections(100);
 	}
@@ -92,14 +99,14 @@ int main(void)
 		printf("Enter remote IP: ");
 		Gets(remoteIP,sizeof(remoteIP));
 		if (remoteIP[0]==0)
-			strcpy(remoteIP, "127.0.0.1");
+			strcpy_s(remoteIP, "127.0.0.1");
 		printf("Enter remote port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			remotePort=60000;
 		else
 			remotePort=atoi(str);
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakClient->Startup(1, &socketDescriptor, 1);
 		rakClient->Connect(remoteIP, remotePort, 0, 0);
 	}
@@ -108,20 +115,20 @@ int main(void)
 
 	sendinterval=128;
 	packetSize=64;
-	lastPacketReceipt=lastNotification=RakNet::GetTimeMS();
+	lastPacketReceipt=lastNotification= SLNet::GetTimeMS();
 	lastSend=0;
 
-	while (1)
+	for(;;)
 	{
-		time=RakNet::GetTimeMS();
+		time= SLNet::GetTimeMS();
 
-		if (kbhit())
+		if (_kbhit())
 		{
 #ifndef _WIN32
 			Gets(buff,sizeof(buff));
 			ch=buff[0];
 #else
-			ch=getch();
+			ch=_getch();
 #endif
 			if (ch=='q')
 			{
@@ -157,12 +164,12 @@ int main(void)
 			{
 				if (rakServer)
 				{
-					StatisticsToString(rakServer->GetStatistics(rakServer->GetSystemAddressFromIndex(0)), randomData, 1);
+					StatisticsToString(rakServer->GetStatistics(rakServer->GetSystemAddressFromIndex(0)), randomData, 8192, 1);
 					printf("%s", randomData);
 				}
 				else
 				{
-					StatisticsToString(rakClient->GetStatistics(rakClient->GetSystemAddressFromIndex(0)), randomData, 1);
+					StatisticsToString(rakClient->GetStatistics(rakClient->GetSystemAddressFromIndex(0)), randomData, 8192, 1);
 					printf("%s", randomData);
 				}
 
@@ -183,7 +190,7 @@ int main(void)
 
 		if (p)
 		{
-			lastPacketReceipt=RakNet::GetTimeMS();
+			lastPacketReceipt= SLNet::GetTimeMS();
 
 			switch (p->data[0])
 			{
@@ -221,15 +228,15 @@ int main(void)
 			(rakClient && rakClient->NumberOfConnections()>0))
 		{
 			// Do sends
-			if (lastSend + (RakNet::TimeMS)sendinterval < time)
+			if (lastSend + (SLNet::TimeMS)sendinterval < time)
 			{
 				if (rakServer)
 				{
-					rakServer->Send((char*)randomData, packetSize, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					rakServer->Send((char*)randomData, packetSize, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 				}
 				else if (rakClient)
 				{
-					rakClient->Send((char*)randomData, packetSize, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					rakClient->Send((char*)randomData, packetSize, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 				}
 
 				lastSend=time;
@@ -244,9 +251,9 @@ int main(void)
 	}
 
 	if (rakServer)
-		RakNet::RakPeerInterface::DestroyInstance(rakServer);
+		SLNet::RakPeerInterface::DestroyInstance(rakServer);
 	else
-		RakNet::RakPeerInterface::DestroyInstance(rakClient);
+		SLNet::RakPeerInterface::DestroyInstance(rakClient);
 
 	return 1;
 }

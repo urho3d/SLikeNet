@@ -1,18 +1,23 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "CloudClient.h"
-#include "RakPeerInterface.h"
-#include "RakSleep.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/CloudClient.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/sleep.h"
 #include <stdlib.h>
 
 void PrintHelp(void)
@@ -29,9 +34,9 @@ void PrintHelp(void)
 
 #define CLOUD_CLIENT_PRIMARY_KEY "CC_Sample_PK"
 
-void UploadInstanceToCloud(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid);
-void GetClientSubscription(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid);
-void GetServers(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid);
+void UploadInstanceToCloud(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid);
+void GetClientSubscription(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid);
+void GetServers(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid);
 
 int main(int argc, char **argv)
 {
@@ -58,23 +63,23 @@ int main(int argc, char **argv)
 	else serverPort=atoi(argv[2]);
 
 	// ---- RAKPEER -----
-	RakNet::RakPeerInterface *rakPeer;
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	SLNet::RakPeerInterface *rakPeer;
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	static const unsigned short clientLocalPort=0;
-	RakNet::SocketDescriptor sd(clientLocalPort,0); // Change this if you want
-	RakNet::StartupResult sr = rakPeer->Startup(1,&sd,1); // Change this if you want
+	SLNet::SocketDescriptor sd(clientLocalPort,0); // Change this if you want
+	SLNet::StartupResult sr = rakPeer->Startup(1,&sd,1); // Change this if you want
 	rakPeer->SetMaximumIncomingConnections(0); // Change this if you want
-	if (sr!=RakNet::RAKNET_STARTED)
+	if (sr!= SLNet::RAKNET_STARTED)
 	{
 		printf("Startup failed. Reason=%i\n", (int) sr);
 		return 1;
 	}
 
-	RakNet::CloudClient cloudClient;
+	SLNet::CloudClient cloudClient;
 	rakPeer->AttachPlugin(&cloudClient);
 
-	RakNet::ConnectionAttemptResult car = rakPeer->Connect(serverAddress, serverPort, 0, 0);
-	if (car==RakNet::CANNOT_RESOLVE_DOMAIN_NAME)
+	SLNet::ConnectionAttemptResult car = rakPeer->Connect(serverAddress, serverPort, 0, 0);
+	if (car== SLNet::CANNOT_RESOLVE_DOMAIN_NAME)
 	{
 		printf("Cannot resolve domain name\n");
 		return 1;
@@ -82,8 +87,8 @@ int main(int argc, char **argv)
 
 	printf("Connecting to %s...\n", serverAddress);
 	bool didRebalance=false; // So we only reconnect to a lower load server once, for load balancing
-	RakNet::Packet *packet;
-	while (1)
+	SLNet::Packet *packet;
+	for(;;)
 	{
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 		{
@@ -121,7 +126,7 @@ int main(int argc, char **argv)
 				break;
 			case ID_CLOUD_GET_RESPONSE:
 				{
-					RakNet::CloudQueryResult cloudQueryResult;
+					SLNet::CloudQueryResult cloudQueryResult;
 					cloudClient.OnGetReponse(&cloudQueryResult, packet);
 					unsigned int rowIndex;
 					const bool wasCallToGetServers=cloudQueryResult.cloudQuery.keys[0].primaryKey=="CloudConnCount";
@@ -133,15 +138,15 @@ int main(int argc, char **argv)
 
 					unsigned short connectionsOnOurServer=65535;
 					unsigned short lowestConnectionsServer=65535;
-					RakNet::SystemAddress lowestConnectionAddress;
+					SLNet::SystemAddress lowestConnectionAddress;
 
 					for (rowIndex=0; rowIndex < cloudQueryResult.rowsReturned.Size(); rowIndex++)
 					{
-						RakNet::CloudQueryRow *row = cloudQueryResult.rowsReturned[rowIndex];
+						SLNet::CloudQueryRow *row = cloudQueryResult.rowsReturned[rowIndex];
 						if (wasCallToGetServers)
 						{
 							unsigned short connCount;
-							RakNet::BitStream bsIn(row->data, row->length, false);
+							SLNet::BitStream bsIn(row->data, row->length, false);
 							bsIn.Read(connCount);
 							printf("%i. Server found at %s with %i connections\n", rowIndex+1, row->serverSystemAddress.ToString(true), connCount);
 
@@ -168,8 +173,8 @@ int main(int argc, char **argv)
 							printf("%i. Client found at %s", rowIndex+1, row->clientSystemAddress.ToString(true));
 							if (row->clientGUID==rakPeer->GetMyGUID())
 								printf(" (Ourselves)");
-							RakNet::BitStream bsIn(row->data, row->length, false);
-							RakNet::RakString clientData;
+							SLNet::BitStream bsIn(row->data, row->length, false);
+							SLNet::RakString clientData;
 							bsIn.Read(clientData);
 							printf(" Data: %s", clientData.C_String());
 							printf("\n");
@@ -198,7 +203,7 @@ int main(int argc, char **argv)
 			case ID_CLOUD_SUBSCRIPTION_NOTIFICATION:
 				{
 					bool wasUpdated;
-					RakNet::CloudQueryRow cloudQueryRow;
+					SLNet::CloudQueryRow cloudQueryRow;
 					cloudClient.OnSubscriptionNotification(&wasUpdated, &cloudQueryRow, packet, 0 );
 					if (wasUpdated)
 						printf("New client at %s\n", cloudQueryRow.clientSystemAddress.ToString(true));
@@ -215,28 +220,28 @@ int main(int argc, char **argv)
 		RakSleep(30);
 	}
 
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	return 0;
 }
 
-void UploadInstanceToCloud(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid)
+void UploadInstanceToCloud(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid)
 {
-	RakNet::CloudKey cloudKey(CLOUD_CLIENT_PRIMARY_KEY,0);
-	RakNet::BitStream bs;
+	SLNet::CloudKey cloudKey(CLOUD_CLIENT_PRIMARY_KEY,0);
+	SLNet::BitStream bs;
 	bs.Write("Hello World"); // This could be anything such as player list, game name, etc.
 	cloudClient->Post(&cloudKey, bs.GetData(), bs.GetNumberOfBytesUsed(), serverGuid);
 }
-void GetClientSubscription(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid)
+void GetClientSubscription(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid)
 {
-	RakNet::CloudQuery cloudQuery;
-	cloudQuery.keys.Push(RakNet::CloudKey(CLOUD_CLIENT_PRIMARY_KEY,0),_FILE_AND_LINE_);
+	SLNet::CloudQuery cloudQuery;
+	cloudQuery.keys.Push(SLNet::CloudKey(CLOUD_CLIENT_PRIMARY_KEY,0),_FILE_AND_LINE_);
 	cloudQuery.subscribeToResults=true; // Causes ID_CLOUD_SUBSCRIPTION_NOTIFICATION
 	cloudClient->Get(&cloudQuery, serverGuid);
 }
-void GetServers(RakNet::CloudClient *cloudClient, RakNet::RakNetGUID serverGuid)
+void GetServers(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid)
 {
-	RakNet::CloudQuery cloudQuery;
-	cloudQuery.keys.Push(RakNet::CloudKey("CloudConnCount",0),_FILE_AND_LINE_); // CloudConnCount is defined at the top of CloudServerHelper.cpp
+	SLNet::CloudQuery cloudQuery;
+	cloudQuery.keys.Push(SLNet::CloudKey("CloudConnCount",0),_FILE_AND_LINE_); // CloudConnCount is defined at the top of CloudServerHelper.cpp
 	cloudQuery.subscribeToResults=false;
 	cloudClient->Get(&cloudQuery, serverGuid);
 }

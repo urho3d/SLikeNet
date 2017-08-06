@@ -1,3 +1,14 @@
+#
+# This file was taken from RakNet 4.082.
+# Please see licenses/RakNet license.txt for the underlying license and related copyright.
+#
+#
+#  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschränkt)
+#
+# This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+#  license found in the license.txt file in the root directory of this source tree.
+#
+
 cmake_minimum_required(VERSION 2.6)
 
 option( RAKNET_SAMPLE_AutopatcherClient "" True )
@@ -99,7 +110,7 @@ if(RAKNET_SAMPLE_BurstTest)
 	add_subdirectory("BurstTest")
 endif()
 if(RAKNET_SAMPLE_Chat_Example)
-	add_subdirectory("Chat Example")
+	add_subdirectory("ChatExample")
 endif()
 if(RAKNET_SAMPLE_CloudClient)
 	add_subdirectory("CloudClient")
@@ -135,7 +146,7 @@ if(RAKNET_SAMPLE_DirectoryDeltaTransfer)
 	add_subdirectory("DirectoryDeltaTransfer")
 endif()
 if(RAKNET_SAMPLE_Dropped_Connection_Test)
-	add_subdirectory("Dropped Connection Test")
+	add_subdirectory("DroppedConnectionTest")
 endif()
 if(RAKNET_SAMPLE_Encryption)
 	add_subdirectory("Encryption")
@@ -153,10 +164,10 @@ if(RAKNET_SAMPLE_FileListTransfer)
 	add_subdirectory("FileListTransfer")
 endif()
 if(RAKNET_SAMPLE_Flow_Control_Test)
-	add_subdirectory("Flow Control Test")
+	add_subdirectory("FlowControlTest")
 endif()
 if(RAKNET_SAMPLE_Fully_Connected_Mesh)
-	add_subdirectory("Fully Connected Mesh")
+	add_subdirectory("FullyConnectedMesh")
 endif()
 if(RAKNET_SAMPLE_GFWL)
 	#add_subdirectory("GFWL")
@@ -243,7 +254,7 @@ if(RAKNET_SAMPLE_ReadyEvent)
 	#add_subdirectory("ReadyEvent")
 endif()
 if(RAKNET_SAMPLE_Reliable_Ordered_Test)
-	add_subdirectory("Reliable Ordered Test")
+	add_subdirectory("ReliableOrderedTest")
 endif()
 if(RAKNET_SAMPLE_ReplicaManager3)
 	add_subdirectory("ReplicaManager3")

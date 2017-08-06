@@ -1,31 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "TelnetTransport.h"
-#include "ConsoleServer.h"
-#include "LogCommandParser.h"
-#include "PacketConsoleLogger.h"
-#include "RakPeerInterface.h"
-#include "RakSleep.h"
+#include "slikenet/TelnetTransport.h"
+#include "slikenet/ConsoleServer.h"
+#include "slikenet/LogCommandParser.h"
+#include "slikenet/PacketConsoleLogger.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/sleep.h"
 #include <stdio.h>
-#include "Getche.h"
-#include "MessageIdentifiers.h"
-#include "Kbhit.h"
+#include "slikenet/Getche.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Kbhit.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 void main(void)
 {
 	printf("Shows how to connect telnet to read PacketLogger output from RakPeer.\n");
 
-	RakPeerInterface *rakPeer = RakNet::RakPeerInterface::GetInstance();
+	RakPeerInterface *rakPeer = SLNet::RakPeerInterface::GetInstance();
 	TelnetTransport tt;
 	ConsoleServer consoleServer;
 	LogCommandParser lcp;
@@ -35,8 +40,8 @@ void main(void)
 	consoleServer.SetTransportProvider(&tt, 23);
 	rakPeer->AttachPlugin(&pcl);
 
-	RakNet::SocketDescriptor sd(0,0);
-	RakNet::StartupResult sr = rakPeer->Startup(32, &sd, 1);
+	SLNet::SocketDescriptor sd(0,0);
+	SLNet::StartupResult sr = rakPeer->Startup(32, &sd, 1);
 	(void) sr;
 	RakAssert(sr==RAKNET_STARTED);
 
@@ -44,16 +49,16 @@ void main(void)
 	printf("Use 'Turn Windows features on and off' with 'Telnet Client' if needed.\n");
 	printf("Once telnet has connected, type 'Logger subscribe'\n");
 	printf("Press any key in this window once you have done all this.\n");
-	RakNet::Packet *packet;
-	while (!kbhit())
+	SLNet::Packet *packet;
+	while (!_kbhit())
 	{
 		consoleServer.Update();
 		RakSleep(30);
 	}
 
-	RakNet::ConnectionAttemptResult car = rakPeer->Connect("natpunch.jenkinssoftware.com", 61111, 0, 0);
+	SLNet::ConnectionAttemptResult car = rakPeer->Connect("natpunch.jenkinssoftware.com", 61111, 0, 0);
 	(void) car;
-	while (1)
+	for(;;)
 	{
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 		{

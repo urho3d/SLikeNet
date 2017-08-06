@@ -1,48 +1,53 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "CloudServerHelper.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "FullyConnectedMesh2.h"
-#include "TwoWayAuthentication.h"
-#include "CloudClient.h"
-#include "DynDNS.h"
-#include "RakPeerInterface.h"
-#include "RakSleep.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/TwoWayAuthentication.h"
+#include "slikenet/CloudClient.h"
+#include "slikenet/DynDNS.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/sleep.h"
+#include "slikenet/ConnectionGraph2.h"
 
 int main(int argc, char **argv)
 {
 	// Used to update DNS
-	RakNet::DynDNS dynDNS;
-	RakNet::CloudServerHelper_DynDns cloudServerHelper(&dynDNS);
+	SLNet::DynDNS dynDNS;
+	SLNet::CloudServerHelper_DynDns cloudServerHelper(&dynDNS);
 	if (!cloudServerHelper.ParseCommandLineParameters(argc, argv))
 		return 1;
 
 	// ---- RAKPEER -----
-	RakNet::RakPeerInterface *rakPeer;
-	rakPeer=RakNet::RakPeerInterface::GetInstance();
+	SLNet::RakPeerInterface *rakPeer;
+	rakPeer= SLNet::RakPeerInterface::GetInstance();
 
 	// ---- PLUGINS -----
 	// Used to load balance clients, allow for client to client discovery
-	RakNet::CloudServer cloudServer;
+	SLNet::CloudServer cloudServer;
 	// Used to update the local cloudServer
-	RakNet::CloudClient cloudClient;
+	SLNet::CloudClient cloudClient;
 	// Used to determine the host of the server fully connected mesh, as well as to connect servers automatically
-	RakNet::FullyConnectedMesh2 fullyConnectedMesh2;
+	SLNet::FullyConnectedMesh2 fullyConnectedMesh2;
 	// Used for servers to verify each other - otherwise any system could pose as a server
 	// Could also be used to verify and restrict clients if paired with the MessageFilter plugin
-	RakNet::TwoWayAuthentication twoWayAuthentication;
+	SLNet::TwoWayAuthentication twoWayAuthentication;
 	// Used to tell servers about each other
-	RakNet::ConnectionGraph2 connectionGraph2;
+	SLNet::ConnectionGraph2 connectionGraph2;
 
 	rakPeer->AttachPlugin(&cloudServer);
 	rakPeer->AttachPlugin(&cloudClient);
@@ -53,7 +58,7 @@ int main(int argc, char **argv)
 	if (!cloudServerHelper.StartRakPeer(rakPeer))
 		return 1;
 
-	RakNet::CloudServerHelperFilter sampleFilter; // Keeps clients from updating stuff to the server they are not supposed to
+	SLNet::CloudServerHelperFilter sampleFilter; // Keeps clients from updating stuff to the server they are not supposed to
 	sampleFilter.serverGuid=rakPeer->GetMyGUID();
 	cloudServerHelper.SetupPlugins(&cloudServer, &sampleFilter, &cloudClient, &fullyConnectedMesh2, &twoWayAuthentication,&connectionGraph2, cloudServerHelper.serverToServerPassword);
 
@@ -67,8 +72,8 @@ int main(int argc, char **argv)
 
 	// Should now be connect to the cloud, using authentication and FullyConnectedMesh2
 	printf("Running.\n");
-	RakNet::Packet *packet;
-	while (1)
+	SLNet::Packet *packet;
+	for(;;)
 	{
 		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 		{
@@ -84,6 +89,6 @@ int main(int argc, char **argv)
 	}
 
 
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	return 0;
 }

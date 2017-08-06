@@ -1,25 +1,30 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "RoomsBrowserGFx3_RakNet.h"
 #include "Lobby2Client.h"
 #include "XMLParser.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/MessageIdentifiers.h"
 #include "RoomTypes.h"
-#include "GetTime.h"
+#include "slikenet/GetTime.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // ---------------------------------------------------------------------------------------
 
-void ServerAndRoomBrowserData::Serialize(RakNet::BitStream *bitStream, bool writeToBitstream)
+void ServerAndRoomBrowserData::Serialize(SLNet::BitStream *bitStream, bool writeToBitstream)
 {
 	bitStream->Serialize(writeToBitstream, numPlayers);
 	bitStream->Serialize(writeToBitstream, maxPlayers);
@@ -49,9 +54,9 @@ void ServerAndRoomBrowserData::WriteToTable(DataStructures::Table *table)
 		initialCellValues.Push(&cells[i],_FILE_AND_LINE_);
 	table->AddRow(table->GetRowCount(), initialCellValues, true);
 }
-void ServerAndRoomBrowserData::SetAsOfflinePingResponse(RakNet::RakPeerInterface *rakPeer)
+void ServerAndRoomBrowserData::SetAsOfflinePingResponse(SLNet::RakPeerInterface *rakPeer)
 {
-	RakNet::BitStream bs;
+	SLNet::BitStream bs;
 	Serialize(&bs,true);
 	rakPeer->SetOfflinePingResponse((const char*) bs.GetData(),bs.GetNumberOfBytesUsed());
 }
@@ -65,13 +70,13 @@ RoomsBrowserGFx3_RakNet::~RoomsBrowserGFx3_RakNet()
 {
 	Shutdown();
 }
-void RoomsBrowserGFx3_RakNet::Init(RakNet::Lobby2Client *_lobby2Client,
-								   RakNet::Lobby2MessageFactory *_messageFactory,
+void RoomsBrowserGFx3_RakNet::Init(SLNet::Lobby2Client *_lobby2Client,
+								   SLNet::Lobby2MessageFactory *_messageFactory,
 								   RakPeerInterface *_rakPeer, 
-								   RakNet::RoomsPlugin *_roomsPlugin,
-								   RakNet::RakString _titleName,
-								   RakNet::RakString _titleSecretKey,
-								   RakNet::RakString _pathToXMLPropertyFile,
+								   SLNet::RoomsPlugin *_roomsPlugin,
+								   SLNet::RakString _titleName,
+								   SLNet::RakString _titleSecretKey,
+								   SLNet::RakString _pathToXMLPropertyFile,
 								   unsigned short _lanServerPort,
 								   GPtr<FxDelegate> pDelegate,
 								   GPtr<GFxMovieView> pMovie)
@@ -120,7 +125,7 @@ void RoomsBrowserGFx3_RakNet::SaveProperty(const char *propertyId, const char *p
 	}
 	xMainNode.writeToFile(pathToXMLPropertyFile.C_String());
 }
-void RoomsBrowserGFx3_RakNet::LoadProperty(const char *propertyId, RakNet::RakString &propertyOut)
+void RoomsBrowserGFx3_RakNet::LoadProperty(const char *propertyId, SLNet::RakString &propertyOut)
 {
 	XMLNode xMainNode=XMLNode::openFileHelper(pathToXMLPropertyFile.C_String(),"");
 	if (xMainNode.isEmpty())
@@ -165,7 +170,7 @@ void RoomsBrowserGFx3_RakNet::OnNewConnection(const SystemAddress &systemAddress
 	{
 		FxResponseArgs<3> rargs;
 		char saString[64];
-		systemAddress.ToString(true,saString);
+		systemAddress.ToString(true,saString,64);
 		char guidString[64];
 		rakNetGUID.ToString(guidString);
 		rargs.Add(saString);
@@ -216,7 +221,7 @@ void RoomsBrowserGFx3_RakNet::OnFailedConnectionAttempt(Packet *packet, PI2_Fail
 	}
 
 	char saString[64];
-	packet->systemAddress.ToString(true,saString);
+	packet->systemAddress.ToString(true,saString,64);
 	rargs.Add(saString);
 
 	if (packet->systemAddress==lobby2Client->GetServerAddress())
@@ -229,15 +234,15 @@ PluginReceiveResult RoomsBrowserGFx3_RakNet::OnReceive(Packet *packet)
 	switch (packet->data[0])
 	{
 	case ID_UNCONNECTED_PONG:
-		if (packet->systemAddress.GetPort()>=lanServerPort && packet->systemAddress.GetPort()<lanServerPort+8 && packet->length>sizeof(RakNet::TimeMS)+sizeof(MessageID)
-			// && packet->guid!=rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (packet->systemAddress.GetPort()>=lanServerPort && packet->systemAddress.GetPort()<lanServerPort+8 && packet->length>sizeof(SLNet::TimeMS)+sizeof(MessageID)
+			// && packet->guid!=rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			)
 		{
-			RakNet::BitStream bsIn(packet->data+1,packet->length-1,false);
-			RakNet::TimeMS pingResponse;
+			SLNet::BitStream bsIn(packet->data+1,packet->length-1,false);
+			SLNet::TimeMS pingResponse;
 			bsIn.Read(pingResponse);
-			RakNet::TimeMS elapsedPing=RakNet::GetTimeMS()-pingResponse;
-			RakNet::TimeMS elapsedPingMs;
+			SLNet::TimeMS elapsedPing= SLNet::GetTimeMS()-pingResponse;
+			SLNet::TimeMS elapsedPingMs;
 #if __GET_TIME_64BIT==1
 			elapsedPingMs=elapsedPing/1000;
 #else
@@ -252,7 +257,7 @@ PluginReceiveResult RoomsBrowserGFx3_RakNet::OnReceive(Packet *packet)
 			rargs.Add(false);
 			rargs.Add((Double)browserData.roomId.g);
 			char ipAddr[64];
-			packet->systemAddress.ToString(true,ipAddr);
+			packet->systemAddress.ToString(true,ipAddr,64);
 			rargs.Add(ipAddr);
 			rargs.Add(browserData.roomName.C_String());
 			rargs.Add((Double)browserData.numPlayers);
@@ -268,7 +273,7 @@ PluginReceiveResult RoomsBrowserGFx3_RakNet::OnReceive(Packet *packet)
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_ConnectToServer)
 {
-	bool callSucceeded = rakPeer->Connect(pparams[0].GetString(), atoi(pparams[1].GetString()), 0, 0)==RakNet::CONNECTION_ATTEMPT_STARTED;
+	bool callSucceeded = rakPeer->Connect(pparams[0].GetString(), atoi(pparams[1].GetString()), 0, 0)== SLNet::CONNECTION_ATTEMPT_STARTED;
 	FxResponseArgs<1> rargs;
 	rargs.Add(callSucceeded);
 	lobby2Client->SetServerAddress(SystemAddress(pparams[0].GetString(), atoi(pparams[1].GetString())));
@@ -290,7 +295,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Login)
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_RegisterAccount)
 {
-	RakNet::Client_RegisterAccount *arg = (RakNet::Client_RegisterAccount *) msgFactory->Alloc(L2MID_Client_RegisterAccount);
+	SLNet::Client_RegisterAccount *arg = (SLNet::Client_RegisterAccount *) msgFactory->Alloc(L2MID_Client_RegisterAccount);
 	arg->userName=pparams[0].GetString();
 	loginUsername=arg->userName;
 	arg->createAccountParameters.password=pparams[1].GetString();
@@ -322,9 +327,9 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_UpdateRoomsList)
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_UpdateFriendsList)
 {
-	RakNet::Friends_GetFriends *arg = (RakNet::Friends_GetFriends *) msgFactory->Alloc(L2MID_Friends_GetFriends);
+	SLNet::Friends_GetFriends *arg = (SLNet::Friends_GetFriends *) msgFactory->Alloc(L2MID_Friends_GetFriends);
 	lobby2Client->SendMsgAndDealloc(arg);
-	RakNet::Friends_GetInvites *arg2 = (RakNet::Friends_GetInvites *) msgFactory->Alloc(L2MID_Friends_GetInvites);
+	SLNet::Friends_GetInvites *arg2 = (SLNet::Friends_GetInvites *) msgFactory->Alloc(L2MID_Friends_GetInvites);
 	lobby2Client->SendMsgAndDealloc(arg2);	
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_JoinByFilter)
@@ -332,7 +337,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_JoinByFilter)
 	if (pparams.GetArgCount()<1)
 		return;
 
-	RakNet::JoinByFilter_Func func;
+	SLNet::JoinByFilter_Func func;
 	func.userName=loginUsername;
 	func.gameIdentifier=titleName;
 	func.roomMemberMode=RMM_ANY_PLAYABLE;
@@ -351,7 +356,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_JoinByFilter)
 		SystemAddress sa;
 		sa.FromString(pparams[2].GetString());
 		char ipPart[32];
-		sa.ToString(false,ipPart);
+		sa.ToString(false,ipPart,32);
 		rakPeer->Connect(ipPart,sa.GetPort(),0,0);
 	}
 
@@ -359,7 +364,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_JoinByFilter)
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_CreateRoom)
 {
 	/// Create a room for the WAN browser
-	RakNet::CreateRoom_Func func;
+	SLNet::CreateRoom_Func func;
 	func.networkedRoomCreationParameters.slots.publicSlots=(unsigned int) pparams[2].GetNumber();
 	func.networkedRoomCreationParameters.slots.reservedSlots=(unsigned int) pparams[3].GetNumber();
 	func.networkedRoomCreationParameters.slots.spectatorSlots=0;
@@ -378,7 +383,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_CreateRoom)
 	func.gameIdentifier=titleName;
 
 	ServerAndRoomBrowserData browserData;
-	browserData.roomId=rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+	browserData.roomId=rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 	browserData.numPlayers=0;
 	browserData.maxPlayers=func.networkedRoomCreationParameters.slots.publicSlots+func.networkedRoomCreationParameters.slots.reservedSlots;
 	browserData.mapName=pparams[1].GetString();
@@ -402,25 +407,25 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_CreateRoom)
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Friends_SendInvite)
 {
-	RakNet::Friends_SendInvite *arg = (RakNet::Friends_SendInvite *) msgFactory->Alloc(L2MID_Friends_SendInvite);
+	SLNet::Friends_SendInvite *arg = (SLNet::Friends_SendInvite *) msgFactory->Alloc(L2MID_Friends_SendInvite);
 	arg->targetHandle=pparams[0].GetString();
 	lobby2Client->SendMsgAndDealloc(arg);
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Friends_Remove)
 {
-	RakNet::Friends_Remove *arg = (RakNet::Friends_Remove *) msgFactory->Alloc(L2MID_Friends_Remove);
+	SLNet::Friends_Remove *arg = (SLNet::Friends_Remove *) msgFactory->Alloc(L2MID_Friends_Remove);
 	arg->targetHandle=pparams[0].GetString();
 	lobby2Client->SendMsgAndDealloc(arg);
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Friends_AcceptInvite)
 {
-	RakNet::Friends_AcceptInvite *arg = (RakNet::Friends_AcceptInvite *) msgFactory->Alloc(L2MID_Friends_AcceptInvite);
+	SLNet::Friends_AcceptInvite *arg = (SLNet::Friends_AcceptInvite *) msgFactory->Alloc(L2MID_Friends_AcceptInvite);
 	arg->targetHandle=pparams[0].GetString();
 	lobby2Client->SendMsgAndDealloc(arg);
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Friends_RejectInvite)
 {
-	RakNet::Friends_RejectInvite *arg = (RakNet::Friends_RejectInvite *) msgFactory->Alloc(L2MID_Friends_RejectInvite);
+	SLNet::Friends_RejectInvite *arg = (SLNet::Friends_RejectInvite *) msgFactory->Alloc(L2MID_Friends_RejectInvite);
 	arg->targetHandle=pparams[0].GetString();
 	lobby2Client->SendMsgAndDealloc(arg);
 }
@@ -443,7 +448,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Room_Chat_Func)
 }
 ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_Logoff)
 {
-	RakNet::Client_Logoff *arg = (RakNet::Client_Logoff *) msgFactory->Alloc(L2MID_Client_Logoff);
+	SLNet::Client_Logoff *arg = (SLNet::Client_Logoff *) msgFactory->Alloc(L2MID_Client_Logoff);
 	lobby2Client->SendMsgAndDealloc(arg);
 }
 //////////////////////////////////////////////////////////////////................................................
@@ -501,7 +506,7 @@ ACTIONSCRIPT_CALLABLE_FUNCTION(RoomsBrowserGFx3_RakNet, f2c_SetRoomLockState)
 {
 	SetRoomLockState_Func func;
 	func.userName=loginUsername;
-	RakNet::RakString lockState=pparams[0].GetString();
+	SLNet::RakString lockState=pparams[0].GetString();
 	if (lockState=="NOT_LOCKED")
 		func.roomLockState=RLS_NOT_LOCKED;
 	else if (lockState=="PLAYERS_LOCKED")
@@ -590,7 +595,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(Client_Login *message)
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
 	FxDelegate::Invoke2(movie, "c2f_Client_Login", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Client_Logoff *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Client_Logoff *message)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -604,7 +609,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(Client_RegisterAccount *message)
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
 	FxDelegate::Invoke2(movie, "c2f_Client_RegisterAccount", rargs);
 }
-void RoomsBrowserGFx3_RakNet::CreateRoom_Callback( const SystemAddress &senderAddress, RakNet::CreateRoom_Func *callResult)
+void RoomsBrowserGFx3_RakNet::CreateRoom_Callback( const SystemAddress &senderAddress, SLNet::CreateRoom_Func *callResult)
 {
 	if (senderAddress!=lobby2Client->GetServerAddress())
 		return;
@@ -614,7 +619,7 @@ void RoomsBrowserGFx3_RakNet::CreateRoom_Callback( const SystemAddress &senderAd
 	rargs.Add(false);
 	FxDelegate::Invoke2(movie, "c2f_CreateRoom", rargs);
 }
-void RoomsBrowserGFx3_RakNet::SearchByFilter_Callback( const SystemAddress &senderAddress, RakNet::SearchByFilter_Func *callResult)
+void RoomsBrowserGFx3_RakNet::SearchByFilter_Callback( const SystemAddress &senderAddress, SLNet::SearchByFilter_Func *callResult)
 {
 	if (senderAddress!=lobby2Client->GetServerAddress())
 		return;
@@ -632,7 +637,7 @@ void RoomsBrowserGFx3_RakNet::SearchByFilter_Callback( const SystemAddress &send
 			rargs.Add(true);
 			rargs.Add((Double)callResult->roomsOutput[i]->GetProperty(DefaultRoomColumns::GetColumnName(DefaultRoomColumns::TC_ROOM_ID))->i);
 			char ipAddr[64];
-			callResult->roomsOutput[i]->roomMemberList[0].systemAddress.ToString(true,ipAddr);
+			callResult->roomsOutput[i]->roomMemberList[0].systemAddress.ToString(true,ipAddr,64);
 			rargs.Add(ipAddr);
 			rargs.Add(callResult->roomsOutput[i]->roomMemberList[0].name.C_String());
 			rargs.Add((Double)callResult->roomsOutput[i]->roomMemberList.Size());
@@ -643,7 +648,7 @@ void RoomsBrowserGFx3_RakNet::SearchByFilter_Callback( const SystemAddress &send
 
 	FxDelegate::Invoke2(movie, "c2f_SearchByFilter_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::JoinByFilter_Callback( const SystemAddress &senderAddress, RakNet::JoinByFilter_Func *callResult)
+void RoomsBrowserGFx3_RakNet::JoinByFilter_Callback( const SystemAddress &senderAddress, SLNet::JoinByFilter_Func *callResult)
 {
 	if (senderAddress!=lobby2Client->GetServerAddress())
 		return;
@@ -687,7 +692,7 @@ void WriteUsernameAndStatus(UsernameAndOnlineStatus &uaos, FxResponseArgsList &r
 	rargs.Add(uaos.presence.titleNameOrID.C_String());
 	rargs.Add(uaos.presence.statusString.C_String());
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_GetFriends *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_GetFriends *message)
 {
 	FxResponseArgsList rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -701,7 +706,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_GetFriends *message)
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_GetFriends", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_GetInvites *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_GetInvites *message)
 {
 	FxResponseArgsList rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -721,7 +726,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_GetInvites *message)
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_GetInvites", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_SendInvite *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_SendInvite *message)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -729,7 +734,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_SendInvite *message)
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_SendInvite", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_AcceptInvite *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_AcceptInvite *message)
 {
 	FxResponseArgs<5> rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -740,7 +745,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_AcceptInvite *messag
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_AcceptInvite", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_RejectInvite *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_RejectInvite *message)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -748,7 +753,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_RejectInvite *messag
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_RejectInvite", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_Remove *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Friends_Remove *message)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(Lobby2ResultCodeDescription::ToEnum(message->resultCode));
@@ -756,7 +761,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Friends_Remove *message)
 
 	FxDelegate::Invoke2(movie, "c2f_Friends_Remove", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Notification_Friends_PresenceUpdate *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Notification_Friends_PresenceUpdate *message)
 {
 	FxResponseArgs<4> rargs;
 	rargs.Add(message->otherHandle.C_String());
@@ -766,7 +771,7 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Notification_Friends_Presenc
 
 	FxDelegate::Invoke2(movie, "c2f_Notification_Friends_PresenceUpdate", rargs);
 }
-void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Notification_Friends_StatusChange *message)
+void RoomsBrowserGFx3_RakNet::MessageResult(SLNet::Notification_Friends_StatusChange *message)
 {
 	FxResponseArgs<5> rargs;
 	rargs.Add(message->OpToString());
@@ -782,13 +787,13 @@ void RoomsBrowserGFx3_RakNet::MessageResult(RakNet::Notification_Friends_StatusC
 //////////////////////////////////////////////////////////////////................................................
 //////////////////////////////////////////////////////////////////................................................
 //////////////////////////////////////////////////////////////////................................................
-void RoomsBrowserGFx3_RakNet::LeaveRoom_Callback( const SystemAddress &senderAddress, RakNet::LeaveRoom_Func *callResult)
+void RoomsBrowserGFx3_RakNet::LeaveRoom_Callback( const SystemAddress &senderAddress, SLNet::LeaveRoom_Func *callResult)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
 	FxDelegate::Invoke2(movie, "c2f_LeaveRoom", rargs);
 }
-void RoomsBrowserGFx3_RakNet::SendInvite_Callback( const SystemAddress &senderAddress, RakNet::SendInvite_Func *callResult)
+void RoomsBrowserGFx3_RakNet::SendInvite_Callback( const SystemAddress &senderAddress, SLNet::SendInvite_Func *callResult)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -796,26 +801,26 @@ void RoomsBrowserGFx3_RakNet::SendInvite_Callback( const SystemAddress &senderAd
 	rargs.Add(callResult->inviteToSpectatorSlot);
 	FxDelegate::Invoke2(movie, "c2f_SendInvite", rargs);
 }
-void RoomsBrowserGFx3_RakNet::StartSpectating_Callback( const SystemAddress &senderAddress, RakNet::StartSpectating_Func *callResult)
+void RoomsBrowserGFx3_RakNet::StartSpectating_Callback( const SystemAddress &senderAddress, SLNet::StartSpectating_Func *callResult)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
 	FxDelegate::Invoke2(movie, "c2f_StartSpectating", rargs);
 }
-void RoomsBrowserGFx3_RakNet::StopSpectating_Callback( const SystemAddress &senderAddress, RakNet::StopSpectating_Func *callResult)
+void RoomsBrowserGFx3_RakNet::StopSpectating_Callback( const SystemAddress &senderAddress, SLNet::StopSpectating_Func *callResult)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
 	FxDelegate::Invoke2(movie, "c2f_StopSpectating", rargs);
 }
-void RoomsBrowserGFx3_RakNet::GrantModerator_Callback( const SystemAddress &senderAddress, RakNet::GrantModerator_Func *callResult)
+void RoomsBrowserGFx3_RakNet::GrantModerator_Callback( const SystemAddress &senderAddress, SLNet::GrantModerator_Func *callResult)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
 	rargs.Add(callResult->newModerator.C_String());
 	FxDelegate::Invoke2(movie, "c2f_AreAllMembersReady", rargs);
 }
-void RoomsBrowserGFx3_RakNet::SetReadyStatus_Callback( const SystemAddress &senderAddress, RakNet::SetReadyStatus_Func *callResult)
+void RoomsBrowserGFx3_RakNet::SetReadyStatus_Callback( const SystemAddress &senderAddress, SLNet::SetReadyStatus_Func *callResult)
 {
 	FxResponseArgsList rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -828,7 +833,7 @@ void RoomsBrowserGFx3_RakNet::SetReadyStatus_Callback( const SystemAddress &send
 		rargs.Add(callResult->unreadyUsers[i].C_String());
 	FxDelegate::Invoke2(movie, "c2f_SetReadyStatus", rargs);
 }
-void RoomsBrowserGFx3_RakNet::GetReadyStatus_Callback( const SystemAddress &senderAddress, RakNet::GetReadyStatus_Func *callResult)
+void RoomsBrowserGFx3_RakNet::GetReadyStatus_Callback( const SystemAddress &senderAddress, SLNet::GetReadyStatus_Func *callResult)
 {
 	FxResponseArgsList rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -839,7 +844,7 @@ void RoomsBrowserGFx3_RakNet::GetReadyStatus_Callback( const SystemAddress &send
 		rargs.Add(callResult->unreadyUsers[i].C_String());
 	FxDelegate::Invoke2(movie, "c2f_GetReadyStatus", rargs);
 }
-void RoomsBrowserGFx3_RakNet::SetRoomLockState_Callback( const SystemAddress &senderAddress, RakNet::SetRoomLockState_Func *callResult)
+void RoomsBrowserGFx3_RakNet::SetRoomLockState_Callback( const SystemAddress &senderAddress, SLNet::SetRoomLockState_Func *callResult)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -851,7 +856,7 @@ void RoomsBrowserGFx3_RakNet::SetRoomLockState_Callback( const SystemAddress &se
 		rargs.Add("ALL_LOCKED"); // No new players are allowed, and you cannot toggle spectator
 	FxDelegate::Invoke2(movie, "c2f_SetRoomLockState", rargs);
 }
-void RoomsBrowserGFx3_RakNet::GetRoomLockState_Callback( const SystemAddress &senderAddress, RakNet::GetRoomLockState_Func *callResult)
+void RoomsBrowserGFx3_RakNet::GetRoomLockState_Callback( const SystemAddress &senderAddress, SLNet::GetRoomLockState_Func *callResult)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -863,14 +868,14 @@ void RoomsBrowserGFx3_RakNet::GetRoomLockState_Callback( const SystemAddress &se
 		rargs.Add("ALL_LOCKED"); // No new players are allowed, and you cannot toggle spectator
 	FxDelegate::Invoke2(movie, "c2f_GetRoomLockState", rargs);
 }
-void RoomsBrowserGFx3_RakNet::AreAllMembersReady_Callback( const SystemAddress &senderAddress, RakNet::AreAllMembersReady_Func *callResult)
+void RoomsBrowserGFx3_RakNet::AreAllMembersReady_Callback( const SystemAddress &senderAddress, SLNet::AreAllMembersReady_Func *callResult)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
 	rargs.Add(callResult->allReady);
 	FxDelegate::Invoke2(movie, "c2f_AreAllMembersReady", rargs);
 }
-void RoomsBrowserGFx3_RakNet::KickMember_Callback( const SystemAddress &senderAddress, RakNet::KickMember_Func *callResult)
+void RoomsBrowserGFx3_RakNet::KickMember_Callback( const SystemAddress &senderAddress, SLNet::KickMember_Func *callResult)
 {
 	FxResponseArgs<3> rargs;
 	rargs.Add(RoomsErrorCodeDescription::ToEnum(callResult->resultCode));
@@ -878,7 +883,7 @@ void RoomsBrowserGFx3_RakNet::KickMember_Callback( const SystemAddress &senderAd
 	rargs.Add(callResult->reason.C_String());
 	FxDelegate::Invoke2(movie, "c2f_KickMember", rargs);
 }
-void RoomsBrowserGFx3_RakNet::GetRoomProperties_Callback( const SystemAddress &senderAddress, RakNet::GetRoomProperties_Func *callResult)
+void RoomsBrowserGFx3_RakNet::GetRoomProperties_Callback( const SystemAddress &senderAddress, SLNet::GetRoomProperties_Func *callResult)
 {
 	char saString[32];
 	char guidString[64];
@@ -892,9 +897,9 @@ void RoomsBrowserGFx3_RakNet::GetRoomProperties_Callback( const SystemAddress &s
 		const char *c = RoomMemberModeToEnum(callResult->roomDescriptor.roomMemberList[i].roomMemberMode);
 		rargs.Add(c);
 		rargs.Add(callResult->roomDescriptor.roomMemberList[i].isReady);
-		callResult->roomDescriptor.roomMemberList[i].systemAddress.ToString(true,saString);
+		callResult->roomDescriptor.roomMemberList[i].systemAddress.ToString(true,saString,32);
 		rargs.Add(saString);
-		callResult->roomDescriptor.roomMemberList[i].guid.ToString(guidString);
+		callResult->roomDescriptor.roomMemberList[i].guid.ToString(guidString, 64);
 		rargs.Add(guidString);
 	}
 
@@ -923,26 +928,26 @@ void RoomsBrowserGFx3_RakNet::GetRoomProperties_Callback( const SystemAddress &s
 
 	FxDelegate::Invoke2(movie, "c2f_GetRoomProperties", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberStartedSpectating_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberStartedSpectating_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberStartedSpectating_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberStartedSpectating_Notification *notification)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(notification->userName.C_String());
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberStartedSpectating_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberStoppedSpectating_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberStoppedSpectating_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberStoppedSpectating_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberStoppedSpectating_Notification *notification)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(notification->userName.C_String());
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberStoppedSpectating_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::ModeratorChanged_Callback( const SystemAddress &senderAddress, RakNet::ModeratorChanged_Notification *notification)
+void RoomsBrowserGFx3_RakNet::ModeratorChanged_Callback( const SystemAddress &senderAddress, SLNet::ModeratorChanged_Notification *notification)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(notification->newModerator.C_String());
 	rargs.Add(notification->oldModerator.C_String());
 	FxDelegate::Invoke2(movie, "c2f_ModeratorChanged_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberReadyStatusSet_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberReadyStatusSet_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberReadyStatusSet_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberReadyStatusSet_Notification *notification)
 {
 	FxResponseArgsList rargs;
 	rargs.Add(notification->isReady);
@@ -955,7 +960,7 @@ void RoomsBrowserGFx3_RakNet::RoomMemberReadyStatusSet_Callback( const SystemAdd
 		rargs.Add(notification->unreadyUsers[i].C_String());
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberReadyStatusSet_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomLockStateSet_Callback( const SystemAddress &senderAddress, RakNet::RoomLockStateSet_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomLockStateSet_Callback( const SystemAddress &senderAddress, SLNet::RoomLockStateSet_Notification *notification)
 {
 	FxResponseArgs<1> rargs;
 	if (notification->roomLockState==RLS_NOT_LOCKED)
@@ -966,7 +971,7 @@ void RoomsBrowserGFx3_RakNet::RoomLockStateSet_Callback( const SystemAddress &se
 		rargs.Add("ALL_LOCKED"); // No new players are allowed, and you cannot toggle spectator
 	FxDelegate::Invoke2(movie, "c2f_RoomLockStateSet_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberKicked_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberKicked_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberKicked_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberKicked_Notification *notification)
 {
 	FxResponseArgs<3> rargs;
 	rargs.Add(notification->kickedMember.C_String());
@@ -974,41 +979,41 @@ void RoomsBrowserGFx3_RakNet::RoomMemberKicked_Callback( const SystemAddress &se
 	rargs.Add(notification->reason.C_String());
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberKicked_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberLeftRoom_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberLeftRoom_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberLeftRoom_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberLeftRoom_Notification *notification)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(notification->roomMember.C_String());
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberLeftRoom_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomMemberJoinedRoom_Callback( const SystemAddress &senderAddress, RakNet::RoomMemberJoinedRoom_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomMemberJoinedRoom_Callback( const SystemAddress &senderAddress, SLNet::RoomMemberJoinedRoom_Notification *notification)
 {
 	char saString[32];
 	FxResponseArgs<4> rargs;
 	rargs.Add(notification->joinedRoomResult->acceptedInvitorName.C_String());
-	notification->joinedRoomResult->acceptedInvitorAddress.ToString(true,saString);
+	notification->joinedRoomResult->acceptedInvitorAddress.ToString(true,saString,32);
 	rargs.Add(saString);
 	rargs.Add(notification->joinedRoomResult->joiningMemberName.C_String());
-	notification->joinedRoomResult->joiningMemberAddress.ToString(true,saString);
+	notification->joinedRoomResult->joiningMemberAddress.ToString(true,saString,32);
 	rargs.Add(saString);
 	FxDelegate::Invoke2(movie, "c2f_RoomMemberJoinedRoom_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomInvitationSent_Callback( const SystemAddress &senderAddress, RakNet::RoomInvitationSent_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomInvitationSent_Callback( const SystemAddress &senderAddress, SLNet::RoomInvitationSent_Notification *notification)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(notification->invitorName.C_String());
 	rargs.Add(notification->inviteToSpectatorSlot);
 	FxDelegate::Invoke2(movie, "c2f_RoomInvitationSent_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomInvitationWithdrawn_Callback( const SystemAddress &senderAddress, RakNet::RoomInvitationWithdrawn_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomInvitationWithdrawn_Callback( const SystemAddress &senderAddress, SLNet::RoomInvitationWithdrawn_Notification *notification)
 {
 	FxResponseArgs<2> rargs;
 	rargs.Add(notification->invitedUser.invitorName.C_String());
 	char saString[32];
-	notification->invitedUser.invitorSystemAddress.ToString(true,saString);
+	notification->invitedUser.invitorSystemAddress.ToString(true,saString,32);
 	rargs.Add(saString);
 	FxDelegate::Invoke2(movie, "c2f_RoomInvitationWithdrawn_Callback", rargs);
 }
-void RoomsBrowserGFx3_RakNet::RoomDestroyedOnModeratorLeft_Callback( const SystemAddress &senderAddress, RakNet::RoomDestroyedOnModeratorLeft_Notification *notification)
+void RoomsBrowserGFx3_RakNet::RoomDestroyedOnModeratorLeft_Callback( const SystemAddress &senderAddress, SLNet::RoomDestroyedOnModeratorLeft_Notification *notification)
 {
 	FxResponseArgs<1> rargs;
 	rargs.Add(notification->oldModerator.C_String());

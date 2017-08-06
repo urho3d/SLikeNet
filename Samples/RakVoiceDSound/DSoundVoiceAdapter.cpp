@@ -1,21 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "DSoundVoiceAdapter.h"
-#include "RakAssert.h"
-#include "RakPeerInterface.h"
+#include "slikenet/assert.h"
+#include "slikenet/peerinterface.h"
+#include <tchar.h>
 
 /// To test sending to myself
 //#define _TEST_LOOPBACK
 
-using namespace RakNet;
+using namespace SLNet;
 
 DSoundVoiceAdapter DSoundVoiceAdapter::instance;
 
@@ -47,13 +53,13 @@ bool DSoundVoiceAdapter::SetupAdapter(RakVoice *rakVoice, HWND hwnd, DWORD dwCoo
 
 	if (FAILED(hr = DirectSoundCreate8(NULL, &ds, NULL)))
 	{
-		DXTRACE_ERR_MSGBOX(L"DirectSoundCreate8, when initiliazing DirectSound", hr);
+		DXTRACE_ERR_MSGBOX(_T("DirectSoundCreate8, when initiliazing DirectSound"), hr);
 		return false;
 	}
 
 	if (FAILED(hr = ds->SetCooperativeLevel(hwnd, dwCoopLevel)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSound8::SetCooperativeLevel", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSound8::SetCooperativeLevel"), hr);
 		Release();
 		return false;
 	}
@@ -138,14 +144,14 @@ bool DSoundVoiceAdapter::SetupIncomingBuffer()
 	// Create buffer. 
 	if (FAILED(hr = ds->CreateSoundBuffer(&dsbdesc, &pDsb, NULL)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSound8::CreateSoundBuffer, when creating buffer for incoming sound )", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSound8::CreateSoundBuffer, when creating buffer for incoming sound )"), hr);
 		return false;
 	}
 	hr = pDsb->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*) &dsbIncoming);
 	pDsb->Release();
 	if (FAILED(hr))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundBuffer::QueryInterface, when getting IDirectSoundBuffer8 interface for incoming sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundBuffer::QueryInterface, when getting IDirectSoundBuffer8 interface for incoming sound"), hr);
 		return false;
 	}
 	//
@@ -160,27 +166,27 @@ bool DSoundVoiceAdapter::SetupIncomingBuffer()
 		if ((incomingBufferNotifications[i].hEventNotify = CreateEvent(NULL, TRUE, FALSE, NULL))==NULL)
 #endif
 		{
-			DXTRACE_ERR_MSGBOX(L"CreateEvent", GetLastError());
+			DXTRACE_ERR_MSGBOX(_T("CreateEvent"), GetLastError());
 			return false;
 		}
 	}
 	IDirectSoundNotify8 *dsbNotify=0;
 	if (FAILED(hr=dsbIncoming->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*) &dsbNotify)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundBuffer8::QueryInterface, when getting IDirectSoundNotify8 interface for incoming sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundBuffer8::QueryInterface, when getting IDirectSoundNotify8 interface for incoming sound"), hr);
 		return false;
 	}
 	hr = dsbNotify->SetNotificationPositions(FRAMES_IN_SOUND, incomingBufferNotifications);
 	dsbNotify->Release();
 	if (FAILED(hr))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundNotify8::SetNotificationPositions, when setting notifications for incoming sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundNotify8::SetNotificationPositions, when setting notifications for incoming sound"), hr);
 		return false;
 	}
 
 	if (FAILED(hr = dsbIncoming->Play(0,0,DSBPLAY_LOOPING)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundBuffer8::Play, when starting incoming sound buffer", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundBuffer8::Play, when starting incoming sound buffer"), hr);
 		return false;
 	}
 
@@ -198,7 +204,7 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 	//
 	if (FAILED(hr=DirectSoundCaptureCreate8(NULL, &dsC, NULL)))
 	{
-		DXTRACE_ERR_MSGBOX(L"DirectSoundCaptureCreate8", hr);
+		DXTRACE_ERR_MSGBOX(_T("DirectSoundCaptureCreate8"), hr);
 		return false;
 	}
 
@@ -225,14 +231,14 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 	LPDIRECTSOUNDCAPTUREBUFFER pDscb = NULL;
 	if (FAILED(hr = dsC->CreateCaptureBuffer(&dscbd, &pDscb, NULL)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundCapture8::CreateCaptureBuffer, when creating buffer for outgoing sound )", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundCapture8::CreateCaptureBuffer, when creating buffer for outgoing sound )"), hr);
 		return false;
 	}
 	hr = pDscb->QueryInterface(IID_IDirectSoundCaptureBuffer8, (LPVOID*) &dsbOutgoing);
 	pDscb->Release();
 	if (FAILED(hr))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundBuffer::QueryInterface, when getting IDirectSoundCaptureBuffer8 interface for outgoing sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundBuffer::QueryInterface, when getting IDirectSoundCaptureBuffer8 interface for outgoing sound"), hr);
 		return false;
 	}
 	//
@@ -243,27 +249,27 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 		outgoingBufferNotifications[i].dwOffset = i*rakVoice->GetBufferSizeBytes();
 		if ((outgoingBufferNotifications[i].hEventNotify = CreateEventEx(0, 0, CREATE_EVENT_MANUAL_RESET, 0))==NULL)
 		{
-			DXTRACE_ERR_MSGBOX(L"CreateEvent", GetLastError());
+			DXTRACE_ERR_MSGBOX(_T("CreateEvent"), GetLastError());
 			return false;
 		}
 	}
 	IDirectSoundNotify8 *dsbNotify=0;
 	if (FAILED(hr=dsbOutgoing->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*) &dsbNotify)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundCaptureBuffer8::QueryInterface, when getting IDirectSoundNotify8 interface for outgoing sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundCaptureBuffer8::QueryInterface, when getting IDirectSoundNotify8 interface for outgoing sound"), hr);
 		return false;
 	}
 	hr = dsbNotify->SetNotificationPositions(FRAMES_IN_SOUND, outgoingBufferNotifications);
 	dsbNotify->Release();
 	if (FAILED(hr))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundNotify8::SetNotificationPositions, when setting notifications for outgoing sound", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundNotify8::SetNotificationPositions, when setting notifications for outgoing sound"), hr);
 		return false;
 	}
 
 	if (FAILED(hr = dsbOutgoing->Start(DSCBSTART_LOOPING)))
 	{
-		DXTRACE_ERR_MSGBOX(L"IDirectSoundCaptureBuffer8::Start, when starting outgoing sound buffer", hr);
+		DXTRACE_ERR_MSGBOX(_T("IDirectSoundCaptureBuffer8::Start, when starting outgoing sound buffer"), hr);
 		return false;
 	}
 
@@ -306,11 +312,11 @@ void DSoundVoiceAdapter::Release()
 	{
 		if (incomingBufferNotifications[i].hEventNotify!=0 && CloseHandle(incomingBufferNotifications[i].hEventNotify)==0)
 		{
-			DXTRACE_ERR_MSGBOX(L"CloseHandle", GetLastError());
+			DXTRACE_ERR_MSGBOX(_T("CloseHandle"), GetLastError());
 		}
 		if (outgoingBufferNotifications[i].hEventNotify!=0 && CloseHandle(outgoingBufferNotifications[i].hEventNotify)==0)
 		{
-			DXTRACE_ERR_MSGBOX(L"CloseHandle", GetLastError());
+			DXTRACE_ERR_MSGBOX(_T("CloseHandle"), GetLastError());
 		}
 	}
 	memset(incomingBufferNotifications,0, sizeof(incomingBufferNotifications));
@@ -383,7 +389,7 @@ void DSoundVoiceAdapter::BroadcastFrame(void *ptr)
 		rakVoice->SendFrame(rakVoice->GetRakPeerInterface()->GetGUIDFromIndex(i), ptr);
 	}
 #else
-	rakVoice->SendFrame(RakNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
+	rakVoice->SendFrame(SLNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
 #endif
 
 }

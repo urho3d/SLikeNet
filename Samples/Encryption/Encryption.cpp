@@ -1,30 +1,37 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
-#include "RakNetTypes.h"
-#include "NativeFeatureIncludes.h"
+#include "slikenet/types.h"
+#include "slikenet/NativeFeatureIncludes.h"
 #include <assert.h>
-#include "RakSleep.h"
-#include "BitStream.h"
-#include "SecureHandshake.h" // Include header for secure handshake
-#include "Gets.h"
-using namespace RakNet;
+#include "slikenet/sleep.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/SecureHandshake.h" // Include header for secure handshake
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
+using namespace SLNet;
 
 #if LIBCAT_SECURITY!=1
 #error "Define LIBCAT_SECURITY 1 in NativeFeatureIncludesOverrides.h to enable Encryption"
@@ -83,7 +90,7 @@ void PrintPacketHeader(Packet *packet)
 				}
 
 				// Transmit test message
-				RakNet::BitStream testBlockLargerThanMTU;
+				SLNet::BitStream testBlockLargerThanMTU;
 				testBlockLargerThanMTU.Write((MessageID) ID_USER_PACKET_ENUM);
 				testBlockLargerThanMTU.PadWithZeroToByteLength(10000);
 				rakPeer1->Send(&testBlockLargerThanMTU, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
@@ -133,7 +140,7 @@ int main(void)
 	char client_public_key[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 	char client_private_key[cat::EasyHandshake::PRIVATE_KEY_BYTES];
 
-	while (1)
+	for(;;)
 	{
 		Gets(str, sizeof(str));
 
@@ -160,7 +167,7 @@ int main(void)
 					if (str[0])
 					{
 						printf("Writing public key... ");
-						fp=fopen(str, "wb");
+						fopen_s(&fp, str, "wb");
 							fwrite(public_key, sizeof(public_key), 1, fp);
 						fclose(fp);
 						printf("Done.\n");
@@ -173,7 +180,7 @@ int main(void)
 					if (str[0])
 					{
 						printf("Writing private key... ");
-						fp=fopen(str, "wb");
+						fopen_s(&fp, str, "wb");
 							fwrite(private_key, sizeof(private_key), 1, fp);
 						fclose(fp);
 						printf("Done.\n");
@@ -190,8 +197,7 @@ int main(void)
 			Gets(str, sizeof(str));
 			if (str[0])
 			{
-				fp=fopen(str, "rb");
-				if (fp)
+				if (fopen_s(&fp, str, "rb") == 0)
 				{
 					printf("Loading public key... ");
 					fread(public_key, sizeof(public_key), 1, fp);
@@ -202,8 +208,7 @@ int main(void)
 					Gets(str, sizeof(str));
 					if (str[0])
 					{
-						fp=fopen(str, "rb");
-						if (fp)
+						if (fopen_s(&fp, str, "rb") == 0)
 						{
 							printf("Loading private key... ");
 							fread(private_key, sizeof(private_key), 1, fp);
@@ -326,8 +331,8 @@ int main(void)
 
 				peer1GotMessage=false;
 				peer2GotMessage=false;
-				TimeMS time = RakNet::GetTimeMS() + 12000;
-				while (RakNet::GetTimeMS() < time)
+				TimeMS time = SLNet::GetTimeMS() + 12000;
+				while (SLNet::GetTimeMS() < time)
 				{
 					packet=rakPeer1->Receive();
 					if (packet)
@@ -335,11 +340,13 @@ int main(void)
 						peer1GotMessage=true;
 						printf("Host got: ");
 						PrintPacketHeader(packet);
+#if defined(_DEBUG) && !defined(__native_client__)
 						if (doTwoWayAuthentication)
 						{
 							char client_public_key_copy[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 							RakAssert(rakPeer1->GetClientPublicKeyFromSystemAddress(packet->systemAddress, client_public_key_copy)==true)
 						}
+#endif
 						rakPeer1->DeallocatePacket(packet);
 					}
 					packet=rakPeer2->Receive();
@@ -348,11 +355,13 @@ int main(void)
 						peer2GotMessage=true;
 						printf("Connecting system got: ");
 						PrintPacketHeader(packet);
+#if defined(_DEBUG) && !defined(__native_client__)
 						if (doTwoWayAuthentication)
 						{
 							char client_public_key_copy[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 							RakAssert(rakPeer2->GetClientPublicKeyFromSystemAddress(packet->systemAddress, client_public_key_copy)==true)
 						}
+#endif
 						rakPeer2->DeallocatePacket(packet);
 					}
 

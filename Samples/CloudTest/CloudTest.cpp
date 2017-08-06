@@ -1,22 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "BitStream.h"
-#include "GetTime.h"
-#include "RakSleep.h"
-#include "Gets.h"
-#include "MessageIdentifiers.h"
-#include "CloudServer.h"
-#include "CloudClient.h"
-#include "Kbhit.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/sleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/CloudServer.h"
+#include "slikenet/CloudClient.h"
+#include "slikenet/Kbhit.h"
 
 enum
 {
@@ -43,13 +48,13 @@ enum
 
 static const unsigned short STARTING_PORT=60000;
 
-class MyCallback : public RakNet::CloudClientCallback
+class MyCallback : public SLNet::CloudClientCallback
 {
-	virtual void OnGet(RakNet::CloudQueryResult *result, bool *deallocateRowsAfterReturn)
+	virtual void OnGet(SLNet::CloudQueryResult *result, bool *deallocateRowsAfterReturn)
 	{
 		printf("On Download %i rows. IsSubscription=%i.\n", result->rowsReturned.Size(), result->subscribeToResults);
 	}
-	virtual void OnSubscriptionNotification(RakNet::CloudQueryRow *result, bool wasUpdated, bool *deallocateRowAfterReturn)
+	virtual void OnSubscriptionNotification(SLNet::CloudQueryRow *result, bool wasUpdated, bool *deallocateRowAfterReturn)
 	{
 		if (wasUpdated)
 			printf("OnSubscriptionNotification Updated\n");
@@ -58,7 +63,7 @@ class MyCallback : public RakNet::CloudClientCallback
 	}
 };
 
-class MyAllocator : public RakNet::CloudAllocator
+class MyAllocator : public SLNet::CloudAllocator
 {
 };
 
@@ -69,13 +74,13 @@ int main(void)
 
 	MyCallback myCloudClientCallback;
 	MyAllocator myCloudClientAllocator;
-	RakNet::CloudServer cloudServer[CLOUD_SERVER_COUNT];
-	RakNet::CloudClient cloudClient[CLOUD_CLIENT_COUNT];
-	RakNet::RakPeerInterface *rakPeer[RAKPEER_COUNT];
+	SLNet::CloudServer cloudServer[CLOUD_SERVER_COUNT];
+	SLNet::CloudClient cloudClient[CLOUD_CLIENT_COUNT];
+	SLNet::RakPeerInterface *rakPeer[RAKPEER_COUNT];
 	for (unsigned int i=0; i < RAKPEER_COUNT; i++)
 	{
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
-		RakNet::SocketDescriptor sd(STARTING_PORT+i,0);
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
+		SLNet::SocketDescriptor sd(STARTING_PORT+i,0);
 		rakPeer[i]->Startup(RAKPEER_COUNT,&sd,1);
 	}
 
@@ -129,17 +134,17 @@ int main(void)
 	printf("'G' To unsubscribe to data sets 1 and 2 from client 2 to server 2.\n");
 	printf("'H' To release data set 1 and 2 from client 2 to server 2.\n");
 	printf("'Y' to disconnect client 1.\n");
-	RakNet::Packet *packet;
-	while (1)
+	SLNet::Packet *packet;
+	for(;;)
 	{
 		char command;
-		if (kbhit())
+		if (_kbhit())
 		{
-			command=getch();
+			command=_getch();
 			if (command=='a' || command=='A')
 			{
 				printf("Uploading data set 1 from client 1\n");
-				RakNet::CloudKey dataKey1;
+				SLNet::CloudKey dataKey1;
 				dataKey1.primaryKey="ApplicationName";
 				dataKey1.secondaryKey=1;
 				cloudClient[CLOUD_CLIENT_1].Post(&dataKey1, (const unsigned char*) "DS1C1S1", (uint32_t) strlen("DS1C1S1")+1, rakPeer[CLIENT_1]->GetGUIDFromIndex(0));
@@ -147,7 +152,7 @@ int main(void)
 			else if (command=='b' || command=='B')
 			{
 				printf("Uploading data set 1 from client 2\n");
-				RakNet::CloudKey dataKey1;
+				SLNet::CloudKey dataKey1;
 				dataKey1.primaryKey="ApplicationName";
 				dataKey1.secondaryKey=1;
 				cloudClient[CLOUD_CLIENT_2].Post(&dataKey1, (const unsigned char*) "DS1C2S2", (uint32_t) strlen("DS1C2S2")+1, rakPeer[CLIENT_2]->GetGUIDFromIndex(0));
@@ -155,7 +160,7 @@ int main(void)
 			else if (command=='c' || command=='C')
 			{
 				printf("Uploading data set 2 from client 2\n");
-				RakNet::CloudKey dataKey1;
+				SLNet::CloudKey dataKey1;
 				dataKey1.primaryKey="ApplicationName";
 				dataKey1.secondaryKey=2;
 				cloudClient[CLOUD_CLIENT_1].Post(&dataKey1, (const unsigned char*) "DS2C2S1", (uint32_t) strlen("DS2C2S1")+1, rakPeer[CLIENT_1]->GetGUIDFromIndex(0));
@@ -163,13 +168,13 @@ int main(void)
 			else if (command=='d' || command=='D')
 			{
 				printf("Downloading data sets 1 and 2 from client 1\n");
-				RakNet::CloudKey dataKey1;
+				SLNet::CloudKey dataKey1;
 				dataKey1.primaryKey="ApplicationName";
 				dataKey1.secondaryKey=1;
 
-				RakNet::CloudQuery keyQuery;
-				keyQuery.keys.Push(RakNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
-				keyQuery.keys.Push(RakNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
+				SLNet::CloudQuery keyQuery;
+				keyQuery.keys.Push(SLNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
+				keyQuery.keys.Push(SLNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
 				keyQuery.maxRowsToReturn=0;
 				keyQuery.startingRowIndex=0;
 				keyQuery.subscribeToResults=false;
@@ -179,23 +184,23 @@ int main(void)
 			else if (command=='e' || command=='E')
 			{
 				printf("Releasing data sets 1 and 2 from client 1\n");
-				DataStructures::List<RakNet::CloudKey> keys;
-				keys.Push(RakNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
-				keys.Push(RakNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
+				DataStructures::List<SLNet::CloudKey> keys;
+				keys.Push(SLNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
+				keys.Push(SLNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
 				cloudClient[CLOUD_CLIENT_1].Release(keys, rakPeer[CLIENT_1]->GetGUIDFromIndex(0));
 			}
 			else if (command=='f' || command=='F')
 			{
 				printf("Subscribing to data sets 1 and 2 from client 2 to server 2.\n");
 
-				RakNet::CloudQuery keyQuery;
-				keyQuery.keys.Push(RakNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
-				keyQuery.keys.Push(RakNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
+				SLNet::CloudQuery keyQuery;
+				keyQuery.keys.Push(SLNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
+				keyQuery.keys.Push(SLNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
 				keyQuery.maxRowsToReturn=0;
 				keyQuery.startingRowIndex=0;
 				keyQuery.subscribeToResults=true;
 
-				DataStructures::List<RakNet::RakNetGUID> specificSystems;
+				DataStructures::List<SLNet::RakNetGUID> specificSystems;
 				specificSystems.Push(rakPeer[CLIENT_1]->GetMyGUID(), _FILE_AND_LINE_);
 
 				cloudClient[CLOUD_CLIENT_2].Get(&keyQuery, specificSystems, rakPeer[CLIENT_2]->GetGUIDFromIndex(0));
@@ -204,10 +209,10 @@ int main(void)
 			{
 				printf("Unsubscribing to data sets 1 and 2 from client 2 to server 2.\n");
 
-				DataStructures::List<RakNet::CloudKey> keys;
-				keys.Push(RakNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
-				keys.Push(RakNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
-				DataStructures::List<RakNet::RakNetGUID> specificSystems;
+				DataStructures::List<SLNet::CloudKey> keys;
+				keys.Push(SLNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
+				keys.Push(SLNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
+				DataStructures::List<SLNet::RakNetGUID> specificSystems;
 				specificSystems.Push(rakPeer[CLIENT_1]->GetMyGUID(), _FILE_AND_LINE_);
 
 				cloudClient[CLOUD_CLIENT_2].Unsubscribe(keys, specificSystems, rakPeer[CLIENT_2]->GetGUIDFromIndex(0));
@@ -215,9 +220,9 @@ int main(void)
 			else if (command=='h' || command=='H')
 			{
 				printf("Releasing data sets 1 and 2 from client 2\n");
-				DataStructures::List<RakNet::CloudKey> keys;
-				keys.Push(RakNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
-				keys.Push(RakNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
+				DataStructures::List<SLNet::CloudKey> keys;
+				keys.Push(SLNet::CloudKey("ApplicationName", 1), _FILE_AND_LINE_);
+				keys.Push(SLNet::CloudKey("ApplicationName", 2), _FILE_AND_LINE_);
 				cloudClient[CLOUD_CLIENT_2].Unsubscribe(keys, rakPeer[CLIENT_2]->GetGUIDFromIndex(0));
 			}
 			else if (command=='y' || command=='Y')
@@ -289,7 +294,7 @@ int main(void)
 
 	for (unsigned int i=0; i < RAKPEER_COUNT; i++)
 	{
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 	}
 
 	return 0;

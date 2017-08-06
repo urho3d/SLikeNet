@@ -1,36 +1,43 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "BitStream.h"
+#include "slikenet/BitStream.h"
 #include <stdlib.h> // For atoi
 #include <cstring> // For strlen
-#include "Rand.h"
-#include "RakNetStatistics.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/Rand.h"
+#include "slikenet/statistics.h"
+#include "slikenet/MessageIdentifiers.h"
 #include <stdio.h>
-#include "Kbhit.h"
-#include "GetTime.h"
-#include "RakAssert.h"
-#include "RakSleep.h"
-#include "Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/assert.h"
+#include "slikenet/sleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep64
+#include "slikenet/WindowsIncludes.h" // Sleep64
 #else
 #include <unistd.h> // usleep
 #include <cstdio>
-#include "Getche.h"
+#include "slikenet/Getche.h"
 #endif
 
 static const int NUM_CLIENTS=100;
@@ -47,15 +54,15 @@ class Client
 	public:
 		Client()
 		{
-			peer = RakNet::RakPeerInterface::GetInstance();
+			peer = SLNet::RakPeerInterface::GetInstance();
 		}
 		~Client()
 		{
-			RakNet::RakPeerInterface::DestroyInstance(peer);
+			SLNet::RakPeerInterface::DestroyInstance(peer);
 		}
 		void Startup(void)
 		{
-			RakNet::SocketDescriptor socketDescriptor;
+			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=0;
 			nextSendTime=0;
 			StartupResult b = peer->Startup(1,&socketDescriptor,1);
@@ -65,7 +72,7 @@ class Client
 		void Connect(void)
 		{
 			bool b;
-			b=peer->Connect(remoteIPAddress, (unsigned short) SERVER_PORT, 0, 0, 0)==RakNet::CONNECTION_ATTEMPT_STARTED;
+			b=peer->Connect(remoteIPAddress, (unsigned short) SERVER_PORT, 0, 0, 0)== SLNet::CONNECTION_ATTEMPT_STARTED;
 			if (b==false)
 			{
 				printf("Client connect call failed!\n");
@@ -76,7 +83,7 @@ class Client
 			peer->CloseConnection(peer->GetSystemAddressFromIndex(0),true,0);
 			isConnected=false;
 		}
-		void Update(RakNet::TimeMS curTime)
+		void Update(SLNet::TimeMS curTime)
 		{
 			Packet *p = peer->Receive();
 			while (p)
@@ -126,11 +133,11 @@ class Client
 			{
 				if (randomMT()%10==0)
 				{
-					peer->Send((const char*)&randomData2,RANDOM_DATA_SIZE_2,HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+					peer->Send((const char*)&randomData2,RANDOM_DATA_SIZE_2,HIGH_PRIORITY,RELIABLE_ORDERED,0, SLNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 				}
 				else
 				{
-					peer->Send((const char*)&randomData1,RANDOM_DATA_SIZE_1,HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+					peer->Send((const char*)&randomData1,RANDOM_DATA_SIZE_1,HIGH_PRIORITY,RELIABLE_ORDERED,0, SLNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 				}
 
 				nextSendTime=curTime+50;
@@ -139,7 +146,7 @@ class Client
 
 		bool isConnected;
 		RakPeerInterface *peer;
-		RakNet::TimeMS nextSendTime;
+		SLNet::TimeMS nextSendTime;
 };
 
 // Just listens for ID_USER_PACKET_ENUM and validates its integrity
@@ -148,18 +155,18 @@ class Server
 	public:
 		Server()
 		{
-			peer = RakNet::RakPeerInterface::GetInstance();
+			peer = SLNet::RakPeerInterface::GetInstance();
 			nextSendTime=0;
 		}
 		~Server()
 		{
-			RakNet::RakPeerInterface::DestroyInstance(peer);
+			SLNet::RakPeerInterface::DestroyInstance(peer);
 		}
 		void Start(void)
 		{
-			RakNet::SocketDescriptor socketDescriptor;
+			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=(unsigned short) SERVER_PORT;
-			bool b = peer->Startup((unsigned short) 600,&socketDescriptor,1)==RakNet::RAKNET_STARTED;
+			bool b = peer->Startup((unsigned short) 600,&socketDescriptor,1)== SLNet::RAKNET_STARTED;
 			RakAssert(b);
 			peer->SetMaximumIncomingConnections(600);
 		}
@@ -169,7 +176,7 @@ class Server
 			peer->GetConnectionList(0,&numberOfSystems);
 			return numberOfSystems;
 		}
-		void Update(RakNet::TimeMS curTime)
+		void Update(SLNet::TimeMS curTime)
 		{
 			Packet *p = peer->Receive();
 			while (p)
@@ -195,11 +202,11 @@ class Server
 			{
 				if (randomMT()%10==0)
 				{
-					peer->Send((const char*)&randomData2,RANDOM_DATA_SIZE_2,HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+					peer->Send((const char*)&randomData2,RANDOM_DATA_SIZE_2,HIGH_PRIORITY,RELIABLE_ORDERED,0, SLNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 				}
 				else
 				{
-					peer->Send((const char*)&randomData1,RANDOM_DATA_SIZE_1,HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+					peer->Send((const char*)&randomData1,RANDOM_DATA_SIZE_1,HIGH_PRIORITY,RELIABLE_ORDERED,0, SLNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 				}
 
 				nextSendTime=curTime+100;
@@ -207,7 +214,7 @@ class Server
 		}
 		
 
-		RakNet::TimeMS nextSendTime;
+		SLNet::TimeMS nextSendTime;
 		RakPeerInterface *peer;
 };
 
@@ -221,7 +228,7 @@ int main(void)
 	printf("Connects many clients to a single server.\n");
 	printf("Difficulty: Intermediate\n\n");
 	printf("Run as (S)erver or (C)lient or (B)oth? ");
-	char ch = getche();
+	char ch = _getche();
 	static char *defaultRemoteIP="127.0.0.1";
 	char remoteIP[128];
 	static char *localIP="127.0.0.1";
@@ -247,7 +254,7 @@ int main(void)
 		Gets(remoteIP, sizeof(remoteIP));
 		if (remoteIP[0]==0)
 		{
-			strcpy(remoteIP, defaultRemoteIP);
+			strcpy_s(remoteIP, defaultRemoteIP);
 			printf("Using %s\n", defaultRemoteIP);
 		}
 	}
@@ -277,8 +284,8 @@ int main(void)
 		printf("Done.\n");
 	}
 	
-	RakNet::TimeMS endTime = RakNet::GetTimeMS()+60000*5;
-	RakNet::TimeMS time = RakNet::GetTimeMS();
+	SLNet::TimeMS endTime = SLNet::GetTimeMS()+60000*5;
+	SLNet::TimeMS time = SLNet::GetTimeMS();
 	while (time < endTime)
 	{
 		if (mode==0 || mode==2)
@@ -289,9 +296,9 @@ int main(void)
 				clients[i].Update(time);
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			char ch = getch();
+			char ch = _getch();
 			if (ch==' ')
 			{
 				FILE *fp;
@@ -299,12 +306,12 @@ int main(void)
 				if (mode==0 || mode==2)
 				{
 					printf("Logging server statistics to ServerStats.txt\n");
-					fp=fopen("ServerStats.txt","wt");
+					fopen_s(&fp,"ServerStats.txt","wt");
 					for (i=0; i < NUM_CLIENTS; i++)
 					{
 						RakNetStatistics *rssSender;
 						rssSender=server.peer->GetStatistics(server.peer->GetSystemAddressFromIndex(i));
-						StatisticsToString(rssSender, text, 3);
+						StatisticsToString(rssSender, text, 2048, 3);
 						fprintf(fp,"==== System %i ====\n", i+1);
 						fprintf(fp,"%s\n\n", text);
 					}
@@ -313,12 +320,12 @@ int main(void)
 				if (mode==1 || mode==2)
 				{
 					printf("Logging client statistics to ClientStats.txt\n");
-					fp=fopen("ClientStats.txt","wt");
+					fopen_s(&fp,"ClientStats.txt","wt");
 					for (i=0; i < NUM_CLIENTS; i++)
 					{
 						RakNetStatistics *rssSender;
 						rssSender=clients[i].peer->GetStatistics(clients[i].peer->GetSystemAddressFromIndex(0));
-						StatisticsToString(rssSender, text, 3);
+						StatisticsToString(rssSender, text, 2048, 3);
 						fprintf(fp,"==== Client %i ====\n", i+1);
 						fprintf(fp,"%s\n\n", text);
 					}
@@ -329,7 +336,7 @@ int main(void)
 				break;
 		}
 
-		time = RakNet::GetTimeMS();
+		time = SLNet::GetTimeMS();
 		RakSleep(30);
 	}
 

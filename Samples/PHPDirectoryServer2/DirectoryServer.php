@@ -1,4 +1,7 @@
 <?php
+// This file was taken from RakNet 4.082 without any modifications.
+// Please see licenses/RakNet license.txt for the underlying license and related copyright.
+
 //These vars may be changed to fit your needs.
 //User executing the script must have write access to the file directory.
 define("PASSWORD_FILE", "pw");

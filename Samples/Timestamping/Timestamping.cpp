@@ -1,34 +1,41 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
-#include "RakSleep.h"
-using namespace RakNet;
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/sleep.h"
+using namespace SLNet;
 
 #include <cstdio>
 #include <memory.h>
 #include <cstring>
-#include "Gets.h"
-#include "Kbhit.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 
 int main(void)
 {
 	char serverIP[64];
 
-	RakPeerInterface *rakClient=RakNet::RakPeerInterface::GetInstance();
-	RakPeerInterface *rakServer=RakNet::RakPeerInterface::GetInstance();
+	RakPeerInterface *rakClient= SLNet::RakPeerInterface::GetInstance();
+	RakPeerInterface *rakServer= SLNet::RakPeerInterface::GetInstance();
 	rakClient->SetOccasionalPing(true);
 	rakServer->SetOccasionalPing(true);
 
@@ -42,9 +49,9 @@ int main(void)
 	printf("Hit 'c' to run as a client.  Hit 's' to run as a server. Hit 'q' to quit\n");
 	char buff[256];
 
-	while (1)
+	for(;;)
 	{
-		gets(buff);
+		gets_s(buff);
 		ch = buff[0];
 
 		if (ch=='c')
@@ -53,9 +60,9 @@ int main(void)
 			puts ("Enter server IP\n");
 			Gets(serverIP,sizeof(serverIP));
 			if (serverIP[0]==0)
-				strcpy(serverIP, "127.0.0.1");
+				strcpy_s(serverIP, "127.0.0.1");
 
-			RakNet::SocketDescriptor socketDescriptor(0,0);
+			SLNet::SocketDescriptor socketDescriptor(0,0);
 			rakClient->Startup(1, &socketDescriptor, 1);
 			rakClient->Connect(serverIP, 2100, 0, 0);
 			printf("Connecting client\n");
@@ -65,7 +72,7 @@ int main(void)
 		else if (ch=='s')
 		{
 			// Run as a server.
-			RakNet::SocketDescriptor socketDescriptor(2100,0);
+			SLNet::SocketDescriptor socketDescriptor(2100,0);
 			rakServer->Startup(32,&socketDescriptor, 1);
 			rakServer->SetMaximumIncomingConnections(32);
 			printf("Server started\n");
@@ -81,26 +88,26 @@ int main(void)
 	}
 
 	printf("Entering main loop.  Press 'q' to quit\n'c' to send from the client.\n's' to send from the server.\n");
-	RakNet::Packet *packet;
-	RakNet::Time time;
+	SLNet::Packet *packet;
+	SLNet::Time time;
 	ch=0;
 	bool packetFromServer;
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
 #ifndef _WIN32
 			Gets(buff,sizeof(buff));
 			ch=buff[0];
 #else
-			ch=getch();
+			ch=_getch();
 #endif
 		}
 
 		if (ch=='q')
 			break;
 
-		if (ch=='c' && rakClient->GetSystemAddressFromIndex(0)!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (ch=='c' && rakClient->GetSystemAddressFromIndex(0)!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 		{
 			BitStream bitStream;
 
@@ -109,9 +116,9 @@ int main(void)
 
 			bitStream.Write((unsigned char)ID_TIMESTAMP);
 			
-			time=RakNet::GetTime();
+			time= SLNet::GetTime();
 			bitStream.Write(time);
-			rakClient->Send(&bitStream, HIGH_PRIORITY, RELIABLE, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			rakClient->Send(&bitStream, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 			printf("Sending message from client at time %" PRINTF_64_BIT_MODIFIER "u\n", time);
 		}
 		else if (ch=='s' && rakServer->IsActive())
@@ -119,9 +126,9 @@ int main(void)
 			BitStream bitStream;
 			bitStream.Write((unsigned char)ID_TIMESTAMP);
 
-			time=RakNet::GetTime();
+			time= SLNet::GetTime();
 			bitStream.Write(time);
-			rakServer->Send(&bitStream, HIGH_PRIORITY, RELIABLE, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			rakServer->Send(&bitStream, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 			printf("Sending packet from server at time %" PRINTF_64_BIT_MODIFIER "u\n", time);
 		}
 
@@ -139,9 +146,9 @@ int main(void)
 		if (packet && packet->data[0]==ID_TIMESTAMP)
 		{
 			// Write the bytes after the first to a variable.  That is the time the packet was sent.
-			RakNet::BitStream timeBS(packet->data+1, sizeof(RakNet::Time), false);
+			SLNet::BitStream timeBS(packet->data+1, sizeof(SLNet::Time), false);
 			timeBS.Read(time);
-			printf("Time difference is %" PRINTF_64_BIT_MODIFIER "u\n", RakNet::GetTime() - time);
+			printf("Time difference is %" PRINTF_64_BIT_MODIFIER "u\n", SLNet::GetTime() - time);
 		}
 
 		if (packet)
@@ -161,8 +168,8 @@ int main(void)
 	rakServer->Shutdown(0);
 	rakClient->Shutdown(0);
 
-	RakNet::RakPeerInterface::DestroyInstance(rakClient);
-	RakNet::RakPeerInterface::DestroyInstance(rakServer);
+	SLNet::RakPeerInterface::DestroyInstance(rakClient);
+	SLNet::RakPeerInterface::DestroyInstance(rakServer);
 
 	return 0;
 }

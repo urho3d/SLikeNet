@@ -1,19 +1,26 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "WindowsIncludes.h"
+#include "slikenet/WindowsIncludes.h"
 #include "SendFileTo.h"
 #include <shlwapi.h>
 #include <tchar.h>
 #include <stdio.h>
 #include <direct.h>
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 bool CSendFileTo::SendMail(HWND hWndParent, const char *strAttachmentFilePath, const char *strAttachmentFileName, const char *strSubject, const char *strBody, const char *strRecipient)
 {
@@ -23,31 +30,31 @@ bool CSendFileTo::SendMail(HWND hWndParent, const char *strAttachmentFilePath, c
 //	if (!hWndParent || !::IsWindow(hWndParent))
 //		return false;
 
-	HINSTANCE hMAPI = ::LoadLibraryA(_T("MAPI32.DLL"));
+	HINSTANCE hMAPI = LoadLibrary(_T("MAPI32.DLL"));
 	if (!hMAPI)
 		return false;
 
 	ULONG (PASCAL *SendMail)(ULONG, ULONG_PTR, MapiMessage*, FLAGS, ULONG);
-	(FARPROC&)SendMail = GetProcAddress(hMAPI, _T("MAPISendMail"));
+	(FARPROC&)SendMail = GetProcAddress(hMAPI, "MAPISendMail");
 
 	if (!SendMail)
 		return false;
 
-//	TCHAR szFileName[_MAX_PATH];
-//	TCHAR szPath[_MAX_PATH];
-	TCHAR szName[_MAX_PATH];
-	TCHAR szSubject[_MAX_PATH];
-	TCHAR szBody[_MAX_PATH];
-	TCHAR szAddress[_MAX_PATH];
-	TCHAR szSupport[_MAX_PATH];
-	//strcpy(szFileName, (LPCTSTR)strAttachmentFileName);
-	//strcpy(szPath, (LPCTSTR)strAttachmentFilePath);
+//	char szFileName[_MAX_PATH];
+//	char szPath[_MAX_PATH];
+	char szName[_MAX_PATH];
+	char szSubject[_MAX_PATH];
+	char szBody[_MAX_PATH];
+	char szAddress[_MAX_PATH];
+	char szSupport[_MAX_PATH];
+	//strcpy_s(szFileName, strAttachmentFileName);
+	//strcpy_s(szPath, strAttachmentFilePath);
 	if (strAttachmentFileName)
-		strcpy(szName, (LPCTSTR)strAttachmentFileName);
-	strcpy(szSubject, (LPCTSTR)strSubject);
-	strcpy(szBody, (LPCTSTR)strBody);
-	sprintf(szAddress, "SMTP:%s", strRecipient);
-	//strcpy(szSupport, _T("Support"));
+		strcpy_s(szName, strAttachmentFileName);
+	strcpy_s(szSubject, strSubject);
+	strcpy_s(szBody, strBody);
+	sprintf_s(szAddress, "SMTP:%s", strRecipient);
+	//strcpy_s(szSupport, "Support");
 
 	char fullPath[_MAX_PATH];
 	if (strAttachmentFileName && strAttachmentFilePath)
@@ -58,12 +65,12 @@ bool CSendFileTo::SendMail(HWND hWndParent, const char *strAttachmentFilePath, c
 			strAttachmentFilePath[2]!='/'))
 		{
 			// Make relative paths absolute
-			getcwd(fullPath, _MAX_PATH);
-			strcat(fullPath, "/");
-			strcat(fullPath, strAttachmentFilePath);
+			_getcwd(fullPath, _MAX_PATH);
+			strcat_s(fullPath, "/");
+			strcat_s(fullPath, strAttachmentFilePath);
 		}
 		else
-			strcpy(fullPath, strAttachmentFilePath);
+			strcpy_s(fullPath, strAttachmentFilePath);
 
 
 		// All slashes have to be \\ and not /

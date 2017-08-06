@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -36,7 +41,15 @@ of each frame.
 #include "dsound.h"
 #include "dxerr.h"
 
-namespace RakNet {
+// for Unicode support, we have to include legacy_stdio_definitions.lib with VS 2015+ so to define
+// _vsnwprintf which is referenced in dxerr.lib(dxerrw.obj) but no longer exported in the standard libs
+// as of VS 2015
+// reference: https://connect.microsoft.com/VisualStudio/feedback/details/1134693/vs-2015-ctp-5-c-vsnwprintf-s-and-other-functions-are-not-exported-in-appcrt140-dll-breaking-linkage-of-static-libraries
+#if _MSC_VER >= 1900 && defined(_DEBUG) && defined(UNICODE)
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+#endif
+
+namespace SLNet {
 
 class DSoundVoiceAdapter
 {
@@ -111,6 +124,6 @@ private:
 
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

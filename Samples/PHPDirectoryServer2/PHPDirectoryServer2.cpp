@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
@@ -21,16 +26,16 @@
 /// License as published by the Free Software Foundation
 
 #include "PHPDirectoryServer2.h"
-#include "HTTPConnection.h"
-#include "RakSleep.h"
-#include "RakString.h"
-#include "RakNetTypes.h"
-#include "GetTime.h"
-#include "RakAssert.h"
+#include "slikenet/HTTPConnection.h"
+#include "slikenet/sleep.h"
+#include "slikenet/string.h"
+#include "slikenet/types.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/assert.h"
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include "Itoa.h"
+#include "slikenet/Itoa.h"
 
 // Column with this header contains the name of the game, passed to UploadTable()
 static const char *GAME_NAME_COMMAND="__GAME_NAME";
@@ -41,7 +46,7 @@ static const char *SYSTEM_ADDRESS_COMMAND="_System_Address";
 // Returned from the PHP server indicating when this row was last updated.
 static const char *LAST_UPDATE_COMMAND="__SEC_AFTER_EPOCH_SINCE_LAST_UPDATE";
 
-using namespace RakNet;
+using namespace SLNet;
 using namespace DataStructures;
 
 PHPDirectoryServer2::PHPDirectoryServer2()
@@ -58,7 +63,7 @@ void PHPDirectoryServer2::Init(HTTPConnection *_http, const char *_path)
 	pathToPHP=_path;
 }
 
-void PHPDirectoryServer2::SetField( RakNet::RakString columnName, RakNet::RakString value )
+void PHPDirectoryServer2::SetField(SLNet::RakString columnName, SLNet::RakString value )
 {
 	if (columnName.IsEmpty())
 		return;
@@ -77,7 +82,7 @@ unsigned int PHPDirectoryServer2::GetFieldCount(void) const
 {
 	return fields.Size();
 }
-void PHPDirectoryServer2::GetField(unsigned int index, RakNet::RakString &columnName, RakNet::RakString &value)
+void PHPDirectoryServer2::GetField(unsigned int index, SLNet::RakString &columnName, SLNet::RakString &value)
 {
 	RakAssert(index < fields.Size());
 	columnName=fields.GetKeyAtIndex(index);
@@ -106,7 +111,7 @@ void PHPDirectoryServer2::ClearFields(void)
 	nextRepost=0;
 }
 
-void PHPDirectoryServer2::UploadTable(RakNet::RakString uploadPassword, RakNet::RakString gameName, unsigned short gamePort, bool autoRepost)
+void PHPDirectoryServer2::UploadTable(SLNet::RakString uploadPassword, SLNet::RakString gameName, unsigned short gamePort, bool autoRepost)
 {
 	gameNameParam=gameName;
 	gamePortParam=gamePort;
@@ -116,17 +121,17 @@ void PHPDirectoryServer2::UploadTable(RakNet::RakString uploadPassword, RakNet::
 	SendOperation();
 
 	if (autoRepost)
-		nextRepost=RakNet::GetTimeMS()+50000;
+		nextRepost= SLNet::GetTimeMS()+50000;
 	else
 		nextRepost=0;
 }
-void PHPDirectoryServer2::DownloadTable(RakNet::RakString downloadPassword)
+void PHPDirectoryServer2::DownloadTable(SLNet::RakString downloadPassword)
 {
 	currentOperation="?query=download&downloadPassword=";
 	currentOperation+=downloadPassword;
 	SendOperation();
 }
-void PHPDirectoryServer2::UploadAndDownloadTable(RakNet::RakString uploadPassword, RakNet::RakString downloadPassword, RakNet::RakString gameName, unsigned short gamePort, bool autoRepost)
+void PHPDirectoryServer2::UploadAndDownloadTable(SLNet::RakString uploadPassword, SLNet::RakString downloadPassword, SLNet::RakString gameName, unsigned short gamePort, bool autoRepost)
 {
 	gameNameParam=gameName;
 	gamePortParam=gamePort;
@@ -138,12 +143,12 @@ void PHPDirectoryServer2::UploadAndDownloadTable(RakNet::RakString uploadPasswor
 	SendOperation();
 
 	if (autoRepost)
-		nextRepost=RakNet::GetTimeMS()+50000;
+		nextRepost= SLNet::GetTimeMS()+50000;
 	else
 		nextRepost=0;
 }
 
-HTTPReadResult PHPDirectoryServer2::ProcessHTTPRead(RakNet::RakString httpRead)
+HTTPReadResult PHPDirectoryServer2::ProcessHTTPRead(SLNet::RakString httpRead)
 {
 	const char *c = (const char*) httpRead.C_String(); // current position
 	HTTPReadResult resultCode=HTTP_RESULT_EMPTY;
@@ -156,9 +161,9 @@ HTTPReadResult PHPDirectoryServer2::ProcessHTTPRead(RakNet::RakString httpRead)
 	char buff[256];
 	int buffIndex;
 	bool isCommand=true;
-	DataStructures::List<RakNet::RakString> columns;
-	DataStructures::List<RakNet::RakString> values;
-	RakNet::RakString curString;
+	DataStructures::List<SLNet::RakString> columns;
+	DataStructures::List<SLNet::RakString> values;
+	SLNet::RakString curString;
 	bool isComment=false;
 	buffIndex=0;
 	while(c && *c)
@@ -224,7 +229,7 @@ HTTPReadResult PHPDirectoryServer2::ProcessHTTPRead(RakNet::RakString httpRead)
 
 	return resultCode;
 }
-void PHPDirectoryServer2::PushColumnsAndValues(DataStructures::List<RakNet::RakString> &columns, DataStructures::List<RakNet::RakString> &values)
+void PHPDirectoryServer2::PushColumnsAndValues(DataStructures::List<SLNet::RakString> &columns, DataStructures::List<SLNet::RakString> &values)
 {
 	DataStructures::Table::Row *row=0;
 
@@ -288,12 +293,12 @@ void PHPDirectoryServer2::Update(void)
 	if (nextRepost==0 || fields.Size()==0)
 		return;
 
-	RakNet::TimeMS time = GetTimeMS();
+	SLNet::TimeMS time = GetTimeMS();
 
 	// Entry deletes itself after 60 seconds, so keep reposting if set to do so
 	if (time > nextRepost)
 	{
-		nextRepost=RakNet::GetTimeMS()+50000;
+		nextRepost= SLNet::GetTimeMS()+50000;
 		SendOperation();
 	}
 }

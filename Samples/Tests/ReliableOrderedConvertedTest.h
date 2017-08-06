@@ -3,9 +3,14 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #pragma once
@@ -14,18 +19,18 @@
 #include "TestInterface.h"
 
 
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
 #include <cstdio>
 #include <memory.h>
 #include <cstring>
 #include <stdlib.h>
-#include "Rand.h"
-#include "RakNetStatistics.h"
-#include "RakSleep.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/Rand.h"
+#include "slikenet/statistics.h"
+#include "slikenet/sleep.h"
+#include "slikenet/memoryoverride.h"
 
 #include "DebugTools.h"
 

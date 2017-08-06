@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // How to patch
@@ -22,29 +27,31 @@
 // Common includes
 #include <stdio.h>
 #include <stdlib.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "FileListTransfer.h"
-#include "FileList.h" // FLP_Printf
-#include "PacketizedTCP.h"
-#include "Gets.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/FileList.h" // FLP_Printf
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/Gets.h"
 #include "CloudServerHelper.h"
-#include "FullyConnectedMesh2.h"
-#include "TwoWayAuthentication.h"
-#include "CloudClient.h"
-#include "DynDNS.h"
-#include "RakPeerInterface.h"
-#include "RakSleep.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/TwoWayAuthentication.h"
+#include "slikenet/CloudClient.h"
+#include "slikenet/DynDNS.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/sleep.h"
+#include "slikenet/ConnectionGraph2.h"
 #include "CloudServerHelper.h"
-#include "HTTPConnection2.h"
+#include "slikenet/HTTPConnection2.h"
 #include "Rackspace2.h"
-#include "GetTime.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 // See http://www.digip.org/jansson/doc/2.4/
 // This is used to make it easier to parse the JSON returned from the master server
 #include "jansson.h"
@@ -55,16 +62,16 @@
 #include "AutopatcherPostgreRepository.h"
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #endif
 
 #define LISTEN_PORT_TCP_PATCHER 60000
 
-using namespace RakNet;
-static const RakNet::Time LOAD_CHECK_INTERVAL=1000*60*5;
-static const RakNet::Time LOAD_CHECK_INTERVAL_AFTER_SPAWN=1000*60*60;
+using namespace SLNet;
+static const SLNet::Time LOAD_CHECK_INTERVAL=1000*60*5;
+static const SLNet::Time LOAD_CHECK_INTERVAL_AFTER_SPAWN=1000*60*60;
 char databasePassword[128];
 int workerThreadCount;
 int sqlConnectionObjectCount;
@@ -72,8 +79,8 @@ int allowDownloadingUnmodifiedFiles;
 
 unsigned short autopatcherLoad=0;
 
-RakNet::RakPeerInterface *rakPeer;
-RakNet::AutopatcherServer *autopatcherServer;
+SLNet::RakPeerInterface *rakPeer;
+SLNet::AutopatcherServer *autopatcherServer;
 
 enum AppState
 {
@@ -84,7 +91,7 @@ enum AppState
 	AP_TERMINATED,
 } appState;
 
-RakNet::Time timeSinceZeroUsers;
+SLNet::Time timeSinceZeroUsers;
 
 
 struct CloudServerHelper_RackspaceCloudDNS : public CloudServerHelper, public Rackspace2EventCallback
@@ -108,11 +115,11 @@ public:
 	} cshState;
 
 	CloudServerHelper_RackspaceCloudDNS() {
-		rackspace2= RakNet::OP_NEW<Rackspace2>(_FILE_AND_LINE_);
+		rackspace2= SLNet::OP_NEW<Rackspace2>(_FILE_AND_LINE_);
 		memset(&thisServerDetail, 0, sizeof(ServerDetail));
 	}
 	~CloudServerHelper_RackspaceCloudDNS() {
-		RakNet::OP_DELETE(rackspace2,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(rackspace2,_FILE_AND_LINE_);
 	}
 	virtual bool Update(void) {
 		UpdateTCP();
@@ -120,8 +127,8 @@ public:
 	}
 	void CopyServerDetails(json_t *arrayElement, const char *publicIPV4)
 	{
-		strcpy(thisServerDetail.publicIPV4, publicIPV4);
-		strcpy(thisServerDetail.id, json_string_value(json_object_get(arrayElement, "id")));
+		strcpy_s(thisServerDetail.publicIPV4, publicIPV4);
+		strcpy_s(thisServerDetail.id, json_string_value(json_object_get(arrayElement, "id")));
 		json_t *privateAddressesArray = json_object_get(json_object_get(arrayElement, "addresses"),"private");
 		size_t privateAddressesArraySize = json_array_size(privateAddressesArray);
 		for (size_t l=0; l < privateAddressesArraySize; l++)
@@ -129,18 +136,18 @@ public:
 			json_t *privateAddressElement = json_array_get(privateAddressesArray, l);
 			if (json_integer_value(json_object_get(privateAddressElement, "version"))==4)
 			{
-				strcpy(thisServerDetail.privateIPV4,json_string_value(json_object_get(privateAddressElement, "addr")));
+				strcpy_s(thisServerDetail.privateIPV4,json_string_value(json_object_get(privateAddressElement, "addr")));
 				break;
 			}
 		}
 
-		strcpy(thisServerDetail.flavorId,json_string_value(json_object_get(json_object_get(arrayElement, "flavor"),"id")));
-		strcpy(thisServerDetail.hostId,json_string_value(json_object_get(arrayElement, "hostId")));
-		strcpy(thisServerDetail.id,json_string_value(json_object_get(arrayElement, "id")));
-		strcpy(thisServerDetail.imageId,json_string_value(json_object_get(json_object_get(arrayElement, "image"),"id")));
-		strcpy(thisServerDetail.name,json_string_value(json_object_get(arrayElement, "name")));
-		strcpy(spawningImageId, thisServerDetail.imageId);
-		strcpy(spawningFlavorId, thisServerDetail.flavorId);
+		strcpy_s(thisServerDetail.flavorId,json_string_value(json_object_get(json_object_get(arrayElement, "flavor"),"id")));
+		strcpy_s(thisServerDetail.hostId,json_string_value(json_object_get(arrayElement, "hostId")));
+		strcpy_s(thisServerDetail.id,json_string_value(json_object_get(arrayElement, "id")));
+		strcpy_s(thisServerDetail.imageId,json_string_value(json_object_get(json_object_get(arrayElement, "image"),"id")));
+		strcpy_s(thisServerDetail.name,json_string_value(json_object_get(arrayElement, "name")));
+		strcpy_s(spawningImageId, thisServerDetail.imageId);
+		strcpy_s(spawningFlavorId, thisServerDetail.flavorId);
 		printf("Using image id %s for new servers\n", spawningImageId);
 	}
 	virtual void OnTCPFailure(void){ printf("--ERROR--: OnTCPFailure()\n"); }
@@ -155,11 +162,11 @@ public:
 	virtual void OnEmptyResponse(RakString stringTransmitted) {
 		printf("--ERROR--: OnEmptyResponse(). stringTransmitted=%s", stringTransmitted.C_String());
 	}
-	virtual void OnMessage(const char *message, RakString responseReceived, RakString stringTransmitted, int contentOffset)
+	virtual void OnMessage(const char *message, RakString responseReceived, RakString stringTransmitted, ptrdiff_t contentOffset)
 	{
 		printf("--WARNING--: OnMessage(). message=%s\nstringTransmitted=%s", message, stringTransmitted.C_String());
 	}
-	virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, int contentOffset){
+	virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, ptrdiff_t contentOffset){
 		if (r2rc==R2RC_AUTHENTICATED)
 		{
 			printf("Authenticated with Rackspace\nX-Auth-Token: %s\n", rackspace2->GetAuthToken());
@@ -217,9 +224,9 @@ public:
 				if (myPublicURLStr)
 				{
 					if (strcmp(elementNameStr, "cloudDNS")==0)
-						strcpy(rackspaceDNSURL, myPublicURLStr);
+						strcpy_s(rackspaceDNSURL, myPublicURLStr);
 					else if (strcmp(elementNameStr, "cloudServersOpenStack")==0)
-						strcpy(rackspaceServersURL, myPublicURLStr);
+						strcpy_s(rackspaceServersURL, myPublicURLStr);
 				}
 				printf("\n");
 			}
@@ -246,7 +253,7 @@ public:
 				//size_t publicAddressesArraySize = json_array_size(publicAddressesArray);
 				//for (size_t j=0; j < publicAddressesArraySize; j++)
 				//{
-				for (int k=0; k < rakPeer->GetNumberOfAddresses(); k++)
+				for (unsigned k=0; k < rakPeer->GetNumberOfAddresses(); k++)
 				{
 					if (strcmp(rakPeer->GetLocalIP(k), json_string_value(json_object_get(arrayElement, "accessIPv4")))==0)
 					{
@@ -267,10 +274,10 @@ public:
 			{
 // 				printf("Could not find a server with this IP address\n");
 // 				printf("Continue anyway (y/n)?\n");
-// 				if (getch()=='y')
+// 				if (_getch()=='y')
 // 				{
 				
-				for (int k=0; k < rakPeer->GetNumberOfAddresses(); k++)
+				for (unsigned k=0; k < rakPeer->GetNumberOfAddresses(); k++)
 				{
 					SystemAddress sa = rakPeer->GetInternalID(UNASSIGNED_SYSTEM_ADDRESS,k);
 					if (sa.IsLANAddress()==false)
@@ -302,7 +309,7 @@ public:
 			{
 				json_t *arrayElement = json_array_get(domainsArray, i);
 				printf("%i. name=%s ", i+1, json_string_value(json_object_get(arrayElement, "name")));
-				printf("progress=%i ", json_integer_value(json_object_get(arrayElement, "progress")));
+				printf("progress=%" JSON_INTEGER_FORMAT " ", json_integer_value(json_object_get(arrayElement, "progress")));
 				printf("status=%s ", json_string_value(json_object_get(arrayElement, "status")));
 				printf("created=%s ", json_string_value(json_object_get(arrayElement, "created")));
 				printf("id=%s\n", json_string_value(json_object_get(arrayElement, "id")));
@@ -317,10 +324,10 @@ public:
 				if (str[0])
 				{
 					int idx = atoi(str);
-					if (idx>=1 && idx <= arraySize)
+					if (idx>=1 && static_cast<unsigned>(idx) <= arraySize)
 					{
 						json_t *arrayElement = json_array_get(domainsArray, idx-1);
-						strcpy(spawningImageId, json_string_value(json_object_get(arrayElement, "id")));
+						strcpy_s(spawningImageId, json_string_value(json_object_get(arrayElement, "id")));
 						// Use spawningFlavorId of whatever it was when the server was started, I don't care about flavor
 						printf("Using image id %s for new servers\n", spawningImageId);
 					}
@@ -347,12 +354,12 @@ public:
 				{
 					json_t *arrayElement = json_array_get(domainsArray, i);
 					json_t *elementIPJson = json_object_get(arrayElement, "data");
-					strcpy(dnsHostIP, json_string_value(elementIPJson));
+					strcpy_s(dnsHostIP, json_string_value(elementIPJson));
 					json_t *elementIDJson = json_object_get(arrayElement, "id");
-					strcpy(patchHostRecordID,json_string_value(elementIDJson));
+					strcpy_s(patchHostRecordID,json_string_value(elementIDJson));
 
 
-					timeOfLastDNSHostCheck=RakNet::GetTime();
+					timeOfLastDNSHostCheck= SLNet::GetTime();
 					if (appState==AP_TERMINATE_IF_NOT_DNS_HOST)
 					{
 						if (strcmp(dnsHostIP, rakPeer->GetLocalIP(0))==0)
@@ -458,9 +465,10 @@ public:
 		// http://docs.rackspace.com/servers/api/v2/cs-devguide/content/Create_Image-d1e4655.html
 		time_t aclock;
 		time( &aclock );   // Get time in seconds
-		tm *newtime = localtime( &aclock );   // Convert time to struct tm form 
+		tm newtime;
+		localtime_s( &newtime, &aclock );   // Convert time to struct tm form 
 		char text[1024];
-		sprintf(text, "%s_%s", patcherHostSubdomainURL, asctime( newtime ));
+		sprintf_s(text, "%s_%s", patcherHostSubdomainURL, asctime( &newtime ));
 
 		RakString url("%s/servers/%s/action", rackspaceServersURL, thisServerDetail.id);
 		json_t *jsonObjectRoot = json_object();
@@ -475,7 +483,7 @@ public:
 		rackspace2->AddOperation(url,Rackspace2::OT_POST,jsonObjectRoot, true);
 	}
 
-	void SpawnServers(int count)
+	void SpawnServers(unsigned count)
 	{
 		if (count==0)
 			return;
@@ -487,14 +495,15 @@ public:
 
 		time_t aclock;
 		time( &aclock );   // Get time in seconds
-		tm *newtime = localtime( &aclock );   // Convert time to struct tm form 
+		tm newtime;
+		localtime_s( &newtime, &aclock );   // Convert time to struct tm form 
 		char text[1024];
 		for (unsigned int i=0; i < count; i++)
 		{
 			json_t *jsonObjectRoot = json_object();
 			json_t *jsonObjectServer = json_object();
 			json_object_set(jsonObjectRoot, "server", jsonObjectServer);
-			sprintf(text, "%s_%s_%i", patcherHostSubdomainURL, asctime( newtime ), i);
+			sprintf_s(text, "%s_%s_%u", patcherHostSubdomainURL, asctime( &newtime ), i);
 			json_object_set(jsonObjectServer, "name", json_string(text));
 			json_object_set(jsonObjectServer, "imageRef", json_string(spawningImageId));
 			json_object_set(jsonObjectServer, "flavorRef", json_string(spawningFlavorId));
@@ -604,12 +613,12 @@ public:
 		rakPeerPort=atoi(argv[2]);
 		allowedIncomingConnections=atoi(argv[3]);
 		allowedOutgoingConnections=atoi(argv[4]);
-		strcpy(patcherHostSubdomainURL, argv[5]);
-		strcpy(patcherHostDomainURL, argv[6]);
-		strcpy(rackspaceAuthenticationURL, argv[7]);
-		strcpy(rackspaceCloudUsername, argv[8]);
-		strcpy(apiAccessKey, argv[9]);
-		strcpy(databasePassword, argv[10]);
+		strcpy_s(patcherHostSubdomainURL, argv[5]);
+		strcpy_s(patcherHostDomainURL, argv[6]);
+		strcpy_s(rackspaceAuthenticationURL, argv[7]);
+		strcpy_s(rackspaceCloudUsername, argv[8]);
+		strcpy_s(apiAccessKey, argv[9]);
+		strcpy_s(databasePassword, argv[10]);
 		workerThreadCount=atoi(argv[11]);
 		sqlConnectionObjectCount=atoi(argv[12]);
 		allowDownloadingUnmodifiedFiles=atoi(argv[13]);
@@ -636,7 +645,7 @@ public:
 	// Call when you get ID_FCM2_NEW_HOST
 	virtual void OnFCMNewHost(Packet *packet, RakPeerInterface *rakPeer) {
 		RakAssert(packet->data[0]==ID_FCM2_NEW_HOST);
-		RakNet::BitStream bsIn(packet->data, packet->length, false);
+		SLNet::BitStream bsIn(packet->data, packet->length, false);
 		bsIn.IgnoreBytes(sizeof(MessageID));
 		RakNetGUID oldHost;
 		bsIn.Read(oldHost);
@@ -657,17 +666,17 @@ public:
 	}
 
 	const char *GetCloudHostAddress(void) const {return dnsHostIP;}
-	RakNet::Time GetTimeOfLastDNSHostCheck(void) {return timeOfLastDNSHostCheck;}
-	void SetTimeOfLastDNSHostCheck(RakNet::Time t) {timeOfLastDNSHostCheck=t;}
+	SLNet::Time GetTimeOfLastDNSHostCheck(void) {return timeOfLastDNSHostCheck;}
+	void SetTimeOfLastDNSHostCheck(SLNet::Time t) {timeOfLastDNSHostCheck=t;}
 
 	virtual int OnJoinCloudResult(
 		Packet *packet,
-		RakNet::RakPeerInterface *rakPeer,
-		RakNet::CloudServer *cloudServer,
-		RakNet::CloudClient *cloudClient,
-		RakNet::FullyConnectedMesh2 *fullyConnectedMesh2,
-		RakNet::TwoWayAuthentication *twoWayAuthentication,
-		RakNet::ConnectionGraph2 *connectionGraph2,
+		SLNet::RakPeerInterface *rakPeer,
+		SLNet::CloudServer *cloudServer,
+		SLNet::CloudClient *cloudClient,
+		SLNet::FullyConnectedMesh2 *fullyConnectedMesh2,
+		SLNet::TwoWayAuthentication *twoWayAuthentication,
+		SLNet::ConnectionGraph2 *connectionGraph2,
 		const char *rakPeerIpOrDomain,
 		char myPublicIP[32]
 	) {
@@ -705,7 +714,7 @@ public:
 
 	virtual void OnConnectionCountChange(RakPeerInterface *rakPeer, CloudClient *cloudClient)
 	{
-		RakNet::BitStream bs;
+		SLNet::BitStream bs;
 		CloudKey cloudKey("CloudConnCount",0);
 		bs.Write(autopatcherLoad);
 		cloudClient->Post(&cloudKey, bs.GetData(), bs.GetNumberOfBytesUsed(), rakPeer->GetMyGUID());
@@ -724,7 +733,7 @@ public:
 protected:
 
 	int raknetPatcherDomainId;
-	RakNet::Time timeOfLastDNSHostCheck;
+	SLNet::Time timeOfLastDNSHostCheck;
 
 	struct ServerDetail
 	{
@@ -742,7 +751,7 @@ protected:
 
 } *cloudServerHelper;
 
-class AutopatcherLoadNotifier : public RakNet::AutopatcherServerLoadNotifier
+class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 {
 	void AutopatcherLoadNotifier::OnQueueUpdate(SystemAddress remoteSystem,
 		AutopatcherServerLoadNotifier::RequestType requestType,
@@ -785,19 +794,21 @@ void SetMaxConcurrentUsers(int i)
 
 // The default AutopatcherPostgreRepository2 uses bsdiff which takes too much memory for large files.
 // I override MakePatch to use XDelta in this case
-class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostgreRepository2
+class AutopatcherPostgreRepository2_WithXDelta : public SLNet::AutopatcherPostgreRepository2
 {
-	bool MakePatch(const char *oldFile, const char *newFile, char **patch, unsigned int *patchLength, int *patchAlgorithm)
+	int MakePatch(const char *oldFile, const char *newFile, char **patch, unsigned int *patchLength, int *patchAlgorithm)
 	{
-		FILE *fpOld = fopen(oldFile, "rb");
+		FILE *fpOld;
+		fopen_s(&fpOld, oldFile, "rb");
 		fseek(fpOld, 0, SEEK_END);
 		int contentLengthOld = ftell(fpOld);
-		FILE *fpNew = fopen(newFile, "rb");
+		FILE *fpNew;
+		fopen_s(&fpNew, newFile, "rb");
 		fseek(fpNew, 0, SEEK_END);
 		int contentLengthNew = ftell(fpNew);
 
 		char WORKING_DIRECTORY[MAX_PATH];
-		GetTempPath(MAX_PATH, WORKING_DIRECTORY);
+		GetTempPathA(MAX_PATH, WORKING_DIRECTORY);
 		if (WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=='\\' || WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=='/')
 			WORKING_DIRECTORY[strlen(WORKING_DIRECTORY)-1]=0;
 
@@ -816,7 +827,7 @@ class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostg
 			bool b = MakePatchBSDiff(fpOld, contentLengthOld, fpNew, contentLengthNew, patch, patchLength);
 			fclose(fpOld);
 			fclose(fpNew);
-			return b;
+			return b == false ? -1 : 0;
 		}
 		else
 		{
@@ -825,11 +836,11 @@ class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostg
 			fclose(fpNew);
 
 			char buff[128];
-			RakNet::TimeUS time = RakNet::GetTimeUS();
+			SLNet::TimeUS time = SLNet::GetTimeUS();
 #if defined(_WIN32)
-			sprintf(buff, "%I64u", time);
+			sprintf_s(buff, "%I64u", time);
 #else
-			sprintf(buff, "%llu", (long long unsigned int) time);
+			sprintf_s(buff, "%llu", (long long unsigned int) time);
 #endif
 
 			// Invoke xdelta
@@ -839,8 +850,8 @@ class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostg
 			commandLine[511]=0;
 
 
-			SHELLEXECUTEINFO shellExecuteInfo;
-			shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+			SHELLEXECUTEINFOA shellExecuteInfo;
+			shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFOA);
 			shellExecuteInfo.fMask = SEE_MASK_NOASYNC | SEE_MASK_NO_CONSOLE;
 			shellExecuteInfo.hwnd = NULL;
 			shellExecuteInfo.lpVerb = "open";
@@ -849,24 +860,27 @@ class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostg
 			shellExecuteInfo.lpDirectory = WORKING_DIRECTORY;
 			shellExecuteInfo.nShow = SW_SHOWNORMAL;
 			shellExecuteInfo.hInstApp = NULL;
-			ShellExecuteEx(&shellExecuteInfo);
+			ShellExecuteExA(&shellExecuteInfo);
 
 			// ShellExecute is blocking, but if it writes a file to disk that file is not always immediately accessible after it returns. And this only happens in release, and only when not running in the debugger
 			//ShellExecute(NULL, "open", PATH_TO_XDELTA_EXE, commandLine, WORKING_DIRECTORY, SW_SHOWNORMAL);
 
 			char pathToPatch[MAX_PATH];
-			sprintf(pathToPatch, "%s/patchServer_%s.tmp", WORKING_DIRECTORY, buff);
-			FILE *fpPatch = fopen(pathToPatch, "r+b");
-			RakNet::TimeUS stopWaiting = time + 60000000 * 5;
-			while (fpPatch==0 && RakNet::GetTimeUS() < stopWaiting)
+			sprintf_s(pathToPatch, "%s/patchServer_%s.tmp", WORKING_DIRECTORY, buff);
+			FILE *fpPatch;
+			errno_t error = fopen_s(&fpPatch, pathToPatch, "r+b");
+			SLNet::TimeUS stopWaiting = time + 60000000 * 5;
+			while (error!=0 && SLNet::GetTimeUS() < stopWaiting)
 			{
 				RakSleep(1000);
-				fpPatch = fopen(pathToPatch, "r+b");
+				error = fopen_s(&fpPatch, pathToPatch, "r+b");
 			}
-			if (fpPatch==0)
+			if (error!=0)
 			{
-				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch, errno, strerror(errno), commandLine);
-				return false;
+				char buff[1024];
+				strerror_s(buff, errno);
+				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch, errno, buff, commandLine);
+				return 1;
 			}
 			fseek(fpPatch, 0, SEEK_END);
 			*patchLength = ftell(fpPatch);
@@ -876,15 +890,18 @@ class AutopatcherPostgreRepository2_WithXDelta : public RakNet::AutopatcherPostg
 			fclose(fpPatch);
 
 			int unlinkRes = _unlink(pathToPatch);
-			while (unlinkRes!=0 && RakNet::GetTimeUS() < stopWaiting)
+			while (unlinkRes!=0 && SLNet::GetTimeUS() < stopWaiting)
 			{
 				RakSleep(1000);
 				unlinkRes = _unlink(pathToPatch);
 			}
-			if (unlinkRes!=0)
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, strerror(errno));
+			if (unlinkRes!=0) {
+				char buff[1024];
+				strerror_s(buff, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, buff);
+			}
 
-			return true;
+			return 0;
 		}
 	}
 };
@@ -896,16 +913,16 @@ int main(int argc, char **argv)
 	return 0;
 #endif
 
-	cloudServerHelper = RakNet::OP_NEW<CloudServerHelper_RackspaceCloudDNS>(_FILE_AND_LINE_);
+	cloudServerHelper = SLNet::OP_NEW<CloudServerHelper_RackspaceCloudDNS>(_FILE_AND_LINE_);
 	if (!cloudServerHelper->ParseCommandLineParameters(argc, argv))
 	{
 		return 1;
 	}
 
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 
 
-	RakNet::Time timeForNextLoadCheck=RakNet::GetTime()+LOAD_CHECK_INTERVAL;
+	SLNet::Time timeForNextLoadCheck= SLNet::GetTime()+LOAD_CHECK_INTERVAL;
 
 	if (!cloudServerHelper->AuthenticateWithRackspaceBlocking())
 	{
@@ -914,7 +931,7 @@ int main(int argc, char **argv)
 	}
 
 	// This does not work unless it comes after AuthenticateWithRackspaceBlocking
-	RakNet::PacketizedTCP packetizedTCP;
+	SLNet::PacketizedTCP packetizedTCP;
 	if (packetizedTCP.Start(LISTEN_PORT_TCP_PATCHER,cloudServerHelper->allowedIncomingConnections)==false)
 	{
 		printf("Failed to start TCP. Is the port already in use?");
@@ -922,15 +939,15 @@ int main(int argc, char **argv)
 	}
 
 	appState=AP_RUNNING;
-	timeSinceZeroUsers=RakNet::GetTime();
+	timeSinceZeroUsers= SLNet::GetTime();
 	printf("Server starting... ");
-	autopatcherServer = RakNet::OP_NEW<AutopatcherServer>(_FILE_AND_LINE_);
-	// RakNet::FLP_Printf progressIndicator;
-	RakNet::FileListTransfer fileListTransfer;
+	autopatcherServer = SLNet::OP_NEW<AutopatcherServer>(_FILE_AND_LINE_);
+	// SLNet::FLP_Printf progressIndicator;
+	SLNet::FileListTransfer fileListTransfer;
 	AutopatcherPostgreRepository2_WithXDelta *connectionObject;
-	connectionObject = RakNet::OP_NEW_ARRAY<AutopatcherPostgreRepository2_WithXDelta>(sqlConnectionObjectCount, _FILE_AND_LINE_);
-	// RakNet::AutopatcherRepositoryInterface **connectionObjectAddresses[sqlConnectionObjectCount];
-	AutopatcherRepositoryInterface **connectionObjectAddresses = RakNet::OP_NEW_ARRAY<AutopatcherRepositoryInterface *>(sqlConnectionObjectCount, _FILE_AND_LINE_);
+	connectionObject = SLNet::OP_NEW_ARRAY<AutopatcherPostgreRepository2_WithXDelta>(sqlConnectionObjectCount, _FILE_AND_LINE_);
+	// SLNet::AutopatcherRepositoryInterface **connectionObjectAddresses[sqlConnectionObjectCount];
+	AutopatcherRepositoryInterface **connectionObjectAddresses = SLNet::OP_NEW_ARRAY<AutopatcherRepositoryInterface *>(sqlConnectionObjectCount, _FILE_AND_LINE_);
 
 	for (int i=0; i < sqlConnectionObjectCount; i++)
 		connectionObjectAddresses[i]=&connectionObject[i];
@@ -948,16 +965,16 @@ int main(int argc, char **argv)
 
 	// ---- PLUGINS -----
 	// Used to load balance clients, allow for client to client discovery
-	RakNet::CloudServer cloudServer;
+	SLNet::CloudServer cloudServer;
 	// Used to update the local cloudServer
-	RakNet::CloudClient cloudClient;
+	SLNet::CloudClient cloudClient;
 	// Used to determine the host of the server fully connected mesh, as well as to connect servers automatically
-	RakNet::FullyConnectedMesh2 fullyConnectedMesh2;
+	SLNet::FullyConnectedMesh2 fullyConnectedMesh2;
 	// Used for servers to verify each other - otherwise any system could pose as a server
 	// Could also be used to verify and restrict clients if paired with the MessageFilter plugin
-	RakNet::TwoWayAuthentication twoWayAuthentication;
+	SLNet::TwoWayAuthentication twoWayAuthentication;
 	// Used to tell servers about each other
-	RakNet::ConnectionGraph2 connectionGraph2;
+	SLNet::ConnectionGraph2 connectionGraph2;
 
 	rakPeer->AttachPlugin(&cloudServer);
 	rakPeer->AttachPlugin(&cloudClient);
@@ -968,7 +985,7 @@ int main(int argc, char **argv)
 	if (!cloudServerHelper->StartRakPeer(rakPeer))
 		return 1;
 
-	RakNet::CloudServerHelperFilter sampleFilter; // Keeps clients from updating stuff to the server they are not supposed to
+	SLNet::CloudServerHelperFilter sampleFilter; // Keeps clients from updating stuff to the server they are not supposed to
 	sampleFilter.serverGuid=rakPeer->GetMyGUID();
 	cloudServerHelper->SetupPlugins(&cloudServer, &sampleFilter, &cloudClient, &fullyConnectedMesh2, &twoWayAuthentication,&connectionGraph2, cloudServerHelper->serverToServerPassword);
 
@@ -988,11 +1005,11 @@ int main(int argc, char **argv)
 	bool connectionSuccess=false;
 	while (connectionSuccess==false)
 	{
-		strcpy(username, "postgres");
-		strcpy(connectionString, "user=");
-		strcat(connectionString, username);
-		strcat(connectionString, " password=");
-		strcat(connectionString, databasePassword);
+		strcpy_s(username, "postgres");
+		strcpy_s(connectionString, "user=");
+		strcat_s(connectionString, username);
+		strcat_s(connectionString, " password=");
+		strcat_s(connectionString, databasePassword);
 		int conIdx;
 		for (conIdx=0; conIdx < sqlConnectionObjectCount; conIdx++)
 		{
@@ -1000,7 +1017,7 @@ int main(int argc, char **argv)
 			{
 				printf("Database connection failed.\n");
 				printf("Try a different password? (y/n)\n");
-				if (getch()!='y')
+				if (_getch()!='y')
 				{
 					return 1;
 				}
@@ -1028,18 +1045,18 @@ int main(int argc, char **argv)
 	printf("(D)rop database\n(C)reate database.\n(U)pdate revision.\n(S)pawn a clone of this server\n(M)ax concurrent users (this server only)\n(I)mage the current state of this server\n(L)ist images\n(T)erminate cloud\n(Q)uit\n");
 
 	char ch;
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	while (appState!=AP_TERMINATED)
 	{
-		RakNet::SystemAddress notificationAddress;
+		SLNet::SystemAddress notificationAddress;
 		notificationAddress=packetizedTCP.HasCompletedConnectionAttempt();
-// 		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+// 		if (notificationAddress!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 // 			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
 		notificationAddress=packetizedTCP.HasNewIncomingConnection();
-// 		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+// 		if (notificationAddress!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 // 			printf("ID_NEW_INCOMING_CONNECTION\n");
 		notificationAddress=packetizedTCP.HasLostConnection();
-// 		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+// 		if (notificationAddress!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 // 			printf("ID_CONNECTION_LOST\n");
 
 		p=packetizedTCP.Receive();
@@ -1057,7 +1074,7 @@ int main(int argc, char **argv)
 				cloudServerHelper->Terminate();
 			}
 			if (timeSinceZeroUsers==0)
-				timeSinceZeroUsers=RakNet::GetTime();
+				timeSinceZeroUsers= SLNet::GetTime();
 		}
 		else
 		{
@@ -1080,7 +1097,7 @@ int main(int argc, char **argv)
 			{
 				if (appState==AP_RUNNING)
 				{
-					RakNet::BitStream bs(p->data,p->length,false);
+					SLNet::BitStream bs(p->data,p->length,false);
 					bs.IgnoreBytes(1);
 					RakNetGUID oldHost;
 					bs.Read(oldHost);
@@ -1098,12 +1115,12 @@ int main(int argc, char **argv)
 						}
 					}
 
-					timeForNextLoadCheck=RakNet::GetTime()+LOAD_CHECK_INTERVAL;
+					timeForNextLoadCheck= SLNet::GetTime()+LOAD_CHECK_INTERVAL;
 				}
 			}
 			else if (p->data[0]==ID_USER_PACKET_ENUM)
 			{
-				RakNet::BitStream bsIn(p->data, p->length, false);
+				SLNet::BitStream bsIn(p->data, p->length, false);
 				bsIn.IgnoreBytes((sizeof(MessageID)));
 				RakString incomingPw;
 				bsIn.Read(incomingPw);
@@ -1127,7 +1144,7 @@ int main(int argc, char **argv)
 			}
 			else if (p->data[0]==ID_CLOUD_GET_RESPONSE)
 			{
-				RakNet::CloudQueryResult cloudQueryResult;
+				SLNet::CloudQueryResult cloudQueryResult;
 				cloudClient.OnGetReponse(&cloudQueryResult, p);
 				unsigned int rowIndex;
 				const bool wasCallToGetServers=cloudQueryResult.cloudQuery.keys[0].primaryKey=="CloudConnCount";
@@ -1139,15 +1156,15 @@ int main(int argc, char **argv)
 
 				unsigned short connectionsOnOurServer=65535;
 				unsigned short lowestConnectionsServer=65535;
-				RakNet::SystemAddress lowestConnectionAddress;
+				SLNet::SystemAddress lowestConnectionAddress;
 
 				int totalConnections=0;
 				for (rowIndex=0; rowIndex < cloudQueryResult.rowsReturned.Size(); rowIndex++)
 				{
-					RakNet::CloudQueryRow *row = cloudQueryResult.rowsReturned[rowIndex];
+					SLNet::CloudQueryRow *row = cloudQueryResult.rowsReturned[rowIndex];
 
 					unsigned short connCount;
-					RakNet::BitStream bsIn(row->data, row->length, false);
+					SLNet::BitStream bsIn(row->data, row->length, false);
 					bsIn.Read(connCount);
 					printf("%i. Server found at %s with %i connections\n", rowIndex+1, row->serverSystemAddress.ToString(true), connCount);
 
@@ -1168,10 +1185,10 @@ int main(int argc, char **argv)
 						newServersNeeded = MAX_SERVERS_EVER - cloudQueryResult.rowsReturned.Size();
 					}
 					if (newServersNeeded>0)
-						cloudServerHelper->SpawnServers(newServersNeeded);
+						cloudServerHelper->SpawnServers(static_cast<unsigned>(newServersNeeded));
 				}
 
-				timeForNextLoadCheck = RakNet::GetTime() + LOAD_CHECK_INTERVAL_AFTER_SPAWN;
+				timeForNextLoadCheck = SLNet::GetTime() + LOAD_CHECK_INTERVAL_AFTER_SPAWN;
 
 				cloudClient.DeallocateWithDefaultAllocator(&cloudQueryResult);
 			}
@@ -1185,8 +1202,8 @@ int main(int argc, char **argv)
 		if (timeSinceZeroUsers!=0 && appState==AP_RUNNING && autopatcherServer->GetMaxConurrentUsers()>0)
 		{
 			// No users currently connected
-			RakNet::Time curTime = RakNet::GetTime();
-			RakNet::Time diff = curTime - timeSinceZeroUsers;
+			SLNet::Time curTime = SLNet::GetTime();
+			SLNet::Time diff = curTime - timeSinceZeroUsers;
 			if (diff > 0)
 			{
 				if (fullyConnectedMesh2.IsHostSystem()==false)
@@ -1202,7 +1219,7 @@ int main(int argc, char **argv)
 					if (diff > 1000 * 60 * 60 * 24)
 					{
 						// No users for 24 hours, verify if we are the host according to Rackspace DNS records. If not, shutdown
-						RakNet::Time diff2;
+						SLNet::Time diff2;
 						diff2 = curTime - cloudServerHelper->GetTimeOfLastDNSHostCheck();
 						if (diff2 > 1000 * 60 * 60 * 24)
 						{
@@ -1221,23 +1238,23 @@ int main(int argc, char **argv)
 		// 4. If we are the host, every 1 hour check load among all servers (including self). It takes like 30 minutes to build a new server.
 		if (fullyConnectedMesh2.IsHostSystem() && autopatcherServer->GetMaxConurrentUsers()>0)
 		{
-			RakNet::Time curTime = RakNet::GetTime();
+			SLNet::Time curTime = SLNet::GetTime();
 			if (curTime > timeForNextLoadCheck)
 			{
 				timeForNextLoadCheck = curTime + LOAD_CHECK_INTERVAL;
 
 				// If the load exceeds such that >=1 new fully loaded server is needed, add that many servers
 				// See ID_CLOUD_GET_RESPONSE
-				RakNet::CloudQuery cloudQuery;
-				cloudQuery.keys.Push(RakNet::CloudKey("CloudConnCount",0),_FILE_AND_LINE_); // CloudConnCount is defined at the top of CloudServerHelper.cpp
+				SLNet::CloudQuery cloudQuery;
+				cloudQuery.keys.Push(SLNet::CloudKey("CloudConnCount",0),_FILE_AND_LINE_); // CloudConnCount is defined at the top of CloudServerHelper.cpp
 				cloudQuery.subscribeToResults=false;
 				cloudClient.Get(&cloudQuery, rakPeer->GetMyGUID());
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='q')
 				break;
 			else if (ch=='c')
@@ -1261,7 +1278,7 @@ int main(int argc, char **argv)
 			else if (ch=='i')
 			{
 				printf("Image this server?\nWill clone this server so that future servers made from this image will use its current state.\nPress 'y' to image.\n");
-				if (getch()=='y')
+				if (_getch()=='y')
 				{
 					cloudServerHelper->ImageThisServer();
 				}
@@ -1273,7 +1290,7 @@ int main(int argc, char **argv)
 				Gets(str, sizeof(str));
 				int num = atoi(str);
 				if (num>0)
-					cloudServerHelper->SpawnServers(num);
+					cloudServerHelper->SpawnServers(static_cast<unsigned>(num));
 			}
 			else if (ch=='m')
 			{
@@ -1322,16 +1339,16 @@ int main(int argc, char **argv)
 			{
 				// printf("Enter application name: ");
 				char appName[512];
-				strcpy(appName, cloudServerHelper->patcherHostSubdomainURL);
+				strcpy_s(appName, cloudServerHelper->patcherHostSubdomainURL);
 // 				Gets(appName,sizeof(appName));
 // 				if (appName[0]==0)
-// 					strcpy(appName, "TestApp");
+// 					strcpy_s(appName, "TestApp");
 
 				printf("Enter application directory: ");
 				char appDir[512];
 				Gets(appDir,sizeof(appDir));
 				if (appDir[0]==0)
-					strcpy(appDir, "D:/temp");
+					strcpy_s(appDir, "D:/temp");
 
 				if (connectionObject[0].UpdateApplicationFiles(appName, appDir, username, 0)==false)
 				{
@@ -1350,11 +1367,11 @@ int main(int argc, char **argv)
 
 
 
-	RakNet::OP_DELETE_ARRAY(connectionObject, _FILE_AND_LINE_);
-	RakNet::OP_DELETE_ARRAY(connectionObjectAddresses, _FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(connectionObject, _FILE_AND_LINE_);
+	SLNet::OP_DELETE_ARRAY(connectionObjectAddresses, _FILE_AND_LINE_);
 	packetizedTCP.Stop();
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
-	RakNet::OP_DELETE(cloudServerHelper, _FILE_AND_LINE_);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::OP_DELETE(cloudServerHelper, _FILE_AND_LINE_);
 
 
 return 0;

@@ -1,20 +1,27 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "Rackspace.h"
+#include "slikenet/Rackspace.h"
 #include <stdio.h>
-#include "Gets.h"
-#include "Rackspace.h"
-#include "TCPInterface.h"
-#include "Kbhit.h"
-#include "RakSleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Rackspace.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 struct CommandAndDescription
 {
@@ -68,10 +75,10 @@ void PrintCommands(void)
 	printf("\n");
 }
 
-bool Authenticate(RakNet::Rackspace *rackspaceApi, RakNet::TCPInterface *tcpInterface)
+bool Authenticate(SLNet::Rackspace *rackspaceApi, SLNet::TCPInterface *tcpInterface)
 {
 
-	RakNet::SystemAddress serverAddress;
+	SLNet::SystemAddress serverAddress;
 	char authenticationURL[128];
 	char rackspaceCloudUsername[128];
 	char apiAccessKey[128];
@@ -84,8 +91,7 @@ bool Authenticate(RakNet::Rackspace *rackspaceApi, RakNet::TCPInterface *tcpInte
 	if (authenticationURL[0]==0)
 	{
 		FILE *fp;
-		fp = fopen("authenticationURL.txt", "rb");
-		if (fp)
+		if (fopen_s(&fp, "authenticationURL.txt", "rb") == 0)
 		{
 			fgets(authenticationURL,128,fp);
 			fclose(fp);
@@ -103,8 +109,7 @@ bool Authenticate(RakNet::Rackspace *rackspaceApi, RakNet::TCPInterface *tcpInte
 	if (rackspaceCloudUsername[0]==0)
 	{
 		FILE *fp;
-		fp = fopen("rackspaceCloudUsername.txt", "rb");
-		if (fp)
+		if (fopen_s(&fp, "rackspaceCloudUsername.txt", "rb") == 0)
 		{
 			fgets(rackspaceCloudUsername,128,fp);
 			fclose(fp);
@@ -123,8 +128,7 @@ bool Authenticate(RakNet::Rackspace *rackspaceApi, RakNet::TCPInterface *tcpInte
 	if (apiAccessKey[0]==0)
 	{
 		FILE *fp;
-		fp = fopen("apiAccessKey.txt", "rb");
-		if (fp)
+		if (fopen_s(&fp, "apiAccessKey.txt", "rb") == 0)
 		{
 			fgets(apiAccessKey,128,fp);
 			fclose(fp);
@@ -138,20 +142,20 @@ bool Authenticate(RakNet::Rackspace *rackspaceApi, RakNet::TCPInterface *tcpInte
 	}
 
 	serverAddress=rackspaceApi->Authenticate(tcpInterface, authenticationURL, rackspaceCloudUsername, apiAccessKey);
-	if (serverAddress==RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+	if (serverAddress== SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 		printf("Failed to connect to %s\n", authenticationURL);
 
 	return true;
 }
 
-class DisplayHTMLPage : public RakNet::RackspaceEventCallback_Default
+class DisplayHTMLPage : public SLNet::RackspaceEventCallback_Default
 {
-	virtual void ExecuteDefault(const char *callbackName, RakNet::RackspaceEventType eventType, const char *htmlAdditionalInfo)
+	virtual void ExecuteDefault(const char *callbackName, SLNet::RackspaceEventType eventType, const char *htmlAdditionalInfo)
 	{
 		/*
-		RakNet::RakString fileName("%s.html", callbackName);
-		FILE *fp = fopen(fileName.C_String(), "wb");
-		if (fp)
+		SLNet::RakString fileName("%s.html", callbackName);
+		FILE *fp;
+		if (fopen_s(&fp, fileName.C_String(), "wb") == 0)
 		{
 			fwrite(htmlAdditionalInfo,1,strlen(htmlAdditionalInfo),fp);
 			fclose(fp);
@@ -160,11 +164,11 @@ class DisplayHTMLPage : public RakNet::RackspaceEventCallback_Default
 			ShellExecute(NULL, "open", fileName.C_String(), NULL, szDirectory, SW_SHOWNORMAL);
 		}
 		*/
-		printf("%s completed with result %s\n", callbackName, RakNet::Rackspace::EventTypeToString(eventType));
+		printf("%s completed with result %s\n", callbackName, SLNet::Rackspace::EventTypeToString(eventType));
 		printf(htmlAdditionalInfo);
 		printf("\n");
 	}
-	virtual void OnConnectionAttemptFailure( RakNet::RackspaceOperationType operationType, const char *url) {printf("OnConnectionAttemptFailure\noperationType=%i\n%s\n", operationType,url);}
+	virtual void OnConnectionAttemptFailure(SLNet::RackspaceOperationType operationType, const char *url) {printf("OnConnectionAttemptFailure\noperationType=%i\n%s\n", operationType,url);}
 };
 
 int main()
@@ -174,8 +178,8 @@ int main()
 	return 1;
 #endif
 
-	RakNet::Rackspace rackspaceApi;
-	RakNet::TCPInterface tcpInterface;
+	SLNet::Rackspace rackspaceApi;
+	SLNet::TCPInterface tcpInterface;
 
 	DisplayHTMLPage callback;
 	rackspaceApi.AddEventCallback(&callback);
@@ -190,227 +194,227 @@ int main()
 
 	PrintCommands();
 
-	RakNet::SystemAddress systemAddress;
-	RakNet::Packet *packet;
-	while (1)
+	SLNet::SystemAddress systemAddress;
+	SLNet::Packet *packet;
+	for(;;)
 	{
 		for (packet=tcpInterface.Receive(); packet; tcpInterface.DeallocatePacket(packet), packet=tcpInterface.Receive())
 		{
 			rackspaceApi.OnReceive(packet);
 		}
 
-		RakNet::SystemAddress lostConnectionAddress = tcpInterface.HasLostConnection();
-		if (lostConnectionAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		SLNet::SystemAddress lostConnectionAddress = tcpInterface.HasLostConnection();
+		if (lostConnectionAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			rackspaceApi.OnClosedConnection(lostConnectionAddress);
 
-		if (kbhit())
+		if (_kbhit())
 		{
 			printf("Command: ");
 
 			char command[128];
 			Gets(command, sizeof(command));
 
-			if (stricmp(command,"Help")==0)
+			if (_stricmp(command,"Help")==0)
 			{
 				PrintCommands();
 			}
-			else if (stricmp(command,"Quit")==0)
+			else if (_stricmp(command,"Quit")==0)
 			{
 				break;
 			}
-			else if (stricmp(command,"Authenticate")==0)
+			else if (_stricmp(command,"Authenticate")==0)
 			{
 				Authenticate(&rackspaceApi, &tcpInterface);
 			}
-			else if (stricmp(command,"ListServers")==0)
+			else if (_stricmp(command,"ListServers")==0)
 			{
 				rackspaceApi.ListServers();
 			}
-			else if (stricmp(command,"ListServersWithDetails")==0)
+			else if (_stricmp(command,"ListServersWithDetails")==0)
 			{
 				rackspaceApi.ListServersWithDetails();
 			}
-			else if (stricmp(command,"CreateServer")==0)
+			else if (_stricmp(command,"CreateServer")==0)
 			{
-				RakNet::RakString name;
+				SLNet::RakString name;
 				printf("Enter server name: ");
 				Gets(command, sizeof(command));
 				name=command;
-				RakNet::RakString imageId;
+				SLNet::RakString imageId;
 				printf("Enter imageId: ");
 				Gets(command, sizeof(command));
 				imageId=command;
-				RakNet::RakString flavorId;
+				SLNet::RakString flavorId;
 				printf("Enter flavorId: ");
 				Gets(command, sizeof(command));
 				flavorId=command;
 
 				rackspaceApi.CreateServer(name, imageId, flavorId);
 			}
-			else if (stricmp(command,"GetServerDetails")==0)
+			else if (_stricmp(command,"GetServerDetails")==0)
 			{
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.GetServerDetails(command);
 			}
-			else if (stricmp(command,"UpdateServerNameOrPassword")==0)
+			else if (_stricmp(command,"UpdateServerNameOrPassword")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString newName;
+				SLNet::RakString newName;
 				printf("Enter newName: ");
 				Gets(command, sizeof(command));
 				newName=command;
-				RakNet::RakString newPassword;
+				SLNet::RakString newPassword;
 				printf("Enter newPassword: ");
 				Gets(command, sizeof(command));
 				newPassword=command;
 
 				rackspaceApi.UpdateServerNameOrPassword(serverId,newName,newPassword);
 			}
-			else if (stricmp(command,"DeleteServer")==0)
+			else if (_stricmp(command,"DeleteServer")==0)
 			{
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.DeleteServer(command);
 			}
-			else if (stricmp(command,"ListServerAddresses")==0)
+			else if (_stricmp(command,"ListServerAddresses")==0)
 			{
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.ListServerAddresses(command);
 			}
-			else if (stricmp(command,"ShareServerAddress")==0)
+			else if (_stricmp(command,"ShareServerAddress")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString serverAddress;
+				SLNet::RakString serverAddress;
 				printf("Enter server serverAddress: ");
 				Gets(command, sizeof(command));
 				serverAddress=command;
 				rackspaceApi.ShareServerAddress(serverId, serverAddress);
 			}
-			else if (stricmp(command,"DeleteServerAddress")==0)
+			else if (_stricmp(command,"DeleteServerAddress")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString serverAddress;
+				SLNet::RakString serverAddress;
 				printf("Enter server serverAddress: ");
 				Gets(command, sizeof(command));
 				serverAddress=command;
 				rackspaceApi.DeleteServerAddress(serverId, serverAddress);
 			}
-			else if (stricmp(command,"RebootServer")==0)
+			else if (_stricmp(command,"RebootServer")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString rebootType;
+				SLNet::RakString rebootType;
 				printf("Enter rebootType: ");
 				Gets(command, sizeof(command));
 				rebootType=command;
 				rackspaceApi.RebootServer(serverId,rebootType);
 			}
-			else if (stricmp(command,"RebuildServer")==0)
+			else if (_stricmp(command,"RebuildServer")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString imageId;
+				SLNet::RakString imageId;
 				printf("Enter imageId: ");
 				Gets(command, sizeof(command));
 				imageId=command;
 				rackspaceApi.RebuildServer(serverId,imageId);
 			}
-			else if (stricmp(command,"ResizeServer")==0)
+			else if (_stricmp(command,"ResizeServer")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString flavorId;
+				SLNet::RakString flavorId;
 				printf("Enter flavorId: ");
 				Gets(command, sizeof(command));
 				flavorId=command;
 				rackspaceApi.ResizeServer(serverId,flavorId);
 			}
-			else if (stricmp(command,"ConfirmResizedServer")==0)
+			else if (_stricmp(command,"ConfirmResizedServer")==0)
 			{
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.ConfirmResizedServer(command);
 			}
-			else if (stricmp(command,"RevertResizedServer")==0)
+			else if (_stricmp(command,"RevertResizedServer")==0)
 			{
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.RevertResizedServer(command);
 			}
-			else if (stricmp(command,"ListFlavors")==0)
+			else if (_stricmp(command,"ListFlavors")==0)
 			{
 				rackspaceApi.ListFlavors();
 			}
-			else if (stricmp(command,"GetFlavorDetails")==0)
+			else if (_stricmp(command,"GetFlavorDetails")==0)
 			{
 				printf("Enter flavor id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.GetFlavorDetails(command);
 			}
-			else if (stricmp(command,"ListImages")==0)
+			else if (_stricmp(command,"ListImages")==0)
 			{
 				rackspaceApi.ListImages();
 			}
-			else if (stricmp(command,"CreateImage")==0)
+			else if (_stricmp(command,"CreateImage")==0)
 			{
-				RakNet::RakString serverId;
+				SLNet::RakString serverId;
 				printf("Enter server id: ");
 				Gets(command, sizeof(command));
 				serverId=command;
-				RakNet::RakString imageName;
+				SLNet::RakString imageName;
 				printf("Enter imageName: ");
 				Gets(command, sizeof(command));
 				imageName=command;
 				rackspaceApi.CreateImage(serverId,imageName);
 			}
-			else if (stricmp(command,"GetImageDetails")==0)
+			else if (_stricmp(command,"GetImageDetails")==0)
 			{
 				printf("Enter image id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.GetImageDetails(command);
 			}
-			else if (stricmp(command,"DeleteImage")==0)
+			else if (_stricmp(command,"DeleteImage")==0)
 			{
 				printf("Enter image id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.DeleteImage(command);
 			}
-			else if (stricmp(command,"ListSharedIPGroups")==0)
+			else if (_stricmp(command,"ListSharedIPGroups")==0)
 			{
 				rackspaceApi.ListSharedIPGroups();
 			}
-			else if (stricmp(command,"ListSharedIPGroupsWithDetails")==0)
+			else if (_stricmp(command,"ListSharedIPGroupsWithDetails")==0)
 			{
 				rackspaceApi.ListSharedIPGroupsWithDetails();
 			}
-			else if (stricmp(command,"CreateSharedIPGroup")==0)
+			else if (_stricmp(command,"CreateSharedIPGroup")==0)
 			{
 				rackspaceApi.CreateSharedIPGroup("testSharedIPGroup","");
 			}
-			else if (stricmp(command,"GetSharedIPGroupDetails")==0)
+			else if (_stricmp(command,"GetSharedIPGroupDetails")==0)
 			{
 				printf("Enter group id: ");
 				Gets(command, sizeof(command));
 				rackspaceApi.GetSharedIPGroupDetails(command);
 			}
-			else if (stricmp(command,"DeleteSharedIPGroup")==0)
+			else if (_stricmp(command,"DeleteSharedIPGroup")==0)
 			{
 				printf("Enter group id: ");
 				Gets(command, sizeof(command));

@@ -1,33 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "TwoWayAuthentication.h"
-#include "RakSleep.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/TwoWayAuthentication.h"
+#include "slikenet/sleep.h"
 
 static const int NUM_PEERS=2;
-RakNet::RakPeerInterface *rakPeer[NUM_PEERS];
-RakNet::TwoWayAuthentication *twoWayAuthenticationPlugin[NUM_PEERS];
+SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
+SLNet::TwoWayAuthentication *twoWayAuthenticationPlugin[NUM_PEERS];
 int main(void)
 {
 	int i;
 
 	for (i=0; i < NUM_PEERS; i++)
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("This project tests and demonstrates the two way authentication plugin.\n");
 	printf("Difficulty: Beginner\n\n");
@@ -37,7 +42,7 @@ int main(void)
 	// Initialize the message handlers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		twoWayAuthenticationPlugin[peerIndex]=RakNet::OP_NEW<RakNet::TwoWayAuthentication>(_FILE_AND_LINE_);
+		twoWayAuthenticationPlugin[peerIndex]= SLNet::OP_NEW<SLNet::TwoWayAuthentication>(_FILE_AND_LINE_);
 		rakPeer[peerIndex]->AttachPlugin(twoWayAuthenticationPlugin[peerIndex]);
 		rakPeer[peerIndex]->SetMaximumIncomingConnections(NUM_PEERS);
 	}
@@ -45,7 +50,7 @@ int main(void)
 	// Initialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 	
@@ -72,7 +77,7 @@ int main(void)
 
 	while (!quit)
 	{
-		RakNet::Packet *packet;
+		SLNet::Packet *packet;
 		for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 		{
 			packet=rakPeer[peerIndex]->Receive();
@@ -83,9 +88,9 @@ int main(void)
 					case ID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_SUCCESS:
 					case ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_SUCCESS:
 					{
-						RakNet::BitStream bs(packet->data, packet->length, false);
-						bs.IgnoreBytes(sizeof(RakNet::MessageID));
-						RakNet::RakString password;
+						SLNet::BitStream bs(packet->data, packet->length, false);
+						bs.IgnoreBytes(sizeof(SLNet::MessageID));
+						SLNet::RakString password;
 						bs.Read(password);
 						if (packet->data[0]==ID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_SUCCESS)
 							printf("ID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_SUCCESS with %s from %s\n", password.C_String(), packet->systemAddress.ToString(true));
@@ -146,9 +151,9 @@ int main(void)
 					break;
 					case ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_TIMEOUT:
 					{
-						RakNet::BitStream bs(packet->data, packet->length, false);
-						bs.IgnoreBytes(sizeof(RakNet::MessageID));
-						RakNet::RakString password;
+						SLNet::BitStream bs(packet->data, packet->length, false);
+						bs.IgnoreBytes(sizeof(SLNet::MessageID));
+						SLNet::RakString password;
 						bs.Read(password);
 						printf("ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_TIMEOUT with %s from %s\n", password.C_String(), packet->systemAddress.ToString(true));
 						printf("Failed stage %i\n", stage);
@@ -156,9 +161,9 @@ int main(void)
 					break;
 					case ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_FAILURE:
 					{
-						RakNet::BitStream bs(packet->data, packet->length, false);
-						bs.IgnoreBytes(sizeof(RakNet::MessageID));
-						RakNet::RakString password;
+						SLNet::BitStream bs(packet->data, packet->length, false);
+						bs.IgnoreBytes(sizeof(SLNet::MessageID));
+						SLNet::RakString password;
 						bs.Read(password);
 						printf("ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_FAILED with %s from %s\n", password.C_String(), packet->systemAddress.ToString(true));
 						if (stage!=4)
@@ -182,10 +187,10 @@ int main(void)
 
 
 	for (i=0; i < NUM_PEERS; i++)
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
-		RakNet::OP_DELETE(twoWayAuthenticationPlugin[peerIndex], _FILE_AND_LINE_);
+		SLNet::OP_DELETE(twoWayAuthenticationPlugin[peerIndex], _FILE_AND_LINE_);
 
 	return 1;
 }

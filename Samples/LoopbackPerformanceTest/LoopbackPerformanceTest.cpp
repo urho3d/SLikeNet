@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h" // Enumerations
-#include "GetTime.h"
-#include "RakNetStatistics.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h" // Enumerations
+#include "slikenet/GetTime.h"
+#include "slikenet/statistics.h"
 #include <cstdio>
 #include <stdlib.h>
-#include "Gets.h"
+#include "slikenet/Gets.h"
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #define SLEEP(arg) ( Sleep( (arg) ) )
 #else
 #include <unistd.h> // usleep
@@ -30,18 +35,18 @@ static const int SOURCE_SYSTEM_PORT=60002;
 
 int main(void)
 {
-	RakNet::RakPeerInterface *localSystem;
-	RakNet::Packet *p;
+	SLNet::RakPeerInterface *localSystem;
+	SLNet::Packet *p;
 	int systemType;
 	unsigned char byteBlock[4096];
-	RakNet::TimeMS time, quitTime, nextStatsTime;
+	SLNet::TimeMS time, quitTime, nextStatsTime;
 	unsigned int packetsPerSecond, bytesPerPacket, num,index, bytesInPackets;
-	RakNet::TimeMS lastSendTime;
+	SLNet::TimeMS lastSendTime;
 	int sendMode;
 	int verbosityLevel;
 	unsigned int showStatsInterval;
 	bool connectionCompleted, incomingConnectionCompleted;
-	RakNet::RakNetStatistics *rss;
+	SLNet::RakNetStatistics *rss;
 
 	printf("Loopback performance test.\n");
 	printf("This test measures the effective transfer rate of RakNet.\n\n");
@@ -59,7 +64,7 @@ int main(void)
 		return 1;
 	}
 
-	localSystem=RakNet::RakPeerInterface::GetInstance();
+	localSystem= SLNet::RakPeerInterface::GetInstance();
 	
 	printf("How many seconds do you want to run the test for?\n");
 	Gets((char*)byteBlock, sizeof(byteBlock));
@@ -95,8 +100,8 @@ int main(void)
 	{
 		printf("Initializing Raknet...\n");
 		// Destination.  Accept one connection and wait for further instructions.
-		RakNet::SocketDescriptor socketDescriptor(DESTINATION_SYSTEM_PORT,0);
-		if (localSystem->Startup(1, &socketDescriptor, 1)!=RakNet::RAKNET_STARTED)
+		SLNet::SocketDescriptor socketDescriptor(DESTINATION_SYSTEM_PORT,0);
+		if (localSystem->Startup(1, &socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 		{
 			printf("Failed to initialize RakNet!.\nQuitting\n");
 			return 1;
@@ -130,15 +135,15 @@ int main(void)
 
 		printf("Initializing Raknet...\n");
 		// Relay.  Accept one connection, initiate outgoing connection, wait for further instructions.
-		RakNet::SocketDescriptor socketDescriptor(RELAY_SYSTEM_PORT,0);
-		if (localSystem->Startup(2, &socketDescriptor, 1)!=RakNet::RAKNET_STARTED)
+		SLNet::SocketDescriptor socketDescriptor(RELAY_SYSTEM_PORT,0);
+		if (localSystem->Startup(2, &socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 		{
 			printf("Failed to initialize RakNet!.\nQuitting\n");
 			return 1;
 		}
 		localSystem->SetMaximumIncomingConnections(1);
 		socketDescriptor.port=DESTINATION_SYSTEM_PORT;
-		if (localSystem->Connect("127.0.0.1", DESTINATION_SYSTEM_PORT, 0, 0)!=RakNet::CONNECTION_ATTEMPT_STARTED)
+		if (localSystem->Connect("127.0.0.1", DESTINATION_SYSTEM_PORT, 0, 0)!= SLNet::CONNECTION_ATTEMPT_STARTED)
 		{
 			printf("Connect call failed!.\nQuitting\n");
 			return 1;
@@ -203,13 +208,13 @@ int main(void)
 
 		printf("Initializing RakNet...\n");
 		// Sender.  Initiate outgoing connection to relay.
-		RakNet::SocketDescriptor socketDescriptor(SOURCE_SYSTEM_PORT,0);
-		if (localSystem->Startup(1, &socketDescriptor, 1)!=RakNet::RAKNET_STARTED)
+		SLNet::SocketDescriptor socketDescriptor(SOURCE_SYSTEM_PORT,0);
+		if (localSystem->Startup(1, &socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 		{
 			printf("Failed to initialize RakNet!.\nQuitting\n");
 			return 1;
 		}
-		if (localSystem->Connect("127.0.0.1", RELAY_SYSTEM_PORT, 0, 0)!=RakNet::CONNECTION_ATTEMPT_STARTED)
+		if (localSystem->Connect("127.0.0.1", RELAY_SYSTEM_PORT, 0, 0)!= SLNet::CONNECTION_ATTEMPT_STARTED)
 		{
 			printf("Connect call failed!.\nQuitting\n");
 			return 1;
@@ -220,16 +225,16 @@ int main(void)
 
 	connectionCompleted=false;
 	incomingConnectionCompleted=false;
-	time = RakNet::GetTimeMS();
+	time = SLNet::GetTimeMS();
 	lastSendTime=time;
 	nextStatsTime=time+2000; // First stat shows up in 2 seconds
 	bytesInPackets=0;
 
 	while (time < quitTime || (connectionCompleted==false && incomingConnectionCompleted==false))
 	{
-		time = RakNet::GetTimeMS();
+		time = SLNet::GetTimeMS();
 		// Parse messages
-		while (1)
+		for(;;)
 		{
 			p = localSystem->Receive();
 
@@ -299,7 +304,7 @@ int main(void)
 		{
 			printf("\n* First connected system statistics:\n");
 			rss=localSystem->GetStatistics(localSystem->GetSystemAddressFromIndex(0));
-			StatisticsToString(rss, (char*)byteBlock, verbosityLevel);
+			StatisticsToString(rss, (char*)byteBlock, 4096, verbosityLevel);
 			printf("%s", byteBlock);
 			if (systemType==1)
 			{
@@ -307,7 +312,7 @@ int main(void)
 				if (rss)
 				{
 					printf("* Second connected system statistics:\n");
-					StatisticsToString(rss, (char*)byteBlock, verbosityLevel);
+					StatisticsToString(rss, (char*)byteBlock, 4096, verbosityLevel);
 					printf("%s", byteBlock);
 				}				
 			}
@@ -327,7 +332,7 @@ int main(void)
 			byteBlock[0]=255; // Relay all data with an identifier of 255
 			for (index=0; index < num; index++)
 			{
-				localSystem->Send((char*)byteBlock, bytesPerPacket, HIGH_PRIORITY, (PacketReliability)sendMode, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+				localSystem->Send((char*)byteBlock, bytesPerPacket, HIGH_PRIORITY, (PacketReliability)sendMode, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 			}
             
 			lastSendTime+= (1000 * num) / packetsPerSecond;
@@ -339,7 +344,7 @@ int main(void)
 	printf("Test duration elapsed.  Final Stats:\n");
 	printf("\n* First connected system statistics:\n");
 	rss=localSystem->GetStatistics(localSystem->GetSystemAddressFromIndex(0));
-	StatisticsToString(rss, (char*)byteBlock, 2);
+	StatisticsToString(rss, (char*)byteBlock, 4096, 2);
 	printf("%s", byteBlock);
 	if (systemType==1)
 	{
@@ -347,7 +352,7 @@ int main(void)
 		if (rss)
 		{
 			printf("* Second connected system statistics:\n");
-			StatisticsToString(rss, (char*)byteBlock, 2);
+			StatisticsToString(rss, (char*)byteBlock, 4096, 2);
 			printf("%s", byteBlock);
 		}				
 	}
@@ -357,6 +362,6 @@ int main(void)
 	char buff[100];
 	Gets(buff,sizeof(buff));
 
-	RakNet::RakPeerInterface::DestroyInstance(localSystem);
+	SLNet::RakPeerInterface::DestroyInstance(localSystem);
 	return 0;
 }

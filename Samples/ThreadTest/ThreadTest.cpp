@@ -1,29 +1,34 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 /// \brief Tests multiple readers and writers on the same instance of RakPeer.
 
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "GetTime.h"
-#include "RakNetStatistics.h"
-#include "MessageIdentifiers.h"
-#include "Kbhit.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/statistics.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Kbhit.h"
 #include <stdio.h> // Printf
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 //#include <process.h>
-#include "RakThread.h"
-#include "RakSleep.h"
-using namespace RakNet;
+#include "slikenet/thread.h"
+#include "slikenet/sleep.h"
+using namespace SLNet;
 
 RakPeerInterface *peer1, *peer2;
 bool endThreads;
@@ -39,9 +44,9 @@ RAK_THREAD_DECLARATION(ProducerThread)
 	{
 //		printf("Thread %i writing...\n", i);
 		if (i&1)
-			peer1->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			peer1->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 		else
-			peer2->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			peer2->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
 //		printf("Thread %i done writing\n", i);
 		RakSleep(30);
@@ -53,7 +58,7 @@ RAK_THREAD_DECLARATION(ProducerThread)
 RAK_THREAD_DECLARATION(ConsumerThread)
 {
 	char i = *((char *) arguments);
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	while (endThreads==false)
 	{
 //		printf("Thread %i reading...\n", i);
@@ -81,11 +86,11 @@ RAK_THREAD_DECLARATION(ConsumerThread)
 
 int main()
 {
-	peer1=RakNet::RakPeerInterface::GetInstance();
-	peer2=RakNet::RakPeerInterface::GetInstance();
+	peer1= SLNet::RakPeerInterface::GetInstance();
+	peer2= SLNet::RakPeerInterface::GetInstance();
 	peer1->SetMaximumIncomingConnections(1);
 	peer2->SetMaximumIncomingConnections(1);
-	RakNet::SocketDescriptor socketDescriptor(1234,0);
+	SLNet::SocketDescriptor socketDescriptor(1234,0);
 	peer1->Startup(1,&socketDescriptor, 1);
 	socketDescriptor.port=1235;
 	peer2->Startup(1,&socketDescriptor, 1);
@@ -105,17 +110,17 @@ int main()
 	for (i=0; i< 10; i++)
 	{
 		count[i]=i;
-		RakNet::RakThread::Create(&ProducerThread, count+i);
+		SLNet::RakThread::Create(&ProducerThread, count+i);
 	}
 	for (; i < 20; i++)
 	{
 		count[i]=i;
-		RakNet::RakThread::Create(&ConsumerThread, count+i );
+		SLNet::RakThread::Create(&ConsumerThread, count+i );
 	}
 
 	printf("Running test\n");
-	RakNet::TimeMS endTime = 60 * 1000 + RakNet::GetTimeMS();
-	while (RakNet::GetTimeMS() < endTime)
+	SLNet::TimeMS endTime = 60 * 1000 + SLNet::GetTimeMS();
+	while (SLNet::GetTimeMS() < endTime)
 	{
 
 		RakSleep(0);
@@ -123,8 +128,8 @@ int main()
 	endThreads=true;
 	printf("Test done!\n");
 
-	RakNet::RakPeerInterface::DestroyInstance(peer1);
-	RakNet::RakPeerInterface::DestroyInstance(peer2);
+	SLNet::RakPeerInterface::DestroyInstance(peer1);
+	SLNet::RakPeerInterface::DestroyInstance(peer2);
 
 	return 0;
 }

@@ -1,27 +1,34 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include "portaudio.h"
-#include "Kbhit.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
 #include "RakVoice.h"
-#include "RakNetStatistics.h"
-#include "NatPunchthroughClient.h"
-#include "BitStream.h"
-#include "Getche.h"
-#include "Gets.h"
+#include "slikenet/statistics.h"
+#include "slikenet/NatPunchthroughClient.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/Getche.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 /// To test sending to myself. Also uncomment in RakVoice.cpp
 //#define _TEST_LOOPBACK
@@ -36,7 +43,7 @@ typedef short SAMPLE;
 //#define SAMPLE_RATE  (16000)
 //#define SAMPLE_RATE  (32000)
 
-RakNet::RakPeerInterface *rakPeer;
+SLNet::RakPeerInterface *rakPeer;
 
 // I think one buffer has to be full (of samples) before you hear the sound.
 // So higher frames per buffer means that there will be a larger latency before you hear the sound
@@ -44,7 +51,7 @@ RakNet::RakPeerInterface *rakPeer;
 #define FRAMES_PER_BUFFER  (2048 / (32000 / SAMPLE_RATE))
 
 bool mute;
-RakNet::RakVoice rakVoice;
+SLNet::RakVoice rakVoice;
 
 // inputBuffer and outputBuffer is an array of SAMPLE of count framesPerBuffer
 // A sample is one unit of sound.
@@ -67,7 +74,7 @@ static int PACallback( void *inputBuffer, void *outputBuffer,
 			rakVoice.SendFrame(rakPeer->GetGUIDFromIndex(i), inputBuffer);
 		}
 #else
-		rakVoice.SendFrame(RakNet::UNASSIGNED_SYSTEM_ADDRESS, inputBuffer);
+		rakVoice.SendFrame(SLNet::UNASSIGNED_SYSTEM_ADDRESS, inputBuffer);
 #endif
 	}
 
@@ -97,14 +104,14 @@ int main(void)
 	printf("Difficulty: Advanced\n\n");
 
 	// Since voice is peer to peer, we give the option to use the nat punchthrough client if desired.
-	RakNet::NatPunchthroughClient natPunchthroughClient;
+	SLNet::NatPunchthroughClient natPunchthroughClient;
 	char port[256];
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 	printf("Enter local port (enter for default): ");
 	Gets(port, sizeof(port));
 	if (port[0]==0)
-		strcpy(port, "60000");
-	RakNet::SocketDescriptor socketDescriptor(atoi(port),0);
+		strcpy_s(port, "60000");
+	SLNet::SocketDescriptor socketDescriptor(atoi(port),0);
 	rakPeer->Startup(4, &socketDescriptor, 1);
 	rakPeer->SetMaximumIncomingConnections(4);
 	rakPeer->AttachPlugin(&rakVoice);
@@ -138,20 +145,20 @@ int main(void)
 
 	printf("Support NAT punchthrough? (y/n)? ");
 	bool useNatPunchthrough;
-	useNatPunchthrough=(getche()=='y');
+	useNatPunchthrough=(_getche()=='y');
 	printf("\n");
 	char facilitatorIP[256];
 	{//Linux fix. Won't compile without it. Because of the goto error above, the scope is ambigious. Make it a block to define that it will not be used after the jump.
 	//Doesn't change current logic
-	RakNet::SystemAddress facilitator;
+		SLNet::SystemAddress facilitator;
 	if (useNatPunchthrough)
 	{
-		printf("My GUID is %s\n", rakPeer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+		printf("My GUID is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 
 		printf("Enter IP of facilitator (enter for default): ");
 		Gets(facilitatorIP,sizeof(facilitatorIP));
 		if (facilitatorIP[0]==0)
-			strcpy(facilitatorIP, "natpunch.jenkinssoftware.com");
+			strcpy_s(facilitatorIP, "natpunch.jenkinssoftware.com");
 		facilitator.FromString(facilitatorIP);
 		facilitator.SetPortHostOrder(NAT_PUNCHTHROUGH_FACILITATOR_PORT);
 		rakPeer->Connect(facilitatorIP, NAT_PUNCHTHROUGH_FACILITATOR_PORT, 0, 0);
@@ -164,16 +171,16 @@ int main(void)
 
 
     
-	RakNet::Packet *p;
+	SLNet::Packet *p;
 	quit=false;
 	if (useNatPunchthrough==false)
 		printf("(Q)uit. (C)onnect. (D)isconnect. C(l)ose voice channels. (M)ute. ' ' for stats.\n");
 
 	while (!quit)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='y')
 			{
 				quit=true;
@@ -182,10 +189,10 @@ int main(void)
 			{
 				if (useNatPunchthrough)
 				{
-					RakNet::RakNetGUID destination;
+					SLNet::RakNetGUID destination;
 					printf("Enter GUID of destination: ");
 					char guidStr[256];
-					while (1)
+					for(;;)
 					{
 						Gets(guidStr,sizeof(guidStr));
 						if (!destination.FromString(guidStr))
@@ -202,11 +209,11 @@ int main(void)
 					printf("Enter IP of remote system: ");
 					Gets(ip, sizeof(ip));
 					if (ip[0]==0)
-						strcpy(ip, "127.0.0.1");
+						strcpy_s(ip, "127.0.0.1");
 					printf("Enter port of remote system: ");
 					Gets(port, sizeof(port));
 					if (port[0]==0)
-						strcpy(port, "60000");
+						strcpy_s(port, "60000");
 					rakPeer->Connect(ip, atoi(port), 0,0);
 
 				}
@@ -230,8 +237,8 @@ int main(void)
 			else if (ch==' ')
 			{
 				char message[2048];
-				RakNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
-				StatisticsToString(rss, message, 2);
+				SLNet::RakNetStatistics *rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
+				StatisticsToString(rss, message, 2048, 2);
 				printf("%s", message);
 			}
 			else if (ch=='q')
@@ -274,32 +281,32 @@ int main(void)
 			}
 			else if (p->data[0]==ID_NAT_TARGET_NOT_CONNECTED)
 			{
-				RakNet::RakNetGUID g;
-				RakNet::BitStream b(p->data, p->length, false);
+				SLNet::RakNetGUID g;
+				SLNet::BitStream b(p->data, p->length, false);
 				b.IgnoreBits(8); // Ignore the ID_...
 				b.Read(g);
 				printf("ID_NAT_TARGET_NOT_CONNECTED for %s\n", g.ToString());
 			}
 			else if (p->data[0]==ID_NAT_TARGET_UNRESPONSIVE)
 			{
-				RakNet::RakNetGUID g;
-				RakNet::BitStream b(p->data, p->length, false);
+				SLNet::RakNetGUID g;
+				SLNet::BitStream b(p->data, p->length, false);
 				b.IgnoreBits(8); // Ignore the ID_...
 				b.Read(g);
 				printf("ID_NAT_TARGET_UNRESPONSIVE for %s\n", g.ToString());
 			}
 			else if (p->data[0]==ID_NAT_CONNECTION_TO_TARGET_LOST)
 			{
-				RakNet::RakNetGUID g;
-				RakNet::BitStream b(p->data, p->length, false);
+				SLNet::RakNetGUID g;
+				SLNet::BitStream b(p->data, p->length, false);
 				b.IgnoreBits(8); // Ignore the ID_...
 				b.Read(g);
 				printf("ID_NAT_CONNECTION_TO_TARGET_LOST for %s\n", g.ToString());
 			}
 			else if (p->data[0]==ID_NAT_ALREADY_IN_PROGRESS)
 			{
-				RakNet::RakNetGUID g;
-				RakNet::BitStream b(p->data, p->length, false);
+				SLNet::RakNetGUID g;
+				SLNet::BitStream b(p->data, p->length, false);
 				b.IgnoreBits(8); // Ignore the ID_...
 				b.Read(g);
 				printf("ID_NAT_ALREADY_IN_PROGRESS for %s\n", g.ToString());
@@ -350,7 +357,7 @@ int main(void)
 	Pa_Terminate();
 
 	rakPeer->Shutdown(300);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 
 	return 0;
 

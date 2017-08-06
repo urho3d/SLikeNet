@@ -1,18 +1,23 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
 #include "FMODVoiceAdapter.h"
 #include "fmod_errors.h"
@@ -25,7 +30,7 @@
 // Number of RakVoice frames in the fmod sound
 #define FRAMES_IN_SOUND 4
 
-using namespace RakNet;
+using namespace SLNet;
 
 FMODVoiceAdapter FMODVoiceAdapter::instance;
 
@@ -226,7 +231,7 @@ void FMODVoiceAdapter::BroadcastFrame(void *ptr)
 		rakVoice->SendFrame(rakVoice->GetRakPeerInterface()->GetGUIDFromIndex(i), ptr);
 	}
 #else
-	rakVoice->SendFrame(RakNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
+	rakVoice->SendFrame(SLNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
 #endif
 
 }

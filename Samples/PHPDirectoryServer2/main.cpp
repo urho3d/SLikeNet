@@ -1,31 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 /// \file
 /// \brief This file is a sample for using HTTPConnection and PHPDirectoryServer2
 
 
-#include "TCPInterface.h"
-#include "HTTPConnection.h"
+#include "slikenet/TCPInterface.h"
+#include "slikenet/HTTPConnection.h"
 #include "PHPDirectoryServer2.h"
-#include "RakSleep.h"
-#include "RakString.h"
-#include "GetTime.h"
-#include "DS_Table.h"
+#include "slikenet/sleep.h"
+#include "slikenet/string.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/DS_Table.h"
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include "Gets.h"
-#include "Getche.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Getche.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 // Allocate rather than create on the stack or the RakString mutex crashes on shutdown
 TCPInterface *tcp;
@@ -39,11 +46,11 @@ enum ReadResultEnum
 	RR_TIMEOUT,
 };
 
-ReadResultEnum ReadResult(RakNet::RakString &httpResult)
+ReadResultEnum ReadResult(SLNet::RakString &httpResult)
 {
-	RakNet::TimeMS endTime=RakNet::GetTimeMS()+10000;
+	SLNet::TimeMS endTime= SLNet::GetTimeMS()+10000;
 	httpResult.Clear();
-	while (RakNet::GetTimeMS()<endTime)
+	while (SLNet::GetTimeMS()<endTime)
 	{
 		Packet *packet = tcp->Receive();
 		if(packet)
@@ -126,11 +133,11 @@ void DownloadTable()
 {
 	phpDirectoryServer2->DownloadTable("a");
 }
-void UploadTable(RakNet::RakString gameName, unsigned short gamePort)
+void UploadTable(SLNet::RakString gameName, unsigned short gamePort)
 {
 	phpDirectoryServer2->UploadTable("a", gameName, gamePort, false);
 }
-void UploadAndDownloadTable(RakNet::RakString gameName, unsigned short gamePort)
+void UploadAndDownloadTable(SLNet::RakString gameName, unsigned short gamePort)
 {
 	phpDirectoryServer2->UploadAndDownloadTable("a", "a", gameName, gamePort, false);
 }
@@ -154,8 +161,8 @@ bool VerifyDownloadMatchesUpload(int requiredRowCount, int testRowIndex)
 		printf("TEST FAILED. Expected %i result rows, got %i\n", requiredRowCount, games->GetRowCount());
 		return false;
 	}
-	RakNet::RakString columnName;
-	RakNet::RakString value;
+	SLNet::RakString columnName;
+	SLNet::RakString value;
 	unsigned int i;
 	DataStructures::Table::Row *row = games->GetRowByIndex(testRowIndex,NULL);
 	const DataStructures::List<DataStructures::Table::ColumnDescriptor>& columns = games->GetColumns();
@@ -211,7 +218,7 @@ bool VerifyDownloadMatchesUpload(int requiredRowCount, int testRowIndex)
 	printf("Test passed.\n");
 	return true;
 }
-void PrintHttpResult(RakNet::RakString httpResult)
+void PrintHttpResult(SLNet::RakString httpResult)
 {
 	printf("--- Last result read ---\n");
 	printf("%s", httpResult.C_String());
@@ -219,8 +226,8 @@ void PrintHttpResult(RakNet::RakString httpResult)
 void PrintFieldColumns(void)
 {
 	unsigned int colIndex;
-	RakNet::RakString columnName;
-	RakNet::RakString value;
+	SLNet::RakString columnName;
+	SLNet::RakString value;
 	for (colIndex=0; colIndex < phpDirectoryServer2->GetFieldCount(); colIndex++)
 	{
 		phpDirectoryServer2->GetField(colIndex, columnName, value);
@@ -229,7 +236,7 @@ void PrintFieldColumns(void)
 }
 bool RunTest()
 {
-	RakNet::RakString httpResult;
+	SLNet::RakString httpResult;
 	ReadResultEnum rr;
 	char ch[32];
 	printf("Warning, table must be clear before starting the test.\n");
@@ -327,7 +334,7 @@ bool RunTest()
 	{PrintHttpResult(httpResult); return false;}
 	if (PassTestOnEmptyDownloadedTable()==false)
 		{PrintHttpResult(httpResult); return false;}
-	RakNet::TimeMS startTime = RakNet::GetTimeMS();
+	SLNet::TimeMS startTime = SLNet::GetTimeMS();
 
 	printf("*** Testing 20 repeated downloads.\n");
 	//printf("Field columns\n");
@@ -362,7 +369,7 @@ bool RunTest()
 	}
 
 	printf("*** Waiting for 70 seconds to have elapsed...\n");
-	RakSleep(70000 - (RakNet::GetTimeMS()-startTime));
+	RakSleep(70000 - (SLNet::GetTimeMS()-startTime));
 
 
 	printf("*** Testing that table is now clear.\n");
@@ -401,13 +408,13 @@ void TestPHPDirectoryServer(int argc, char **argv)
 	printf("Set columns and one row for your game, and upload it to a\nviewable and downloadable webpage.\n");
 	printf("Difficulty: Intermediate\n\n");
 
-// 	tcp = RakNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
-// 	httpConnection = RakNet::OP_NEW<HTTPConnection>(_FILE_AND_LINE_);
-// 	phpDirectoryServer2 = RakNet::OP_NEW<PHPDirectoryServer2>(_FILE_AND_LINE_);
+// 	tcp = SLNet::OP_NEW<TCPInterface>(_FILE_AND_LINE_);
+// 	httpConnection = SLNet::OP_NEW<HTTPConnection>(_FILE_AND_LINE_);
+// 	phpDirectoryServer2 = SLNet::OP_NEW<PHPDirectoryServer2>(_FILE_AND_LINE_);
 
 
 
-//	RakNet::TimeMS lastTouched = 0;
+//	SLNet::TimeMS lastTouched = 0;
 
 
 
@@ -415,20 +422,20 @@ void TestPHPDirectoryServer(int argc, char **argv)
 	char pathToPHP[256];
 	if (argc==3)
 	{
-		strcpy(website, argv[1]);
-		strcpy(pathToPHP, argv[2]);
+		strcpy_s(website, argv[1]);
+		strcpy_s(pathToPHP, argv[2]);
 	}
 	else
 	{
 		printf("Enter website, e.g. jenkinssoftware.com:\n");
 		Gets(website,sizeof(website));
 		if (website[0]==0)
-			strcpy(website, "jenkinssoftware.com");
+			strcpy_s(website, "jenkinssoftware.com");
 
 		printf("Enter path to DirectoryServer.php, e.g. raknet/DirectoryServer.php:\n");
 		Gets(pathToPHP,sizeof(pathToPHP));
 		if (pathToPHP[0]==0)
-			strcpy(pathToPHP, "/raknet/DirectoryServer.php");
+			strcpy_s(pathToPHP, "/raknet/DirectoryServer.php");
 	}
 
 	if (website[strlen(website)-1]!='/' && pathToPHP[0]!='/')
@@ -457,9 +464,9 @@ void TestPHPDirectoryServer(int argc, char **argv)
 	} while (str[0]!='q');
 
 	// The destructor of each of these references the other, so delete in this order
-	RakNet::OP_DELETE(phpDirectoryServer2,_FILE_AND_LINE_);
-	RakNet::OP_DELETE(httpConnection,_FILE_AND_LINE_);
-	RakNet::OP_DELETE(tcp,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(phpDirectoryServer2,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(httpConnection,_FILE_AND_LINE_);
+	SLNet::OP_DELETE(tcp,_FILE_AND_LINE_);
 }
 
 void TestGet(void)
@@ -467,7 +474,7 @@ void TestGet(void)
 	printf("This is NOT a reliable way to download from a website. Use libcurl instead.\n");
 	httpConnection->Init(tcp, "jenkinssoftware.com");
 	httpConnection->Get("/trivia/ranking.php?t=single&places=6&top");
-	while (1)
+	for(;;)
 	{
 		Packet *packet = tcp->Receive();
 		if(packet)
@@ -482,7 +489,7 @@ void TestGet(void)
 		{
 			RakString fileContents = httpConnection->Read();
 			printf(fileContents.C_String());
-			getche();
+			_getche();
 			return;
 		}
 		// Prevent 100% cpu usage
@@ -497,9 +504,9 @@ int main(int argc, char **argv)
 	printf("Set columns and one row for your game, and upload it to a\nviewable and downloadable webpage.\n");
 	printf("Difficulty: Intermediate\n\n");
 
-	tcp = RakNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
-	httpConnection = RakNet::OP_NEW<HTTPConnection>(__FILE__,__LINE__);
-	phpDirectoryServer2 = RakNet::OP_NEW<PHPDirectoryServer2>(__FILE__,__LINE__);
+	tcp = SLNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
+	httpConnection = SLNet::OP_NEW<HTTPConnection>(__FILE__,__LINE__);
+	phpDirectoryServer2 = SLNet::OP_NEW<PHPDirectoryServer2>(__FILE__,__LINE__);
 
 
 

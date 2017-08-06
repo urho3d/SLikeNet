@@ -1,32 +1,39 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // Common includes
 #include <stdio.h>
 #include <stdlib.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "StringCompressor.h"
-#include "FileListTransfer.h"
-#include "FileList.h" // FLP_Printf
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/FileListTransfer.h"
+#include "slikenet/FileList.h" // FLP_Printf
 #include "AutopatcherServer.h"
 #include "AutopatcherMySQLRepository.h"
-#include "PacketizedTCP.h"
-#include "Gets.h"
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #endif
@@ -44,14 +51,14 @@ int main(int argc, char **argv)
 	printf("WARNING: MySQL is an order of magnitude slower than PostgreSQL.\nRecommended you use AutopatcherServer_PostgreSQL instead.");
 
 	printf("Server starting... ");
-	RakNet::AutopatcherServer autopatcherServer;
-	// RakNet::FLP_Printf progressIndicator;
-	RakNet::FileListTransfer fileListTransfer;
+	SLNet::AutopatcherServer autopatcherServer;
+	// SLNet::FLP_Printf progressIndicator;
+	SLNet::FileListTransfer fileListTransfer;
 	// So only one thread runs per connection, we create an array of connection objects, and tell the autopatcher server to use one thread per item
 	static const int workerThreadCount=4; // Used for checking patches only
 	static const int sqlConnectionObjectCount=32; // Used for both checking patches and downloading
-	RakNet::AutopatcherMySQLRepository connectionObject[sqlConnectionObjectCount];
-	RakNet::AutopatcherRepositoryInterface *connectionObjectAddresses[sqlConnectionObjectCount];
+	SLNet::AutopatcherMySQLRepository connectionObject[sqlConnectionObjectCount];
+	SLNet::AutopatcherRepositoryInterface *connectionObjectAddresses[sqlConnectionObjectCount];
 	for (int i=0; i < sqlConnectionObjectCount; i++)
 		connectionObjectAddresses[i]=&connectionObject[i];
 	// fileListTransfer.AddCallback(&progressIndicator);
@@ -60,10 +67,10 @@ int main(int argc, char **argv)
 	// Without this, only one user would be sent files at a time basically
 	fileListTransfer.StartIncrementalReadThreads(sqlConnectionObjectCount);
 	autopatcherServer.SetMaxConurrentUsers(MAX_INCOMING_CONNECTIONS); // More users than this get queued up
-	RakNet::AutopatcherServerLoadNotifier_Printf loadNotifier;
+	SLNet::AutopatcherServerLoadNotifier_Printf loadNotifier;
 	autopatcherServer.SetLoadManagementCallback(&loadNotifier);
 #ifdef USE_TCP
-	RakNet::PacketizedTCP packetizedTCP;
+	SLNet::PacketizedTCP packetizedTCP;
 	if (packetizedTCP.Start(LISTEN_PORT,MAX_INCOMING_CONNECTIONS)==false)
 	{
 		printf("Failed to start TCP. Is the port already in use?");
@@ -72,9 +79,9 @@ int main(int argc, char **argv)
 	packetizedTCP.AttachPlugin(&autopatcherServer);
 	packetizedTCP.AttachPlugin(&fileListTransfer);
 #else
-	RakNet::RakPeerInterface *rakPeer;
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
-	RakNet::SocketDescriptor socketDescriptor(LISTEN_PORT,0);
+	SLNet::RakPeerInterface *rakPeer;
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
+	SLNet::SocketDescriptor socketDescriptor(LISTEN_PORT,0);
 	rakPeer->Startup(MAX_INCOMING_CONNECTIONS,&socketDescriptor, 1);
 	rakPeer->SetMaximumIncomingConnections(MAX_INCOMING_CONNECTIONS);
 	rakPeer->AttachPlugin(&autopatcherServer);
@@ -85,10 +92,10 @@ int main(int argc, char **argv)
 	printf("Enter database password:\n");
 	char password[128];
 	char username[256];
-	strcpy(username, "root");
+	strcpy_s(username, "root");
 	Gets(password,sizeof(password));
 	if (password[0]==0)
-		strcpy(password,"aaaa");
+		strcpy_s(password,"aaaa");
 	char db[256];
 	printf("Enter DB schema: ");
 	// To create the schema, go to the command line client and type create schema autopatcher;
@@ -99,7 +106,7 @@ int main(int argc, char **argv)
 	// Be sure to restart the service after doing so
 	Gets(db,sizeof(db));
 	if (db[0]==0)
-		strcpy(db,"autopatcher");
+		strcpy_s(db,"autopatcher");
 	for (int conIdx=0; conIdx < sqlConnectionObjectCount; conIdx++)
 	{
 		if (!connectionObject[conIdx].Connect("localhost", username, password, db, 0, NULL, 0))
@@ -118,19 +125,19 @@ int main(int argc, char **argv)
 	printf("(D)rop database\n(C)reate database.\n(A)dd application\n(U)pdate revision.\n(R)emove application\n(Q)uit\n");
 
 	char ch;
-	RakNet::Packet *p;
-	while (1)
+	SLNet::Packet *p;
+	for(;;)
 	{
 #ifdef USE_TCP
-		RakNet::SystemAddress notificationAddress;
+		SLNet::SystemAddress notificationAddress;
 		notificationAddress=packetizedTCP.HasCompletedConnectionAttempt();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
 		notificationAddress=packetizedTCP.HasNewIncomingConnection();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_NEW_INCOMING_CONNECTION\n");
 		notificationAddress=packetizedTCP.HasLostConnection();
-		if (notificationAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (notificationAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_CONNECTION_LOST\n");
 
 		p=packetizedTCP.Receive();
@@ -154,9 +161,9 @@ int main(int argc, char **argv)
 			p=rakPeer->Receive();
 		}
 #endif
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='q')
 				break;
 			else if (ch=='c')
@@ -179,7 +186,7 @@ int main(int argc, char **argv)
 				char appName[512];
 				Gets(appName,sizeof(appName));
 				if (appName[0]==0)
-					strcpy(appName, "TestApp");
+					strcpy_s(appName, "TestApp");
 
 				if (connectionObject[0].AddApplication(appName, username)==false)
 					printf("Error: %s\n", connectionObject[0].GetLastError());
@@ -192,7 +199,7 @@ int main(int argc, char **argv)
 				char appName[512];
 				Gets(appName,sizeof(appName));
 				if (appName[0]==0)
-					strcpy(appName, "TestApp");
+					strcpy_s(appName, "TestApp");
 
 				if (connectionObject[0].RemoveApplication(appName)==false)
 					printf("Error: %s\n", connectionObject[0].GetLastError());
@@ -205,13 +212,13 @@ int main(int argc, char **argv)
 				char appName[512];
 				Gets(appName,sizeof(appName));
 				if (appName[0]==0)
-					strcpy(appName, "TestApp");
+					strcpy_s(appName, "TestApp");
 
 				printf("Enter application directory: ");
 				char appDir[512];
 				Gets(appDir,sizeof(appName));
 				if (appDir[0]==0)
-					strcpy(appDir, "C:/temp");
+					strcpy_s(appDir, "C:/temp");
 
 				if (connectionObject[0].UpdateApplicationFiles(appName, appDir, username, 0)==false)
 				{
@@ -232,6 +239,6 @@ int main(int argc, char **argv)
 #ifdef USE_TCP
 	packetizedTCP.Stop();
 #else
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 #endif
 }

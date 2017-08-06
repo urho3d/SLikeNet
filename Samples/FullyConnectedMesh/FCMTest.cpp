@@ -1,31 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "Rand.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Rand.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
-#include "FullyConnectedMesh2.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ConnectionGraph2.h"
 #include <assert.h>
-#include "Kbhit.h"
-#include "RakSleep.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
 
 static const int NUM_PEERS=8;
-RakNet::RakPeerInterface *rakPeer[NUM_PEERS];
-RakNet::FullyConnectedMesh2 fullyConnectedMeshPlugin[NUM_PEERS];
-RakNet::ConnectionGraph2 connectionGraphPlugin[NUM_PEERS];
+SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
+SLNet::FullyConnectedMesh2 fullyConnectedMeshPlugin[NUM_PEERS];
+SLNet::ConnectionGraph2 connectionGraphPlugin[NUM_PEERS];
 void PrintConnections(void);
 
 int main(void)
@@ -33,7 +38,7 @@ int main(void)
 	int i;
 
 	for (i=0; i < NUM_PEERS; i++)
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("This project tests and demonstrates the fully connected mesh plugin.\n");
 	printf("No data is actually sent so it's mostly a sample of how to use a plugin.\n");
@@ -54,7 +59,7 @@ int main(void)
 	// Initialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 
@@ -81,7 +86,7 @@ int main(void)
 	// Reinitialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS,&socketDescriptor, 1 );
 	}
 
@@ -103,7 +108,7 @@ int main(void)
 	// Reinitialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 
@@ -129,12 +134,12 @@ int main(void)
 	// Reinitialize the peers
 	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
-		RakNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
+		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 
 
-	unsigned int seed = (unsigned int) RakNet::GetTimeMS(); 
+	unsigned int seed = (unsigned int)SLNet::GetTimeMS();
 	seedMT(seed);
 	printf("Connecting each peer to a random peer with seed %u.\n", seed);
 	int connectTo=0;
@@ -152,7 +157,7 @@ int main(void)
 	PrintConnections();
 
 	for (i=0; i < NUM_PEERS; i++)
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
 	return 1;
 }
@@ -161,14 +166,14 @@ void PrintConnections()
 {
 	int i,j;
 	char ch=0;
-	RakNet::SystemAddress systemAddress;
-	RakNet::Packet *packet;
+	SLNet::SystemAddress systemAddress;
+	SLNet::Packet *packet;
 	printf("Connecting.  Press space to see status or c to continue.\n");
 
 	while (ch!='c' && ch!='C')
 	{
-		if (kbhit())
-			ch=getch();
+		if (_kbhit())
+			ch=_getch();
 
 		if (ch==' ')
 		{
@@ -182,7 +187,7 @@ void PrintConnections()
 					for (j=0; j < (int)fullyConnectedMeshPlugin[i].GetMeshPeerListSize(); j++)
 					{
 						systemAddress=fullyConnectedMeshPlugin[i].GetPeerIDAtIndex(j);
-						if (systemAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+						if (systemAddress!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 							printf("%i ", systemAddress.GetPort());
 					}
 
@@ -193,7 +198,7 @@ void PrintConnections()
 					for (j=0; j < NUM_PEERS; j++)
 					{
 						systemAddress=rakPeer[i]->GetSystemAddressFromIndex(j);
-						if (systemAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+						if (systemAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 							printf("%i ", systemAddress.GetPort());
 					}
 
@@ -206,14 +211,14 @@ void PrintConnections()
 					for (connCount=0, j=0; j < NUM_PEERS; j++)
 					{
 						systemAddress=rakPeer[i]->GetSystemAddressFromIndex(j);
-						if (systemAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+						if (systemAddress!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 							connCount++;
 					}
 					/*
 					for (meshCount=0, j=0; j < (int)fullyConnectedMeshPlugin[i].GetMeshPeerListSize(); j++)
 					{
 						systemAddress=fullyConnectedMeshPlugin[i].GetPeerIDAtIndex(j);
-						if (systemAddress!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+						if (systemAddress!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 							meshCount++;
 					}
 					*/

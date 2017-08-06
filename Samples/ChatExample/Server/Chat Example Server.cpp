@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // ----------------------------------------------------------------------
@@ -14,25 +19,27 @@
 // Very basic chat engine example
 // ----------------------------------------------------------------------
 
-#include "MessageIdentifiers.h"
+#include "slikenet/MessageIdentifiers.h"
 
-#include "RakPeerInterface.h"
-#include "RakNetStatistics.h"
-#include "RakNetTypes.h"
-#include "BitStream.h"
-#include "RakSleep.h"
-#include "PacketLogger.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/statistics.h"
+#include "slikenet/types.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/sleep.h"
+#include "slikenet/PacketLogger.h"
 #include <assert.h>
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <stdio.h>
 #include <string.h>
-#include "Gets.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #if LIBCAT_SECURITY==1
-#include "SecureHandshake.h" // Include header for secure handshake
+#include "slikenet/SecureHandshake.h" // Include header for secure handshake
 #endif
 
 #if defined(_CONSOLE_2)
@@ -40,7 +47,7 @@
 #endif
 
 // We copy this from Multiplayer.cpp to keep things all in one file for this example
-unsigned char GetPacketIdentifier(RakNet::Packet *p);
+unsigned char GetPacketIdentifier(SLNet::Packet *p);
 
 #ifdef _CONSOLE_2
 _CONSOLE_2_SetSystemProcessParams
@@ -50,11 +57,11 @@ int main(void)
 {
 	// Pointers to the interfaces of our server and client.
 	// Note we can easily have both in the same program
-	RakNet::RakPeerInterface *server=RakNet::RakPeerInterface::GetInstance();
-	RakNet::RakNetStatistics *rss;
+	SLNet::RakPeerInterface *server= SLNet::RakPeerInterface::GetInstance();
+	SLNet::RakNetStatistics *rss;
 	server->SetIncomingPassword("Rumpelstiltskin", (int)strlen("Rumpelstiltskin"));
-	server->SetTimeoutTime(30000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-//	RakNet::PacketLogger packetLogger;
+	server->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+//	SLNet::PacketLogger packetLogger;
 //	server->AttachPlugin(&packetLogger);
 
 #if LIBCAT_SECURITY==1
@@ -63,19 +70,20 @@ int main(void)
 	char private_key[cat::EasyHandshake::PRIVATE_KEY_BYTES];
 	handshake.GenerateServerKey(public_key, private_key);
 	server->InitializeSecurity(public_key, private_key, false);
-	FILE *fp = fopen("publicKey.dat","wb");
+	FILE *fp;
+	fopen_s(&fp,"publicKey.dat","wb");
 	fwrite(public_key,sizeof(public_key),1,fp);
 	fclose(fp);
 #endif
 
 	// Holds packets
-	RakNet::Packet* p;
+	SLNet::Packet* p;
 
 	// GetPacketIdentifier returns this
 	unsigned char packetIdentifier;
 
 	// Record the first client that connects to us so we can pass it to the ping function
-	RakNet::SystemAddress clientID=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+	SLNet::SystemAddress clientID= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 
 	// Holds user data
 	char portstring[30];
@@ -88,26 +96,26 @@ int main(void)
 	puts("Enter the server port to listen on");
 	Gets(portstring,sizeof(portstring));
 	if (portstring[0]==0)
-		strcpy(portstring, "1234");
+		strcpy_s(portstring, "1234");
 	
 	puts("Starting server.");
 	// Starting the server is very simple.  2 players allowed.
 	// 0 means we don't care about a connectionValidationInteger, and false
 	// for low priority threads
 	// I am creating two socketDesciptors, to create two sockets. One using IPV6 and the other IPV4
-	RakNet::SocketDescriptor socketDescriptors[2];
+	SLNet::SocketDescriptor socketDescriptors[2];
 	socketDescriptors[0].port=atoi(portstring);
 	socketDescriptors[0].socketFamily=AF_INET; // Test out IPV4
 	socketDescriptors[1].port=atoi(portstring);
 	socketDescriptors[1].socketFamily=AF_INET6; // Test out IPV6
-	bool b = server->Startup(4, socketDescriptors, 2 )==RakNet::RAKNET_STARTED;
+	bool b = server->Startup(4, socketDescriptors, 2 )== SLNet::RAKNET_STARTED;
 	server->SetMaximumIncomingConnections(4);
 	if (!b)
 	{
 		printf("Failed to start dual IPV4 and IPV6 ports. Trying IPV4 only.\n");
 
 		// Try again, but leave out IPV6
-		b = server->Startup(4, socketDescriptors, 1 )==RakNet::RAKNET_STARTED;
+		b = server->Startup(4, socketDescriptors, 1 )== SLNet::RAKNET_STARTED;
 		if (!b)
 		{
 			puts("Server failed to start.  Terminating.");
@@ -117,7 +125,7 @@ int main(void)
 	server->SetOccasionalPing(true);
 	server->SetUnreliableTimeout(1000);
 
-	DataStructures::List< RakNet::RakNetSocket2* > sockets;
+	DataStructures::List< SLNet::RakNetSocket2* > sockets;
 	server->GetSockets(sockets);
 	printf("Socket addresses used by RakNet:\n");
 	for (unsigned int i=0; i < sockets.Size(); i++)
@@ -128,22 +136,22 @@ int main(void)
 	printf("\nMy IP addresses:\n");
 	for (unsigned int i=0; i < server->GetNumberOfAddresses(); i++)
 	{
-		RakNet::SystemAddress sa = server->GetInternalID(RakNet::UNASSIGNED_SYSTEM_ADDRESS, i);
+		SLNet::SystemAddress sa = server->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS, i);
 		printf("%i. %s (LAN=%i)\n", i+1, sa.ToString(false), sa.IsLANAddress());
 	}
 
-	printf("\nMy GUID is %s\n", server->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+	printf("\nMy GUID is %s\n", server->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	puts("'quit' to quit. 'stat' to show stats. 'ping' to ping.\n'pingip' to ping an ip address\n'ban' to ban an IP from connecting.\n'kick to kick the first connected player.\nType to talk.");
 	char message[2048];
 
 	// Loop for input
-	while (1)
+	for(;;)
 	{
 
 	// This sleep keeps RakNet responsive
 	RakSleep(30);
 
-	if (kbhit())
+	if (_kbhit())
 	{
 		// Notice what is not here: something to keep our network running.  It's
 		// fine to block on gets or anything we want
@@ -159,7 +167,7 @@ int main(void)
 		if (strcmp(message, "stat")==0)
 		{
 			rss=server->GetStatistics(server->GetSystemAddressFromIndex(0));
-			StatisticsToString(rss, message, 2);
+			StatisticsToString(rss, message, 2048, 2);
 			printf("%s", message);
 			printf("Ping %i\n", server->GetAveragePing(server->GetSystemAddressFromIndex(0)));
 	
@@ -180,7 +188,7 @@ int main(void)
 			printf("Enter port: ");
 			Gets(portstring,sizeof(portstring));
 			if (portstring[0]==0)
-				strcpy(portstring, "1234");
+				strcpy_s(portstring, "1234");
 			server->Ping(message, atoi(portstring), false);
 
 			continue;
@@ -195,9 +203,9 @@ int main(void)
 
 		if (strcmp(message, "getconnectionlist")==0)
 		{
-			RakNet::SystemAddress systems[10];
+			SLNet::SystemAddress systems[10];
 			unsigned short numConnections=10;
-			server->GetConnectionList((RakNet::SystemAddress*) &systems, &numConnections);
+			server->GetConnectionList((SLNet::SystemAddress*) &systems, &numConnections);
 			for (int i=0; i < numConnections; i++)
 			{
 				printf("%i. %s\n", i+1, systems[i].ToString(true));
@@ -223,17 +231,17 @@ int main(void)
 		// relayed from other clients
 		message2[0]=0;
 		const static char prefix[] = "Server: ";
-		strncpy(message2, prefix, sizeof(message2));
-		strncat(message2, message, sizeof(message2) - strlen(prefix) - 1);
+		strncpy_s(message2, prefix, sizeof(message2));
+		strncat_s(message2, message, sizeof(message2) - strlen(prefix) - 1);
 	
 		// message2 is the data to send
 		// strlen(message2)+1 is to send the null terminator
 		// HIGH_PRIORITY doesn't actually matter here because we don't use any other priority
 		// RELIABLE_ORDERED means make sure the message arrives in the right order
 		// We arbitrarily pick 0 for the ordering stream
-		// RakNet::UNASSIGNED_SYSTEM_ADDRESS means don't exclude anyone from the broadcast
+		// SLNet::UNASSIGNED_SYSTEM_ADDRESS means don't exclude anyone from the broadcast
 		// true means broadcast the message to everyone connected
-		server->Send(message2, (const int) strlen(message2)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+		server->Send(message2, (const int) strlen(message2)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 	}
 
 		// Get a packet from either the server or the client
@@ -260,8 +268,8 @@ int main(void)
 				printf("Remote internal IDs:\n");
 				for (int index=0; index < MAXIMUM_NUMBER_OF_INTERNAL_IDS; index++)
 				{
-					RakNet::SystemAddress internalId = server->GetInternalID(p->systemAddress, index);
-					if (internalId!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+					SLNet::SystemAddress internalId = server->GetInternalID(p->systemAddress, index);
+					if (internalId!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 					{
 						printf("%i. %s\n", index+1, internalId.ToString(true));
 					}
@@ -292,7 +300,7 @@ int main(void)
 				// Relay the message.  We prefix the name for other clients.  This demonstrates
 				// That messages can be changed on the server before being broadcast
 				// Sending is the same as before
-				sprintf(message, "%s", p->data);
+				sprintf_s(message, "%s", p->data);
 				server->Send(message, (const int) strlen(message)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p->systemAddress, true);
 
 				break;
@@ -303,7 +311,7 @@ int main(void)
 
 	server->Shutdown(300);
 	// We're done with the network
-	RakNet::RakPeerInterface::DestroyInstance(server);
+	SLNet::RakPeerInterface::DestroyInstance(server);
 
 	return 0;
 }
@@ -311,15 +319,15 @@ int main(void)
 // Copied from Multiplayer.cpp
 // If the first byte is ID_TIMESTAMP, then we want the 5th byte
 // Otherwise we want the 1st byte
-unsigned char GetPacketIdentifier(RakNet::Packet *p)
+unsigned char GetPacketIdentifier(SLNet::Packet *p)
 {
 	if (p==0)
 		return 255;
 
 	if ((unsigned char)p->data[0] == ID_TIMESTAMP)
 	{
-		RakAssert(p->length > sizeof(RakNet::MessageID) + sizeof(RakNet::Time));
-		return (unsigned char) p->data[sizeof(RakNet::MessageID) + sizeof(RakNet::Time)];
+		RakAssert(p->length > sizeof(SLNet::MessageID) + sizeof(SLNet::Time));
+		return (unsigned char) p->data[sizeof(SLNet::MessageID) + sizeof(SLNet::Time)];
 	}
 	else
 		return (unsigned char) p->data[0];

@@ -1,31 +1,36 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "RPC3.h"
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
 #include <stdio.h>
-#include "Kbhit.h"
+#include "slikenet/Kbhit.h"
 #include <string.h>
 #include <stdlib.h>
-#include "BitStream.h"
-#include "MessageIdentifiers.h"
-#include "StringCompressor.h"
-#include "RakSleep.h"
-#include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
-#include "GetTime.h"
-#include "Gets.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/StringCompressor.h"
+#include "slikenet/sleep.h"
+#include "slikenet/NetworkIDObject.h"
+#include "slikenet/NetworkIDManager.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/Gets.h"
 
 // This has to be a pointer, because it uses UNASSIGNED_NETWORK_ID, initialized globally
-RakNet::RPC3 *rpc3Inst;
+SLNet::RPC3 *rpc3Inst;
 
 struct NormalizedVector
 {
@@ -34,17 +39,17 @@ public:
 	float x,y,z;
 };
 
-// Shift operators have to be in the namespace RakNet or they might use the default one in BitStream.h instead. Error occurs with std::string
-namespace RakNet
+// Shift operators have to be in the namespace SLNet or they might use the default one in BitStream.h instead. Error occurs with std::string
+namespace SLNet
 {
 	// Specialize the << and >> operator to serialize each element of NormalizedVector individually
 	// This allows us to endian swap each parameter (which could not otherwise happen) and also send the data in a compressed form
-	RakNet::BitStream& operator<<(RakNet::BitStream& out, NormalizedVector& in)
+	SLNet::BitStream& operator<<(SLNet::BitStream& out, NormalizedVector& in)
 	{
 		out.WriteNormVector(in.x,in.y,in.z);
 		return out;
 	}
-	RakNet::BitStream& operator>>(RakNet::BitStream& in, NormalizedVector& out)
+	SLNet::BitStream& operator>>(SLNet::BitStream& in, NormalizedVector& out)
 	{
 		bool success = in.ReadNormVector(out.x,out.y,out.z);
 		assert(success);
@@ -60,17 +65,17 @@ public: A() {a=1;} int a;};
 class B {
 public:
 	B() {b=2;} int b;
-	virtual void ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, RakNet::BitStream *bs1, RakNet::BitStream &bs2, RakNet::RPC3 *rpc3Inst);
+	virtual void ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, SLNet::BitStream *bs1, SLNet::BitStream &bs2, SLNet::RPC3 *rpc3Inst);
 };
-class C : public A, public B, public RakNet::NetworkIDObject {
+class C : public A, public B, public SLNet::NetworkIDObject {
 public:
 	C() {c=3;} int c;
-	virtual void ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, RakNet::BitStream *bs1, RakNet::BitStream &bs2, RakNet::RPC3 *rpc3Inst);
-	void ClassMemberFunc2(RakNet::RPC3 *rpc3Inst);
+	virtual void ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, SLNet::BitStream *bs1, SLNet::BitStream &bs2, SLNet::RPC3 *rpc3Inst);
+	void ClassMemberFunc2(SLNet::RPC3 *rpc3Inst);
 	virtual void TestSlot(void) {printf("C::TestSlot\n");}
 };
 
-class D : public B, public RakNet::NetworkIDObject {
+class D : public B, public SLNet::NetworkIDObject {
 public:
 	D() {for (int i=0; i < 10; i++) tenBytes[i]=i;}
 	char tenBytes[10];
@@ -81,14 +86,14 @@ public:
 // The number of parameters for a C++ function is limited by BOOST_FUSION_INVOKE_MAX_ARITY-1 found in boost/fusion/functional/invocation/limits.hpp
 // I define this in RPC3_Boost.h to be 10. The default is 6.
 // rpcFromNetwork is automatically filled in from the RPC class. Pass 0 when calling locally. Will be set to the plugin instance when this function is called from the remote system
-void B::ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, RakNet::BitStream *bs1, RakNet::BitStream &bs2, RakNet::RPC3 *rpcFromNetwork){
+void B::ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, SLNet::BitStream *bs1, SLNet::BitStream &bs2, SLNet::RPC3 *rpcFromNetwork){
 	if (rpcFromNetwork==0)
 		printf("\nB::ClassMemberFunc called locally\n");
 	else
 		printf("\nB::ClassMemberFunc called from %s\n", rpcFromNetwork->GetLastSenderAddress().ToString());
 	printf("a1=%i a2=%i c1=%i\n", a1->a, a2.a, c1->c);
 	printf("d1::Verify=%i\n", d1->Verify());
-	RakNet::RakString rs1, rs2;
+	SLNet::RakString rs1, rs2;
 	bs1->Read(rs1);
 	bs2.Read(rs2);
 	printf("rs1=%s\n", rs1.C_String());
@@ -97,35 +102,35 @@ void B::ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, RakNet::BitStream *bs1, RakN
 }
 
 // C and D derive from networkIDObject, so cannot be passed as references. A pointer is required to do the object lookup
-void C::ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, RakNet::BitStream *bs1, RakNet::BitStream &bs2, RakNet::RPC3 *rpcFromNetwork)	{
+void C::ClassMemberFunc(A *a1, A &a2, C *c1, D *d1, SLNet::BitStream *bs1, SLNet::BitStream &bs2, SLNet::RPC3 *rpcFromNetwork)	{
 	printf("\nC::ClassMemberFunc\n");
 	B::ClassMemberFunc(a1,a2,c1,d1,bs1,bs2,rpcFromNetwork);
 
 	if (rpcFromNetwork==0)
 	{
-		// The RakNet::RPC3 * parameter can be passed to Call() if you want to - it is skipped and not serialized or deserialized so it doesn't matter.
+		// The SLNet::RPC3 * parameter can be passed to Call() if you want to - it is skipped and not serialized or deserialized so it doesn't matter.
 		// The point of it is so when this function is called on the remote system, it is set to the instance of the plugin so you can query network parameters from the caller
 		// 
 		// By default, pointers to objects that derive from NetworkIDObject (classes C and D), only transmit the NetworkID of the object.
-		// If you also want to dereference the pointer and serialize the object itself, use RakNet::_RPC3::Deref(myVariable)
+		// If you also want to dereference the pointer and serialize the object itself, use SLNet::_RPC3::Deref(myVariable)
 		// In this case, parameters that both derive from NetworkIDObject and are pointers are the variables c1 and d1
 		// c1 will only transmit c1->GetNetworkID() (default behavior)
 		// d1 will transmit d1->GetNetworkID() and also bitStream << (*d1) (contents of the pointer)
 		//
-		rpc3Inst->CallCPP("&C::ClassMemberFunc", GetNetworkID(), a1,a2,c1,RakNet::_RPC3::Deref(d1),bs1,bs2,rpcFromNetwork);
+		rpc3Inst->CallCPP("&C::ClassMemberFunc", GetNetworkID(), a1,a2,c1, SLNet::_RPC3::Deref(d1),bs1,bs2,rpcFromNetwork);
 	}
 }	
 
-void C::ClassMemberFunc2(RakNet::RPC3 *rpcFromNetwork)	{
+void C::ClassMemberFunc2(SLNet::RPC3 *rpcFromNetwork)	{
 	printf("\nC::ClassMemberFunc2\n");
 
 	if (rpcFromNetwork==0)
 	{
-		// The RakNet::RPC3 * parameter can be passed to Call() if you want to - it is skipped and not serialized or deserialized so it doesn't matter.
+		// The SLNet::RPC3 * parameter can be passed to Call() if you want to - it is skipped and not serialized or deserialized so it doesn't matter.
 		// The point of it is so when this function is called on the remote system, it is set to the instance of the plugin so you can query network parameters from the caller
 		// 
 		// By default, pointers to objects that derive from NetworkIDObject (classes C and D), only transmit the NetworkID of the object.
-		// If you also want to dereference the pointer and serialize the object itself, use RakNet::_RPC3::Deref(myVariable)
+		// If you also want to dereference the pointer and serialize the object itself, use SLNet::_RPC3::Deref(myVariable)
 		// In this case, parameters that both derive from NetworkIDObject and are pointers are the variables c1 and d1
 		// c1 will only transmit c1->GetNetworkID() (default behavior)
 		// d1 will transmit d1->GetNetworkID() and also bitStream << (*d1) (contents of the pointer)
@@ -136,7 +141,7 @@ void C::ClassMemberFunc2(RakNet::RPC3 *rpcFromNetwork)	{
 
 // The number of parameters for a C function is limited by BOOST_FUSION_INVOKE_MAX_ARITY found in boost/fusion/functional/invocation/limits.hpp
 // I define this in RPC3_Boost.h to be 9. The default is 6.
-void CFunc(RakNet::RakString rakString, int intArray[10], C *c1, const char *str, NormalizedVector *nv1, NormalizedVector &nv2, RakNet::RPC3 *rpcFromNetwork )
+void CFunc(SLNet::RakString rakString, int intArray[10], C *c1, const char *str, NormalizedVector *nv1, NormalizedVector &nv2, SLNet::RPC3 *rpcFromNetwork )
 {
 	// We pass 0 to the rpcFromNetwork when calling this function locally. When it is called by the RPC3 system, it is set to the address of the plugin
 	if (rpcFromNetwork==0)
@@ -155,10 +160,10 @@ void CFunc(RakNet::RakString rakString, int intArray[10], C *c1, const char *str
 	printf("rpc3Inst=%p\n", rpc3Inst);
 
 	// the parameter "int intArray[10]" is actually a pointer due to the design of C and C++
-	// The RakNet::_RPC3::PtrToArray() function will tell the RPC3 system that this is actually an array of n elements
+	// The SLNet::_RPC3::PtrToArray() function will tell the RPC3 system that this is actually an array of n elements
 	// Each element will be endian swapped appropriately
 	if (rpcFromNetwork==0)
-		rpc3Inst->CallC("CFunc", rakString,RakNet::_RPC3::PtrToArray(10,intArray),c1,str,nv1,nv2,rpcFromNetwork);
+		rpc3Inst->CallC("CFunc", rakString, SLNet::_RPC3::PtrToArray(10,intArray),c1,str,nv1,nv2,rpcFromNetwork);
 }
 int main(void)
 {
@@ -175,19 +180,19 @@ int main(void)
 	bool objectExists;
 	int idx = ol.GetIndexFromKey(4,&objectExists);
 
-	RakNet::RakPeerInterface *rakPeer;
-	RakNet::SystemAddress tempAddr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+	SLNet::RakPeerInterface *rakPeer;
+	SLNet::SystemAddress tempAddr = SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	A a;
 	B b;
 	C c;
 	D d;
 
 	NormalizedVector normalizedVector;
-	RakNet::TimeMS stage2=0;
-	RakNet::NetworkIDManager networkIDManager;
-	rpc3Inst = new RakNet::RPC3;
+	SLNet::TimeMS stage2=0;
+	SLNet::NetworkIDManager networkIDManager;
+	rpc3Inst = new SLNet::RPC3;
 	rpc3Inst->SetNetworkIDManager(&networkIDManager);
-	RakNet::NetworkID idZero, idOne;
+	SLNet::NetworkID idZero, idOne;
 	idZero=0;
 	idOne=1;
 	rpc3Inst->SetNetworkIDManager(&networkIDManager);
@@ -216,10 +221,10 @@ int main(void)
 	else
 		isServer=false;
 
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 	if (isServer)
 	{
-		RakNet::SocketDescriptor socketDescriptor(50000,0);
+		SLNet::SocketDescriptor socketDescriptor(50000,0);
 		socketDescriptor.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 		rakPeer->Startup(10, &socketDescriptor, 1);
 		rakPeer->SetMaximumIncomingConnections(10);
@@ -227,7 +232,7 @@ int main(void)
 	}
 	else
 	{
-		RakNet::SocketDescriptor socketDescriptor(0,0);
+		SLNet::SocketDescriptor socketDescriptor(0,0);
 		socketDescriptor.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 		rakPeer->Startup(1, &socketDescriptor, 1);
 
@@ -238,8 +243,8 @@ int main(void)
 	}
 	rakPeer->AttachPlugin(rpc3Inst);
 
-	RakNet::Packet *p;
-	while (1)
+	SLNet::Packet *p;
+	for(;;)
 	{
 		for (p=rakPeer->Receive(); p; rakPeer->DeallocatePacket(p), p=rakPeer->Receive())
 		{
@@ -267,17 +272,17 @@ int main(void)
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
 			{
-				RakNet::BitStream testBitStream1, testBitStream2;
+				SLNet::BitStream testBitStream1, testBitStream2;
 				testBitStream1.Write("Hello World 1");
 				testBitStream2.Write("Hello World 2");
 				c.ClassMemberFunc(&a,a,&c,&d,&testBitStream1,testBitStream2,0);
 				c.ClassMemberFunc2(0);
-				RakNet::RakString rs("RakString test");
+				SLNet::RakString rs("RakString test");
 				int intArray[10];
 				for (int i=0; i < sizeof(intArray)/sizeof(int); i++)
 					intArray[i]=i;
 				CFunc(rs, intArray,&c,"Test string",&normalizedVector,normalizedVector,0);
-				stage2=RakNet::GetTimeMS()+500;
+				stage2= SLNet::GetTimeMS()+500;
 				break;
 			}				
 			case ID_RPC_REMOTE_ERROR:
@@ -285,25 +290,25 @@ int main(void)
 					// Recipient system returned an error
 					switch (p->data[1])
 					{
-					case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+					case SLNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
 						printf("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 						break;
-					case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+					case SLNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
 						printf("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 						break;
-					case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+					case SLNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
 						printf("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
 						break;
-					case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
+					case SLNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
 						printf("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
 						break;
-					case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+					case SLNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
 						printf("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
 						break;
-					case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
+					case SLNet::RPC_ERROR_CALLING_CPP_AS_C:
 						printf("RPC_ERROR_CALLING_CPP_AS_C\n");
 						break;
-					case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
+					case SLNet::RPC_ERROR_CALLING_C_AS_CPP:
 						printf("RPC_ERROR_CALLING_C_AS_CPP\n");
 						break;
 					}
@@ -312,15 +317,15 @@ int main(void)
 			}
 		}
 
-		if (stage2 && stage2 < RakNet::GetTimeMS())
+		if (stage2 && stage2 < SLNet::GetTimeMS())
 		{
 			stage2=0;
 
-			RakNet::BitStream testBitStream1, testBitStream2;
+			SLNet::BitStream testBitStream1, testBitStream2;
 			testBitStream1.Write("Hello World 1 (2)");
 			testBitStream2.Write("Hello World 2 (2)");
 			c.ClassMemberFunc(&a,a,&c,&d,&testBitStream1,testBitStream2,0);
-			RakNet::RakString rs("RakString test (2)");
+			SLNet::RakString rs("RakString test (2)");
 			int intArray[10];
 			for (int i=0; i < sizeof(intArray)/sizeof(int); i++)
 				intArray[i]=i;
@@ -332,7 +337,7 @@ int main(void)
 	}
 
 	rakPeer->Shutdown(100,0);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	delete rpc3Inst;
 
 	return 1;

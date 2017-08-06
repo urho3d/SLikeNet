@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #ifndef __CRASH_REPORTER_H
@@ -60,7 +65,7 @@
 // #include "DbgHelp.h"
 // Link with Dbghelp.lib ws2_32.lib
 
-namespace RakNet {
+namespace SLNet {
 
 // Possible actions to take on a crash.  If you want to restart the app as well, see the CrashRelauncher sample.
 enum CrashReportAction
@@ -131,6 +136,6 @@ public:
 	static CrashReportControls controls;
 };
 
-} // namespace RakNet
+} // namespace SLNet
 
 #endif

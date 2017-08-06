@@ -1,31 +1,38 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
 #include <cstdio>
 #include <memory.h>
 #include <cstring>
 #include <stdlib.h>
-#include "Rand.h"
-#include "RakNetStatistics.h"
-#include "RakSleep.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/Rand.h"
+#include "slikenet/statistics.h"
+#include "slikenet/sleep.h"
+#include "slikenet/memoryoverride.h"
 #include <stdio.h>
-#include "Gets.h"
-#include "Kbhit.h"
-#include "RakSleep.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/sleep.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 int main(int argc, char **argv)
 {
@@ -33,12 +40,12 @@ int main(int argc, char **argv)
 	char str[256];
 	char ip[32];
 	unsigned short remotePort, localPort;
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 
 	printf("This project tests sending a burst of messages to a remote system.\n");
 	printf("Difficulty: Beginner\n\n");
 	
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 	
 	printf("Enter remote IP (enter to not connect): ");
 	Gets(ip, sizeof(ip));
@@ -47,16 +54,16 @@ int main(int argc, char **argv)
 		printf("Enter remote port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "60000");
+			strcpy_s(str, "60000");
 		remotePort=atoi(str);
 		
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "0");
+			strcpy_s(str, "0");
 		localPort=atoi(str);
 		
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakPeer->Startup(32, &socketDescriptor, 1);
 		
 		printf("Connecting...\n");
@@ -67,21 +74,21 @@ int main(int argc, char **argv)
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "60000");
+			strcpy_s(str, "60000");
 		localPort=atoi(str);
 		
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakPeer->Startup(32, &socketDescriptor, 1);
 	}
 	rakPeer->SetMaximumIncomingConnections(32);
 	
 	printf("'s' to send. ' ' for statistics. 'q' to quit.\n");
 
-	while (1)
+	for(;;)
 	{
-		if (kbhit())
+		if (_kbhit())
 		{
-			char ch=getch();
+			char ch=_getch();
 			if (ch=='q')
 				return 1;
 			else if (ch==' ')
@@ -89,7 +96,7 @@ int main(int argc, char **argv)
 				RakNetStatistics *rss;
 				char message[2048];
 					rss=rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
-				StatisticsToString(rss, message, 2);
+				StatisticsToString(rss, message, 2048, 2);
 				printf("%s", message);
 			}
 			else if (ch=='s')
@@ -108,7 +115,7 @@ int main(int argc, char **argv)
 					msgCount=128;
 				else
 					msgCount=atoi(msgCountStr);
-				RakNet::BitStream bitStream;
+				SLNet::BitStream bitStream;
 				for (index=0; index < msgCount; index++)
 				{
 					bitStream.Reset();
@@ -149,7 +156,7 @@ int main(int argc, char **argv)
 			case ID_USER_PACKET_ENUM:
 				{
 					uint32_t msgSize, msgCount, index;
-					RakNet::BitStream bitStream(packet->data, packet->length, false);
+					SLNet::BitStream bitStream(packet->data, packet->length, false);
 					bitStream.IgnoreBytes(sizeof(MessageID));
 					bitStream.Read(msgSize);
 					bitStream.Read(index);
@@ -170,7 +177,7 @@ int main(int argc, char **argv)
 	}
 
 	rakPeer->Shutdown(100);
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 
 	return 1;
 }

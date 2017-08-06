@@ -1,34 +1,39 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
 
-#include "RakNetTypes.h"
-#include "RakSleep.h"
-#include "FullyConnectedMesh2.h"
-#include "ConnectionGraph2.h"
+#include "slikenet/types.h"
+#include "slikenet/sleep.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ConnectionGraph2.h"
 #include <assert.h>
-#include "SocketLayer.h"
-#include "Kbhit.h"
-#include "PacketLogger.h"
-#include "Gets.h"
+#include "slikenet/SocketLayer.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/Gets.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 #define NUM_PEERS 8
-RakNet::RakPeerInterface *rakPeer[NUM_PEERS];
+SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
 
 int main()
 {
@@ -37,17 +42,17 @@ int main()
 
 	for (int i=0; i < NUM_PEERS; i++)
 	{
-		rakPeer[i]=RakNet::RakPeerInterface::GetInstance();
+		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 		rakPeer[i]->AttachPlugin(&fcm2[i]);
 		rakPeer[i]->AttachPlugin(&cg2[i]);
 		fcm2[i].SetAutoparticipateConnections(true);
-		RakNet::SocketDescriptor sd;
+		SLNet::SocketDescriptor sd;
 		sd.port=60000+i;
 		StartupResult sr = rakPeer[i]->Startup(NUM_PEERS,&sd,1);
 		RakAssert(sr==RAKNET_STARTED);
 		rakPeer[i]->SetMaximumIncomingConnections(NUM_PEERS);
-		rakPeer[i]->SetTimeoutTime(1000,RakNet::UNASSIGNED_SYSTEM_ADDRESS);
-		printf("Our guid is %s\n", rakPeer[i]->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+		rakPeer[i]->SetTimeoutTime(1000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
+		printf("Our guid is %s\n", rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	}
 
 	for (int i=0; i < NUM_PEERS; i++)
@@ -62,7 +67,7 @@ int main()
 	}
 
 	bool quit=false;
-	RakNet::Packet *packet;
+	SLNet::Packet *packet;
 	char ch;
 	while (!quit)
 	{
@@ -99,7 +104,7 @@ int main()
 
 
 				case ID_FCM2_NEW_HOST:
-					if (packet->systemAddress==RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+					if (packet->systemAddress== SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 						printf("%i. Got new host (ourselves)\n", i);
 					else
 						printf("%i. Got new host %s, %s\n", i, packet->systemAddress.ToString(true), packet->guid.ToString());
@@ -108,9 +113,9 @@ int main()
 			}
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch==' ')
 			{
 				unsigned int participantList;
@@ -126,9 +131,9 @@ int main()
 					hostGuid=fcm2[i].GetHostSystem();
 					
 					if (weAreHost)
-						printf("%i. %iP myGuid=%s, hostGuid=%s tcc=%i (Y)\n",i, participantList, rakPeer[i]->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(), hostGuid.ToString(), fcm2[i].GetTotalConnectionCount());
+						printf("%i. %iP myGuid=%s, hostGuid=%s tcc=%i (Y)\n",i, participantList, rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(), hostGuid.ToString(), fcm2[i].GetTotalConnectionCount());
 					else
-						printf("%i. %iP myGuid=%s, hostGuid=%s tcc=%i (N)\n",i, participantList, rakPeer[i]->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(), hostGuid.ToString(), fcm2[i].GetTotalConnectionCount());
+						printf("%i. %iP myGuid=%s, hostGuid=%s tcc=%i (N)\n",i, participantList, rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(), hostGuid.ToString(), fcm2[i].GetTotalConnectionCount());
 				}
 			}
 			if (ch=='d' || ch=='D')
@@ -152,7 +157,7 @@ int main()
 
 	for (int i=0; i < NUM_PEERS; i++)
 	{
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 	}
 	return 0;
 }

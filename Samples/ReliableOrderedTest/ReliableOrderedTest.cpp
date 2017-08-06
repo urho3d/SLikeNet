@@ -1,33 +1,40 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
-#include "GetTime.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/BitStream.h"
 #include <cstdio>
 #include <memory.h>
 #include <cstring>
 #include <stdlib.h>
-#include "Rand.h"
-#include "RakNetStatistics.h"
-#include "RakSleep.h"
-#include "RakMemoryOverride.h"
+#include "slikenet/Rand.h"
+#include "slikenet/statistics.h"
+#include "slikenet/sleep.h"
+#include "slikenet/memoryoverride.h"
 #include <stdio.h>
-#include "Gets.h"
-#include "Kbhit.h"
+#include "slikenet/Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #endif
@@ -70,14 +77,14 @@ int main(int argc, char **argv)
 {
 	RakPeerInterface *sender, *receiver;
 	unsigned int packetNumber[32], receivedPacketNumber;
-	RakNet::Time receivedTime;
+	SLNet::Time receivedTime;
 	char str[256];
 	char ip[32];
-	RakNet::Time sendInterval, nextSend, currentTime, quitTime;
+	SLNet::Time sendInterval, nextSend, currentTime, quitTime;
 	unsigned short remotePort, localPort;
 	unsigned char streamNumber;
-	RakNet::BitStream bitStream;
-	RakNet::Packet *packet;
+	SLNet::BitStream bitStream;
+	SLNet::Packet *packet;
 	bool doSend=false;
 
 	for (int i=0; i < 32; i++)
@@ -93,7 +100,7 @@ int main(int argc, char **argv)
 
 	if (argc==2)
 	{
-		fp = fopen(argv[1],"wt");
+		fopen_s(&fp,argv[1],"wt");
 		SetMalloc_Ex(LoggedMalloc);
 		SetRealloc_Ex(LoggedRealloc);
 		SetFree_Ex(LoggedFree);
@@ -103,7 +110,7 @@ int main(int argc, char **argv)
 
 	if (str[0]=='s' || str[0]=='S')
 	{
-		sender = RakNet::RakPeerInterface::GetInstance();
+		sender = SLNet::RakPeerInterface::GetInstance();
 
 		receiver = 0;
 
@@ -117,42 +124,42 @@ int main(int argc, char **argv)
 		printf("Enter remote IP: ");
 		Gets(ip, sizeof(ip));
 		if (ip[0]==0)
-			strcpy(ip, "127.0.0.1");
-			// strcpy(ip, "natpunch.jenkinssoftware.com");
+			strcpy_s(ip, "127.0.0.1");
+			// strcpy_s(ip, "natpunch.jenkinssoftware.com");
 		
 		printf("Enter remote port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "60000");
+			strcpy_s(str, "60000");
 		remotePort=atoi(str);
 
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "0");
+			strcpy_s(str, "0");
 		localPort=atoi(str);
 
 
 		printf("Connecting...\n");
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		sender->Startup(8, &socketDescriptor, 1);
 		// sender->ApplyNetworkSimulator(.2, 0, 0);
 		sender->Connect(ip, remotePort, 0, 0);
 	}
 	else
 	{
-		receiver = RakNet::RakPeerInterface::GetInstance();
+		receiver = SLNet::RakPeerInterface::GetInstance();
 		// receiver->ApplyNetworkSimulator(.2, 0, 0);
 		sender=0;
 
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
-			strcpy(str, "60000");
+			strcpy_s(str, "60000");
 		localPort=atoi(str);
 
 		printf("Waiting for connections...\n");
-		RakNet::SocketDescriptor socketDescriptor(localPort,0);
+		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		receiver->Startup(8, &socketDescriptor, 1);
 		receiver->SetMaximumIncomingConnections(8);
 	}
@@ -162,9 +169,9 @@ int main(int argc, char **argv)
 	printf("How long to run this test for, in seconds?\n");
 	Gets(str, sizeof(str));
 	if (str[0]==0)
-		strcpy(str, "12000");
+		strcpy_s(str, "12000");
 	
-	currentTime = RakNet::GetTimeMS();
+	currentTime = SLNet::GetTimeMS();
 	quitTime = atoi(str) * 1000 + currentTime;
 
 	nextSend=currentTime;
@@ -172,12 +179,12 @@ int main(int argc, char **argv)
 	printf("Test running.\n");
 
 	//while (currentTime < quitTime)
-	while (1)
+	for(;;)
 	{
 #ifdef _WIN32
-		if (kbhit())
+		if (_kbhit())
 		{
-			char ch=getch();
+			char ch=_getch();
 			if (ch=='q')
 				break;
 			else if (ch==' ')
@@ -188,7 +195,7 @@ int main(int argc, char **argv)
 					rss=sender->GetStatistics(sender->GetSystemAddressFromIndex(0));
 				else
 					rss=receiver->GetStatistics(receiver->GetSystemAddressFromIndex(0));
-				StatisticsToString(rss, message, 2);
+				StatisticsToString(rss, message, 2048, 2);
 				printf("%s", message);
 			}
 		}
@@ -244,7 +251,7 @@ int main(int argc, char **argv)
                 {
 					bitStream.Reset();
 					bitStream.Write((unsigned char) (ID_TIMESTAMP));
-					bitStream.Write(RakNet::GetTime());
+					bitStream.Write(SLNet::GetTime());
 					bitStream.Write((unsigned char) (ID_USER_PACKET_ENUM+1));
 					bitStream.Write(packetNumber[streamNumber]);
 					packetNumber[streamNumber]++;
@@ -267,7 +274,7 @@ int main(int argc, char **argv)
                     bitStream.Write(reliability);
                     bitStream.PadWithZeroToByteLength(padLength);
 
-				    if (sender->Send(&bitStream, HIGH_PRIORITY, reliability ,streamNumber, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true)==0)
+				    if (sender->Send(&bitStream, HIGH_PRIORITY, reliability ,streamNumber, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true)==0)
 				    {
 					    packetNumber[streamNumber]--;
 				    }
@@ -346,13 +353,13 @@ int main(int argc, char **argv)
 #else
 		usleep(0);
 #endif
-		currentTime=RakNet::GetTimeMS();
+		currentTime= SLNet::GetTimeMS();
 	}
 
 	if (sender)
-		RakNet::RakPeerInterface::DestroyInstance(sender);
+		SLNet::RakPeerInterface::DestroyInstance(sender);
 	if (receiver)
-		RakNet::RakPeerInterface::DestroyInstance(receiver);
+		SLNet::RakPeerInterface::DestroyInstance(receiver);
 
 	if (fp)
 		fclose(fp);

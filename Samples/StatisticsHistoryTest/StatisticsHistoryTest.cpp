@@ -1,11 +1,16 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 // TODO - see PLplot plplot.sourceforge.net/download.phpd for visualization
@@ -14,14 +19,14 @@
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "StatisticsHistory.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/StatisticsHistory.h"
 #include <math.h>
-#include "RakSleep.h"
+#include "slikenet/sleep.h"
 
-using namespace RakNet;
+using namespace SLNet;
 
 enum HistoryObject
 {
@@ -87,7 +92,7 @@ int main(void)
 	double f;
 
 	Time nextPrint=0;
-	while (1)
+	for(;;)
 	{
 		f = (double) ((double)GetTime() / (double)1000);
 		statisticsHistory.AddValueByObjectID(HO_SIN_WAVE,"Waveform",sin(f),GetTime(), false);

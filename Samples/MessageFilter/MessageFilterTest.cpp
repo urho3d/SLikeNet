@@ -1,30 +1,35 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "RakPeerInterface.h"
+#include "slikenet/peerinterface.h"
 
-#include "MessageFilter.h"
-#include "MessageIdentifiers.h"
-#include "RakSleep.h"
+#include "slikenet/MessageFilter.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/sleep.h"
 #include <stdio.h>
 
 int main()
 {
 	// The message filter parses all incoming messages and only allows messages of a certain type
-	RakNet::MessageFilter messageFilter;
-	RakNet::RakPeerInterface *peer1, *peer2;
+	SLNet::MessageFilter messageFilter;
+	SLNet::RakPeerInterface *peer1, *peer2;
 
 	char message;
-	RakNet::Packet *packet;
-	peer1=RakNet::RakPeerInterface::GetInstance();
-	peer2=RakNet::RakPeerInterface::GetInstance();
+	SLNet::Packet *packet;
+	peer1= SLNet::RakPeerInterface::GetInstance();
+	peer2= SLNet::RakPeerInterface::GetInstance();
 
 	// Set up the filter rules.
 	// All new connections go to filter 0
@@ -37,7 +42,7 @@ int main()
 	peer1->AttachPlugin(&messageFilter);
 
 	// Connect the systems to each other
-	RakNet::SocketDescriptor socketDescriptor(60000,0);
+	SLNet::SocketDescriptor socketDescriptor(60000,0);
 	peer1->Startup(1,&socketDescriptor, 1);
 	peer1->SetMaximumIncomingConnections(1);
 	socketDescriptor.port=60001;
@@ -45,7 +50,7 @@ int main()
 	peer2->Connect("127.0.0.1", 60000,0,0);
 
 	// Wait for the connection to complete
-	while (1)
+	for(;;)
 	{
 		packet = peer1->Receive();
 		if (packet && packet->data[0]==ID_NEW_INCOMING_CONNECTION)
@@ -61,12 +66,12 @@ int main()
 	printf("Peer 2 sending ID_USER_PACKET_ENUM+1 and ID_USER_PACKET_ENUM\n");
 
 	// Have peer 2 send a disallowed message, then the allowed message.
-	message=ID_USER_PACKET_ENUM+1;
-	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+	message=static_cast<unsigned char>(ID_USER_PACKET_ENUM+1);
+	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
 	// Allowed message
-	message=ID_USER_PACKET_ENUM;
-	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+	message=static_cast<unsigned char>(ID_USER_PACKET_ENUM);
+	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
 	RakSleep(1000);
 
@@ -93,10 +98,10 @@ int main()
 	}
 
 	// Have peer 2 send the messages again.
-	message=ID_USER_PACKET_ENUM+1;
-	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-	message=ID_USER_PACKET_ENUM;
-	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+	message=static_cast<unsigned char>(ID_USER_PACKET_ENUM+1);
+	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+	message=static_cast<unsigned char>(ID_USER_PACKET_ENUM);
+	peer2->Send(&message, 1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
 	RakSleep(1000);
 
@@ -119,7 +124,7 @@ int main()
 	}
 
 	printf("Done.\n");
-	RakNet::RakPeerInterface::DestroyInstance(peer1);
-	RakNet::RakPeerInterface::DestroyInstance(peer2);
+	SLNet::RakPeerInterface::DestroyInstance(peer1);
+	SLNet::RakPeerInterface::DestroyInstance(peer2);
 	return 0;
 }

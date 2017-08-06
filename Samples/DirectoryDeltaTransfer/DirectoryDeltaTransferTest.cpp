@@ -1,39 +1,46 @@
 /*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
+ *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
+ *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
-#include "GetTime.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "RakNetStatistics.h"
-#include "DirectoryDeltaTransfer.h"
-#include "FileListTransfer.h"
+#include "slikenet/GetTime.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/statistics.h"
+#include "slikenet/DirectoryDeltaTransfer.h"
+#include "slikenet/FileListTransfer.h"
 #include <cstdio>
 #include <stdlib.h>
-#include "Kbhit.h"
-#include "FileList.h"
-#include "DataCompressor.h"
-#include "FileListTransferCBInterface.h"
-#include "RakSleep.h"
-#include "IncrementalReadInterface.h"
-#include "PacketizedTCP.h"
-#include "Gets.h"
+#include "slikenet/Kbhit.h"
+#include "slikenet/FileList.h"
+#include "slikenet/DataCompressor.h"
+#include "slikenet/FileListTransferCBInterface.h"
+#include "slikenet/sleep.h"
+#include "slikenet/IncrementalReadInterface.h"
+#include "slikenet/PacketizedTCP.h"
+#include "slikenet/Gets.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 #ifdef _WIN32
-#include "WindowsIncludes.h" // Sleep
+#include "slikenet/WindowsIncludes.h" // Sleep
 #else
 #include <unistd.h> // usleep
 #endif
 
 #define USE_TCP
 
-class TestCB : public RakNet::FileListTransferCBInterface
+class TestCB : public SLNet::FileListTransferCBInterface
 {
 public:
 	bool OnFile(
@@ -55,8 +62,7 @@ public:
 			fps->onFileStruct->numberOfFilesInThisSet,
 			fps->onFileStruct->fileName,
 			fps->onFileStruct->byteLengthOfThisFile,
-			fps->onFileStruct->byteLengthOfThisSet,
-			fps->firstDataChunk);
+			fps->onFileStruct->byteLengthOfThisSet);
 	}
 
 	virtual bool OnDownloadComplete(DownloadCompleteStruct *dcs)
@@ -75,24 +81,24 @@ int main(void)
 	char ch;
 
 #ifdef USE_TCP
-	RakNet::PacketizedTCP tcp1;
+	SLNet::PacketizedTCP tcp1;
 #else
-	RakNet::RakPeerInterface *rakPeer;
+	SLNet::RakPeerInterface *rakPeer;
 #endif
 
 	// directoryDeltaTransfer is the main plugin that does the work for this sample.
-	RakNet::DirectoryDeltaTransfer directoryDeltaTransfer;
+	SLNet::DirectoryDeltaTransfer directoryDeltaTransfer;
 	// The fileListTransfer plugin is used by the DirectoryDeltaTransfer plugin and must also be registered (you could use this yourself too if you wanted, of course).
-	RakNet::FileListTransfer fileListTransfer;
+	SLNet::FileListTransfer fileListTransfer;
 	// Read files in parts, rather than the whole file from disk at once
-	RakNet::IncrementalReadInterface iri;
+	SLNet::IncrementalReadInterface iri;
 	directoryDeltaTransfer.SetDownloadRequestIncrementalReadInterface(&iri, 1000000);
 
 #ifdef USE_TCP
 	tcp1.AttachPlugin(&directoryDeltaTransfer);
 	tcp1.AttachPlugin(&fileListTransfer);
 #else
-	rakPeer = RakNet::RakPeerInterface::GetInstance();
+	rakPeer = SLNet::RakPeerInterface::GetInstance();
 	rakPeer->AttachPlugin(&directoryDeltaTransfer);
 	rakPeer->AttachPlugin(&fileListTransfer);
 	// Get download progress notifications.  Handled by the plugin.
@@ -114,14 +120,14 @@ int main(void)
 		localPort=60000;
 	else
 		localPort=atoi(str);
-	RakNet::SocketDescriptor socketDescriptor(localPort,0);
+	SLNet::SocketDescriptor socketDescriptor(localPort,0);
 #ifdef USE_TCP
 	bool b=tcp1.Start(localPort,8);
 	RakAssert(b);
 #else
-	if (rakPeer->Startup(8,&socketDescriptor, 1)!=RakNet::RAKNET_STARTED)
+	if (rakPeer->Startup(8,&socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 	{
-		RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+		SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 		printf("RakNet initialize failed.  Possibly duplicate port.\n");
 		return 1;
 	}
@@ -136,27 +142,27 @@ int main(void)
 	printf("C(o)nnect to another system.\n");
 	printf("(Q)uit.\n");
 
-	RakNet::SystemAddress sysAddrZero=RakNet::UNASSIGNED_SYSTEM_ADDRESS;
-	RakNet::TimeMS nextStatTime = RakNet::GetTimeMS() + 1000;
+	SLNet::SystemAddress sysAddrZero= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
+	SLNet::TimeMS nextStatTime = SLNet::GetTimeMS() + 1000;
 
-	RakNet::Packet *p;
-	while (1)
+	SLNet::Packet *p;
+	for(;;)
 	{
 		/*
 		if (//directoryDeltaTransfer.GetNumberOfFilesForUpload()>0 &&
-			RakNet::GetTimeMS() > nextStatTime)
+			SLNet::GetTimeMS() > nextStatTime)
 		{
 			// If sending, periodically show connection stats
 			char statData[2048];
 			RakNetStatistics *statistics = rakPeer->GetStatistics(rakPeer->GetSystemAddressFromIndex(0));
 		//	if (statistics->messagesOnResendQueue>0 || statistics->internalOutputQueueSize>0)
-			if (rakPeer->GetSystemAddressFromIndex(0)!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+			if (rakPeer->GetSystemAddressFromIndex(0)!=SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			{
-				StatisticsToString(statistics, statData, 2);
+				StatisticsToString(statistics, statData, 2048, 2);
 				printf("%s\n", statData);
 			}
 			
-			nextStatTime=RakNet::GetTimeMS()+5000;
+			nextStatTime=SLNet::GetTimeMS()+5000;
 		}
 		*/
 
@@ -168,19 +174,19 @@ int main(void)
 #endif
 
 #ifdef USE_TCP
-		RakNet::SystemAddress sa;
+		SLNet::SystemAddress sa;
 		sa=tcp1.HasNewIncomingConnection();
-		if (sa!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (sa!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 		{
 			printf("ID_NEW_INCOMING_CONNECTION\n");
 			sysAddrZero=sa;
 		}
-		if (tcp1.HasLostConnection()!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (tcp1.HasLostConnection()!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_DISCONNECTION_NOTIFICATION\n");
-		if (tcp1.HasFailedConnectionAttempt()!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (tcp1.HasFailedConnectionAttempt()!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			printf("ID_CONNECTION_ATTEMPT_FAILED\n");
 		sa=tcp1.HasCompletedConnectionAttempt();
-		if (sa!=RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		if (sa!= SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 		{
 			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
 			sysAddrZero=sa;
@@ -216,15 +222,15 @@ int main(void)
 #endif
 		}
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			ch=getch();
+			ch=_getch();
 			if (ch=='s')
 			{
 				printf("Enter application directory\n");
 				Gets(str, sizeof(str));
 				if (str[0]==0)
-					strcpy(str, "C:/Temp");
+					strcpy_s(str, "C:/Temp");
 				directoryDeltaTransfer.SetApplicationDirectory(str);
 				printf("This directory will be prefixed to upload and download subdirectories.\n");
 			}
@@ -264,7 +270,7 @@ int main(void)
 				printf("Enter host IP: ");
 				Gets(host,sizeof(host));
 				if (host[0]==0)
-					strcpy(host, "127.0.0.1");
+					strcpy_s(host, "127.0.0.1");
 				unsigned short remotePort;
 				printf("Enter host port: ");
 				Gets(str, sizeof(str));
@@ -297,7 +303,7 @@ int main(void)
 
 #ifdef USE_TCP
 #else
-	RakNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 #endif
 
 	return 0;
