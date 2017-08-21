@@ -1,6 +1,6 @@
-SLikeNet™ 0.1.0
+SLikeNetâ„¢ 0.1.0
 ===============
-Copyright © 2016-2017 SLikeSoft™ UG (haftungsbeschränkt)
+Copyright Â© 2016-2017 SLikeSoftâ„¢ UG (haftungsbeschrÃ¤nkt)
 
 Part of the documentation in this readme file was taken from RakNet 4.082
 readme files. These sections are marked with [partially copied from RakNet].
@@ -169,8 +169,8 @@ Table of Contents
 
 If you want to get started quickly simply follow these directions:
 
-Windows™: see chapter 3.2.1 and use the prebuilt libraries
-Linux®/OSX: see chapter 3.3.1
+Windowsâ„¢: see chapter 3.2.1 and use the prebuilt libraries
+LinuxÂ®/OSX: see chapter 3.3.1
 Migrating from RakNet to SLikeNet: see chapter 3.4.1
 
 For quick instructions to comply with license requirements see:
@@ -180,12 +180,12 @@ licenses/_quick_licensing_slikenet_extended.txt
 
 1. What is SLikeNet?
 
-SLikeNet™ is an Open Source/Free Software cross-platform network engine written
+SLikeNetâ„¢ is an Open Source/Free Software cross-platform network engine written
 in C++ and specifially designed for games (and applications which have
 comparable requirements on a network engine like games) building upon the
 discontinued RakNet network engine which had more than 13 years of active
 development. SLikeNet currently supports Windows, Linux and Mac with limited
-support for iPhone®, Android™, and Windows Phone™ 8.
+support for iPhoneÂ®, Androidâ„¢, and Windows Phoneâ„¢ 8.
 SLikeNet is not a simple rebranding of RakNet, but rather incorporates already
 in its initial version several bug- and security fixes as well as changes to
 bring the engine back on track with recent compiler and language changes.
@@ -205,7 +205,7 @@ integration and could only invest his own spare time in this area.
 Kevin Jenkins / Jenkins Software LLC, got acquired by Oculus VR, LLC. and was
 put under an open source license.
 Initially the developers thought about mainly becoming an active member of the
-community. However, it turned out that since GitHub® wasn't opened up, no
+community. However, it turned out that since GitHubÂ® wasn't opened up, no
 organized community established itself and the idea of the development of
 RakNet being taken over by the community didn't come true.
 While there were quite a few talented developers who provided patches on
@@ -214,7 +214,7 @@ to get an organizational structure around the continuous development of RakNet.
 Hence, to the developers of SLikeNet the question arose how they could actually
 help out here and what would be the best way to ensure that RakNet will
 continue to thrive for several years to come. The conclusion was to found a
-company (SLikeSoft™) and continue the work RakNet left behind under a fresh
+company (SLikeSoftâ„¢) and continue the work RakNet left behind under a fresh
 name. That should provide a strong fundament and basis for the community to
 rely on that their ideas, bugfixes, and features won't get lost but rather will
 be integrated/handled in an organized manner.
@@ -354,14 +354,14 @@ The following list presents the known restrictions:
 	- Samples/Lobby2ClientGFx3.0/GFxPlayerTinyD3D9.cpp (licensing)
 	- Samples/RoomsBrowserGFx3/GFxPlayerTinyD3D9.cpp (licensing)
 - dropped support for the following platforms (licensing):
-	- Xbox 360®
-	- PlayStation® Vita
+	- Xbox 360Â®
+	- PlayStationÂ® Vita
 	- Playstation 3
 - limited support for iOS, Android, Windows Phone 8 (later)
 - limited support for Samples and Tests (later)
 - limited support for RakVoiceFMOD (later)
 - limited support for SWIG and the C# interface (later)
-- missing support for server related features like Lobby3, MaterServer,
+- missing support for server related features like Lobby3, MasterServer,
   MasterServer2, etc. (later)
 
 
@@ -388,7 +388,7 @@ compiler).
 OSs:
 We test SLikeNet on the fully patched earliest and on the latest version of the
 supported OS. Full support is only provided for the operation systems listed
-below. For instance we support Microsoft™ Windows XP but only if Service Pack 3
+below. For instance we support Microsoftâ„¢ Windows XP but only if Service Pack 3
 is installed (and all available OS patches are applied). Windows XP without any
 service pack or only SP1/SP1a/SP2 installed is unsupported.
 
@@ -413,7 +413,7 @@ instance the code not being compilable with an ancient version of Visual Studio
 like VC6) we might in the end ask you to upgrade to one of the supported
 compilers/OSs/3rd-party libraries.
 
-A special note on Xcode® / OSX support:
+A special note on XcodeÂ® / OSX support:
 Our test capabilities are limited on OSX atm. Therefore, we cannot test
 SLikeNet at the moment on any other compiler than the one listed below. Since
 RakNet originally supported the OSXSDK 10.5+ we are listing that version as
@@ -427,15 +427,15 @@ restrictions the support couldn't be made open source however. If you require
 support for these platforms, please contact us (see chapter 6).
 
 2.2 Compiler support
-   Microsoft Visual Studio™: 2010 SP1, 2012 Update 1, 2013 Update 5, 2015
+   Microsoft Visual Studioâ„¢: 2010 SP1, 2012 Update 1, 2013 Update 5, 2015
                              Update 3, 2017 15.2 (26430.16)
    GNU Compiler Collection: 4.6.4, 4.7.4, 4.8.5, 4.9.3, 5.4.0
    Xcode: 7.3.1 (limited support for 3.0+ with OSXSDK 10.5+)
-   CMake®: 2.6.4 2.8.12.2, 3.0.2, 3.1.3, 3.2.3, 3.3.2, 3.4.3, 3.5.2, 3.6.3,
+   CMakeÂ®: 2.6.4 2.8.12.2, 3.0.2, 3.1.3, 3.2.3, 3.3.2, 3.4.3, 3.5.2, 3.6.3,
            3.7.2
 
 2.3 OS support
-   Microsoft Windows: Windows XP (SP3), Windows XP x64 (SP2), Windows Vista®
+   Microsoft Windows: Windows XP (SP3), Windows XP x64 (SP2), Windows VistaÂ®
                       (SP2), Windows 7 (SP1), Windows 8.1,
                       Windows 10 (1607 / 1703)
    Linux: Ubuntu 14.04/16.04
@@ -478,7 +478,7 @@ of the license file.
    License: BSD style License
    License file(s): licenses/bzip2 license.txt
 
-2.4.3 FMOD® Ex
+2.4.3 FMODÂ® Ex
    Description: FMOD is a sound effects engine for video games and applications
                 developed by Firelight Technologies Pty Ltd.
    URL: https://www.fmod.com/
@@ -490,7 +490,7 @@ of the license file.
    Description: A package containing C software to implement JPEG image
                 encoding, decoding, and transcoding.
    URL: http://www.ijg.org/
-   Supported versions: version 7 (6b for Microsoft DirectX® - 8d for Irrlicht
+   Supported versions: version 7 (6b for Microsoft DirectXÂ® - 8d for Irrlicht
                        Engine) (version 7 is bundled)
    Used in:
       - Irrlicht Engine (see 2.4.5)
@@ -515,7 +515,7 @@ of the license file.
       - Independent JPEG Group's free JPEG software (see 2.4.4)
    Used in:
       - IrrlichtDemo (see 4.5)
-   License: libpng™/zlib license
+   License: libpngâ„¢/zlib license
    License file(s): licenses/Irrlicht Engine License.txt, libpng license.txt,
                     zlib license.txt
 
@@ -586,7 +586,7 @@ of the license file.
    bsdqueue.h has separate license terms (also licensed under the Modified BSD
    License, however).
 
-2.4.11 MySQL®
+2.4.11 MySQLÂ®
    Description: MySQL is the world's most popular open source database.
    URL: https://www.mysql.com/
    Supported versions: 5.1.30
@@ -595,7 +595,7 @@ of the license file.
       - AutoPatcherServer_MySQL (see 5.6)
       - MySQLInterface (see 4.6)
 
-2.4.12 NVIDIA® Cg Toolkit
+2.4.12 NVIDIAÂ® Cg Toolkit
    Description: The Cg Toolkit is a legacy NVIDIA toolkit allowing to use
                 programmable shading with Cg.
    URL: https://developer.nvidia.com/cg-toolkit
@@ -637,7 +637,7 @@ of the license file.
       - BspCollision (see 4.3)
       - Ogre3DInterpDemo (see 4.7)
 
-2.4.15 OpenSSL®
+2.4.15 OpenSSLÂ®
    Description: OpenSSL is an open source project that provides a robust,
                 commercial-grade, and full-featured toolkit for the Transport
                 Layer Security (TLS) and Secure Socket Layer (SSL) protocols.
@@ -659,7 +659,7 @@ of the license file.
    License: MIT-style License
    License file(s): PortAudio License.txt
 
-2.4.17 PostgreSQL®
+2.4.17 PostgreSQLÂ®
    Description: PostgreSQL is a powerful, open source object-relational
                 database system.
    URL: https://www.postgresql.org/
@@ -671,7 +671,7 @@ of the license file.
       - PostgreSQLInterface (see 4.9)
       - Lobby2Server_PGSQL (see 5.23)
 
-2.4.18 Autodesk® Scaleform® GFx
+2.4.18 AutodeskÂ® ScaleformÂ® GFx
    Description: Autodesk Scaleform middleware provides a design-driven workflow
                 for creating powerful and immersive user interface (UI)
                 environments for PCs, game consoles, mobile devies, and
@@ -695,7 +695,7 @@ of the license file.
    License: Modified BSD License
    License file(s): licenses/speex license.txt
 
-2.4.20 SQLite®
+2.4.20 SQLiteÂ®
    Description: SQLite is a self-contained, high-reliability, embedded,
                 full-featured, public-domain, SQL database engine. SQLite is
                 the most used database engine in the world.
@@ -710,9 +710,9 @@ of the license file.
    License: Public Domain
    License file(s): n/A
 
-2.4.21 Steamworks® SDK
+2.4.21 SteamworksÂ® SDK
    Description: Steamworks is a free suite of tools available to any developer
-                to use in their game or software on Steam®.
+                to use in their game or software on SteamÂ®.
    URL: https://partner.steamgames.com/
    Supported versions: 1.15-1.23a
    Used in:
@@ -804,7 +804,7 @@ Fingerprint: 90BDC5B9C28EBCAD5805930806DED38809EECFCA
 
 3.1.2 Downloading via SVN
 The latest development version can always be acquired directly via our
-Subversion® repository at https://www.slikesoft.com/svn/slikenet/.
+SubversionÂ® repository at https://www.slikesoft.com/svn/slikenet/.
 Released versions are tagged (i.e.
 https://www.slikesoft.com/svn/slikenet/tags/) while the main development trunk
 is located under https://www.slikenet.com/svn/slikenet/trunk/ .
@@ -812,7 +812,7 @@ We suggest you use a Subversion client to get your copy from that repository. A
 list of available Subversion clients is located here:
 https://subversion.apache.org/packages.html .
 
-3.1.3 Downloading via GIT®
+3.1.3 Downloading via GITÂ®
 In addition to the main SVN repository, we also provide SLikeNet as a fork of
 RakNet on GitHub. If you are mainly using GIT, this might be the way you wanna
 got to acquire a copy of SLikeNet.
@@ -1945,7 +1945,7 @@ Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
 - Alex Howland: https://github.com/alliekins (pull request: 48)
 - Hunter Mayer: https://github.com/orionnoir (pull request: 31)
-- Jalmari Ikävalko: https://github.com/tzaeru (pull request: 56)
+- Jalmari IkÃ¤valko: https://github.com/tzaeru (pull request: 56)
 - lenky0401: https://github.com/lenky0401 (pull request: 60)
 - Peter Hille: https://github.com/png85 (pull request: 7)
 - Rhys Kidd:  https://github.com/Echelon9 (pull requests: 10 and 14)
@@ -1990,7 +1990,7 @@ being complete. If a name is not listed in this section or you spot a mistake
 of how use the trademark we'd appreciate to be dropped a note so we can correct
 the mistake/oversight.
 
-In general we mark trademarks with ™ and registered trademarks with ® upon
+In general we mark trademarks with â„¢ and registered trademarks with Â® upon
 first use of the trademark. Any following usages of the same trademark implies
 the corresponding trademark symbol.
 
@@ -2002,7 +2002,7 @@ GITHUB is a registered trademark of GitHub, Inc.
 libpng is a trademark of Glenn Randers-Pehrson
 Android is a trademark of Google Inc.
 SQLite is a registered trademark of Hipp, Wyrick & Company, Inc
-Linux® is the registered trademark of Linus Torvalds in the U.S. and other
+LinuxÂ® is the registered trademark of Linus Torvalds in the U.S. and other
 countries.
 CMake is a registered trademark of Kitware, Inc.
 DirectX, Windows Vista,  Windows Phone, and Xbox 360 are registered trademarks
@@ -2011,7 +2011,7 @@ Microsoft, Visual Studio, and Windows are trademarks of Microsoft Corporation.
 MySQL is a registered trademark of MySQL AB
 NVIDIA is a registered trademark of NVIDIA Corporation
 OpenSSL is a registered trademark of the OpenSSL Software Foundation, Inc.
-SLikeSoft and SLikeNet are trademarks of SLikeSoft UG (haftungsbeschränkt)
+SLikeSoft and SLikeNet are trademarks of SLikeSoft UG (haftungsbeschrÃ¤nkt)
 GIT is a registered trademark of Software Freedom Conservancy, Inc.
 Playstation is a registered trademark of Sony Interactive Entertainment Inc.
 PostgreSQL is a registered trademark of the PostgreSQL Community Association of
