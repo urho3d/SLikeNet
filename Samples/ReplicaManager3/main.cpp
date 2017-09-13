@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschrÃ¤nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -223,8 +223,8 @@ struct SampleReplica : public Replica3
 	VariableDeltaSerializer variableDeltaSerializer;
 };
 
-struct ClientCreatible_ClientSerialized : public SampleReplica {
-	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatible_ClientSerialized");}
+struct ClientCreatable_ClientSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatable_ClientSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		return SampleReplica::Serialize(serializeParameters);
@@ -262,8 +262,8 @@ struct ServerCreated_ClientSerialized : public SampleReplica {
 		return QueryActionOnPopConnection_Server(droppedConnection);
 	}
 };
-struct ClientCreatible_ServerSerialized : public SampleReplica {
-	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatible_ServerSerialized");}
+struct ClientCreatable_ServerSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatable_ServerSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		if (topology==CLIENT)
@@ -333,9 +333,9 @@ public:
 	{
 		SLNet::RakString typeName;
 		allocationId->Read(typeName);
-		if (typeName=="ClientCreatible_ClientSerialized") return new ClientCreatible_ClientSerialized;
+		if (typeName=="ClientCreatable_ClientSerialized") return new ClientCreatable_ClientSerialized;
 		if (typeName=="ServerCreated_ClientSerialized") return new ServerCreated_ClientSerialized;
-		if (typeName=="ClientCreatible_ServerSerialized") return new ClientCreatible_ServerSerialized;
+		if (typeName=="ClientCreatable_ServerSerialized") return new ClientCreatable_ServerSerialized;
 		if (typeName=="ServerCreated_ServerSerialized") return new ServerCreated_ServerSerialized;
 		if (typeName=="P2PReplica") return new P2PReplica;
 		return 0;
@@ -486,9 +486,9 @@ int main(void)
 				printf("Objects created.\n");
 				if (topology==SERVER||topology==CLIENT)
 				{
-					replicaManager.Reference(new ClientCreatible_ClientSerialized);
+					replicaManager.Reference(new ClientCreatable_ClientSerialized);
 					replicaManager.Reference(new ServerCreated_ClientSerialized);
-					replicaManager.Reference(new ClientCreatible_ServerSerialized);
+					replicaManager.Reference(new ClientCreatable_ServerSerialized);
 					replicaManager.Reference(new ServerCreated_ServerSerialized);
 				}
 				else
