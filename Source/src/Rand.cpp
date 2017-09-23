@@ -35,6 +35,8 @@
 *   an appropriate reference to your work.
 *
 * It would be nice to CC: <Cokus@math.washington.edu> when you write.
+*
+* Note from SLikeSoft: The mail addresses here seem to be dead ends and we could not determine any current ways to contact the authors.
 */
 
 /*

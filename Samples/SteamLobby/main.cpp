@@ -234,10 +234,10 @@ int main(int argc, char **argv)
 						printf("Not in a room\n");
 						break;
 					}
-					SLNet::Console_LeaveRoom_Steam* msg = (SLNet::Console_LeaveRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_LeaveRoom);
-					msg->roomId=lobby2Client->GetRoomID();
-					lobby2Client->SendMsg(msg);
-					messageFactory->Dealloc(msg);
+					SLNet::Console_LeaveRoom_Steam* leaveroomMsg = (SLNet::Console_LeaveRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_LeaveRoom);
+					leaveroomMsg->roomId=lobby2Client->GetRoomID();
+					lobby2Client->SendMsg(leaveroomMsg);
+					messageFactory->Dealloc(leaveroomMsg);
 				}
 				break;
 
@@ -249,15 +249,15 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					SLNet::Console_CreateRoom_Steam* msg = (SLNet::Console_CreateRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_CreateRoom);
+					SLNet::Console_CreateRoom_Steam* createroomMsg = (SLNet::Console_CreateRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_CreateRoom);
 					// set the name of the lobby if it's ours
 					char rgchLobbyName[256];
-					msg->roomIsPublic=true;
+					createroomMsg->roomIsPublic=true;
 					_snprintf( rgchLobbyName, sizeof( rgchLobbyName ), "%s's lobby", SteamFriends()->GetPersonaName() );
-					msg->roomName=rgchLobbyName;
-					msg->publicSlots=8;
-					lobby2Client->SendMsg(msg);
-					messageFactory->Dealloc(msg);
+					createroomMsg->roomName=rgchLobbyName;
+					createroomMsg->publicSlots=8;
+					lobby2Client->SendMsg(createroomMsg);
+					messageFactory->Dealloc(createroomMsg);
 
 				}
 				break;
@@ -270,20 +270,20 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					SLNet::Console_JoinRoom_Steam* msg = (SLNet::Console_JoinRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_JoinRoom);
+					SLNet::Console_JoinRoom_Steam* joinroomMsg = (SLNet::Console_JoinRoom_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_JoinRoom);
 					printf("Enter room id, or enter for %" PRINTF_64_BIT_MODIFIER "u: ", lastRoom);
 					char str[256];
 					Gets(str, sizeof(str));
 					if (str[0]==0)
 					{
-						msg->roomId=lastRoom;
+						joinroomMsg->roomId=lastRoom;
 					}
 					else
 					{
-						msg->roomId=_atoi64(str);
+						joinroomMsg->roomId=_atoi64(str);
 					}
-					lobby2Client->SendMsg(msg);
-					messageFactory->Dealloc(msg);
+					lobby2Client->SendMsg(joinroomMsg);
+					messageFactory->Dealloc(joinroomMsg);
 				}
 				break;
 
@@ -295,10 +295,10 @@ int main(int argc, char **argv)
 						break;
 					}
 
-					SLNet::Console_GetRoomDetails_Steam* msg = (SLNet::Console_GetRoomDetails_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_GetRoomDetails);
-					msg->roomId=lobby2Client->GetRoomID();
-					lobby2Client->SendMsg(msg);
-					messageFactory->Dealloc(msg);
+					SLNet::Console_GetRoomDetails_Steam* roomdetailsMsg = (SLNet::Console_GetRoomDetails_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_GetRoomDetails);
+					roomdetailsMsg->roomId=lobby2Client->GetRoomID();
+					lobby2Client->SendMsg(roomdetailsMsg);
+					messageFactory->Dealloc(roomdetailsMsg);
 				}
 				break;
 
@@ -310,11 +310,11 @@ int main(int argc, char **argv)
 						break;
 
 					}
-					SLNet::Console_SendRoomChatMessage_Steam* msg = (SLNet::Console_SendRoomChatMessage_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_SendRoomChatMessage);
-					msg->message="Test chat message.";
-					msg->roomId=lobby2Client->GetRoomID();
-					lobby2Client->SendMsg(msg);
-					messageFactory->Dealloc(msg);
+					SLNet::Console_SendRoomChatMessage_Steam* roomchatMsg = (SLNet::Console_SendRoomChatMessage_Steam*) messageFactory->Alloc(SLNet::L2MID_Console_SendRoomChatMessage);
+					roomchatMsg->message="Test chat message.";
+					roomchatMsg->roomId=lobby2Client->GetRoomID();
+					lobby2Client->SendMsg(roomchatMsg);
+					messageFactory->Dealloc(roomchatMsg);
 
 				}
 				break;

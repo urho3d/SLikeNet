@@ -23,6 +23,10 @@
 // Every platform except windows store 8 and native client supports Berkley sockets
 #if !defined(WINDOWS_STORE_RT) && !defined(__native_client__)
 
+#ifdef _WIN32
+#include <tchar.h>	// used for _tprintf() (via RAKNET_DEBUG_TPRINTF)
+#endif
+
 #include "slikenet/Itoa.h"
 
 void RNS2_Berkley::SetSocketOptions(void)
@@ -121,7 +125,7 @@ void RNS2_Berkley::GetSystemAddressIPV4And6 ( RNS2Socket rns2Socket, SystemAddre
 			NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 			( LPTSTR ) & messageBuffer, 0, NULL );
 		// something has gone wrong here...
-		RAKNET_DEBUG_PRINTF( "getsockname failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer));
+		RAKNET_DEBUG_TPRINTF( _T("getsockname failed:Error code - %d\n%s"), dwIOError, static_cast<LPTSTR>(messageBuffer));
 
 		//Free the buffer.
 		LocalFree( messageBuffer );
@@ -396,7 +400,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 				NULL, dwIOError, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),  // Default language
 				( LPTSTR ) & messageBuffer, 0, NULL );
 			// I see this hit on XP with IPV6 for some reason
-			RAKNET_DEBUG_PRINTF( "Warning: recvfrom failed:Error code - %d\n%s", dwIOError, static_cast<LPTSTR>(messageBuffer) );
+			RAKNET_DEBUG_TPRINTF( _T("Warning: recvfrom failed:Error code - %d\n%s"), dwIOError, static_cast<LPTSTR>(messageBuffer) );
 			LocalFree( messageBuffer );
 		}
 	}	

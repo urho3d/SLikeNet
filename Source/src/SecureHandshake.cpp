@@ -54,7 +54,14 @@
 #include "cat/src/crypt/rand/EntropyLinux.cpp"
 #include "cat/src/crypt/rand/EntropyWindowsCE.cpp"
 #include "cat/src/crypt/rand/EntropyGeneric.cpp"
+#ifdef _M_X64
+#pragma warning(push)
+#pragma warning(disable:4838)
+#endif
 #include "cat/src/crypt/rand/Fortuna.cpp"
+#ifdef _M_X64
+#pragma warning(pop)
+#endif
 
 #include "cat/src/crypt/tunnel/KeyAgreement.cpp"
 #include "cat/src/crypt/tunnel/AuthenticatedEncryption.cpp"

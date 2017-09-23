@@ -148,7 +148,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Debug - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Debug\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Debug - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Debug - Unicode\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -207,7 +207,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Retail\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -236,7 +236,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release - Unicode\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -265,7 +265,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Retail - Unicode\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
