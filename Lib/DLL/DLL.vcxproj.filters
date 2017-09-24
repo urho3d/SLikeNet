@@ -628,9 +628,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\include\slikenet\definesoverrides.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -809,6 +806,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\RandSync.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

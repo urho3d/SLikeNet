@@ -12,7 +12,7 @@ If you require a more detailed list on the changes, please refer to the
 Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
 
 version 0.1.1 (xx-xx-xxxx xx:xx UTC)
-*** This release satisfies/processes 1 complete GitHub pull request
+*** This release satisfies/processes 2 complete GitHub pull request
 General:
   * changed GitHub pullrequest markers to support pull requests from different GitHub forks (#105)
   * dropped optional license requirement to notifiy "Mersenne Twister"-algorithm devs due to lack of valid contact information (#105)
@@ -20,6 +20,8 @@ General:
 Core:
   RakNetSocket2:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
+  ReplicaManager3:
+    * fixed spelling mistake in ClientCreateible structs (#122 - SLNETPR10)
   SocketLayer:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
 Building:

@@ -535,6 +535,7 @@
     <ClCompile Include="..\..\Source\src\WSAStartupSingleton.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\linux_adapter.h" />
     <ClInclude Include="..\..\Source\include\slikenet\osx_adapter.h" />
     <ClInclude Include="..\..\Source\include\slikenet\RandSync.h" />
@@ -631,7 +632,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\memoryoverride.h" />
     <ClInclude Include="..\..\Source\include\slikenet\commandparser.h" />
     <ClInclude Include="..\..\Source\include\slikenet\defines.h" />
-    <ClInclude Include="..\..\Source\include\slikenet\definesOverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket2.h" />
