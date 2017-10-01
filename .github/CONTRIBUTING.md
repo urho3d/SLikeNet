@@ -21,7 +21,7 @@ Signing the agreement
 
 State so in a comment in your first pull request/issue report (no need to make the statement again in following contributions, since we'll have your agreement on our record).
 For instance you can use the following statement for your comment:
-"I hereby declare I've read and agree to the current CLA as provided under https://github.com/SLikeSoft/SLikeNet/blob/master/.github/CONTRIBUTING"
+"I hereby declare I've read and agree to the current CLA as provided under https://github.com/SLikeSoft/SLikeNet/blob/master/.github/CONTRIBUTING.md"
 
 Alternatively send a mail to info@slikesoft.com and state that you agree to this CLA. In this case, make sure that we can identify you as the holder of the account who made the contribution in GitHub (f.e. ensure that your email address you send the mail from is shown on your GitHub user profile (or a linked personal page on that profile) or simply post in a comment of your contribution that you contacted us).
 
