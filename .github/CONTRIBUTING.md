@@ -1,4 +1,4 @@
-Thanks for considering contributing to SLikeNet.
+Thanks for considering contributing to SLikeNet™.
 
 In case you intend to contribute changes/code which should be incorporated in SLikeNet, we kindly ask you to sign the following CLA.
 Please note that signing this CLA is obviously not required, if you simply add a bugrport, provide feedback, or want to ask a question.
@@ -9,7 +9,7 @@ CLA
 In short
 --------
 
-- By signing this agreement, you grant SLikeSoft UG (haftungsbeschänkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to be incorporated in our product(s).
+- By signing this agreement, you grant SLikeSoft™ UG (haftungsbeschänkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to be incorporated in our product(s).
 - You declare that you are legally entitled to grant us such license.
 - This agreement is valid until revoked for this and all following contributions.
 - Revoking the agreement for previous contributions is possible in certain cases (please see details below).
