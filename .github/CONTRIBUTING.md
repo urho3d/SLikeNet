@@ -1,6 +1,6 @@
 Thanks for considering contributing to SLikeNet.
 
-In case you are intend to contribute changes/code which should be incorporated in SLikeNet, we kindly ask you to sign the following CLA.
+In case you intend to contribute changes/code which should be incorporated in SLikeNet, we kindly ask you to sign the following CLA.
 Please note that signing this CLA is obviously not required, if you simply add a bugrport, provide feedback, or want to ask a question.
 
 CLA
@@ -9,7 +9,7 @@ CLA
 In short
 --------
 
-- By signing this agreement, you grant SLikeSoft UG (haftungsbesch‰nkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to be incorporated in our product(s).
+- By signing this agreement, you grant SLikeSoft UG (haftungsbesch√§nkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to be incorporated in our product(s).
 - You declare that you are legally entitled to grant us such license.
 - This agreement is valid until revoked for this and all following contributions.
 - Revoking the agreement for previous contributions is possible in certain cases (please see details below).
@@ -39,7 +39,7 @@ For us this ensures us that you really meant your contribution being used by us 
 
 As a German company we fall under the German copyright law which is in certain parts quite different from copyright laws in most English speaking countries (like the US). Most importantly by German law you as the contributor cannot give away the copyright of your contribution to us - you are and always will be the copyright holder of your contribution.
 
-Hence, instead of passing on your copyright to us, we ask you to grant SLikeSoft UG (haftungsbeschr‰nkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to incorporate it into our product(s). In non-legal language this means that you allow us to use your contribution:
+Hence, instead of passing on your copyright to us, we ask you to grant SLikeSoft UG (haftungsbeschr√§nkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to incorporate it into our product(s). In non-legal language this means that you allow us to use your contribution:
 - now or in the future without any deadline (i.e. perpetual)
 - but are still allowed to pass along your contribution to others and also grant them a non-exclusive license of the same work as well (i.e. non-exclusive)
 - worldwide and not restricted to a specific area/country (i.e. worldwide)
