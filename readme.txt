@@ -1951,14 +1951,17 @@ impossible for us to continue the effort wich went into the RakNet library.
 
 Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
-- Alex Howland: https://github.com/alliekins (pull request: RAKPR48)
-- Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR31)
-- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR56)
-- lenky0401: https://github.com/lenky0401 (pull request: RAKPR60)
-- Peter Hille: https://github.com/png85 (pull request: RAKPR7)
-- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKPR10 and RAKPR14)
-- Tim Ullrich: https://github.com/tullrich (pull request: RAKPR63)
-- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKPR51, RAKPR54, and RAKPR57)
+- Alex Howland: https://github.com/alliekins (pull request: RAKPR_48)
+- GBearUK: https://github.com/GBearUK (pull request: RAKPR_67)
+- Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR_31)
+- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR_56)
+- jaynus: https://github.com/jaynus (pull request: RAKPR_64)
+- lenky0401: https://github.com/lenky0401 (pull request: RAKPR_60)
+- Peter Hille: https://github.com/png85 (pull request: RAKPR_7)
+- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKPR_10 and RAKPR_14)
+- TheComet: https://github.com/TheComet (pull request: RAKPR_29)
+- Tim Ullrich: https://github.com/tullrich (pull request: RAKPR_63)
+- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKPR_51, RAKPR_54, and RAKPR_57)
 
 We'd also like to thank those contributors who have requested to remain
 anonymous and/or those who we could not contact at all (due to lack of contact
