@@ -1,4 +1,14 @@
-In short:
+Thanks for considering contributing to SLikeNet.
+
+In case you are intend to contribute changes/code which should be incorporated in SLikeNet, we kindly ask you to sign the following CLA.
+Please note that signing this CLA is obviously not required, if you simply add a bugrport, provide feedback, or want to ask a question.
+
+CLA
+===
+
+In short
+--------
+
 - By signing this agreement, you grant SLikeSoft UG (haftungsbeschänkt) a perpetual, non-exclusive, worldwide, no-charge, royalty-free license to use your contribution to be incorporated in our product(s).
 - You declare that you are legally entitled to grant us such license.
 - This agreement is valid until revoked for this and all following contributions.
@@ -6,15 +16,18 @@ In short:
 - Send a mail to info@slikesoft.com, if we'd add you to the acknowledgement section.
 
 
-To sign this agreement:
-State so in a comment in your first pull request (no need to make the statement for pull-requests afterwards since we'll have your agreement on our record).
+Signing the agreement
+---------------------
+
+State so in a comment in your first pull request/issue report (no need to make the statement again in following contributions, since we'll have your agreement on our record).
 For instance you can use the following statement for your comment:
 "I hereby declare I've read and agree to the current CLA as provided under https://github.com/SLikeSoft/SLikeNet/blob/master/.github/CONTRIBUTING"
 
 Alternatively send a mail to info@slikesoft.com and state that you agree to this CLA. In this case, make sure that we can identify you as the holder of the account who made the contribution in GitHub (f.e. ensure that your email address you send the mail from is shown on your GitHub user profile (or a linked personal page on that profile) or simply post in a comment of your contribution that you contacted us).
 
 
-In details:
+In detail
+---------
 
 If you don't know what a CLA is, here's a nice explaination of what this is and why it's required and/or good to have one: https://www.clahub.com/pages/why_cla
 
