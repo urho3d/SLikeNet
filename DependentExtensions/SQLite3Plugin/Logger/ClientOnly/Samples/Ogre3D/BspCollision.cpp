@@ -16,7 +16,7 @@ LGPL like the rest of the engine.
  * This file was taken from RakNet 4.082.
  * Please see licenses/RakNet license.txt for the underlying license and related copyright.
  *
- * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschr‰nkt)
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  * Modifications in this file are free to be used for anything you like.
  * Alternatively you are permitted to license the modifications under the MIT license, if you so desire. The

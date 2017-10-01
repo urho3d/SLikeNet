@@ -1,4 +1,4 @@
-# - Try to find Boost include dirs and libraries
+﻿# - Try to find Boost include dirs and libraries
 # Usage of this module as follows:
 #
 # NOTE: Take note of the Boost_ADDITIONAL_VERSIONS variable below.
@@ -288,7 +288,7 @@
 #
 #
 #
-# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschr�nkt)
+# Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
 #
 # This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
 # license found in the license.txt file in the root directory of this source tree.

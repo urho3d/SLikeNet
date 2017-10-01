@@ -1,4 +1,4 @@
-# - Try to find Irrlicht
+﻿# - Try to find Irrlicht
 # Once done this will define
 #
 #  IRRLICHT_FOUND - system has Irrlicht

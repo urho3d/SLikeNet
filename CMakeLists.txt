@@ -4,7 +4,7 @@
 #
 #
 #
-# Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschr‰nkt)
+# Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschr√§nkt)
 #
 # This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
 # license found in the license.txt file in the root directory of this source tree.

@@ -1,7 +1,7 @@
-/* -----------------------------------------------------------------------------
+﻿/* -----------------------------------------------------------------------------
  * See licenses/SWIG library files license.txt for license and copyright information.
  * 
- * Modified work : Copyright(c) 2017, SLikeSoft UG(haftungsbeschr�nkt)
+ * Modified work : Copyright(c) 2017, SLikeSoft UG(haftungsbeschränkt)
  *
  * This source code was modified by SLikeSoft. Modifications in this file are provided with no particular
  * license requirements.

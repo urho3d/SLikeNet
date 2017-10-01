@@ -1,4 +1,4 @@
-# - Try to find Speex
+﻿# - Try to find Speex
 # Once done this will define
 #
 #  SPEEXDSP_FOUND - system has Speex

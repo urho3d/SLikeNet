@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------
+﻿#-------------------------------------------------------------------
 # This file is part of the CMake build system for OGRE
 #     (Object-oriented Graphics Rendering Engine)
 # For the latest info, see http://www.ogre3d.org/

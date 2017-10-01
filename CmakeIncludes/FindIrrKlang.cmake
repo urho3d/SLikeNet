@@ -1,4 +1,4 @@
-# - Try to find irrKlang
+﻿# - Try to find irrKlang
 # Once done this will define
 #
 #  IRRKLANG_FOUND - system has irrKlang

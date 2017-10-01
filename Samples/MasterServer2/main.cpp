@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr√§nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -82,7 +82,7 @@ void main_RakNet_Post(void)
 	json_object_set(jsonObject, "__gameId", json_string("MotoGP_13") );
 	json_object_set(jsonObject, "__clientReqId", json_integer(0) );
 	json_object_set(jsonObject, "__timeoutSec", json_integer(60) );
-	//json_object_set(jsonObject, "mapname", json_string(RakString::NonVariadic("JouÈ-lÈs-tours").URLEncode().C_String()) );
+	//json_object_set(jsonObject, "mapname", json_string(RakString::NonVariadic("Jou√©-l√©s-tours").URLEncode().C_String()) );
 
 	char *ds = json_dumps(jsonObject,0);
 	RakString rspost = RakString::FormatForPOST(

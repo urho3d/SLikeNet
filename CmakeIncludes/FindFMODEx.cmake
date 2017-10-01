@@ -1,4 +1,4 @@
-# - Locate FMOD library
+﻿# - Locate FMOD library
 # This module defines
 #  FMODEX_LIBRARY, the library to link against
 #  FMODEX_FOUND, if false, do not try to link to FMOD
@@ -10,7 +10,7 @@
 #
 #
 #
-#  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschr�nkt)
+#  Modified work: Copyright (c) 2016, SLikeSoft UG (haftungsbeschränkt)
 #
 # This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
 #  license found in the license.txt file in the root directory of this source tree.

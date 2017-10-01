@@ -1,4 +1,4 @@
-# - Find MySQL
+﻿# - Find MySQL
 # Find the MySQL includes and client library
 # This module defines
 #  MYSQL_INCLUDE_DIR, where to find mysql.h

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschrÃ¤nkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -1051,7 +1051,7 @@ RAK_THREAD_DECLARATION(SLNet::UpdateTCPInterfaceLoop)
 				sts->remoteClients[i].isActiveMutex.Lock();
 				if (sts->remoteClients[i].isActive)
 				{
-					// calling FD_ISSET with -1 as socket (that’s what 0 is set to) produces a bus error under Linux 64-Bit
+					// calling FD_ISSET with -1 as socket (thatâ€™s what 0 is set to) produces a bus error under Linux 64-Bit
 					__TCPSOCKET__ socketCopy = sts->remoteClients[i].socket;
 					if (socketCopy != 0)
 					{
@@ -1153,7 +1153,7 @@ RAK_THREAD_DECLARATION(SLNet::UpdateTCPInterfaceLoop)
 						i++;
 						continue;
 					}
-					// calling FD_ISSET with -1 as socket (that’s what 0 is set to) produces a bus error under Linux 64-Bit
+					// calling FD_ISSET with -1 as socket (thatâ€™s what 0 is set to) produces a bus error under Linux 64-Bit
 					__TCPSOCKET__ socketCopy = sts->remoteClients[i].socket;
 					if (socketCopy == 0)
 					{

@@ -1,4 +1,4 @@
-#This has been modified fron the original
+﻿#This has been modified fron the original
 
 include(${RakNet_SOURCE_DIR}/CmakeIncludes/Ogre3D/PreprocessorUtils.cmake)
 include(${RakNet_SOURCE_DIR}/CmakeIncludes/Ogre3D/FindPkgMacros.cmake)

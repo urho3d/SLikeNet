@@ -1,4 +1,4 @@
-# - Find PostgreSQL
+﻿# - Find PostgreSQL
 # Find the PostgreSQL includes and client library
 # This module defines
 #  POSTGRESQL_INCLUDE_DIR, where to find POSTGRESQL.h
