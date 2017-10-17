@@ -17,11 +17,12 @@ General:
   * changed GitHub pullrequest markers to support pull requests from different GitHub forks (#105)
   * dropped optional license requirement to notifiy "Mersenne Twister"-algorithm devs due to lack of valid contact information (#105)
   * several small documentation updates (#105, #112 - SLNET_10)
+  * corrected text encoding throughout all files (#116)
 Core:
   RakNetSocket2:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
   ReplicaManager3:
-    * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_10)
+    * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_15)
   SocketLayer:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
 Building:
