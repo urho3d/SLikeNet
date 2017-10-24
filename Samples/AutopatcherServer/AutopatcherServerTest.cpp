@@ -142,7 +142,7 @@ class AutopatcherPostgreRepository2_WithXDelta : public SLNet::AutopatcherPostgr
 	}
 };
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
 	printf("Server starting... ");
 	SLNet::AutopatcherServer autopatcherServer;

@@ -12,7 +12,17 @@
  * Alternatively you are permitted to license the modifications under the zlib/libpng license.
  */
 
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4100) // unreferenced formal parameter
+#endif
+
 #include <irrlicht.h>
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
 #ifdef _WIN32__
 #include "slikenet/WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
 #include <windows.h>
@@ -28,7 +38,7 @@ using namespace irr;
 #ifdef _WIN32
 
 #pragma comment(lib, "Irrlicht.lib")
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
 #else
 int main(int argc, char* argv[])
 #endif

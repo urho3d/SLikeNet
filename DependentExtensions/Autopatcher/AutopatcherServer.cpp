@@ -234,9 +234,15 @@ void AutopatcherServer::Clear(void)
 }
 void AutopatcherServer::OnStartup(RakPeerInterface *peer)
 {
+	// unused parameters
+	(void)peer;
 }
 void AutopatcherServer::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
+	// unused parameters
+	(void)rakNetGUID;
+	(void)lostConnectionReason;
+
 	RemoveFromThreadPool(systemAddress);
 
 	unsigned int i=0;
@@ -744,6 +750,9 @@ void AutopatcherServer::PerThreadDestructor(void* factoryResult, void *context)
 }
 void AutopatcherServer::OnFilePushesComplete( SystemAddress systemAddress, unsigned short setID )
 {
+	// unused parameters
+	(void)setID;
+
 	if (DecrementPatchingUserCount(systemAddress))
 		CallPatchCompleteCallback(systemAddress, AutopatcherServerLoadNotifier::PR_PATCHES_WERE_SENT);
 }
@@ -844,6 +853,9 @@ void AutopatcherServer::SetAllowDownloadOfOriginalUnmodifiedFiles(bool allow)
 }
 unsigned int AutopatcherServer::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
 {
+	// unused parameters
+	(void)filename;
+
 	/*
 	int offset;
 	if (context.op==PC_HASH_1_WITH_PATCH)

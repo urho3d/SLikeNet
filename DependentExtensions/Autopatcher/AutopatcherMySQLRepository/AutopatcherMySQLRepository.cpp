@@ -410,6 +410,15 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 
 bool AutopatcherMySQLRepository::GetMostRecentChangelistWithPatches(SLNet::RakString &applicationName, FileList *patchedFiles, FileList *addedFiles, FileList *addedOrModifiedFileHashes, FileList *deletedFiles, double *priorRowPatchTime, double *mostRecentRowPatchTime)
 {
+	// unused parameters
+	(void)applicationName;
+	(void)patchedFiles;
+	(void)addedFiles;
+	(void)addedOrModifiedFileHashes;
+	(void)deletedFiles;
+	(void)priorRowPatchTime;
+	(void)mostRecentRowPatchTime;
+
 	// Not yet implemented
 	return false;
 }
@@ -781,6 +790,9 @@ const char *AutopatcherMySQLRepository::GetLastError(void) const
 }
 unsigned int AutopatcherMySQLRepository::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
 {
+	// unused parameters
+	(void)filename;
+
 	char query[512];
 	sprintf_s(query, "SELECT substring(content from %i for %i) FROM FileVersionHistory WHERE fileId=%i;", startReadBytes+1,numBytesToRead,context.flnc_extraData1);
 

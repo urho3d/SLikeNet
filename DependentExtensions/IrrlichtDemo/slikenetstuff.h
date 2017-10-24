@@ -28,7 +28,18 @@
 #include "slikenet/HTTPConnection.h"
 #include "../../Samples/PHPDirectoryServer2/PHPDirectoryServer2.h"
 #include "vector3d.h"
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4100) // unreferenced formal parameter
+#endif
+
 #include "IAnimatedMeshSceneNode.h"
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
 #include "slikenet/MessageIdentifiers.h"
 
 
@@ -59,17 +70,50 @@ class BaseIrrlichtReplica : public SLNet::Replica3
 public:
 	BaseIrrlichtReplica();
 	virtual ~BaseIrrlichtReplica();
-	virtual SLNet::RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, SLNet::ReplicaManager3 *replicaManager3) {return QueryConstruction_PeerToPeer(destinationConnection);}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return QueryRemoteConstruction_PeerToPeer(sourceConnection);}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {return QuerySerialization_PeerToPeer(destinationConnection);}
+	virtual SLNet::RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, SLNet::ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
+		return QueryConstruction_PeerToPeer(destinationConnection);
+	}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		return QueryRemoteConstruction_PeerToPeer(sourceConnection);
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
+		return QuerySerialization_PeerToPeer(destinationConnection);
+	}
 	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection);
 	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection);
 	virtual SLNet::RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters);
 	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters);
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return QueryActionOnPopConnection_PeerToPeer(droppedConnection);}
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		return QueryActionOnPopConnection_PeerToPeer(droppedConnection);
+	}
 
 	/// This function is not derived from Replica3, it's specific to this app
 	/// Called from CDemo::UpdateRakNet
@@ -153,8 +197,13 @@ public:
 };
 class Connection_RM3Irrlicht : public SLNet::Connection_RM3 {
 public:
-	Connection_RM3Irrlicht(const SLNet::SystemAddress &_systemAddress, SLNet::RakNetGUID _guid, CDemo *_demo) : SLNet::Connection_RM3(_systemAddress, _guid) {demo=_demo;}
-	virtual ~Connection_RM3Irrlicht() {}
+	Connection_RM3Irrlicht(const SLNet::SystemAddress &_systemAddress, SLNet::RakNetGUID _guid, CDemo *_demo) : SLNet::Connection_RM3(_systemAddress, _guid)
+	{
+		demo=_demo;
+	}
+	virtual ~Connection_RM3Irrlicht()
+	{
+	}
 
 	virtual SLNet::Replica3 *AllocReplica(SLNet::BitStream *allocationId, SLNet::ReplicaManager3 *replicaManager3);
 protected:
@@ -164,10 +213,12 @@ protected:
 class ReplicaManager3Irrlicht : public SLNet::ReplicaManager3
 {
 public:
-	virtual SLNet::Connection_RM3* AllocConnection(const SLNet::SystemAddress &systemAddress, SLNet::RakNetGUID rakNetGUID) const {
+	virtual SLNet::Connection_RM3* AllocConnection(const SLNet::SystemAddress &systemAddress, SLNet::RakNetGUID rakNetGUID) const
+	{
 		return new Connection_RM3Irrlicht(systemAddress,rakNetGUID,demo);
 	}
-	virtual void DeallocConnection(SLNet::Connection_RM3 *connection) const {
+	virtual void DeallocConnection(SLNet::Connection_RM3 *connection) const
+	{
 		delete connection;
 	}
 	CDemo *demo;

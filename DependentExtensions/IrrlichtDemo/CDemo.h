@@ -23,7 +23,16 @@
 // Include path in windows project by defaults assumes C:\irrlicht-1.6
 // 1.6 or higher may be used in linux
 // Get Irrlicht from http://irrlicht.sourceforge.net/ , it's a great engine
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4100) // unreferenced formal parameter
+#endif
+
 #include <irrlicht.h>
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 #define IRRLICHT_MEDIA_PATH "IrrlichtMedia/"
 

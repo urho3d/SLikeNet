@@ -159,22 +159,35 @@ BaseIrrlichtReplica::~BaseIrrlichtReplica()
 }
 void BaseIrrlichtReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
+	// unused parameters
+	(void)destinationConnection;
+
 	constructionBitstream->Write(position);
 }
 bool BaseIrrlichtReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 {
+	// unused parameters
+	(void)sourceConnection;
+
 	constructionBitstream->Read(position);
 	return true;
 }
 RM3SerializationResult BaseIrrlichtReplica::Serialize(SLNet::SerializeParameters *serializeParameters)
 {
+	// unused parameters
+	(void)serializeParameters;
+
 	return RM3SR_BROADCAST_IDENTICALLY;
 }
 void BaseIrrlichtReplica::Deserialize(SLNet::DeserializeParameters *deserializeParameters)
 {
+	// unused parameters
+	(void)deserializeParameters;
 }
 void BaseIrrlichtReplica::Update(SLNet::TimeMS curTime)
 {
+	// unused parameters
+	(void)curTime;
 }
 PlayerReplica::PlayerReplica()
 {
@@ -193,6 +206,9 @@ PlayerReplica::~PlayerReplica()
 }
 void PlayerReplica::WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
 {
+	// unused parameters
+	(void)destinationConnection;
+
 	allocationIdBitstream->Write(SLNet::RakString("PlayerReplica"));
 }
 void PlayerReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
@@ -213,6 +229,10 @@ bool PlayerReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstr
 }
 void PlayerReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
+	// unused parameters
+	(void)constructionBitstream;
+	(void)destinationConnection;
+
 	// Object was remotely created and all data loaded. Now we can make the object visible
 	scene::IAnimatedMesh* mesh = 0;
 	scene::ISceneManager *sm = demo->GetSceneManager();
@@ -243,6 +263,9 @@ void PlayerReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBi
 }
 void PlayerReplica::PreDestruction(SLNet::Connection_RM3 *sourceConnection)
 {
+	// unused parameters
+	(void)sourceConnection;
+
 	if (model)
 		model->remove();
 }
@@ -360,6 +383,9 @@ float PlayerReplica::GetRotationDifference(float r1, float r2)
 }
 void PlayerReplica::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
 {
+	// unused parameters
+	(void)node;
+
 	if (curAnim==scene::EMAT_ATTACK)
 	{
 		if (isMoving)
@@ -395,6 +421,9 @@ BallReplica::~BallReplica()
 }
 void BallReplica::WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
 {
+	// unused parameters
+	(void)destinationConnection;
+
 	allocationIdBitstream->Write(SLNet::RakString("BallReplica"));
 }
 void BallReplica::SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
@@ -411,6 +440,10 @@ bool BallReplica::DeserializeConstruction(SLNet::BitStream *constructionBitstrea
 }
 void BallReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 {
+	// unused parameters
+	(void)constructionBitstream;
+	(void)destinationConnection;
+
 	// Shot visible effect and BallReplica classes are not linked, but they update the same way, such that
 	// they are in the same spot all the time
 	demo->shootFromOrigin(position, shotDirection);
@@ -428,6 +461,9 @@ void BallReplica::PostDeserializeConstruction(SLNet::BitStream *constructionBits
 }
 void BallReplica::PreDestruction(SLNet::Connection_RM3 *sourceConnection)
 {
+	// unused parameters
+	(void)sourceConnection;
+
 	// The system that shot this ball destroyed it, or disconnected
 	// Technically we should clear out the node visible effect too, but it's not important for now
 }
@@ -484,6 +520,9 @@ void BallReplica::Update(SLNet::TimeMS curTime)
 }
 SLNet::Replica3 *Connection_RM3Irrlicht::AllocReplica(SLNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
 {
+	// unused parameters
+	(void)replicaManager3;
+
 	SLNet::RakString typeName; allocationId->Read(typeName);
 	if (typeName=="PlayerReplica") {BaseIrrlichtReplica *r = new PlayerReplica; r->demo=demo; return r;}
 	if (typeName=="BallReplica") {BaseIrrlichtReplica *r = new BallReplica; r->demo=demo; return r;}

@@ -2038,6 +2038,9 @@ const char *AutopatcherPostgreRepository::GetLastError(void) const
 }
 unsigned int AutopatcherPostgreRepository::GetPatchPart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context)
 {
+	// unused parameters
+	(void)filename;
+
 	PGresult *result;
 	char query[512];
 	char *patch, *contentHash;

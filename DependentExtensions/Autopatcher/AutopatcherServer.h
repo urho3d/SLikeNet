@@ -104,13 +104,24 @@ public:
 		AutopatcherServerLoadNotifier::RequestType requestType,
 		AutopatcherServerLoadNotifier::QueueOperation queueOperation,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
-	{(void) remoteSystem; (void) requestType; (void) queueOperation; (void) autopatcherState;}
+	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)requestType;
+		(void)queueOperation;
+		(void)autopatcherState;
+	}
 
 	virtual void OnGetChangelistCompleted(
 		SystemAddress remoteSystem,
 		AutopatcherServerLoadNotifier::GetChangelistResult getChangelistResult,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
-	{(void) remoteSystem; (void) autopatcherState;}
+	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)getChangelistResult;
+		(void)autopatcherState;
+	}
 
 	/// A file transfer has completed, or was not necessary
 	/// \param[out] remoteSystem Which system this refers to
@@ -118,7 +129,12 @@ public:
 	virtual void OnGetPatchCompleted(SystemAddress remoteSystem,
 		AutopatcherServerLoadNotifier::PatchResult patchResult,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
-	{(void) remoteSystem; (void) patchResult; (void) autopatcherState;};
+	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)patchResult;
+		(void)autopatcherState;
+	}
 };
 
 /// \brief Sample implementation of AutopatcherServerLoadNotifier using printf

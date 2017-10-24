@@ -44,6 +44,9 @@ static const unsigned HASH_LENGTH=4;
 
 PatchContext AutopatcherClientCBInterface::ApplyPatchBase(const char *oldFilePath, char **newFileContents, unsigned int *newFileSize, char *patchContents, unsigned int patchSize, uint32_t patchAlgorithm)
 {
+	// unused parameters
+	(void)patchAlgorithm;
+
 	return ApplyPatchBSDiff(oldFilePath, newFileContents, newFileSize, patchContents, patchSize);
 }
 
@@ -87,6 +90,9 @@ struct AutopatcherClientThreadInfo
 // -----------------------------------------------------------------
 AutopatcherClientThreadInfo* AutopatcherClientWorkerThread(AutopatcherClientThreadInfo* input, bool *returnOutput, void* perThreadData)
 {
+	// unused parameters
+	(void)perThreadData;
+
 	char fullPathToDir[1024];
 	*returnOutput=true;
 
@@ -550,6 +556,10 @@ void AutopatcherClient::Update(void)
 }
 void AutopatcherClient::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
+	// unused parameters
+	(void)rakNetGUID;
+	(void)lostConnectionReason;
+
 	if (systemAddress==serverId)
 		Clear();
 }

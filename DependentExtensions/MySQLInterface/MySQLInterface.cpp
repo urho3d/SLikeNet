@@ -108,6 +108,9 @@ bool MySQLInterface::ExecuteBlockingCommand(const char *command)
 
 bool MySQLInterface::ExecuteBlockingCommand(const char *command, MYSQL_RES **result, bool rollbackOnFailure)
 {
+	// unused parameters
+	(void)rollbackOnFailure;
+
 	if (!ExecuteBlockingCommand (command))
 		return false;
 

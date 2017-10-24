@@ -14,7 +14,17 @@
 #ifndef __C_MAIN_MENU_H_INCLUDED__
 #define __C_MAIN_MENU_H_INCLUDED__
 
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable:4100) // unreferenced formal parameter
+#endif
+
 #include <irrlicht.h>
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
 #ifdef _WIN32__
 #include "slikenet/WindowsIncludes.h" // Prevent 'fd_set' : 'struct' type redefinition
 #endif
