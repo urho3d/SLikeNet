@@ -51,6 +51,9 @@ void SQLiteClientLogger_PacketLogger::OnDirectSocketReceive(const char *data, co
 }
 void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time, bool isSend)
 {
+	// unused parameters
+	(void)time;
+
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
 	localSystemAddress.ToString(true, str1, 64);
@@ -78,6 +81,9 @@ void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalP
 }
 void SQLiteClientLogger_PacketLogger::OnAck(unsigned int messageNumber, SystemAddress remoteSystemAddress, SLNet::TimeMS time)
 {
+	// unused parameters
+	(void)time;
+
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
 	localSystemAddress.ToString(true, str1, 64);

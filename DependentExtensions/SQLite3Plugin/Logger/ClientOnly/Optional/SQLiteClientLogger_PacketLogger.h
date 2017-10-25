@@ -43,7 +43,11 @@ public:
 	virtual void WriteMiscellaneous(const char *type, const char *msg);
 protected:
 
-	virtual void WriteLog(const char *str) {}
+	virtual void WriteLog(const char *str)
+	{
+		// unused parameters
+		(void)str;
+	}
 };
 
 }

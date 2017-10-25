@@ -69,6 +69,9 @@ void RPC3::SetNetworkIDManager(NetworkIDManager *idMan)
 
 bool RPC3::UnregisterFunction(const char *uniqueIdentifier)
 {
+	// unused parameters
+	(void)uniqueIdentifier;
+
 	return false;
 }
 
@@ -544,6 +547,11 @@ void RPC3::InvokeSignal(DataStructures::HashIndex functionIndex, SLNet::BitStrea
 
 void RPC3::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
+	// unused parameters
+	(void)systemAddress;
+	(void)rakNetGUID;
+	(void)lostConnectionReason;
+
 // 	if (remoteFunctions.Has(systemAddress))
 // 	{
 // 		DataStructures::OrderedList<RPCIdentifier, RemoteRPCFunction, RPC3::RemoteRPCFunctionComp> *theList = remoteFunctions.Get(systemAddress);

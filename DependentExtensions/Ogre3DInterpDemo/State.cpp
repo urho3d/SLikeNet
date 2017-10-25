@@ -28,18 +28,28 @@ State::~State()
 }
 void State::OnEnter(const FSM *caller, bool loadResources)
 {
-
+	// unused parameters
+	(void)caller;
+	(void)loadResources;
 }
 void State::OnLeave(const FSM *caller, bool unloadResources)
 {
-	
+	// unused parameters
+	(void)caller;
+	(void)unloadResources;
 }
 void State::FSMAddRef(const FSM *caller)
 {
+	// unused parameters
+	(void)caller;
+
 	++fsmRefCount;
 }
 void State::FSMRemoveRef(const FSM *caller)
 {
+	// unused parameters
+	(void)caller;
+
 	RakAssert(fsmRefCount!=0);
 	--fsmRefCount;
 }
@@ -49,6 +59,9 @@ unsigned State::FSMRefCount(void) const
 }
 void ManagedState::FSMRemoveRef(const FSM *caller)
 {
+	// unused parameters
+	(void)caller;
+
 	RakAssert(fsmRefCount!=0);
 	if (--fsmRefCount)
 		delete this;

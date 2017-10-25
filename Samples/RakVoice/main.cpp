@@ -61,6 +61,10 @@ static int PACallback( void *inputBuffer, void *outputBuffer,
 						  unsigned long framesPerBuffer,
 						  PaTimestamp outTime, void *userData )
 {
+	// unused parameters
+	(void)framesPerBuffer;
+	(void)outTime;
+	(void)userData;
 
 	if (inputBuffer && !mute)
 	{

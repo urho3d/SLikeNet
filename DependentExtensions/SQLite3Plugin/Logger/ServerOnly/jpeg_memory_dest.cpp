@@ -1,6 +1,11 @@
 /*
- * This file was taken from RakNet 4.082 without any modifications.
+ * This file was taken from RakNet 4.082.
  * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *
+ * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ * license found in the license.txt file in the root directory of this source tree.
  */
 
 #include "jpeg_memory_dest.h"
@@ -89,6 +94,9 @@ jpeg_memory_dest (j_compress_ptr cinfo, JOCTET* buffer, int bufsize, int* outsiz
 METHODDEF(void)
 init_source (j_decompress_ptr dinfo)
 {
+	// unused parameters
+	(void)dinfo;
+
 	/* nothing to do here, really. I mean. I'm not lazy or something, but...
 	we're actually through here. */
 }
@@ -97,6 +105,9 @@ init_source (j_decompress_ptr dinfo)
 METHODDEF(boolean)
 fill_input_buffer (j_decompress_ptr dinfo)
 {
+	// unused parameters
+	(void)dinfo;
+
 	/* we can't do anything about this. This might happen if the provided
 	buffer is either invalid with regards to its content or just a to
 	small bufsize has been given. */
@@ -126,6 +137,9 @@ skip_input_data (j_decompress_ptr dinfo, INT32 num_bytes)
 METHODDEF(void)
 term_source (j_decompress_ptr dinfo)
 {
+	// unused parameters
+	(void)dinfo;
+
 	/* Again. Absolute laziness. Nothing to do here. Boring. */
 }
 

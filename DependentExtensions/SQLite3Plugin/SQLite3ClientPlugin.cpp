@@ -21,6 +21,8 @@ void SQLite3PluginResultInterface_Printf::_sqlite3_exec(
 	const SQLite3Table &table,
 	SLNet::RakString errorMsg)
 {
+	// unused parameters
+	(void)queryId;
 
 	if (errorMsg.IsEmpty()==false)
 	{
@@ -53,6 +55,9 @@ void SQLite3PluginResultInterface_Printf::OnUnknownDBIdentifier(
 	unsigned int queryId,
 	SLNet::RakString dbIdentifier)
 {
+	// unused parameters
+	(void)queryId;
+
 	printf("Unknown DB %s\n", dbIdentifier.C_String());
 }
 SQLite3ClientPlugin::SQLite3ClientPlugin()

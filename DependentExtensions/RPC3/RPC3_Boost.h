@@ -239,7 +239,11 @@ struct ReadWithoutNetworkIDNoPtr
 
 	// typedef boost::mpl::false_ Cleanup;
 	template< typename T2 >
-	static void Cleanup(T2 &t) {}
+	static void Cleanup(T2 &t)
+	{
+		// unused parameters
+		(void)t;
+	}
 };
 
 template< typename T >
@@ -293,7 +297,11 @@ struct ReadWithNetworkIDPtr
 	}
 
 	template< typename T2 >
-	static void Cleanup(T2 &t) {}
+	static void Cleanup(T2 &t)
+	{
+		// unused parameters
+		(void)t;
+	}
 };
 
 template< typename T >
@@ -339,7 +347,8 @@ struct ReadWithoutNetworkIDPtr
 	}
 
 	template< typename T2 >
-	static void Cleanup(T2 &t) {
+	static void Cleanup(T2 &t)
+	{
 		if (t)
 			delete [] t;
 	}
@@ -356,7 +365,11 @@ struct SetRPC3Ptr
 
 	//typedef boost::mpl::false_ Cleanup;
 	template< typename T2 >
-	static void Cleanup(T2 &t) {}
+	static void Cleanup(T2 &t)
+	{
+		// unused parameters
+		(void)t;
+	}
 };
 
 /*

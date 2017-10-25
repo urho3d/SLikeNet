@@ -48,6 +48,8 @@ void AppInterface::PreConfigure(void)
 }
 void AppInterface::PostConfigure(const char *defaultResourceConfigurationPath)
 {
+	// unused parameters
+	(void)defaultResourceConfigurationPath;
 }
 void AppInterface::Update(AppTime curTimeMS,AppTime elapsedTimeMS)
 {
@@ -77,6 +79,10 @@ void AppInterface::DebugOut(unsigned int lifetimeMS, const char *format, ...)
 	text[8095]=0;
 	printf(text);
 #else
+	// unused parameters
+	(void)lifetimeMS;
+	(void)format;
+
 	// Don't call this without an implementation.  Perhaps you meant to use MainApp() instead
 	RakAssert(0);
 #endif
