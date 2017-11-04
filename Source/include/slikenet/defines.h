@@ -102,9 +102,6 @@
 #endif
 
 #ifndef RakAssert
-
-
-
 #if   defined(__native_client__)
 #define RakAssert(x)
 #else

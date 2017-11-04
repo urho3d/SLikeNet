@@ -43,13 +43,31 @@ bool runningAsServer;
 class User : public Replica3
 {
 public:
-	User() {score=0;}
-	virtual ~User() {}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("User");}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)	{
+	User()
+	{
+		score=0;
+	}
+	virtual ~User()
+	{
+	}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		allocationIdBitstream->Write("User");
+	}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
 		return QueryConstruction_ServerConstruction(destinationConnection, runningAsServer);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return QueryRemoteConstruction_ServerConstruction(sourceConnection, runningAsServer);}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		return QueryRemoteConstruction_ServerConstruction(sourceConnection, runningAsServer);
+	}
 	static void SerializeToBitStream(User *user, BitStream *bitStream)
 	{
 		bitStream->Write(user->score);
@@ -62,10 +80,18 @@ public:
 		bitStream->Read(user->username);
 		bitStream->Read(user->guid);
 	}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		SerializeToBitStream(this, constructionBitstream);
 	}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		DeserializeToBitStream(this, constructionBitstream);
 		if (guid==rakPeer->GetMyGUID())
 			printf("My user created with name %s and score %i\n", username.C_String(), score);
@@ -74,20 +100,45 @@ public:
 		return true;
 	}
 
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
 		if (runningAsServer)
 			return QueryActionOnPopConnection_Server(droppedConnection);
 		else
-			return QueryActionOnPopConnection_Client(droppedConnection);}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {return QuerySerialization_ServerSerializable(destinationConnection, runningAsServer);}
-	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {
+			return QueryActionOnPopConnection_Client(droppedConnection);
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
+		return QuerySerialization_ServerSerializable(destinationConnection, runningAsServer);
+	}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters)
+	{
 		SerializeToBitStream(this, &serializeParameters->outputBitstream[0]);
 		return RM3SR_BROADCAST_IDENTICALLY;
 	}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
+	{
 		if (deserializeParameters->bitstreamWrittenTo[0])
 			DeserializeToBitStream(this, &deserializeParameters->serializationBitstream[0]);
 	}
@@ -106,7 +157,11 @@ public:
 			}
 		}
 	}
-	virtual void PreDestruction(SLNet::Connection_RM3 *sourceConnection) {
+	virtual void PreDestruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		if (guid==rakPeer->GetMyGUID())
 			printf("My user destroyed with name %s and score %i\n", username.C_String(), score);
 		else
@@ -122,10 +177,17 @@ public:
 class SampleConnectionRM3 : public Connection_RM3
 {
 public:
-	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid) {}
-	virtual ~SampleConnectionRM3() {}
+	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid)
+	{
+	}
+	virtual ~SampleConnectionRM3()
+	{
+	}
 	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3)
 	{
+		// unused parameters
+		(void)replicaManager3;
+
 		RakString objectType;
 		// Types are written by WriteAllocationID()
 		allocationIdBitstream->Read(objectType);
@@ -139,10 +201,20 @@ public:
 class SampleRM3 : public ReplicaManager3
 {
 public:
-	SampleRM3() {}
-	virtual ~SampleRM3() {}
-	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const {return new SampleConnectionRM3(systemAddress,rakNetGUID);}
-	virtual void DeallocConnection(Connection_RM3 *connection) const {delete connection;}
+	SampleRM3()
+	{
+	}
+	virtual ~SampleRM3()
+	{
+	}
+	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const
+	{
+		return new SampleConnectionRM3(systemAddress,rakNetGUID);
+	}
+	virtual void DeallocConnection(Connection_RM3 *connection) const
+	{
+		delete connection;
+	}
 };
 
 int serverMain(void);

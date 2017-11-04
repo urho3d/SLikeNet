@@ -2930,6 +2930,13 @@ void RakPeer::ReleaseSockets( DataStructures::List<RakNetSocket2* > &sockets )
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void RakPeer::ApplyNetworkSimulator( float packetloss, unsigned short minExtraPing, unsigned short extraPingVariance)
 {
+#ifndef _DEBUG
+	// unused parameters
+	(void)packetloss;
+	(void)minExtraPing;
+	(void)extraPingVariance;
+#endif
+
 #ifdef _DEBUG
 	if (remoteSystemList)
 	{

@@ -89,6 +89,9 @@ public:
 
 	virtual bool OnDownloadComplete(DownloadCompleteStruct *dcs)
 	{
+		// unused parameters
+		(void)dcs;
+
 		printf("Download complete.\n");
 
 		// Returning false automatically deallocates the automatically allocated handler that was created by DirectoryDeltaTransfer
@@ -102,11 +105,20 @@ class TestFileListProgress : public SLNet::FileListProgress
 {
     virtual void OnFilePush(const char *fileName, unsigned int fileLengthBytes, unsigned int offset, unsigned int bytesBeingSent, bool done, SLNet::SystemAddress targetSystem, unsigned short setID)
 	{
+		// unused parameters
+		(void)fileLengthBytes;
+		(void)done;
+		(void)targetSystem;
+		(void)setID;
+
 		printf("Sending %s bytes=%i offset=%i\n", fileName, bytesBeingSent, offset);
 	}
 
     virtual void OnFilePushesComplete(SLNet::SystemAddress systemAddress, unsigned short setID )
 	{
+		// unused parameters
+		(void)setID;
+
 		char str[32];
 		systemAddress.ToString(true, (char*) str, 32);
 		RAKNET_DEBUG_PRINTF("File pushes complete to %s\n", str);	

@@ -52,10 +52,17 @@ class MyCallback : public SLNet::CloudClientCallback
 {
 	virtual void OnGet(SLNet::CloudQueryResult *result, bool *deallocateRowsAfterReturn)
 	{
+		// unused parameters
+		(void)deallocateRowsAfterReturn;
+
 		printf("On Download %i rows. IsSubscription=%i.\n", result->rowsReturned.Size(), result->subscribeToResults);
 	}
 	virtual void OnSubscriptionNotification(SLNet::CloudQueryRow *result, bool wasUpdated, bool *deallocateRowAfterReturn)
 	{
+		// unused parameters
+		(void)result;
+		(void)deallocateRowAfterReturn;
+
 		if (wasUpdated)
 			printf("OnSubscriptionNotification Updated\n");
 		else

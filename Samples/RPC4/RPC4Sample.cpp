@@ -32,6 +32,9 @@ RakPeerInterface *rakPeer;
 
 void CFunc1(SLNet::BitStream *bitStream, Packet *packet )
 {
+	// unused parameters
+	(void)packet;
+
 	printf("CFunc1 ");
 	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();
@@ -42,6 +45,9 @@ void CFunc1(SLNet::BitStream *bitStream, Packet *packet )
 
 void CFunc2(SLNet::BitStream *bitStream, Packet *packet )
 {
+	// unused parameters
+	(void)packet;
+
 	printf("CFunc2 ");
 	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();
@@ -52,6 +58,9 @@ void CFunc2(SLNet::BitStream *bitStream, Packet *packet )
 
 void CFunc3(SLNet::BitStream *bitStream, SLNet::BitStream *returnData, Packet *packet )
 {
+	// unused parameters
+	(void)packet;
+
 	printf("CFunc3 ");
 	SLNet::RakString data;
 	int offset=bitStream->GetReadOffset();

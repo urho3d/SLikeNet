@@ -48,22 +48,108 @@ NetworkIDManager *networkIDManager;
 class Team : public Replica3
 {
 public:
-	Team() {tmTeam.SetOwner(this);}
-	virtual ~Team() {}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3CS_ALREADY_EXISTS_REMOTELY; return RM3CS_ALREADY_EXISTS_REMOTELY_DO_NOT_CONSTRUCT;}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return false;}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {tmTeam.SerializeConstruction(constructionBitstream);};
-	virtual void DeserializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {tmTeam.DeserializeConstruction(teamManager, constructionBitstream);};
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return RM3AOPC_DO_NOTHING;}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {if (fullyConnectedMesh2->IsConnectedHost()) return RM3QSR_CALL_SERIALIZE; return RM3QSR_DO_NOT_CALL_SERIALIZE;}
-	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[0].WriteCompressed(teamName); return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {deserializeParameters->serializationBitstream[0].ReadCompressed(teamName);}
+	Team()
+	{
+		tmTeam.SetOwner(this);
+	}
+	virtual ~Team()
+	{
+	}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+		(void)allocationIdBitstream;
+	}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)destinationConnection;
+		(void)replicaManager3;
+
+		if (fullyConnectedMesh2->IsConnectedHost())
+			return RM3CS_ALREADY_EXISTS_REMOTELY;
+		return RM3CS_ALREADY_EXISTS_REMOTELY_DO_NOT_CONSTRUCT;
+	}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		return false;
+	}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)constructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)constructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual void SerializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		tmTeam.SerializeConstruction(constructionBitstream);
+	}
+	virtual void DeserializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		tmTeam.DeserializeConstruction(teamManager, constructionBitstream);
+	}
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		// unused parameters
+		(void)droppedConnection;
+
+		return RM3AOPC_DO_NOTHING;
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		if (fullyConnectedMesh2->IsConnectedHost())
+			return RM3QSR_CALL_SERIALIZE;
+		return RM3QSR_DO_NOT_CALL_SERIALIZE;
+	}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters)
+	{
+		serializeParameters->outputBitstream[0].WriteCompressed(teamName);
+		return RM3SR_BROADCAST_IDENTICALLY;
+	}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
+	{
+		deserializeParameters->serializationBitstream[0].ReadCompressed(teamName);
+	}
 
 	// The actual team data
 	TM_Team tmTeam;
@@ -77,25 +163,88 @@ public:
 class User : public Replica3
 {
 public:
-	User() {tmTeamMember.SetOwner(this);}
-	virtual ~User() {}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("User");}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {return QueryConstruction_PeerToPeer(destinationConnection);}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	User()
+	{
+		tmTeamMember.SetOwner(this);
+	}
+	virtual ~User()
+	{
+	}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		allocationIdBitstream->Write("User");
+	}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
+		return QueryConstruction_PeerToPeer(destinationConnection);
+	}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		// teamMember must be serialized later than teams. This is accomplished by registering teams first with ReplicaManager3
 		tmTeamMember.SerializeConstruction(constructionBitstream);
 	}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		return tmTeamMember.DeserializeConstruction(teamManager, constructionBitstream);
 	}
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return QueryActionOnPopConnection_PeerToPeer(droppedConnection);}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {return QuerySerialization_PeerToPeer(destinationConnection);}
-	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {serializeParameters->outputBitstream[1].Write(userName); return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {if (deserializeParameters->bitstreamWrittenTo[1]) deserializeParameters->serializationBitstream[1].Read(userName);}
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		return QueryActionOnPopConnection_PeerToPeer(droppedConnection);
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
+		return QuerySerialization_PeerToPeer(destinationConnection);
+	}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters)
+	{
+		serializeParameters->outputBitstream[1].Write(userName);
+		return RM3SR_BROADCAST_IDENTICALLY;
+	}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
+	{
+		if (deserializeParameters->bitstreamWrittenTo[1])
+			deserializeParameters->serializationBitstream[1].Read(userName);
+	}
 
 	void PrintTeamStatus(void)
 	{
@@ -139,19 +288,43 @@ public:
 class SampleConnectionRM3 : public Connection_RM3
 {
 public:
-	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid) {}
-	virtual ~SampleConnectionRM3() {}
-	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3) {RakString objectType; allocationIdBitstream->Read(objectType); if (objectType=="User") return new User; return 0;}
+	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid)
+	{
+	}
+	virtual ~SampleConnectionRM3()
+	{
+	}
+	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
+		RakString objectType;
+		allocationIdBitstream->Read(objectType);
+		if (objectType=="User")
+			return new User;
+		return 0;
+	}
 };
 
 // Required to derive from ReplicaManager3 as a class factory pattern to create SampleConnectionRM3
 class SampleRM3 : public ReplicaManager3
 {
 public:
-	SampleRM3() {}
-	virtual ~SampleRM3() {}
-	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const {return new SampleConnectionRM3(systemAddress,rakNetGUID);}
-	virtual void DeallocConnection(Connection_RM3 *connection) const {delete connection;}
+	SampleRM3()
+	{
+	}
+	virtual ~SampleRM3()
+	{
+	}
+	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const
+	{
+		return new SampleConnectionRM3(systemAddress,rakNetGUID);
+	}
+	virtual void DeallocConnection(Connection_RM3 *connection) const
+	{
+		delete connection;
+	}
 };
 
 // Instance of ReplicaManager3
