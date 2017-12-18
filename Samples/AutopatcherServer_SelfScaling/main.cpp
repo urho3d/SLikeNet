@@ -159,14 +159,20 @@ public:
 		printf("Retrying...\n");
 		httpConnection2->TransmitRequest(postStr,authURLDomain, 443, true);
 	}
-	virtual void OnEmptyResponse(RakString stringTransmitted) {
+	virtual void OnEmptyResponse(RakString stringTransmitted)
+	{
 		printf("--ERROR--: OnEmptyResponse(). stringTransmitted=%s", stringTransmitted.C_String());
 	}
 	virtual void OnMessage(const char *message, RakString responseReceived, RakString stringTransmitted, ptrdiff_t contentOffset)
 	{
+		// unused parameters
+		(void)responseReceived;
+		(void)contentOffset;
+
 		printf("--WARNING--: OnMessage(). message=%s\nstringTransmitted=%s", message, stringTransmitted.C_String());
 	}
-	virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, ptrdiff_t contentOffset){
+	virtual void OnResponse(Rackspace2ResponseCode r2rc, RakString responseReceived, ptrdiff_t contentOffset)
+	{
 		if (r2rc==R2RC_AUTHENTICATED)
 		{
 			printf("Authenticated with Rackspace\nX-Auth-Token: %s\n", rackspace2->GetAuthToken());
@@ -758,6 +764,11 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		AutopatcherServerLoadNotifier::QueueOperation queueOperation,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)requestType;
+		(void)queueOperation;
+
 		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
 
 		//AutopatcherServerLoadNotifier_Printf::OnQueueUpdate(remoteSystem, requestType, queueOperation, autopatcherState);
@@ -768,6 +779,10 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		AutopatcherServerLoadNotifier::GetChangelistResult getChangelistResult,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)getChangelistResult;
+
 		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
 
 		//AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(remoteSystem, getChangelistResult, autopatcherState);
@@ -777,6 +792,10 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		AutopatcherServerLoadNotifier::PatchResult patchResult,
 		AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 	{
+		// unused parameters
+		(void)remoteSystem;
+		(void)patchResult;
+
 		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
 
 		//AutopatcherServerLoadNotifier_Printf::OnGetPatchCompleted(remoteSystem, patchResult, autopatcherState);

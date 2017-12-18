@@ -125,6 +125,9 @@ void SQLite3ServerPlugin::Update(void)
 }
 SQLite3ServerPlugin::SQLExecThreadOutput ExecStatementThread(SQLite3ServerPlugin::SQLExecThreadInput threadInput, bool *returnOutput, void* perThreadData)
 {
+	// unused parameters
+	(void)perThreadData;
+
 	unsigned int queryId;
 	SLNet::RakString dbIdentifier;
 	SLNet::RakString inputStatement;

@@ -67,6 +67,9 @@ public:
 
 	virtual bool OnDownloadComplete(DownloadCompleteStruct *dcs)
 	{
+		// unused parameters
+		(void)dcs;
+
 		printf("Download complete.\n");
 
 		// Returning false automatically deallocates the automatically allocated handler that was created by DirectoryDeltaTransfer

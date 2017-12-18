@@ -34,7 +34,7 @@
 
 using namespace SLNet;
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
 	RakPeerInterface *rakPeer;
 	char str[256];

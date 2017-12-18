@@ -17,7 +17,6 @@
 #include "slikenet/sleep.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include "slikenet/Kbhit.h"
 #include "slikenet/MessageIdentifiers.h"
@@ -107,6 +106,9 @@ struct NatTypeDetectionServerFramework : public SampleFramework
 	}
 	virtual void ProcessPacket(SLNet::RakPeerInterface *rakPeer, Packet *packet)
 	{
+		// unused parameters
+		(void)rakPeer;
+		(void)packet;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
@@ -139,6 +141,9 @@ struct NatPunchthroughServerFramework : public SampleFramework, public NatPuncht
 	}
 	virtual void ProcessPacket(SLNet::RakPeerInterface *rakPeer, Packet *packet)
 	{
+		// unused parameters
+		(void)rakPeer;
+		(void)packet;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
@@ -169,6 +174,9 @@ struct RelayPluginFramework : public SampleFramework
 	}
 	virtual void ProcessPacket(SLNet::RakPeerInterface *rakPeer, Packet *packet)
 	{
+		// unused parameters
+		(void)rakPeer;
+		(void)packet;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
@@ -208,6 +216,9 @@ struct UDPProxyCoordinatorFramework : public SampleFramework
 	}
 	virtual void ProcessPacket(SLNet::RakPeerInterface *rakPeer, Packet *packet)
 	{
+		// unused parameters
+		(void)rakPeer;
+		(void)packet;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
@@ -359,6 +370,9 @@ struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerRe
 	}
 	virtual void ProcessPacket(SLNet::RakPeerInterface *rakPeer, Packet *packet)
 	{
+		// unused parameters
+		(void)rakPeer;
+		(void)packet;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
@@ -372,14 +386,23 @@ struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerRe
 
 	virtual void OnLoginSuccess(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)
 	{
+		// unused parameters
+		(void)proxyServerPlugin;
+
 		printf("%s logged into UDPProxyCoordinator.\n", QueryName());
 	}
 	virtual void OnAlreadyLoggedIn(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)
 	{
+		// unused parameters
+		(void)proxyServerPlugin;
+
 		printf("%s already logged into UDPProxyCoordinator.\n", QueryName());
 	}
 	virtual void OnNoPasswordSet(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)
 	{
+		// unused parameters
+		(void)proxyServerPlugin;
+
 		printf("%s failed login to UDPProxyCoordinator. No password set.\n", QueryName());
 		isSupported=QUERY;
 		delete udpps;
@@ -387,6 +410,9 @@ struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerRe
 	}
 	virtual void OnWrongPassword(SLNet::RakString usedPassword, SLNet::UDPProxyServer *proxyServerPlugin)
 	{
+		// unused parameters
+		(void)proxyServerPlugin;
+
 		printf("%s failed login to UDPProxyCoordinator. %s was the wrong password.\n", QueryName(), usedPassword.C_String());
 		isSupported=QUERY;
 		delete udpps;

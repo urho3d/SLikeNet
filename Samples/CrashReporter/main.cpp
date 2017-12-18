@@ -59,7 +59,7 @@ void function1(int a)
 	printf("Now crashing!!!! %p\n", crashPtr);
 	// If it crashes here in your debugger that is because you didn't define _DEBUG_CRASH_REPORTER to catch it.
 	// The normal mode of the crash handler is to only catch when you are NOT debugging (started through ctrl-f5)
-	*crashPtr=10;
+	*crashPtr=a;
 }
 
 void RunGame(void)

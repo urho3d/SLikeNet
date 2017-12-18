@@ -138,20 +138,61 @@ public:
 		IN_GAME,
 		EXIT_SAMPLE,
 	};
-	Game() {myNatType=NAT_TYPE_UNKNOWN; masterServerRow=-1; Reset(); whenToNextUpdateMasterServer=0; masterServerQueryResult=0;}
-	virtual ~Game() {if (masterServerQueryResult) json_decref(masterServerQueryResult);}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	Game()
+	{
+		myNatType=NAT_TYPE_UNKNOWN;
+		masterServerRow = -1;
+		Reset();
+		whenToNextUpdateMasterServer = 0;
+		masterServerQueryResult = 0;
+	}
+	virtual ~Game()
+	{
+		if (masterServerQueryResult)
+			json_decref(masterServerQueryResult);
+	}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+		(void)allocationIdBitstream;
+	}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
 		if (fullyConnectedMesh2->IsConnectedHost())
 			return QueryConstruction_PeerToPeer(destinationConnection, R3P2PM_STATIC_OBJECT_CURRENTLY_AUTHORITATIVE);
 		else
 			return QueryConstruction_PeerToPeer(destinationConnection, R3P2PM_STATIC_OBJECT_NOT_CURRENTLY_AUTHORITATIVE);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)constructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)constructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
 	virtual void SerializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
 	{
+		// unused parameters
+		(void)destinationConnection;
+
 		constructionBitstream->Write(gameName);
 		constructionBitstream->Write(lockGame);
 		constructionBitstream->Write(gameInLobby);
@@ -159,17 +200,45 @@ public:
 	}
 	virtual void DeserializeConstructionExisting(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 	{
+		// unused parameters
+		(void)sourceConnection;
+
 		constructionBitstream->Read(gameName);
 		constructionBitstream->Read(lockGame);
 		constructionBitstream->Read(gameInLobby);
 		constructionBitstream->Read(masterServerRow);
 		printf("Downloaded game. locked=%i. inLobby=%i\n", lockGame, gameInLobby);
 	}
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return RM3AOPC_DO_NOTHING;}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		// unused parameters
+		(void)droppedConnection;
+
+		return RM3AOPC_DO_NOTHING;
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
 		if (fullyConnectedMesh2->IsConnectedHost())
 			return QuerySerialization_PeerToPeer(destinationConnection, R3P2PM_STATIC_OBJECT_CURRENTLY_AUTHORITATIVE);
 		else
@@ -263,7 +332,11 @@ public:
 		}
 	}
 
-	void Reset(void) {lockGame=false; gameInLobby=true;}
+	void Reset(void)
+	{
+		lockGame=false;
+		gameInLobby=true;
+	}
 
 	void SearchForGames(void)
 	{
@@ -344,14 +417,26 @@ public:
 class Team : public Replica3
 {
 public:
-	Team() {
+	Team()
+	{
 		game->teams.Push(this, _FILE_AND_LINE_); tmTeam.SetOwner(this);
 	}
-	virtual ~Team() {
+	virtual ~Team()
+	{
 		game->teams.RemoveAtIndex(game->teams.GetIndexOf(this));
 	}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("Team");}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		allocationIdBitstream->Write("Team");
+	}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
+	{
+		// unused parameters
+		(void)replicaManager3;
+
 		// This implementation has the host create the Team instances initially
 		// If the original host disconnects, the new host as determined by FullyConnectedMesh2 takes over replication duties
 		if (fullyConnectedMesh2->IsConnectedHost())
@@ -359,11 +444,25 @@ public:
 		else
 			return QueryConstruction_PeerToPeer(destinationConnection, R3P2PM_MULTI_OWNER_NOT_CURRENTLY_AUTHORITATIVE);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		constructionBitstream->Write(teamName);
 	}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		constructionBitstream->Read(teamName);
 		printf("Downloaded team. name=%s\n", teamName.C_String());
 		// When ReplicaManager3 creates the team from a network command, the TeamManager class has to be informed of the new TM_Team instance
@@ -371,29 +470,70 @@ public:
 		return true;
 	}
 
-	virtual void PostSerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	virtual void PostSerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		tmTeam.SerializeConstruction(constructionBitstream);
 	}
-	virtual void PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
-		tmTeam.DeserializeConstruction(teamManager, constructionBitstream);	
+	virtual void PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		tmTeam.DeserializeConstruction(teamManager, constructionBitstream);
 	}
 
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		// unused parameters
+		(void)droppedConnection;
+
 		// Do not destroy the object when the connection that created it disconnects.
 		return RM3AOPC_DO_NOTHING;
 	}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
 		// Whoever is currently the host serializes the class
 		if (fullyConnectedMesh2->IsConnectedHost())
 			return QuerySerialization_PeerToPeer(destinationConnection, R3P2PM_MULTI_OWNER_CURRENTLY_AUTHORITATIVE);
 		else
 			return QuerySerialization_PeerToPeer(destinationConnection, R3P2PM_MULTI_OWNER_NOT_CURRENTLY_AUTHORITATIVE);
 	}
-	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters)
+	{
+		// unused parameters
+		(void)serializeParameters;
+
+		return RM3SR_BROADCAST_IDENTICALLY;
+	}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
+	{
+		// unused parameters
+		(void)deserializeParameters;
+	}
 	
 	// Team data managed by the TeamManager plugin
 	TM_Team tmTeam;
@@ -408,24 +548,53 @@ public:
 class User : public Replica3
 {
 public:
-	User() {game->users.Push(this, _FILE_AND_LINE_); tmTeamMember.SetOwner(this); natType=NAT_TYPE_UNKNOWN;}
-	virtual ~User() {
+	User()
+	{
+		game->users.Push(this, _FILE_AND_LINE_);
+		tmTeamMember.SetOwner(this);
+		natType=NAT_TYPE_UNKNOWN;
+	}
+	virtual ~User()
+	{
 		game->users.RemoveAtIndex(game->users.GetIndexOf(this));
 	}
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {allocationIdBitstream->Write("User");}
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
+	{
+		// unused parameters
+		(void)destinationConnection;
+
+		allocationIdBitstream->Write("User");
+	}
 	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
 	{
+		// unused parameters
+		(void)replicaManager3;
+
 		// Whoever created the user replicates it.
 		return QueryConstruction_PeerToPeer(destinationConnection);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		constructionBitstream->Write(userName);
 		constructionBitstream->WriteCasted<unsigned char>(natType);
 		constructionBitstream->Write(playerGuid);
 		constructionBitstream->Write(playerAddress);
 	}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		// The TeamManager plugin has to be informed of TM_TeamMember instances created over the network
 		teamManager->GetWorldAtIndex(0)->ReferenceTeamMember(&tmTeamMember, GetNetworkID());
 		constructionBitstream->Read(userName);
@@ -434,12 +603,20 @@ public:
 		constructionBitstream->Read(playerAddress);
 		return true;
 	}
-	virtual void PostSerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection) {
+	virtual void PostSerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destinationConnection;
+
 		// TeamManager requires that TM_Team was created before TM_TeamMember that uses it.
 		// PostSerializeConstruction and PostDeserializeConstruction ensure that all objects have been created before serialization
 		tmTeamMember.SerializeConstruction(constructionBitstream);
 	}
-	virtual void PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
+	virtual void PostDeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
 		tmTeamMember.DeserializeConstruction(teamManager, constructionBitstream);	
 		printf("Downloaded user. name=%s", userName.C_String());
 		if (tmTeamMember.GetCurrentTeam()==0)
@@ -452,13 +629,47 @@ public:
 			PostRoomToMaster();
 	}
 
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection) {}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {return true;}
-	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {return QueryActionOnPopConnection_PeerToPeer(droppedConnection);}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {delete this;}
-	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {return QuerySerialization_PeerToPeer(destinationConnection);}
-	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters) {return RM3SR_BROADCAST_IDENTICALLY;}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {}
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)destinationConnection;
+	}
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)destructionBitstream;
+		(void)sourceConnection;
+
+		return true;
+	}
+	virtual SLNet::RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
+	{
+		return QueryActionOnPopConnection_PeerToPeer(droppedConnection);
+	}
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
+	{
+		// unused parameters
+		(void)sourceConnection;
+
+		delete this;
+	}
+	virtual SLNet::RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
+	{
+		return QuerySerialization_PeerToPeer(destinationConnection);
+	}
+	virtual RM3SerializationResult Serialize(SLNet::SerializeParameters *serializeParameters)
+	{
+		// unused parameters
+		(void)serializeParameters;
+		
+		return RM3SR_BROADCAST_IDENTICALLY;
+	}
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
+	{
+		// unused parameters
+		(void)deserializeParameters;
+	}
 	
 	// Team data managed by the TeamManager plugin
 	TM_TeamMember tmTeamMember;
@@ -473,10 +684,17 @@ public:
 class SampleConnectionRM3 : public Connection_RM3
 {
 public:
-	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid) {}
-	virtual ~SampleConnectionRM3() {}
+	SampleConnectionRM3(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid)
+	{
+	}
+	virtual ~SampleConnectionRM3()
+	{
+	}
 	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationIdBitstream, ReplicaManager3 *replicaManager3)
 	{
+		// unused parameters
+		(void)replicaManager3;
+
 		RakString objectType;
 		// Types are written by WriteAllocationID()
 		allocationIdBitstream->Read(objectType);
@@ -491,10 +709,20 @@ public:
 class SampleRM3 : public ReplicaManager3
 {
 public:
-	SampleRM3() {}
-	virtual ~SampleRM3() {}
-	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const {return new SampleConnectionRM3(systemAddress,rakNetGUID);}
-	virtual void DeallocConnection(Connection_RM3 *connection) const {delete connection;}
+	SampleRM3()
+	{
+	}
+	virtual ~SampleRM3()
+	{
+	}
+	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const
+	{
+		return new SampleConnectionRM3(systemAddress,rakNetGUID);
+	}
+	virtual void DeallocConnection(Connection_RM3 *connection) const
+	{
+		delete connection;
+	}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -504,6 +732,9 @@ public:
 // Demonstrates how to use the RPC4 plugin
 void InGameChat(SLNet::BitStream *userData, Packet *packet)
 {
+	// unused parameters
+	(void)packet;
+
 	RakString rs;
 	userData->Read(rs);
 	printf("%s\n", rs.C_String());
@@ -722,10 +953,17 @@ void UPNPOpenAsynch(unsigned short portToOpen,
 
 void UPNPProgressCallback(const char *progressMsg, void *userData)
 {
+	// unused parameters
+	(void)userData;
+
 	printf(progressMsg);
 }
 void UPNPResultCallback(bool success, unsigned short portToOpen, void *userData)
 {
+	// unused parameters
+	(void)portToOpen;
+	(void)userData;
+
 	if (success)
 		game->myNatType=NAT_TYPE_SUPPORTS_UPNP;
 	game->EnterPhase(Game::SEARCH_FOR_GAMES);
