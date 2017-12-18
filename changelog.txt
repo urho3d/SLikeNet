@@ -11,11 +11,6 @@ SECURITY = special marker to indicate fixes related to security issues
 If you require a more detailed list on the changes, please refer to the
 Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
 
-version 0.2.0 (xx-xx-xxxx xx:xx UTC)
-Samples:
-  CrashReporter:
-    * fixed minor glitch in function1() not using the passed argument (#130)
-
 version 0.1.1 (xx-xx-xxxx xx:xx UTC)
 *** This release satisfies/processes 2 complete GitHub pull request
 General:

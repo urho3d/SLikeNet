@@ -17,6 +17,7 @@
 #include "slikenet/sleep.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <string.h>
 #include "slikenet/Kbhit.h"
 #include "slikenet/MessageIdentifiers.h"
@@ -278,20 +279,13 @@ struct UPNPFramework : public SampleFramework
 
 	virtual void ProcessPacket(Packet *packet)
 	{
-		// unused parameters
-		(void)packet;
 	}
 	virtual void Update(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		if (sampleResult==FAILED) return;
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
 	}
 
 };
@@ -354,9 +348,6 @@ struct NatTypeDetectionFramework : public SampleFramework
 	}
 	virtual void Update(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		if (sampleResult==FAILED) return;
 
 		if (sampleResult==PENDING && SLNet::GetTimeMS()>timeout)
@@ -367,9 +358,6 @@ struct NatTypeDetectionFramework : public SampleFramework
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		delete ntdc;
 		ntdc=0;
 	}
@@ -502,9 +490,6 @@ struct NatPunchthoughClientFramework : public SampleFramework, public NatPunchth
 	}
 	virtual void Update(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		if (sampleResult==FAILED) return;
 
 		if (sampleResult==PENDING && SLNet::GetTimeMS()>timeout && isListening==false)
@@ -515,9 +500,6 @@ struct NatPunchthoughClientFramework : public SampleFramework, public NatPunchth
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		delete npClient;
 		npClient=0;
 	}
@@ -584,14 +566,9 @@ struct Router2Framework : public SampleFramework
 	}
 	virtual void ProcessPacket(Packet *packet)
 	{
-		// unused parameters
-		(void)packet;
 	}
 	virtual void Update(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		if (sampleResult==FAILED) return;
 
 		if (sampleResult==PENDING && SLNet::GetTimeMS()>timeout)
@@ -602,9 +579,6 @@ struct Router2Framework : public SampleFramework
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		delete router2;
 		router2=0;
 	}
@@ -663,14 +637,9 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	}
 	virtual void ProcessPacket(Packet *packet)
 	{
-		// unused parameters
-		(void)packet;
 	}
 	virtual void Update(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		if (sampleResult==FAILED) return;
 
 		if (sampleResult==PENDING && SLNet::GetTimeMS()>timeout && isListening==false)
@@ -681,9 +650,6 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	}
 	virtual void Shutdown(SLNet::RakPeerInterface *rakPeer)
 	{
-		// unused parameters
-		(void)rakPeer;
-
 		delete udpProxy;
 		udpProxy=0;
 	}
@@ -691,11 +657,6 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnForwardingSuccess(const char *proxyIPAddress, unsigned short proxyPort,
 		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)targetGuid;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-
 		printf("Datagrams forwarded by proxy %s:%i to target %s.\n", proxyIPAddress, proxyPort, targetAddress.ToString(false));
 		printf("Connecting to proxy, which will be received by target.\n");
 		ConnectionAttemptResult car = proxyClientPlugin->GetRakPeerInterface()->Connect(proxyIPAddress, proxyPort, 0, 0);
@@ -705,63 +666,27 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnForwardingNotification(const char *proxyIPAddress, unsigned short proxyPort,
 		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)proxyCoordinator;
-
 		printf("Source %s has setup forwarding to us through proxy %s:%i.\n", sourceAddress.ToString(false), proxyIPAddress, proxyPort);
 
 		sampleResult=SUCCEEDED;
 	}
 	virtual void OnNoServersOnline(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-
 		printf("Failure: No servers logged into coordinator.\n");
 		sampleResult=FAILED;
 	}
 	virtual void OnRecipientNotConnected(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-
 		printf("Failure: Recipient not connected to coordinator.\n");
 		sampleResult=FAILED;
 	}
 	virtual void OnAllServersBusy(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-
 		printf("Failure: No servers have available forwarding ports.\n");
 		sampleResult=FAILED;
 	}
 	virtual void OnForwardingInProgress(const char *proxyIPAddress, unsigned short proxyPort, SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
-		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-		(void)proxyPort;
-		(void)proxyIPAddress;
-
 		printf("Notification: Forwarding already in progress.\n");
 	}
 

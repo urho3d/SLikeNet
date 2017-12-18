@@ -35,11 +35,6 @@ using namespace SLNet;
 
 bool CloudServerHelperFilter::OnPostRequest(RakNetGUID clientGuid, SystemAddress clientAddress, CloudKey key, uint32_t dataLength, const char *data)
 {
-	// unused parameters
-	(void)clientAddress;
-	(void)dataLength;
-	(void)data;
-
 	if (clientGuid!=serverGuid)
 	{
 		if (key.primaryKey==CLOUD_SERVER_CONNECTION_COUNT_PRIMARY_KEY)
@@ -47,35 +42,9 @@ bool CloudServerHelperFilter::OnPostRequest(RakNetGUID clientGuid, SystemAddress
 	}
 	return true;
 }
-bool CloudServerHelperFilter::OnReleaseRequest(RakNetGUID clientGuid, SystemAddress clientAddress, DataStructures::List<CloudKey> &cloudKeys)
-{
-	// unused parameters
-	(void)clientGuid;
-	(void)clientAddress;
-	(void)cloudKeys;
-
-	return true;
-}
-bool CloudServerHelperFilter::OnGetRequest(RakNetGUID clientGuid, SystemAddress clientAddress, CloudQuery &query, DataStructures::List<RakNetGUID> &specificSystems)
-{
-	// unused parameters
-	(void)clientGuid;
-	(void)clientAddress;
-	(void)query;
-	(void)specificSystems;
-
-	return true;
-}
-bool CloudServerHelperFilter::OnUnsubscribeRequest(RakNetGUID clientGuid, SystemAddress clientAddress, DataStructures::List<CloudKey> &cloudKeys, DataStructures::List<RakNetGUID> &specificSystems)
-{
-	// unused parameters
-	(void)clientGuid;
-	(void)clientAddress;
-	(void)cloudKeys;
-	(void)specificSystems;
-
-	return true;
-}
+bool CloudServerHelperFilter::OnReleaseRequest(RakNetGUID clientGuid, SystemAddress clientAddress, DataStructures::List<CloudKey> &cloudKeys) {return true;}
+bool CloudServerHelperFilter::OnGetRequest(RakNetGUID clientGuid, SystemAddress clientAddress, CloudQuery &query, DataStructures::List<RakNetGUID> &specificSystems) {return true;}
+bool CloudServerHelperFilter::OnUnsubscribeRequest(RakNetGUID clientGuid, SystemAddress clientAddress, DataStructures::List<CloudKey> &cloudKeys, DataStructures::List<RakNetGUID> &specificSystems) {return true;}
 
 bool CloudServerHelper::ParseCommandLineParameters(int argc, char **argv)
 {
@@ -299,9 +268,6 @@ void CloudServerHelper::SetupPlugins(
 	const char *serverToServerPassword
 	)
 {
-	// unused parameters
-	(void)cloudClient;
-
 	cloudServer->AddQueryFilter(sampleFilter);
 	// Connect to all systems told about via ConnectionGraph2::AddParticpant(). We are only told about servers that have already been authenticated
 	fullyConnectedMesh2->SetConnectOnNewRemoteConnection(true, "");
@@ -377,9 +343,7 @@ bool CloudServerHelper_DynDns::Update(void)
 }
 void CloudServerHelper::OnFCMNewHost(Packet *packet, RakPeerInterface *rakPeer)
 {
-	// unused parameters
-	(void)packet;
-	(void)rakPeer;
+
 }
 void CloudServerHelper_DynDns::OnFCMNewHost(Packet *packet, RakPeerInterface *rakPeer)
 {

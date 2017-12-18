@@ -53,11 +53,7 @@ using namespace SLNet;
 struct my_error_mgr {
 	struct jpeg_error_mgr pub;
 };
-METHODDEF(void) my_error_exit (j_common_ptr cinfo)
-{
-	// unused parameters
-	(void)cinfo;
-}
+METHODDEF(void) my_error_exit (j_common_ptr cinfo) {}
 
 #define FILE_COLUMN "SourceFile"
 #define LINE_COLUMN "SourceLine"
@@ -161,9 +157,6 @@ void DeinitDxt(void*)
 }
 SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLoggerPlugin::CPUThreadInput* cpuThreadInput, bool *returnOutput, void* perThreadData)
 {
-	// unused parameters
-	(void)perThreadData;
-
 	int i;
 	*returnOutput=true;
 	SQLiteServerLoggerPlugin::CPUThreadOutput *cpuThreadOutput = SLNet::OP_NEW<SQLiteServerLoggerPlugin::CPUThreadOutput>(_FILE_AND_LINE_);
@@ -1034,10 +1027,6 @@ PluginReceiveResult SQLiteServerLoggerPlugin::OnReceive(Packet *packet)
 }
 void SQLiteServerLoggerPlugin::OnClosedConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason )
 {
-	// unused parameters
-	(void)rakNetGUID;
-	(void)lostConnectionReason;
-
 	SLNet::RakString removedSession;
 	unsigned int i=0;
 	while (i < loggedInSessions.Size())

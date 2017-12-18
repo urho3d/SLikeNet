@@ -49,22 +49,10 @@ using namespace SLNet;
 
 struct SampleReplica : public Replica3
 {
-	SampleReplica()
-	{
-		var1Unreliable=0;
-		var2Unreliable=0;
-		var3Reliable=0;
-		var4Reliable=0;
-	}
-	~SampleReplica()
-	{
-	}
+	SampleReplica() {var1Unreliable=0; var2Unreliable=0; var3Reliable=0; var4Reliable=0;}
+	~SampleReplica() {}
 	virtual SLNet::RakString GetName(void) const=0;
-	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const
-	{
-		// unused parameters
-		(void)destinationConnection;
-
+	virtual void WriteAllocationID(SLNet::Connection_RM3 *destinationConnection, SLNet::BitStream *allocationIdBitstream) const {
 		allocationIdBitstream->Write(GetName());
 	}
 	void PrintStringInBitstream(SLNet::BitStream *bs)
@@ -76,43 +64,32 @@ struct SampleReplica : public Replica3
 		printf("Receive: %s\n", rakString.C_String());
 	}
 
-	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
-	{	
+	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)	{
+		
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call adds another remote system to track
 		variableDeltaSerializer.AddRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
 
 		constructionBitstream->Write(GetName() + SLNet::RakString(" SerializeConstruction"));
 	}
-	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection)
-	{
-		// unused parameters
-		(void)sourceConnection;
-
+	virtual bool DeserializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
 		PrintStringInBitstream(constructionBitstream);
 		return true;
 	}
-	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
-	{	
+	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)	{
+		
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call removes a remote system
 		variableDeltaSerializer.RemoveRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
 
-		destructionBitstream->Write(GetName() + SLNet::RakString(" SerializeDestruction"));	
+		destructionBitstream->Write(GetName() + SLNet::RakString(" SerializeDestruction"));
+		
 	}
-	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
-	{
-		// unused parameters
-		(void)sourceConnection;
-
+	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection) {
 		PrintStringInBitstream(destructionBitstream);
 		return true;
 	}
-	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection)
-	{
-		// unused parameters
-		(void)sourceConnection;
-
+	virtual void DeallocReplica(SLNet::Connection_RM3 *sourceConnection) {
 		delete this;
 	}
 
@@ -123,8 +100,8 @@ struct SampleReplica : public Replica3
 		variableDeltaSerializer.OnPreSerializeTick();
 	}
 
-	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
-	{
+	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)	{
+
 		VariableDeltaSerializer::SerializationContext serializationContext;
 
 		// Put all variables to be sent unreliably on the same channel, then specify the send type for that channel
@@ -165,8 +142,8 @@ struct SampleReplica : public Replica3
 		// Use RM3SR_SERIALIZED_ALWAYS instead of RM3SR_SERIALIZED_ALWAYS_IDENTICALLY to support sending different data to different system, which is needed when using unreliable and dirty variable resends
 		return RM3SR_SERIALIZED_ALWAYS;
 	}
-	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters)
-	{
+	virtual void Deserialize(SLNet::DeserializeParameters *deserializeParameters) {
+
 		VariableDeltaSerializer::DeserializationContext deserializationContext;
 
 		// Deserialization is written similar to serialization
@@ -187,32 +164,16 @@ struct SampleReplica : public Replica3
 		variableDeltaSerializer.EndDeserialize(&deserializationContext);
 	}
 
-	virtual void SerializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)
-	{
-		// unused parameters
-		(void)requestingConnection;
-
+	virtual void SerializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)	{
 		serializationBitstream->Write(GetName() + SLNet::RakString(" SerializeConstructionRequestAccepted"));
 	}
-	virtual void DeserializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *acceptingConnection)
-	{
-		// unused parameters
-		(void)acceptingConnection;
-
+	virtual void DeserializeConstructionRequestAccepted(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *acceptingConnection) {
 		PrintStringInBitstream(serializationBitstream);
 	}
-	virtual void SerializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)
-	{
-		// unused parameters
-		(void)requestingConnection;
-
+	virtual void SerializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *requestingConnection)	{
 		serializationBitstream->Write(GetName() + SLNet::RakString(" SerializeConstructionRequestRejected"));
 	}
-	virtual void DeserializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *rejectingConnection)
-	{
-		// unused parameters
-		(void)rejectingConnection;
-
+	virtual void DeserializeConstructionRequestRejected(SLNet::BitStream *serializationBitstream, SLNet::Connection_RM3 *rejectingConnection) {
 		PrintStringInBitstream(serializationBitstream);
 	}
 
@@ -262,105 +223,68 @@ struct SampleReplica : public Replica3
 	VariableDeltaSerializer variableDeltaSerializer;
 };
 
-struct ClientCreatable_ClientSerialized : public SampleReplica
-{
-	virtual SLNet::RakString GetName(void) const
-	{
-		return SLNet::RakString("ClientCreatable_ClientSerialized");
-	}
+struct ClientCreatable_ClientSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatable_ClientSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
-	{
-		// unused parameters
-		(void)replicaManager3;
-
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ClientConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
-	{
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ClientConstruction(sourceConnection,topology!=CLIENT);
 	}
 
-	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
-	{
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ClientSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
-	{
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Client(droppedConnection);
 	}
 };
-struct ServerCreated_ClientSerialized : public SampleReplica
-{
-	virtual SLNet::RakString GetName(void) const
-	{
-		return SLNet::RakString("ServerCreated_ClientSerialized");
-	}
+struct ServerCreated_ClientSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ServerCreated_ClientSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
-	{
-		// unused parameters
-		(void)replicaManager3;
-
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ServerConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
-	{
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ServerConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
-	{
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ClientSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
-	{
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Server(droppedConnection);
 	}
 };
-struct ClientCreatable_ServerSerialized : public SampleReplica
-{
-	virtual SLNet::RakString GetName(void) const
-	{
-		return SLNet::RakString("ClientCreatable_ServerSerialized");
-	}
+struct ClientCreatable_ServerSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ClientCreatable_ServerSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		if (topology==CLIENT)
 			return RM3SR_DO_NOT_SERIALIZE;
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
-	{
-		// unused parameters
-		(void)replicaManager3;
-
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ClientConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
-	{
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ClientConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
-	{
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ServerSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
-	{
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Client(droppedConnection);
 	}
 };
-struct ServerCreated_ServerSerialized : public SampleReplica
-{
-	virtual SLNet::RakString GetName(void) const
-	{
-		return SLNet::RakString("ServerCreated_ServerSerialized");
-	}
+struct ServerCreated_ServerSerialized : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("ServerCreated_ServerSerialized");}
 	virtual RM3SerializationResult Serialize(SerializeParameters *serializeParameters)
 	{
 		if (topology==CLIENT)
@@ -368,74 +292,45 @@ struct ServerCreated_ServerSerialized : public SampleReplica
 
 		return SampleReplica::Serialize(serializeParameters);
 	}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
-	{
-		// unused parameters
-		(void)replicaManager3;
-
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_ServerConstruction(destinationConnection,topology!=CLIENT);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
-	{
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_ServerConstruction(sourceConnection,topology!=CLIENT);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
-	{
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_ServerSerializable(destinationConnection,topology!=CLIENT);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
-	{
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_Server(droppedConnection);
 	}
 };
-struct P2PReplica : public SampleReplica
-{
-	virtual SLNet::RakString GetName(void) const
-	{
-		return SLNet::RakString("P2PReplica");
-	}
-	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3)
-	{
-		// unused parameters
-		(void)replicaManager3;
-
+struct P2PReplica : public SampleReplica {
+	virtual SLNet::RakString GetName(void) const {return SLNet::RakString("P2PReplica");}
+	virtual RM3ConstructionState QueryConstruction(SLNet::Connection_RM3 *destinationConnection, ReplicaManager3 *replicaManager3) {
 		return QueryConstruction_PeerToPeer(destinationConnection);
 	}
-	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection)
-	{
+	virtual bool QueryRemoteConstruction(SLNet::Connection_RM3 *sourceConnection) {
 		return QueryRemoteConstruction_PeerToPeer(sourceConnection);
 	}
-	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection)
-	{
+	virtual RM3QuerySerializationResult QuerySerialization(SLNet::Connection_RM3 *destinationConnection) {
 		return QuerySerialization_PeerToPeer(destinationConnection);
 	}
-	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const
-	{
+	virtual RM3ActionOnPopConnection QueryActionOnPopConnection(SLNet::Connection_RM3 *droppedConnection) const {
 		return QueryActionOnPopConnection_PeerToPeer(droppedConnection);
 	}
 };
 
-class SampleConnection : public Connection_RM3
-{
+class SampleConnection : public Connection_RM3 {
 public:
-	SampleConnection(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid)
-	{
-	}
-	virtual ~SampleConnection()
-	{
-	}
+	SampleConnection(const SystemAddress &_systemAddress, RakNetGUID _guid) : Connection_RM3(_systemAddress, _guid) {}
+	virtual ~SampleConnection() {}
 
 	// See documentation - Makes all messages between ID_REPLICA_MANAGER_DOWNLOAD_STARTED and ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE arrive in one tick
-	bool QueryGroupDownloadMessages(void) const
-	{
-		return true;
-	}
+	bool QueryGroupDownloadMessages(void) const {return true;}
 
 	virtual Replica3 *AllocReplica(SLNet::BitStream *allocationId, ReplicaManager3 *replicaManager3)
 	{
-		// unused parameters
-		(void)replicaManager3;
-
 		SLNet::RakString typeName;
 		allocationId->Read(typeName);
 		if (typeName=="ClientCreatable_ClientSerialized") return new ClientCreatable_ClientSerialized;
@@ -450,12 +345,10 @@ protected:
 
 class ReplicaManager3Sample : public ReplicaManager3
 {
-	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const
-	{
+	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const {
 		return new SampleConnection(systemAddress,rakNetGUID);
 	}
-	virtual void DeallocConnection(Connection_RM3 *connection) const
-	{
+	virtual void DeallocConnection(Connection_RM3 *connection) const {
 		delete connection;
 	}
 };

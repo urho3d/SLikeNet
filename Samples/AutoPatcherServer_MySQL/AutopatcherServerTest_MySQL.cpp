@@ -42,7 +42,7 @@
 #define LISTEN_PORT 60000
 #define MAX_INCOMING_CONNECTIONS 128
 
-int main(int, char **)
+int main(int argc, char **argv)
 {
 	// Avoids the Error: Got a packet bigger than 'max_allowed_packet' bytes
 	printf("Important: Requires that you first set the DB schema and the max packet size on the server.\n");

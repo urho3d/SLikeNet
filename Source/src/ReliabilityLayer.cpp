@@ -2359,13 +2359,6 @@ bool ReliabilityLayer::AreAcksWaiting(void)
 //-------------------------------------------------------------------------------------------------------
 void ReliabilityLayer::ApplyNetworkSimulator( double _packetloss, SLNet::TimeMS _minExtraPing, SLNet::TimeMS _extraPingVariance )
 {
-#ifndef _DEBUG
-	// unused parameters
-	(void)_packetloss;
-	(void)_minExtraPing;
-	(void)_extraPingVariance;
-#endif
-
 #ifdef _DEBUG
 	packetloss=_packetloss;
 	minExtraPing=_minExtraPing;

@@ -28,7 +28,7 @@
 
 using namespace SLNet;
 
-int main(int, char **)
+int main(int argc, char **argv)
 {
 	RakPeerInterface *sender, *receiver;
 
