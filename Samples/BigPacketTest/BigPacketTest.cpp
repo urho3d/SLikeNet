@@ -44,7 +44,7 @@ int main(void)
 
 	text= new char [BIG_PACKET_SIZE];
 	quit=false;
-	char ch;
+	int ch;
 
 	printf("This is a test I use to test the packet splitting capabilities of RakNet\n");
 	printf("All it does is send a large block of data to the feedback loop\n");
@@ -77,7 +77,7 @@ int main(void)
 	}
 
 	// Test IPV6
-	int socketFamily;
+	short socketFamily;
 	socketFamily=AF_INET;
 	//socketFamily=AF_INET6;
 
@@ -125,8 +125,7 @@ int main(void)
 		rakPeer=server;
 	else
 		rakPeer=client;
-	unsigned int i;
-	for (i=0; i < rakPeer->GetNumberOfAddresses(); i++)
+	for (unsigned int i=0; i < rakPeer->GetNumberOfAddresses(); i++)
 	{
 		printf("%i. %s\n", i+1, rakPeer->GetLocalIP(i));
 	}
@@ -177,7 +176,7 @@ int main(void)
 
 			if (_kbhit())
 			{
-				char ch=_getch();
+				ch=_getch();
 				if (ch==' ')
 				{
 					printf("Sending medium priority message\n");
@@ -241,8 +240,8 @@ int main(void)
 						if (repeat)
 						{
 							printf("Rerequesting send.\n");
-							unsigned char ch=(unsigned char) 253;
-							client->Send((const char*) &ch, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+							unsigned char ch2=(unsigned char) 253;
+							client->Send((const char*) &ch2, 1, MEDIUM_PRIORITY, RELIABLE_ORDERED, 1, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 						else
 						{
@@ -282,12 +281,11 @@ int main(void)
 			RakNetStatistics rssReceiver;
 			if (server)
 			{
-				unsigned int i;
 				unsigned short numSystems;
 				server->GetConnectionList(0,&numSystems);
 				if (numSystems>0)
 				{
-					for (i=0; i < numSystems; i++)
+					for (unsigned int i=0; i < numSystems; i++)
 					{
 						server->GetStatistics(server->GetSystemAddressFromIndex(i), &rssSender);
 						StatisticsToString(&rssSender, text, BIG_PACKET_SIZE, 2);

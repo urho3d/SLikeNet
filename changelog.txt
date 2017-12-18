@@ -26,10 +26,16 @@ General:
 Core:
   RakNetSocket2:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
-  ReplicaManager3:
-    * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_15)
   SocketLayer:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
+Extensions:
+  Autopatcher:
+    * fixed crash/undefined behavior upon file read error in postgreSQL-based Autopatcher (#143)
+  Lobby2:
+    * fixed Clans_GetMemberProperties::clanMemberState not being populated (#141)
+Samples:
+  ReplicaManager3:
+    * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_15)
 Building:
   General:
     * added missing libcat big_x64.o object file (#117)

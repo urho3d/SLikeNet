@@ -104,15 +104,14 @@ int main()
 
 
 	endThreads=false;
-	unsigned i;
 	char count[20];
 	printf("Starting threads\n");
-	for (i=0; i< 10; i++)
+	for (char i=0; i< 10; i++)
 	{
 		count[i]=i;
 		SLNet::RakThread::Create(&ProducerThread, count+i);
 	}
-	for (; i < 20; i++)
+	for (char i=10; i < 20; i++)
 	{
 		count[i]=i;
 		SLNet::RakThread::Create(&ConsumerThread, count+i );

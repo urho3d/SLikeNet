@@ -346,7 +346,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 					}
 					//sqlCommandMutex.Unlock();
 
-                    MYSQL_ROW row = mysql_fetch_row (patchResult);
+                    row = mysql_fetch_row (patchResult);
 					if (row==0)
 					{
 						// If no patch found, then this is a non-release version, or a very old version we are no longer tracking.
@@ -363,7 +363,7 @@ int AutopatcherMySQLRepository::GetPatches(const char *applicationName, FileList
 						}
 
 						MYSQL_RES * substrresult = mysql_store_result (mySqlConnection);
-						MYSQL_ROW row = mysql_fetch_row (substrresult);
+						row = mysql_fetch_row (substrresult);
 						char * file = row [0];
 						unsigned long contentLength = mysql_fetch_lengths (substrresult) [0];
 						
@@ -626,8 +626,6 @@ bool AutopatcherMySQLRepository::UpdateApplicationFiles(const char *applicationN
 		//sqlCommandMutex.Unlock();
 		
 		// Create new patches for every create version
-		MYSQL_ROW row;
-
 		while ((row = mysql_fetch_row (res)) != 0)
 		{
 			const char * fileID = row [0];
@@ -801,7 +799,7 @@ unsigned int AutopatcherMySQLRepository::GetFilePart( const char *filename, unsi
 
 	MYSQL_RES * result;
 
-	char lastError[512];
+	char error[512];
 	filePartConnectionMutex.Lock();
 	if (filePartConnection==0)
 	{
@@ -811,7 +809,7 @@ unsigned int AutopatcherMySQLRepository::GetFilePart( const char *filename, unsi
 
 	if (mysql_query(filePartConnection, query)!=0)
 	{
-		strcpy (lastError, mysql_error (filePartConnection));
+		strcpy (error, mysql_error (filePartConnection));
 	}
 	result = mysql_store_result (filePartConnection);
 

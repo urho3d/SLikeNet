@@ -76,7 +76,7 @@ void main_RakNet(void)
 	unsigned char output[SHA1_LENGTH];
 	CSHA1::HMAC((unsigned char*) __sharedKey, strlen(__sharedKey), (unsigned char*) jsonStr, strlen(jsonStr), output);
 	char outputBase64[SHA1_LENGTH*2+6];
-	int bytesWritten = Base64Encoding(output, sizeof(output), outputBase64);
+	/*int bytesWritten =*/ Base64Encoding(output, sizeof(output), outputBase64);
 	//outputBase64[bytesWritten]=0;
 	json_object_set(jsonObject, "__hash", json_string(outputBase64));
 	jsonStr = json_dumps(jsonObject, JSON_COMPACT | JSON_PRESERVE_ORDER);

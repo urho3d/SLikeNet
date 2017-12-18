@@ -45,7 +45,6 @@ int main(void)
 	RakPeerInterface *peers[NUM_PEERS];
 	int peerIndex;
 	float nextAction;
-	int i;
 
 	printf("This is just a test app to run a bit of everything to test for crashes.\n");
 	printf("Difficulty: Intermediate\n\n");
@@ -56,7 +55,7 @@ int main(void)
 	printf("Using seed %i\n", seed);
 	seedMT(seed);
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 	{
 		peers[i]= SLNet::RakPeerInterface::GetInstance();
 		peers[i]->SetMaximumIncomingConnections(CONNECTIONS_PER_SYSTEM);
@@ -65,7 +64,7 @@ int main(void)
 		peers[i]->SetOfflinePingResponse("Offline Ping Data", (int)strlen("Offline Ping Data")+1);
 	}
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 	{
 		peers[i]->Connect("127.0.0.1", 60000+(randomMT()%NUM_PEERS), 0, 0);		
 	}
@@ -106,7 +105,7 @@ int main(void)
 			{
 #ifdef _DO_PRINTF
 				printf("%i: ", 60000+numSystems);
-				for (i=0; i < numSystems; i++)
+				for (unsigned short i=0; i < numSystems; i++)
 				{
 					printf("%i: ", remoteSystems[i].GetPort());
 				}
@@ -234,7 +233,7 @@ int main(void)
 			}			
 		}
 
-		for (i=0; i < NUM_PEERS; i++)
+		for (unsigned short i=0; i < NUM_PEERS; i++)
             peers[i]->DeallocatePacket(peers[i]->Receive());
 
 #ifdef _WIN32
@@ -245,7 +244,7 @@ int main(void)
 	}
 
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 		SLNet::RakPeerInterface::DestroyInstance(peers[i]);
 
 	return 0;

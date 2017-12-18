@@ -101,12 +101,14 @@ bool CloudServerHelper::ParseCommandLineParameters(int argc, char **argv)
 
 bool CloudServerHelper_DynDns::ParseCommandLineParameters(int argc, char **argv)
 {
-	char *DEFAULT_DNS_HOST="test.dnsalias.net";
-	char *DEFAULT_USERNAME_AND_PASSWORD="test:test";
-	char *DEFAULT_SERVER_TO_SERVER_PASSWORD="qwerty1234";
 	const unsigned short DEFAULT_SERVER_PORT=60000;
 	const unsigned short DEFAULT_ALLOWED_INCOMING_CONNECTIONS=1024;
 	const unsigned short DEFAULT_ALLOWED_OUTGOING_CONNECTIONS=64;
+#ifdef _DEBUG
+	char *DEFAULT_DNS_HOST = "test.dnsalias.net";
+	char *DEFAULT_USERNAME_AND_PASSWORD = "test:test";
+	char *DEFAULT_SERVER_TO_SERVER_PASSWORD = "qwerty1234";
+#endif
 
 #ifndef _DEBUG
 	// Only allow insecure defaults for debugging
@@ -296,7 +298,7 @@ void CloudServerHelper::SetupPlugins(
 	SLNet::FullyConnectedMesh2 *fullyConnectedMesh2,
 	SLNet::TwoWayAuthentication *twoWayAuthentication,
 	SLNet::ConnectionGraph2 *connectionGraph2,
-	const char *serverToServerPassword
+	const char *newServerToServerPassword
 	)
 {
 	// unused parameters
@@ -308,7 +310,7 @@ void CloudServerHelper::SetupPlugins(
 	// Do not add to the host trracking system all connections, only those designated as servers
 	fullyConnectedMesh2->SetAutoparticipateConnections(false);
 	// Shared password
-	twoWayAuthentication->AddPassword("CloudServerHelperS2SPassword",serverToServerPassword);
+	twoWayAuthentication->AddPassword("CloudServerHelperS2SPassword", newServerToServerPassword);
 	// Do not add systems to the graph unless first validated as a server through the TwoWayAuthentication plugin
 	connectionGraph2->SetAutoProcessNewConnections(false);
 }

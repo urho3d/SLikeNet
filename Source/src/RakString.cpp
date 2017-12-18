@@ -1458,10 +1458,12 @@ SLNet::RakString RakString::NonVariadic(const char *str)
 unsigned long RakString::ToInteger(const char *str)
 {
 	unsigned long hash = 0;
-	int c;
+	int c = *str;
 
-	while ((c = *str++))
+	while (c) {
 		hash = c + (hash << 6) + (hash << 16) - hash;
+		c = *(++str);
+	}
 
 	return hash;
 }

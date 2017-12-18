@@ -196,8 +196,7 @@ bool PostgreSQLInterface::PQGetValueFromBinary(float *output, PGresult *result, 
 	char *binaryData = PQgetvalue(result, rowIndex, columnIndex);
 	if (binaryData==0)
 		return false;
-	int len = PQgetlength(result, rowIndex, columnIndex);
-	RakAssert(len==sizeof(float));
+	RakAssert(PQgetlength(result, rowIndex, columnIndex) == sizeof(float));
 	RakAssert(binaryData);
 	if (binaryData)
 	{
@@ -213,8 +212,7 @@ bool PostgreSQLInterface::PQGetValueFromBinary(double *output, PGresult *result,
 	char *binaryData = PQgetvalue(result, rowIndex, columnIndex);
 	if (binaryData==0)
 		return false;
-	int len = PQgetlength(result, rowIndex, columnIndex);
-	RakAssert(len==sizeof(double));
+	RakAssert(PQgetlength(result, rowIndex, columnIndex) == sizeof(double));
 	RakAssert(binaryData);
 	if (binaryData)
 	{

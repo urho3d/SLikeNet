@@ -46,7 +46,8 @@ int main(void)
 	SLNet::RakPeerInterface *client= SLNet::RakPeerInterface::GetInstance();
 	SLNet::RakPeerInterface *server= SLNet::RakPeerInterface::GetInstance();
 
-	int i = server->GetNumberOfAddresses();
+	// #med - review whether the call is actually required at all
+	server->GetNumberOfAddresses();
 
 	// Holds packets
 	SLNet::Packet* p;

@@ -27,12 +27,12 @@ DSoundVoiceAdapter DSoundVoiceAdapter::instance;
 
 DSoundVoiceAdapter::DSoundVoiceAdapter()
 {
-	rakVoice = 0;
+	m_rakVoice = 0;
 	ds = 0;
 	dsC = 0;
 	dsbIncoming = 0;
 	dsbOutgoing = 0;
-	mute = false;
+	m_mute = false;
 	memset(incomingBufferNotifications,0,sizeof(incomingBufferNotifications));
 	memset(outgoingBufferNotifications,0,sizeof(outgoingBufferNotifications));
 }
@@ -105,7 +105,7 @@ bool DSoundVoiceAdapter::SetupAdapter(RakVoice *rakVoice)
 	// Make sure rakVoice was initialized
 	RakAssert((rakVoice->IsInitialized())&&(rakVoice->GetRakPeerInterface()!=NULL));
 
-	this->rakVoice = rakVoice;
+	m_rakVoice = rakVoice;
 
 	if (!SetupIncomingBuffer())
 		return false;
@@ -130,7 +130,7 @@ bool DSoundVoiceAdapter::SetupIncomingBuffer()
 	memset(&wfx, 0, sizeof(WAVEFORMATEX)); 
 	wfx.wFormatTag = WAVE_FORMAT_PCM; 
 	wfx.nChannels = 1; 
-	wfx.nSamplesPerSec = rakVoice->GetSampleRate(); 
+	wfx.nSamplesPerSec = m_rakVoice->GetSampleRate(); 
 	wfx.nBlockAlign = 2; 
 	wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign; 
 	wfx.wBitsPerSample = 16; 
@@ -139,7 +139,7 @@ bool DSoundVoiceAdapter::SetupIncomingBuffer()
 	dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
 	dsbdesc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPOSITIONNOTIFY
 		| DSBCAPS_LOCSOFTWARE; // Create in software, because DX documentation says its the best option when using notifications
-	dsbdesc.dwBufferBytes = rakVoice->GetBufferSizeBytes()*FRAMES_IN_SOUND; 
+	dsbdesc.dwBufferBytes = m_rakVoice->GetBufferSizeBytes()*FRAMES_IN_SOUND; 
 	dsbdesc.lpwfxFormat = &wfx; 
 	// Create buffer. 
 	if (FAILED(hr = ds->CreateSoundBuffer(&dsbdesc, &pDsb, NULL)))
@@ -159,7 +159,7 @@ bool DSoundVoiceAdapter::SetupIncomingBuffer()
 	//
 	for (int i=0; i<FRAMES_IN_SOUND; i++)
 	{
-		incomingBufferNotifications[i].dwOffset = i*rakVoice->GetBufferSizeBytes();
+		incomingBufferNotifications[i].dwOffset = i*m_rakVoice->GetBufferSizeBytes();
 #if defined(WINDOWS_PHONE_8)
 		if ((incomingBufferNotifications[i].hEventNotify = CreateEventEx(0, 0, CREATE_EVENT_MANUAL_RESET, 0))==NULL)
 #else
@@ -213,7 +213,7 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 	memset(&wfx, 0, sizeof(WAVEFORMATEX)); 
 	wfx.wFormatTag = WAVE_FORMAT_PCM; 
 	wfx.nChannels = 1; 
-	wfx.nSamplesPerSec = rakVoice->GetSampleRate(); 
+	wfx.nSamplesPerSec = m_rakVoice->GetSampleRate(); 
 	wfx.nBlockAlign = 2; 
 	wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign; 
 	wfx.wBitsPerSample = 16; 
@@ -222,7 +222,7 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 	memset(&dscbd, 0, sizeof(DSCBUFFERDESC));
 	dscbd.dwSize = sizeof(DSCBUFFERDESC);
 	dscbd.dwFlags = 0;
-	dscbd.dwBufferBytes = rakVoice->GetBufferSizeBytes()*FRAMES_IN_SOUND; 
+	dscbd.dwBufferBytes = m_rakVoice->GetBufferSizeBytes()*FRAMES_IN_SOUND; 
 	dscbd.dwReserved = 0;
 	dscbd.lpwfxFormat = &wfx;
 	dscbd.dwFXCount = 0;
@@ -246,7 +246,7 @@ bool DSoundVoiceAdapter::SetupOutgoingBuffer()
 	//
 	for (int i=0; i<FRAMES_IN_SOUND; i++)
 	{
-		outgoingBufferNotifications[i].dwOffset = i*rakVoice->GetBufferSizeBytes();
+		outgoingBufferNotifications[i].dwOffset = i*m_rakVoice->GetBufferSizeBytes();
 		if ((outgoingBufferNotifications[i].hEventNotify = CreateEventEx(0, 0, CREATE_EVENT_MANUAL_RESET, 0))==NULL)
 		{
 			DXTRACE_ERR_MSGBOX(_T("CreateEvent"), GetLastError());
@@ -343,11 +343,11 @@ void DSoundVoiceAdapter::Update()
 		{
 			// The lock offset is the buffer right before the one the event refers to
 			DWORD dwOffset = (i==0) ? incomingBufferNotifications[FRAMES_IN_SOUND-1].dwOffset : incomingBufferNotifications[i-1].dwOffset;
-			hr = dsbIncoming->Lock(dwOffset, rakVoice->GetBufferSizeBytes(), &audioPtr, &audioPtrbytes, NULL, NULL, 0);
-			RakAssert(audioPtrbytes==rakVoice->GetBufferSizeBytes());
+			hr = dsbIncoming->Lock(dwOffset, m_rakVoice->GetBufferSizeBytes(), &audioPtr, &audioPtrbytes, NULL, NULL, 0);
+			RakAssert(audioPtrbytes==m_rakVoice->GetBufferSizeBytes());
 			if (SUCCEEDED(hr))
 			{
-				rakVoice->ReceiveFrame(audioPtr);
+				m_rakVoice->ReceiveFrame(audioPtr);
 				dsbIncoming->Unlock(audioPtr, audioPtrbytes, NULL, 0);
 			}
 			ResetEvent(incomingBufferNotifications[i].hEventNotify);
@@ -360,12 +360,12 @@ void DSoundVoiceAdapter::Update()
 		{
 
 			/* If we're set to mute, we don't send anything, and just reset the event */
-			if (!mute)
+			if (!m_mute)
 			{		
 				// The lock offset is the buffer right before the one the event refers to
 				DWORD dwOffset = (i==0) ? outgoingBufferNotifications[FRAMES_IN_SOUND-1].dwOffset : outgoingBufferNotifications[i-1].dwOffset;
-				hr = dsbOutgoing->Lock(dwOffset, rakVoice->GetBufferSizeBytes(), &audioPtr, &audioPtrbytes, NULL, NULL, 0);
-				RakAssert(audioPtrbytes==rakVoice->GetBufferSizeBytes());
+				hr = dsbOutgoing->Lock(dwOffset, m_rakVoice->GetBufferSizeBytes(), &audioPtr, &audioPtrbytes, NULL, NULL, 0);
+				RakAssert(audioPtrbytes==m_rakVoice->GetBufferSizeBytes());
 				if (SUCCEEDED(hr))
 				{
 					BroadcastFrame(audioPtr);
@@ -383,18 +383,18 @@ void DSoundVoiceAdapter::BroadcastFrame(void *ptr)
 #ifndef _TEST_LOOPBACK
 	unsigned i;
 
-	unsigned int numPeers = rakVoice->GetRakPeerInterface()->GetMaximumNumberOfPeers();
+	unsigned int numPeers = m_rakVoice->GetRakPeerInterface()->GetMaximumNumberOfPeers();
 	for (i=0; i < numPeers; i++)
 	{
-		rakVoice->SendFrame(rakVoice->GetRakPeerInterface()->GetGUIDFromIndex(i), ptr);
+		m_rakVoice->SendFrame(m_rakVoice->GetRakPeerInterface()->GetGUIDFromIndex(i), ptr);
 	}
 #else
-	rakVoice->SendFrame(SLNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
+	m_rakVoice->SendFrame(SLNet::UNASSIGNED_SYSTEM_ADDRESS, ptr);
 #endif
 
 }
 
 void DSoundVoiceAdapter::SetMute(bool mute)
 {
-	this->mute = mute;
+	m_mute = mute;
 }

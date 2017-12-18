@@ -215,7 +215,7 @@ protected:
 	SimpleMutex threadActionQueueMutex;
 
 	//DataStructures::List<PostgreSQLInterface *> connectionPool;
-	void SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses );
+	void SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char curOrderingChannel, const DataStructures::List<SystemAddress> systemAddresses );
 };
 	
 }

@@ -1863,15 +1863,15 @@ bool SLNet::Client_PerTitleBinaryStorage_PGSQL::ServerDBImpl( Lobby2ServerComman
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool SLNet::Client_SetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+bool SLNet::Client_SetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle )
 {
-	server->SetPresence( presence, userHandle );
+	server->SetPresence( presence, curUserHandle );
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
-bool SLNet::Client_GetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+bool SLNet::Client_GetPresence_PGSQL::ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle )
 {
-	server->GetPresence( presence, userHandle );
+	server->GetPresence( presence, curUserHandle );
 	resultCode=L2RC_SUCCESS;
 	return true;
 }
@@ -2392,8 +2392,7 @@ bool SLNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 		return true;
 	}
 	int numRowsReturned = PQntuples(result);
-	int i;
-	for (i=0; i < numRowsReturned; i++)
+	for (int i=0; i < numRowsReturned; i++)
 	{
 		EmailResult emailResult;
 		SLNet::RakString otherHandle;
@@ -2406,9 +2405,9 @@ bool SLNet::Emails_Get_PGSQL::ServerDBImpl( Lobby2ServerCommand *command, void *
 		if (emailsToRetrieve.Size()>0)
 		{
 			getThisEmail=false;
-			for (unsigned int i=0; i < emailsToRetrieve.Size(); i++)
+			for (unsigned int j=0; j < emailsToRetrieve.Size(); j++)
 			{
-				if (emailsToRetrieve[i]==emailResult.emailID)
+				if (emailsToRetrieve[j]==emailResult.emailID)
 				{
 					getThisEmail=true;
 					break;
@@ -3352,8 +3351,8 @@ bool SLNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 		resultCode=L2RC_Clans_GetMemberProperties_UNKNOWN_TARGET_HANDLE;
 		return true;
 	}
-	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
-	if (clanMemberState==CMD_UNDEFINED)
+	SLNet::ClanMemberState curClanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	if (curClanMemberState==CMD_UNDEFINED)
 	{
 		resultCode=L2RC_Clans_GetMemberProperties_TARGET_NOT_IN_CLAN;
 		return true;

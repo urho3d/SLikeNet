@@ -38,7 +38,6 @@ SLNet::RakPeerInterface *peer2= SLNet::RakPeerInterface::GetInstance();
 int main(void)
 {
 	char text[1024];
-	bool sentPacket=false;
 	nextTest=0;
 
 	printf("This project tests the advertise system and offline ping messages.\n");

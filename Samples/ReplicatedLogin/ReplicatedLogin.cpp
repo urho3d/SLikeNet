@@ -248,8 +248,7 @@ int serverMain(void)
 
 	SLNet::SocketDescriptor sd;
 	sd.port=60000;
-	StartupResult sr = rakPeer->Startup(8,&sd,1);
-	RakAssert(sr==RAKNET_STARTED);
+	SLNET_VERIFY(rakPeer->Startup(8,&sd,1) == RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(8);
 	rakPeer->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 
@@ -304,8 +303,7 @@ int clientMain(void)
 
 	SLNet::SocketDescriptor sd;
 	sd.port=0;
-	StartupResult sr = rakPeer->Startup(1,&sd,1);
-	RakAssert(sr==RAKNET_STARTED);
+	SLNET_VERIFY(rakPeer->Startup(1,&sd,1) == RAKNET_STARTED);
 	rakPeer->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 
 	rakPeer->Connect("127.0.0.1", 60000, 0, 0);

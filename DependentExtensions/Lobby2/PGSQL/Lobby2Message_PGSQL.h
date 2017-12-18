@@ -105,8 +105,8 @@ __L2_MSG_DB_HEADER(Client_PerTitleIntegerStorage, PGSQL){
 	virtual bool Delete( Lobby2ServerCommand *command, void *databaseInterface );
 	virtual bool Add( Lobby2ServerCommand *command, void *databaseInterface );
 };
-__L2_MSG_DB_HEADER(Client_SetPresence, PGSQL){virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle );};
-__L2_MSG_DB_HEADER(Client_GetPresence, PGSQL){virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle );};
+__L2_MSG_DB_HEADER(Client_SetPresence, PGSQL){virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle );};
+__L2_MSG_DB_HEADER(Client_GetPresence, PGSQL){virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle );};
 __L2_MSG_DB_HEADER(Client_PerTitleBinaryStorage, PGSQL){virtual bool ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface );};
 __L2_MSG_DB_HEADER(Friends_SendInvite, PGSQL){virtual bool ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface );};
 __L2_MSG_DB_HEADER(Friends_AcceptInvite, PGSQL){

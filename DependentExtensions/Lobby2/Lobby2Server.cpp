@@ -246,12 +246,12 @@ void Lobby2Server::OnMessage(Packet *packet)
 		{
 			if (lobby2Message->RequiresLogin())
 			{
-				SLNet::BitStream bs;
-				bs.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
-				bs.Write((MessageID)lobby2Message->GetID());
+				SLNet::BitStream bs2;
+				bs2.Write((MessageID)ID_LOBBY2_SEND_MESSAGE);
+				bs2.Write((MessageID)lobby2Message->GetID());
 				lobby2Message->resultCode=L2RC_NOT_LOGGED_IN;
-				lobby2Message->Serialize(true,true,&bs);
-				SendUnified(&bs,packetPriority, RELIABLE_ORDERED, orderingChannel, packet->systemAddress, false);
+				lobby2Message->Serialize(true,true,&bs2);
+				SendUnified(&bs2,packetPriority, RELIABLE_ORDERED, orderingChannel, packet->systemAddress, false);
 				return;
 			}
 			command.callerUserId=0;
@@ -614,7 +614,6 @@ void Lobby2Server::RemoveUser(unsigned int index)
 	threadPool.LockInput();
 	while (i < threadPool.InputSize())
 	{
-		Lobby2ServerCommand command;
 		command = threadPool.GetInputAtIndex(i);
 		if (command.lobby2Message->CancelOnDisconnect()&& command.callerSystemAddresses.Size()>0 && user->systemAddresses.GetIndexOf(command.callerSystemAddresses[0])!=(unsigned int)-1)
 		{
@@ -729,8 +728,8 @@ void Lobby2Server::GetPresence(SLNet::Lobby2Presence &presence, SLNet::RakString
 		presence.status=Lobby2Presence::NOT_ONLINE;
 	}
 }
-void Lobby2Server::SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const DataStructures::List<SystemAddress> systemAddresses )
+void Lobby2Server::SendUnifiedToMultiple( const SLNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char curOrderingChannel, const DataStructures::List<SystemAddress> systemAddresses )
 {
 	for (unsigned int i=0; i < systemAddresses.Size(); i++)
-		SendUnified(bitStream,priority,reliability,orderingChannel,systemAddresses[i],false);
+		SendUnified(bitStream,priority,reliability,curOrderingChannel,systemAddresses[i],false);
 }

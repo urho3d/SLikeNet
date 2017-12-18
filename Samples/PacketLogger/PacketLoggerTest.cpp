@@ -38,9 +38,7 @@ void PrintConnections(void);
 
 int main(void)
 {
-	int i;
-	
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("Packet Logger Test.\n");
@@ -59,17 +57,15 @@ int main(void)
 	printf("8. Local System (binary IP followed by port),\n");
 	printf("9. Remote System (binary IP followed by port)\n\n");
 
-	int peerIndex;
-
 	// Initialize the message handlers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->AttachPlugin(&messageHandler[peerIndex]);
 		rakPeer[peerIndex]->SetMaximumIncomingConnections(NUM_PEERS);
 	}
 
 	// Initialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
@@ -80,7 +76,7 @@ int main(void)
 	messageHandler[0].LogHeader();
 	
 	// Connect each peer to the prior peer
-	for (peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
 	{
         rakPeer[peerIndex]->Connect("127.0.0.1", 60000+peerIndex-1, 0, 0);
 	}
@@ -91,7 +87,7 @@ int main(void)
 	usleep(5000*1000);
 #endif
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
 	printf("Press enter to continue.\n");

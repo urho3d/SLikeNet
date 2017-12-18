@@ -452,8 +452,7 @@ struct NatPunchthoughClientFramework : public SampleFramework, public NatPunchth
 			{
 				SLNet::BitStream bs(packet->data,packet->length,false);
 				bs.IgnoreBytes(1);
-				bool b = bs.Read(guid);
-				RakAssert(b);
+				SLNET_VERIFY(bs.Read(guid));
 			}
 
 			switch (packet->data[0])
@@ -698,8 +697,7 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 
 		printf("Datagrams forwarded by proxy %s:%i to target %s.\n", proxyIPAddress, proxyPort, targetAddress.ToString(false));
 		printf("Connecting to proxy, which will be received by target.\n");
-		ConnectionAttemptResult car = proxyClientPlugin->GetRakPeerInterface()->Connect(proxyIPAddress, proxyPort, 0, 0);
-		RakAssert(car==CONNECTION_ATTEMPT_STARTED);
+		SLNET_VERIFY(proxyClientPlugin->GetRakPeerInterface()->Connect(proxyIPAddress, proxyPort, 0, 0) == CONNECTION_ATTEMPT_STARTED);
 		sampleResult=SUCCEEDED;
 	}
 	virtual void OnForwardingNotification(const char *proxyIPAddress, unsigned short proxyPort,

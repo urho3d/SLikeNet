@@ -178,8 +178,8 @@ VOID SetupMatrices()
     // every 1000 ms. To avoid the loss of precision inherent in very high 
     // floating point numbers, the system time is modulated by the rotation 
     // period before conversion to a radian angle.
-    UINT iTime = timeGetTime() % 1000;
-    FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
+//    UINT iTime = timeGetTime() % 1000;
+//    FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 //     D3DXMatrixRotationY( &matWorld, fAngle );
 //     g_pd3dDevice->SetTransform( D3DTS_WORLD, &matWorld );
 

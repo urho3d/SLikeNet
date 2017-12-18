@@ -32,7 +32,7 @@ public:
 		(void)elapsedTimeMS;
 	}
 	virtual void Render(AppTime curTimeMS)=0;
-	void SetParentApp(AppInterface *parent);
+	void SetParentApp(AppInterface *newparent);
 	// Call when internal variables set and the state is ready to use
 	virtual void OnStateReady(void);
 

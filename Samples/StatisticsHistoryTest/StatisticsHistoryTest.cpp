@@ -48,32 +48,32 @@ void PrintGraph(DataStructures::Queue<StatisticsHistory::TimeAndValue> &histogra
 
 	unsigned int numR;
 
-	for (unsigned int c = 0; c < histogram.Size() && c < numGraphColumns; c++)
+	for (unsigned int col = 0; col < histogram.Size() && col < numGraphColumns; col++)
 	{
-		double r = (double) numGraphRows * ((histogram[c].val-lowest) / range);
+		double r = (double) numGraphRows * ((histogram[col].val-lowest) / range);
 		if (r - floor(r)>.5)
 			r=ceil(r);
 		else
 			r=floor(r);
 		numR = (unsigned int) r;
-		for (unsigned int r = 0; r < numR && r < numGraphRows; r++)
+		for (unsigned int row = 0; row < numR && row < numGraphRows; row++)
 		{
-			drawPoint[r][c]=true;
+			drawPoint[row][col]=true;
 		}
 	}
 
-	for (int r=numGraphRows-1; r >= 0; r--)
+	for (int row=numGraphRows-1; row >= 0; row--)
 	{
-		for (unsigned int c = 0; c < numGraphColumns; c++)
+		for (unsigned int col = 0; col < numGraphColumns; col++)
 		{
-			if (drawPoint[r][c])
+			if (drawPoint[row][col])
 				printf("|");
 			else
 				printf(" ");
 		}
 		printf("\n");
 	}
-	for (unsigned int c = 0; c < numGraphColumns; c++)
+	for (unsigned int col = 0; col < numGraphColumns; col++)
 		printf("-");
 	printf("\n\n");
 }

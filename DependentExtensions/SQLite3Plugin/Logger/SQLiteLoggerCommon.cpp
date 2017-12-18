@@ -29,7 +29,8 @@ extern "C" const char *GetSqlDataTypeName(SQLLoggerPrimaryDataType idx) {return 
 
 void LogParameter::Serialize(SLNet::BitStream *bs) const
 {
-	unsigned char c = type;
+	// #med consider changing SQLLoggerPrimaryDataType to unsigned char type or add bounds checks here?
+	unsigned char c = static_cast<unsigned char>(type);
 	bs->Write(c);
 	bs->Write(size);
 	switch (type)

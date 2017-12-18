@@ -12,9 +12,9 @@
 
 
 
-void RunnableState::SetParentApp(AppInterface *parent)
+void RunnableState::SetParentApp(AppInterface *newparent)
 {
-	this->parent=parent;
+	parent=newparent;
 }
 void RunnableState::SetFocus(bool hasFocus)
 {

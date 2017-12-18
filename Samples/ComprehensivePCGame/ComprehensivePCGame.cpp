@@ -865,9 +865,7 @@ RAK_THREAD_DECLARATION(UPNPOpenWorker)
 
 	// Behind a NAT. Try to open with UPNP to avoid doing NAT punchthrough
 	struct UPNPDev * devlist = 0;
-	SLNet::Time t1 = GetTime();
 	devlist = upnpDiscover(args->timeout, 0, 0, 0, 0, 0);
-	SLNet::Time t2 = GetTime();
 	if (devlist)
 	{
 		if (args->progressCallback)
@@ -1062,8 +1060,7 @@ int main(void)
 	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	sd.port=0;
-	StartupResult sr = rakPeer->Startup(8,&sd,1);
-	RakAssert(sr==RAKNET_STARTED);
+	SLNET_VERIFY(rakPeer->Startup(8,&sd,1) == RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(8);
 	rakPeer->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());

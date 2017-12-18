@@ -35,9 +35,23 @@
 #include "cat/src/threads/Thread.cpp"
 #include "cat/src/threads/WaitableFlag.cpp"
 #include "cat/src/hash/MurmurHash2.cpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4706)	// assignment within conditional expression
+#endif
 #include "cat/src/lang/Strings.cpp"
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4706)	// assignment within conditional expression
+#endif
 #include "cat/src/math/BigRTL.cpp"
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include "cat/src/math/BigPseudoMersenne.cpp"
 #include "cat/src/math/BigTwistedEdwards.cpp"
 

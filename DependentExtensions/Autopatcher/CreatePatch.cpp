@@ -261,7 +261,8 @@ static bool CreatePatchInternal(const char *old, off_t oldsize, char *_new, off_
 //	u_char *old,*new;
 //	off_t oldsize,newsize;
 	off_t *I,*V;
-	off_t scan,pos,len;
+	off_t scan,len;
+	off_t pos = 0; // #low review whether this really is unnecessary - (presumably) unnecessary assignment - added to workaround false-positive of C4701
 	off_t lastscan,lastpos,lastoffset;
 	off_t oldscore,scsc;
 	off_t s,Sf,lenf,Sb,lenb;
@@ -605,10 +606,10 @@ bool CreatePatch(const char *old, off_t oldsize, char *_new, off_t newsize, char
 
 int TestDiffInMemory(int argc,char *argv[])
 {
-	char *old;
-	off_t oldsize;
-	char *_new;
-	off_t newsize;
+	char *old = nullptr; // unnecessary assignment - added to workaround false-positive of C4701
+	off_t oldsize = 0; // unnecessary assignment - added to workaround false-positive of C4701
+	char *_new = nullptr; // unnecessary assignment - added to workaround false-positive of C4701
+	off_t newsize = 0; // unnecessary assignment - added to workaround false-positive of C4701
 	char *out;
 	unsigned outSize;
 	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
@@ -644,10 +645,14 @@ int TestDiffInMemory(int argc,char *argv[])
 int DIFF_main(int argc,char *argv[])
 {
 	int fd;
-	u_char *old,*_new;
-	off_t oldsize,newsize;
-	off_t *I,*V;
-	off_t scan,pos,len;
+	u_char *old = nullptr; // unnecessary assignment - added to workaround false-positive of C4701
+	u_char *_new;
+	off_t oldsize = 0; // unnecessary assignment - added to workaround false-positive of C4701
+	off_t newsize = 0; // unnecessary assignment - added to workaround false-positive of C4701
+	off_t *I;
+	off_t *V = nullptr; // unnecessary assignment - added to workaround false-positive of C4701
+	off_t scan,len;
+	off_t pos = 0; // #low review whether this really is unnecessary - (presumably) unnecessary assignment - added to workaround false-positive of C4701
 	off_t lastscan,lastpos,lastoffset;
 	off_t oldscore,scsc;
 	off_t s,Sf,lenf,Sb,lenb;

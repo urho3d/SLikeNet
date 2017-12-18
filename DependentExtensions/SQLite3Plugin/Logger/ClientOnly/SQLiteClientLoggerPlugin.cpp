@@ -55,7 +55,8 @@ SQLLogResult SQLiteClientLoggerPlugin::SqlLog( bool isFunctionCall, const char *
 	recursiveCheck=true;
 
 	SLNet::BitStream bitStream;
-	SerializeHeader(&bitStream, isFunctionCall, tableName, columnNames, file, line, parameterList.paramCount);
+	// #med - proper bounds check for paramCount required
+	SerializeHeader(&bitStream, isFunctionCall, tableName, columnNames, file, line, static_cast<unsigned char>(parameterList.paramCount));
 //	int i;
 	//for (i=0; i < parameterList.paramCount; i++)
 	//	parameterList.parms[i].Serialize(&bitStream);

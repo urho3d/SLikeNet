@@ -240,7 +240,8 @@ public:
 		if (threadPool.HasOutputFast() && threadPool.HasOutput())
 		{
 			AutopatcherClientThreadInfo *threadInfo = threadPool.GetOutput();
-			threadInfo->onFileStruct.context.op=threadInfo->result;
+			// #med - add proper range-check for threadInfo->result
+			threadInfo->onFileStruct.context.op=static_cast<unsigned char>(threadInfo->result);
 			switch (threadInfo->result)
 			{
 				case PC_NOTICE_WILL_COPY_ON_RESTART:
@@ -388,7 +389,8 @@ public:
 AutopatcherClient::AutopatcherClient()
 {
 	serverId=UNASSIGNED_SYSTEM_ADDRESS;
-	serverIdIndex=-1;
+	// #med - use unsigned short max?
+	serverIdIndex=static_cast<unsigned short>(-1);
 	applicationDirectory[0]=0;
 	fileListTransfer=0;
     priority=HIGH_PRIORITY;

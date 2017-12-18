@@ -113,6 +113,12 @@
 #endif
 #endif
 
+#if !defined(_DEBUG) || defined(__native_client__)
+#define SLNET_VERIFY(x) ((void)(x))
+#else
+#define SLNET_VERIFY(x) RakAssert(x)
+#endif
+
 /// This controls the amount of memory used per connection.
 /// This many datagrams are tracked by datagramNumber. If more than this many datagrams are sent, then an ack for an older datagram would be ignored
 /// This results in an unnecessary resend in that case

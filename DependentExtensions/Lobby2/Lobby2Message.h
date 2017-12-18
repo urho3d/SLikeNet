@@ -283,7 +283,7 @@ struct Lobby2Message
 	/// Do any Lobby2Server	functionality when the message first arrives on the server, and after it has returned true from PrevalidateInput()
 	/// If it returns true, the message has been handled, and the result is sent to the client
 	/// If it returns false, the message continues to ServerDBImpl
-	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle );
+	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle);
 
 	/// Do any Lobby2Server	functionality after the message has been processed by the database, in the server thread.
 	virtual void ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle );
@@ -950,7 +950,7 @@ struct Platform_Startup : public Lobby2Message
 	virtual bool CancelOnDisconnect(void) const {return false;}
 	virtual bool RequiresLogin(void) const {return false;}
 	virtual bool PrevalidateInput(void) {return true;}
-	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; return true; }
+	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle) { (void)server; (void)curUserHandle; return true; }
 };
 
 /// \brief Platform specific startup. Unused on the PC
@@ -963,7 +963,7 @@ struct Platform_Shutdown : public Lobby2Message
 	virtual bool CancelOnDisconnect(void) const {return false;}
 	virtual bool RequiresLogin(void) const {return false;}
 	virtual bool PrevalidateInput(void) {return true;}
-	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; return true; }
+	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle) { (void)server; (void)curUserHandle; return true; }
 };
 
 /// \brief Create all tables and stored procedures on a system that does not already have them
@@ -1619,7 +1619,7 @@ struct Client_SetPresence : public Lobby2Message
 	virtual bool CancelOnDisconnect(void) const {return true;}
 	virtual bool RequiresLogin(void) const {return true;}
 	virtual void Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream );
-//	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle );
+//	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle );
 
 	/// \param[in] Presence info to set.
 	SLNet::Lobby2Presence presence;
@@ -1635,7 +1635,7 @@ struct Client_GetPresence : public Lobby2Message
 	virtual bool CancelOnDisconnect(void) const {return true;}
 	virtual bool RequiresLogin(void) const {return false;}
 	virtual void Serialize( bool writeToBitstream, bool serializeOutput, SLNet::BitStream *bitStream );
-//	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle );
+//	virtual bool ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle );
 
 	/// \param[in] Which user we are looking up ( can be ourselves )
 	SLNet::RakString userHandle;

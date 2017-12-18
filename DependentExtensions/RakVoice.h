@@ -77,8 +77,8 @@ public:
 
 	/// \brief Starts RakVoice
 	/// \param[in] speexSampleRate 8000, 16000, or 32000
-	/// \param[in] bufferSizeBytes How many bytes long inputBuffer and outputBuffer are in SendFrame and ReceiveFrame are.  Should be your sample size * the number of samples to encode at once.
-	void Init(unsigned short speexSampleRate, unsigned bufferSizeBytes);
+	/// \param[in] newBufferSizeBytes How many bytes long inputBuffer and outputBuffer are in SendFrame and ReceiveFrame are.  Should be your sample size * the number of samples to encode at once.
+	void Init(unsigned short speexSampleRate, unsigned newBufferSizeBytes);
 
 	/// \brief Changes encoder complexity
 	/// Specifying higher values might help when encoding non-speech sounds.

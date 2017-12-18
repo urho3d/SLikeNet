@@ -69,16 +69,15 @@ void DX9_BackbufferGrabber::LockBackbufferCopy(SLNet::RGBImageBlob *blob)
 
 	//	SLNet::TimeMS t1 = SLNet::GetTimeMS();
 	D3DLOCKED_RECT lockedRect;
-	unsigned int videoMemoryDestOffset=0;
-	unsigned int pDataOffset=0;
 	hr = pDestSurface->LockRect(&lockedRect,0,D3DLOCK_DONOTWAIT|D3DLOCK_READONLY|D3DLOCK_NOSYSLOCK);
 	if (hr==D3D_OK)
 	{
 		blob->data=(unsigned char*)(lockedRect.pBits);
-		blob->imageHeight=height;
-		blob->imageWidth=width;
+		// #high - consider changing data types or add error handling
+		blob->imageHeight=static_cast<uint16_t>(height);
+		blob->imageWidth=static_cast<uint16_t>(width);
 		blob->input_components=4;
-		blob->linePitch=lockedRect.Pitch;
+		blob->linePitch=static_cast<uint16_t>(lockedRect.Pitch);
 		needsUnlock=true;
 	}
 }

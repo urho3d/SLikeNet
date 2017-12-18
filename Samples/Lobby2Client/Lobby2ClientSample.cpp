@@ -303,7 +303,7 @@ int main()
 
 		if (_kbhit())
 		{
-			char ch = _getch();
+			int ch = _getch();
 			if (ch <= '0' || ch > '9')
 			{
 				printf("Bad instance number\n");
@@ -530,13 +530,15 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Client_UpdateAccount:
 		{
-			SLNet::Client_UpdateAccount *arg = (SLNet::Client_UpdateAccount *) m;
+			// provided for documentation purposes only
+			// SLNet::Client_UpdateAccount *arg = (SLNet::Client_UpdateAccount *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Client_GetAccountDetails:
 		{
-			SLNet::Client_GetAccountDetails *arg = (SLNet::Client_GetAccountDetails *) m;
+			// provided for documentation purposes only
+			// SLNet::Client_GetAccountDetails *arg = (SLNet::Client_GetAccountDetails *) m;
 		}
 		break;
 
@@ -556,7 +558,8 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Client_GetIgnoreList:
 		{
-		SLNet::Client_GetIgnoreList *arg = (SLNet::Client_GetIgnoreList *) m;
+			// provided for documentation purposes only
+			// SLNet::Client_GetIgnoreList *arg = (SLNet::Client_GetIgnoreList *) m;
 		}
 		break;
 
@@ -607,13 +610,15 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Friends_GetInvites:
 		{
-		SLNet::Friends_GetInvites *arg = (SLNet::Friends_GetInvites *) m;
+			// provided for documentation purposes only
+			// SLNet::Friends_GetInvites *arg = (SLNet::Friends_GetInvites *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Friends_GetFriends:
 		{
-		SLNet::Friends_GetFriends *arg = (SLNet::Friends_GetFriends *) m;
+			// provided for documentation purposes only
+			// SLNet::Friends_GetFriends *arg = (SLNet::Friends_GetFriends *) m;
 		}
 		break;
 
@@ -644,7 +649,8 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 		break;
 	case SLNet::L2MID_BookmarkedUsers_Get:
 		{
-		SLNet::BookmarkedUsers_Get *arg = (SLNet::BookmarkedUsers_Get *) m;
+			// provided for documentation purposes only
+			// SLNet::BookmarkedUsers_Get *arg = (SLNet::BookmarkedUsers_Get *) m;
 		}
 		break;
 
@@ -863,7 +869,8 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Clans_Get:
 		{
-		SLNet::Clans_Get *arg = (SLNet::Clans_Get *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_Get *arg = (SLNet::Clans_Get *) m;
 		}
 		break;
 
@@ -907,7 +914,8 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Clans_DownloadInvitationList:
 		{
-		SLNet::Clans_DownloadInvitationList *arg = (SLNet::Clans_DownloadInvitationList *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_DownloadInvitationList *arg = (SLNet::Clans_DownloadInvitationList *) m;
 		}
 		break;
 
@@ -946,7 +954,8 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Clans_DownloadRequestList:
 		{
-		SLNet::Clans_DownloadRequestList *arg = (SLNet::Clans_DownloadRequestList *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_DownloadRequestList *arg = (SLNet::Clans_DownloadRequestList *) m;
 		}
 		break;
 
@@ -984,49 +993,57 @@ void ExecuteCommand(SLNet::Lobby2MessageID command, SLNet::RakString userName, i
 
 	case SLNet::L2MID_Clans_CreateBoard:
 		{
-		SLNet::Clans_CreateBoard *arg = (SLNet::Clans_CreateBoard *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_CreateBoard *arg = (SLNet::Clans_CreateBoard *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_DestroyBoard:
 		{
-		SLNet::Clans_DestroyBoard *arg = (SLNet::Clans_DestroyBoard *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_DestroyBoard *arg = (SLNet::Clans_DestroyBoard *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_CreateNewTopic:
 		{
-		SLNet::Clans_CreateNewTopic *arg = (SLNet::Clans_CreateNewTopic *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_CreateNewTopic *arg = (SLNet::Clans_CreateNewTopic *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_ReplyToTopic:
 		{
-		SLNet::Clans_ReplyToTopic *arg = (SLNet::Clans_ReplyToTopic *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_ReplyToTopic *arg = (SLNet::Clans_ReplyToTopic *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_RemovePost:
 		{
-		SLNet::Clans_RemovePost *arg = (SLNet::Clans_RemovePost *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_RemovePost *arg = (SLNet::Clans_RemovePost *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_GetBoards:
 		{
-		SLNet::Clans_GetBoards *arg = (SLNet::Clans_GetBoards *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_GetBoards *arg = (SLNet::Clans_GetBoards *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_GetTopics:
 		{
-		SLNet::Clans_GetTopics *arg = (SLNet::Clans_GetTopics *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_GetTopics *arg = (SLNet::Clans_GetTopics *) m;
 		}
 		break;
 
 	case SLNet::L2MID_Clans_GetPosts:
 		{
-		SLNet::Clans_GetPosts *arg = (SLNet::Clans_GetPosts *) m;
+			// provided for documentation purposes only
+			// SLNet::Clans_GetPosts *arg = (SLNet::Clans_GetPosts *) m;
 		}
 		break;
 	}

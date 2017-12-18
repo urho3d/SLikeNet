@@ -91,13 +91,13 @@ bool AppInterface::HasFocus(void) const
 {
 	return hasFocus;
 }
-void AppInterface::SetFocus(bool hasFocus)
+void AppInterface::SetFocus(bool focus)
 {
-	if (this->hasFocus!=hasFocus)
+	if (hasFocus!=focus)
 	{
 		if (primaryFSM->CurrentState())
-			((RunnableState*)(primaryFSM->CurrentState()))->SetFocus(hasFocus);
-		this->hasFocus=hasFocus;
+			((RunnableState*)(primaryFSM->CurrentState()))->SetFocus(focus);
+		hasFocus=focus;
 	}
 }
 void AppInterface::PushState(RunnableState* state)

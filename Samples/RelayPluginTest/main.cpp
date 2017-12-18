@@ -63,8 +63,7 @@ int main(void)
 		if (serverPort[0]==0)
 			strcpy_s(serverPort, "1234");
 
-		SLNet::ConnectionAttemptResult car = peer->Connect(ip, atoi(serverPort), 0, 0);
-		RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
+		SLNET_VERIFY(peer->Connect(ip, atoi(serverPort), 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 	}
 
 	peer->SetTimeoutTime(30000, UNASSIGNED_SYSTEM_ADDRESS);
@@ -108,7 +107,6 @@ int main(void)
 			}
 			else if (ch=='p' || ch=='P')
 			{
-				char name[128];
 				printf("Enter name of participant: ");
 				Gets(name, sizeof(name));
 				if (name[0])

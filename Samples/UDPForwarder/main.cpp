@@ -79,8 +79,7 @@ int main()
 	printf("UDPForwarder bound on %s\n", boundAddress.ToString(false));
 
 	// Send a connect message to the forwarder, on the port to forward to rakPeer[1]
-	SLNet::ConnectionAttemptResult car = rakPeer[0]->Connect(boundAddress.ToString(false), fowardPort, 0, 0);
-	RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
+	SLNET_VERIFY(rakPeer[0]->Connect(boundAddress.ToString(false), fowardPort, 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 	
 	printf("'q'uit.\n");
 	SLNet::Packet *p;
@@ -111,7 +110,7 @@ int main()
 
 		if (_kbhit())
 		{
-			char ch = _getch();
+			int ch = _getch();
 			if (ch=='q' || ch=='Q')
 				break;
 		}

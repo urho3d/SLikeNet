@@ -115,8 +115,7 @@ int main(void)
 			gets_s(port);
 			if (port[0]==0)
 				strcpy_s(port, "60000");
-			ConnectionAttemptResult car = rakPeer->Connect(str, atoi(port), 0, 0, 0);
-			RakAssert(car==CONNECTION_ATTEMPT_STARTED);
+			SLNET_VERIFY(rakPeer->Connect(str, atoi(port), 0, 0, 0) == CONNECTION_ATTEMPT_STARTED);
 			printf("Connecting.\n");
 		}
 		if (ch=='d' || ch=='D')
@@ -269,7 +268,6 @@ int main(void)
 void PrintConnections()
 {
 	int i,j;
-	char ch=0;
 	SystemAddress systemAddress;
 	
 	printf("--------------------------------\n");

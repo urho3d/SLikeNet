@@ -60,13 +60,13 @@ RakVoice::~RakVoice()
 {
 	Deinit();
 }
-void RakVoice::Init(unsigned short sampleRate, unsigned bufferSizeBytes)
+void RakVoice::Init(unsigned short speexSampleRate, unsigned newBufferSizeBytes)
 {
 	// Record the parameters
-	RakAssert(sampleRate==8000 || sampleRate==16000 || sampleRate==32000);
-	this->sampleRate=sampleRate;
-	this->bufferSizeBytes=bufferSizeBytes;
-	bufferedOutputCount=bufferSizeBytes/SAMPLESIZE;
+	RakAssert(speexSampleRate==8000 || speexSampleRate==16000 || speexSampleRate==32000);
+	sampleRate=speexSampleRate;
+	bufferSizeBytes=newBufferSizeBytes;
+	bufferedOutputCount=newBufferSizeBytes/SAMPLESIZE;
 	bufferedOutput = (float*) rakMalloc_Ex(sizeof(float)*bufferedOutputCount, _FILE_AND_LINE_);
 	unsigned i;
 	for (i=0; i < bufferedOutputCount; i++)
@@ -625,9 +625,9 @@ void RakVoice::OpenChannel(Packet *packet)
 	VoiceChannel *channel= SLNet::OP_NEW<VoiceChannel>( _FILE_AND_LINE_ );
 	channel->guid=packet->guid;
 	channel->isSendingVoiceData=false;
-	int sampleRate;
-	in.Read(sampleRate);
-	channel->remoteSampleRate=sampleRate;
+	int newSampleRate;
+	in.Read(newSampleRate);
+	channel->remoteSampleRate=newSampleRate;
 
 	if (channel->remoteSampleRate!=8000 && channel->remoteSampleRate!=16000 && channel->remoteSampleRate!=32000)
 	{
@@ -638,9 +638,9 @@ void RakVoice::OpenChannel(Packet *packet)
 		return;
 	}
 
-	if (sampleRate==8000)
+	if (newSampleRate==8000)
 		channel->enc_state=speex_encoder_init(&speex_nb_mode);
-	else if (sampleRate==16000)
+	else if (newSampleRate==16000)
 		channel->enc_state=speex_encoder_init(&speex_wb_mode);
 	else // 32000
 		channel->enc_state=speex_encoder_init(&speex_uwb_mode);
@@ -674,7 +674,7 @@ void RakVoice::OpenChannel(Packet *packet)
 	channel->incomingMessageNumber=0;
 
 	// Initialize preprocessor
-	channel->pre_state = speex_preprocess_state_init(channel->speexOutgoingFrameSampleCount, sampleRate);
+	channel->pre_state = speex_preprocess_state_init(channel->speexOutgoingFrameSampleCount, newSampleRate);
 	RakAssert(channel->pre_state);
 
 	// Set encoder default parameters
@@ -692,14 +692,12 @@ void RakVoice::SetEncoderParameter(void* enc_state, int vartype, int val)
 {
 	if (enc_state){ 
 		// Set parameter for just one encoder
-		int ret = speex_encoder_ctl(enc_state, vartype, &val);
-		RakAssert(ret==0);		
+		SLNET_VERIFY(speex_encoder_ctl(enc_state, vartype, &val) == 0);
 	} else {
 		// Set parameter for all encoders
 		for (unsigned int index=0; index < voiceChannels.Size(); index++)
 		{
-			int ret = speex_encoder_ctl(voiceChannels[index]->enc_state, vartype, &val);
-			RakAssert(ret==0);
+			SLNET_VERIFY(speex_encoder_ctl(voiceChannels[index]->enc_state, vartype, &val) == 0);
 		}
 	}
 }
@@ -708,14 +706,12 @@ void RakVoice::SetPreprocessorParameter(void* pre_state, int vartype, int val)
 {
 	if (pre_state){
 		// Set parameter for just one preprocessor
-		int ret = speex_preprocess_ctl((SpeexPreprocessState*)pre_state, vartype, &val);
-		RakAssert(ret==0);
+		SLNET_VERIFY(speex_preprocess_ctl((SpeexPreprocessState*)pre_state, vartype, &val) == 0);
 	} else {
 		// Set parameter for all decoders
 		for (unsigned int index=0; index < voiceChannels.Size(); index++)
 		{
-			int ret = speex_preprocess_ctl((SpeexPreprocessState*)voiceChannels[index]->pre_state, vartype, &val);
-			RakAssert(ret==0);
+			SLNET_VERIFY(speex_preprocess_ctl((SpeexPreprocessState*)voiceChannels[index]->pre_state, vartype, &val) == 0);
 		}
 	}
 }

@@ -229,7 +229,8 @@ public:
 				if (popCountdown <= timeElapsedMs)
 				{
 					SetToPopped();
-					popCountdown=-1;
+					// #med - use unsigned short max?
+					popCountdown= static_cast<SLNet::TimeMS>(-1);
 				}
 				else
 					popCountdown-=timeElapsedMs;

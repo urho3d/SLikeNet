@@ -27,11 +27,11 @@ void main_sockets(void)
 	memset(&serverAddr,0,sizeof(sockaddr_in));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = 0;
-	int j = bind(sock,(struct sockaddr *) &serverAddr,sizeof(serverAddr));
+	bind(sock,(struct sockaddr *) &serverAddr,sizeof(serverAddr));
 	struct addrinfo *curAddress = NULL;
 
-	// #low disabled (aka: main_sockets() not called) and not IPv6 aware / missing error check for err
-	int err = getaddrinfo("masterserver2.raknet.com", NULL, NULL, &curAddress);
+	// #low disabled (aka: main_sockets() not called) and not IPv6 aware / missing error check for return value
+	getaddrinfo("masterserver2.raknet.com", NULL, NULL, &curAddress);
 
 	// get the (first) IPv4 address
 	while (curAddress != NULL) {

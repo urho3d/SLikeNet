@@ -270,7 +270,6 @@ void RPC3::OnRPC3Call(const SystemAddress &systemAddress, unsigned char *data, u
 
 	DataStructures::HashIndex functionIndex;
 	LocalRPCFunction *lrpcf;
-	bool hasParameterCount=false;
 	char parameterCount;
 	NetworkIDObject *networkIdObject;
 	NetworkID networkId;
@@ -284,8 +283,7 @@ void RPC3::OnRPC3Call(const SystemAddress &systemAddress, unsigned char *data, u
 	bs.Read(hasNetworkId);
 	if (hasNetworkId)
 	{
-		bool readSuccess = bs.Read(networkId);
-		RakAssert(readSuccess);
+		SLNET_VERIFY(bs.Read(networkId));
 		RakAssert(networkId!=UNASSIGNED_NETWORK_ID);
 		if (networkIdManager==0)
 		{
@@ -397,7 +395,7 @@ void RPC3::OnRPC3Call(const SystemAddress &systemAddress, unsigned char *data, u
 
 	if (isCall)
 	{
-		bool isObjectMember = boost::fusion::get<0>(lrpcf->functionPointer);
+		/*bool isObjectMember = */ boost::fusion::get<0>(lrpcf->functionPointer);
 		boost::function<_RPC3::InvokeResultCodes (_RPC3::InvokeArgs)> functionPtr = boost::fusion::get<1>(lrpcf->functionPointer);
 		//	int arity = boost::fusion::get<2>(localFunctions[functionIndex].functionPointer);
 		//	if (isObjectMember)
@@ -425,7 +423,7 @@ void RPC3::OnRPC3Call(const SystemAddress &systemAddress, unsigned char *data, u
 		
 		// serializedParameters.PrintBits();
 
-		_RPC3::InvokeResultCodes res2 = functionPtr(functionArgs);
+		functionPtr(functionArgs);
 	}
 	else
 	{
@@ -468,7 +466,8 @@ void RPC3::InvokeSignal(DataStructures::HashIndex functionIndex, SLNet::BitStrea
 			functionArgs.thisPtr=0;
 		functionArgs.bitStream->ResetReadPointer();
 
-		bool isObjectMember = boost::fusion::get<0>(localSlot->slotObjects[i].functionPointer);
+		// #med - review whether the call is actually required at all
+		boost::fusion::get<0>(localSlot->slotObjects[i].functionPointer);
 		boost::function<_RPC3::InvokeResultCodes (_RPC3::InvokeArgs)> functionPtr = boost::fusion::get<1>(localSlot->slotObjects[i].functionPointer);
 		if (functionPtr==0)
 		{
@@ -479,7 +478,7 @@ void RPC3::InvokeSignal(DataStructures::HashIndex functionIndex, SLNet::BitStrea
 			}
 			return;
 		}
-		_RPC3::InvokeResultCodes res2 = functionPtr(functionArgs);
+		functionPtr(functionArgs);
 
 		// Not threadsafe
 		if (interruptSignal==true)

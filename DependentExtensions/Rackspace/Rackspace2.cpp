@@ -111,8 +111,8 @@ void Rackspace2::Update(void)
 						{
 							reexecuteLastRequestOnAuth=false;
 
-							json_t *root = json_loads(__addOpLast_dataAsStr.C_String(), 0, &error);							
-							AddOperation(__addOpLast_URL, __addOpLast_isPost, root, true);							
+							json_t *root2 = json_loads(__addOpLast_dataAsStr.C_String(), 0, &error);							
+							AddOperation(__addOpLast_URL, __addOpLast_isPost, root2, true);							
 						}
 						else
 						{

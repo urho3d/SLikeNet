@@ -65,8 +65,7 @@ class Client
 			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=0;
 			nextSendTime=0;
-			StartupResult b = peer->Startup(1,&socketDescriptor,1);
-			RakAssert(b==RAKNET_STARTED);
+			SLNET_VERIFY(peer->Startup(1,&socketDescriptor,1) == RAKNET_STARTED);
 			isConnected=false;
 		}
 		void Connect(void)
@@ -166,8 +165,7 @@ class Server
 		{
 			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=(unsigned short) SERVER_PORT;
-			bool b = peer->Startup((unsigned short) 600,&socketDescriptor,1)== SLNet::RAKNET_STARTED;
-			RakAssert(b);
+			SLNET_VERIFY(peer->Startup((unsigned short) 600,&socketDescriptor,1) == SLNet::RAKNET_STARTED);
 			peer->SetMaximumIncomingConnections(600);
 		}
 		unsigned ConnectionCount(void) const
@@ -228,7 +226,7 @@ int main(void)
 	printf("Connects many clients to a single server.\n");
 	printf("Difficulty: Intermediate\n\n");
 	printf("Run as (S)erver or (C)lient or (B)oth? ");
-	char ch = _getche();
+	int ch = _getche();
 	static char *defaultRemoteIP="127.0.0.1";
 	char remoteIP[128];
 	static char *localIP="127.0.0.1";
@@ -259,12 +257,11 @@ int main(void)
 		}
 	}
 
-	unsigned i;
 	randomData1[0]=(char) ID_USER_PACKET_ENUM;
-	for (i=0; i < RANDOM_DATA_SIZE_1-1; i++)
+	for (char i=0; i < RANDOM_DATA_SIZE_1-1; i++)
 		randomData1[i+1]=i;
 	randomData2[0]=(char) ID_USER_PACKET_ENUM;
-	for (i=0; i < RANDOM_DATA_SIZE_2-1; i++)
+	for (char i=0; i < RANDOM_DATA_SIZE_2-1; i++)
 		randomData2[i+1]=i;
 
 	if (mode==0 || mode==2)
@@ -275,11 +272,11 @@ int main(void)
 	if (mode==1 || mode==2)
 	{
 		printf("Starting clients...\n");
-		for (i=0; i < NUM_CLIENTS; i++)
+		for (unsigned int i=0; i < NUM_CLIENTS; i++)
 			clients[i].Startup();
 		printf("Started clients\n");
 		printf("Connecting clients...\n");
-		for (i=0; i < NUM_CLIENTS; i++)
+		for (unsigned int i=0; i < NUM_CLIENTS; i++)
 			clients[i].Connect();
 		printf("Done.\n");
 	}
@@ -292,13 +289,13 @@ int main(void)
 			server.Update(time);
 		if (mode==1 || mode==2)
 		{
-			for (i=0; i < NUM_CLIENTS; i++)
+			for (unsigned int i=0; i < NUM_CLIENTS; i++)
 				clients[i].Update(time);
 		}
 
 		if (_kbhit())
 		{
-			char ch = _getch();
+			ch = _getch();
 			if (ch==' ')
 			{
 				FILE *fp;
@@ -307,7 +304,7 @@ int main(void)
 				{
 					printf("Logging server statistics to ServerStats.txt\n");
 					fopen_s(&fp,"ServerStats.txt","wt");
-					for (i=0; i < NUM_CLIENTS; i++)
+					for (unsigned int i=0; i < NUM_CLIENTS; i++)
 					{
 						RakNetStatistics *rssSender;
 						rssSender=server.peer->GetStatistics(server.peer->GetSystemAddressFromIndex(i));
@@ -321,7 +318,7 @@ int main(void)
 				{
 					printf("Logging client statistics to ClientStats.txt\n");
 					fopen_s(&fp,"ClientStats.txt","wt");
-					for (i=0; i < NUM_CLIENTS; i++)
+					for (unsigned int i=0; i < NUM_CLIENTS; i++)
 					{
 						RakNetStatistics *rssSender;
 						rssSender=clients[i].peer->GetStatistics(clients[i].peer->GetSystemAddressFromIndex(0));
@@ -343,7 +340,7 @@ int main(void)
 	if (mode==0 || mode==2)
 		server.peer->Shutdown(0);
 	if (mode==1 || mode==2)
-		for (i=0; i < NUM_CLIENTS; i++)
+		for (unsigned int i=0; i < NUM_CLIENTS; i++)
 			clients[i].peer->Shutdown(0);
 
 	printf("Test completed");

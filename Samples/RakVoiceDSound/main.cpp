@@ -143,7 +143,7 @@ int main(void)
 
 	bool mute=false;
 	bool quit;
-	char ch;
+	int ch;
 
 	char port[256];
 	rakPeer = SLNet::RakPeerInterface::GetInstance();

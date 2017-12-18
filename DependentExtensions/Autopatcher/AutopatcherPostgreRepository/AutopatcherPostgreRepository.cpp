@@ -366,8 +366,8 @@ int AutopatcherPostgreRepository::GetPatches(const char *applicationName, FileLi
 			//	contentLength=PQgetlength(result, 0, 0);
 			//	patchList->AddFile(userFilename, content, contentLength, contentLength, FileListNodeContext(PC_WRITE_FILE,0),false);
 
-				int fileIdIndex = PQfnumber(result, "fileId");
-				int fileLengthIndex = PQfnumber(result, "fileLength");
+				fileIdIndex = PQfnumber(result, "fileId");
+				fileLengthIndex = PQfnumber(result, "fileLength");
 				int changeSetIdIndex = PQfnumber(result, "changeSetID");
 				int fileId = ntohl(*((int*)PQgetvalue(result, 0, fileIdIndex)));
 				int fileLength = ntohl(*((int*)PQgetvalue(result, 0, fileLengthIndex)));
@@ -1318,7 +1318,6 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 		if (fopen_s(&fp, path, "rb") != 0)
 		{
 			newFiles.Clear();
-			PQclear(fileRows);
 			RakAssert(0);
 			return false;
 		}
@@ -2064,7 +2063,8 @@ unsigned int AutopatcherPostgreRepository::GetPatchPart( const char *filename, u
 	if (IsResultSuccessful(result, true)==false)
 	{
 		PQclear(result);
-		return -1;
+		// #med - review/change return value
+		return static_cast<unsigned int>(-1);
 	}
 
 	int patchColumnIndex = PQfnumber(result, "substring");
@@ -2149,7 +2149,7 @@ unsigned int AutopatcherPostgreRepository2::GetFilePart( const char *filename, u
 		RakAssert(context.op==PC_WRITE_FILE)
 
 		sprintf_s(query, "SELECT pathToContent FROM FileVersionHistory WHERE fileId=%i;", context.flnc_extraData1);
-		bool res = ExecuteBlockingCommand(query, &result, true);
+		ExecuteBlockingCommand(query, &result, true);
 		char *path;
 		path = PQgetvalue(result,0,0);
 

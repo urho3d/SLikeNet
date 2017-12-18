@@ -50,7 +50,7 @@ void AutopatcherServerLoadNotifier_Printf::OnQueueUpdate(SystemAddress remoteSys
 		operationString="added";
 	else if (queueOperation==QO_POPPED_ONTO_TO_PROCESSING_THREAD)
 		operationString="processing";
-	else if (queueOperation==QO_WAS_ABORTED)
+	else  // otherwise queueOperation == QO_WAS_ABORTED
 		operationString="aborted";
 
 	printf("%s %s %s. %i queued. %i working.\n", systemAddressString, requestTypeString, operationString, autopatcherState->requestsQueued, autopatcherState->requestsWorking);
@@ -72,7 +72,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(
 		changelistString="Add and delete files";
 	else if (getChangelistResult==GCR_NOTHING_TO_DO)
 		changelistString="No files in changelist";
-	else if (getChangelistResult==GCR_REPOSITORY_ERROR)
+	else  // otherwise getChangelistResult == GCR_REPOSITORY_ERROR
 		changelistString="Repository error";
 
 	printf("%s GetChangelist complete. %s. %i queued. %i working.\n", systemAddressString, changelistString, autopatcherState->requestsQueued, autopatcherState->requestsWorking);
@@ -93,7 +93,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetPatchCompleted(SystemAddress rem
 		patchResultString="Files pushed for patching";
 	else if (patchResult==PR_ABORTED_FROM_INPUT_THREAD)
 		patchResultString="Aborted from input thread";
-	else if (patchResult==PR_ABORTED_FROM_DOWNLOAD_THREAD)
+	else  // otherwise patchResult == PR_ABORTED_FROM_DOWNLOAD_THREAD
 		patchResultString="Aborted from download thread";
 
 	printf("%s GetPatch complete. %s. %i queued. %i working.\n", systemAddressString, patchResultString, autopatcherState->requestsQueued, autopatcherState->requestsWorking);
@@ -267,8 +267,7 @@ void AutopatcherServer::OnClosedConnection(const SystemAddress &systemAddress, R
 }
 void AutopatcherServer::RemoveFromThreadPool(SystemAddress systemAddress)
 {
-	unsigned i;
-	i=0;
+	unsigned int i = 0;
 	threadPool.LockInput();
 	while (i < threadPool.InputSize())
 	{

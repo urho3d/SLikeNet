@@ -147,8 +147,7 @@ void main(void)
 	SLNet::SystemAddress localAddress=server->GetMyBoundAddress();
 	roomsPluginClient.SetServerAddress(localAddress);
 	roomsPluginClient.SetRoomsCallback(&sampleCallbacks);
-	SLNet::ConnectionAttemptResult car = client->Connect("127.0.0.1", 1234, 0, 0, 0);
-	RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
+	SLNET_VERIFY(client->Connect("127.0.0.1", 1234, 0, 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 
 	printf("A. CreateRoom\n");
 	printf("B. EnterRoom\n");

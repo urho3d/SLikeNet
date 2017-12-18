@@ -302,8 +302,8 @@ bool Lobby2Message::ValidateEmailAddress( RakString *text )
 }
 bool Lobby2Message::PrevalidateInput(void) {return true;}
 bool Lobby2Message::ClientImpl(SLNet::Lobby2Plugin *client) { (void)client; return true; }
-bool Lobby2Message::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; return false; }
-void Lobby2Message::ServerPostDBMemoryImpl( Lobby2Server *server, RakString userHandle ) { (void)server; (void)userHandle; }
+bool Lobby2Message::ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle ) { (void)server; (void)curUserHandle; return false; }
+void Lobby2Message::ServerPostDBMemoryImpl( Lobby2Server *server, RakString curUserHandle ) { (void)server; (void)curUserHandle; }
 bool Lobby2Message::ServerDBImpl( Lobby2ServerCommand *command, void *databaseInterface ) { (void)command; (void)databaseInterface; resultCode=L2RC_COUNT; return true; }
 
 void CreateAccountParameters::Serialize(bool writeToBitstream, BitStream *bitStream)
@@ -938,7 +938,7 @@ void Client_SetPresence::Serialize( bool writeToBitstream, bool serializeOutput,
 	SerializeBase(writeToBitstream, serializeOutput, bitStream);
 	presence.Serialize(bitStream,writeToBitstream);
 }
-// bool Client_SetPresence::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+// bool Client_SetPresence::ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle )
 // {
 // 	// This has to go in Lobby2Message_PGSQL.h because the server and client both share this file, and the client doesn't know about the server
 // 	server->SetPresence( presence, systemAddress );
@@ -953,10 +953,10 @@ void Client_GetPresence::Serialize( bool writeToBitstream, bool serializeOutput,
 		presence.Serialize(bitStream,writeToBitstream);
 	}
 }
-// bool Client_GetPresence::ServerPreDBMemoryImpl( Lobby2Server *server, RakString userHandle )
+// bool Client_GetPresence::ServerPreDBMemoryImpl( Lobby2Server *server, RakString curUserHandle )
 // {
 // 	// This has to go in Lobby2Message_PGSQL.h because the server and client both share this file, and the client doesn't know about the server
-// 	server->GetPresence( presence, userHandle );
+// 	server->GetPresence( presence, curUserHandle );
 // 	return true;
 // }
 void Friends_SendInvite::Serialize( bool writeToBitstream, bool serializeOutput, BitStream *bitStream )

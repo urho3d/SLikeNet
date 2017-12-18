@@ -452,14 +452,13 @@ int main(void)
 	sd.port=60000;
 	while (IRNS2_Berkley::IsPortInUse(sd.port, sd.hostAddress, sd.socketFamily, SOCK_DGRAM)==true)
 		sd.port++;
-	StartupResult sr = rakPeer->Startup(8,&sd,1);
-	RakAssert(sr==RAKNET_STARTED);
+	SLNET_VERIFY(rakPeer->Startup(8,&sd,1) == RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(8);
 	rakPeer->SetTimeoutTime(30000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 	printf("Our guid is %s\n", rakPeer->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	printf("Started on %s\n", rakPeer->GetMyBoundAddress().ToString(true));
 
-	for (int i=0; i < 32; i++)
+	for (unsigned short i=0; i < 32; i++)
 	{
 		if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
 			rakPeer->AdvertiseSystem("255.255.255.255", 60000+i, 0,0,0);
@@ -469,7 +468,7 @@ int main(void)
 
 	bool success;
 	bool quit=false;
-	char ch;
+	int ch;
 	Packet *packet;
 	while (!quit)
 	{
@@ -486,8 +485,7 @@ int main(void)
 					// Add mid-game joins to ReplicaManager3 as long as we know who the host is
 					if (fullyConnectedMesh2->GetConnectedHost()!=UNASSIGNED_RAKNET_GUID)
 					{
-						bool success = replicaManager3->PushConnection(replicaManager3->AllocConnection(packet->systemAddress, packet->guid));
-						RakAssert(success);
+						SLNET_VERIFY(replicaManager3->PushConnection(replicaManager3->AllocConnection(packet->systemAddress, packet->guid)));
 						teamManager->GetWorldAtIndex(0)->AddParticipant(packet->guid);
 					}
 				}
@@ -498,8 +496,7 @@ int main(void)
 					// Add mid-game joins to ReplicaManager3 as long as we know who the host is
 					if (fullyConnectedMesh2->GetConnectedHost()!=UNASSIGNED_RAKNET_GUID)
 					{
-						bool success = replicaManager3->PushConnection(replicaManager3->AllocConnection(packet->systemAddress, packet->guid));
-						RakAssert(success);
+						SLNET_VERIFY(replicaManager3->PushConnection(replicaManager3->AllocConnection(packet->systemAddress, packet->guid)));
 						teamManager->GetWorldAtIndex(0)->AddParticipant(packet->guid);
 					}
 				}

@@ -91,9 +91,9 @@ void ReadAllPackets(void)
 			bs.Read(port);
 			intermediateAddress.SetPortHostOrder(port);
 
-			char str2[32];
-			intermediateAddress.ToString(true, str2,32);
-			printf("Connection to %s rerouted through %s\n", str, str2);
+			char str3[32];
+			intermediateAddress.ToString(true, str3, 32);
+			printf("Connection to %s rerouted through %s\n", str, str3);
 
 			// Test sending a message to the endpoint
 			SLNet::BitStream bsOut;
@@ -141,7 +141,7 @@ int main(void)
 	{
 		if (_kbhit())
 		{
-			char ch=_getch();
+			int ch=_getch();
 			if (ch=='q')
 				break;
 			if (ch=='r')

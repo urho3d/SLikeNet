@@ -37,9 +37,7 @@ void CFunc1(SLNet::BitStream *bitStream, Packet *packet )
 
 	printf("CFunc1 ");
 	SLNet::RakString data;
-	int offset=bitStream->GetReadOffset();
-	bool read = bitStream->ReadCompressed(data);
-	RakAssert(read);
+	SLNET_VERIFY(bitStream->ReadCompressed(data));
 	printf("%s\n", data.C_String());
 };
 
@@ -50,9 +48,7 @@ void CFunc2(SLNet::BitStream *bitStream, Packet *packet )
 
 	printf("CFunc2 ");
 	SLNet::RakString data;
-	int offset=bitStream->GetReadOffset();
-	bool read = bitStream->ReadCompressed(data);
-	RakAssert(read);
+	SLNET_VERIFY(bitStream->ReadCompressed(data));
 	printf("%s\n", data.C_String());
 };
 
@@ -63,9 +59,7 @@ void CFunc3(SLNet::BitStream *bitStream, SLNet::BitStream *returnData, Packet *p
 
 	printf("CFunc3 ");
 	SLNet::RakString data;
-	int offset=bitStream->GetReadOffset();
-	bool read = bitStream->ReadCompressed(data);
-	RakAssert(read);
+	SLNET_VERIFY(bitStream->ReadCompressed(data));
 	printf("%s\n", data.C_String());
 	returnData->WriteCompressed("CFunc3 returnData");
 };
@@ -125,7 +119,7 @@ int main(void)
 		rpc.CallBlocking("Blocking", &testBs, HIGH_PRIORITY,RELIABLE_ORDERED,0,rakPeer->GetSystemAddressFromIndex(0),&testBlockingReturn);
 
 		SLNet::RakString data;
-		bool read = testBlockingReturn.ReadCompressed(data);
+		testBlockingReturn.ReadCompressed(data);
 		printf("%s\n", data.C_String());
 	}
 	else

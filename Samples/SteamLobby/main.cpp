@@ -68,8 +68,7 @@ struct SteamResults : public SLNet::Lobby2Callbacks
 			// Steam's NAT punch is implicit, so it takes a long time to connect. Give it extra time
 			unsigned int sendConnectionAttemptCount=24;
 			unsigned int timeBetweenSendConnectionAttemptsMS=500;
-			ConnectionAttemptResult car = rakPeer->Connect(msgSteam->remoteSystem.ToString(false), msgSteam->remoteSystem.GetPort(), 0, 0, 0, 0, sendConnectionAttemptCount, timeBetweenSendConnectionAttemptsMS);
-			RakAssert(car==CONNECTION_ATTEMPT_STARTED);
+			SLNET_VERIFY(rakPeer->Connect(msgSteam->remoteSystem.ToString(false), msgSteam->remoteSystem.GetPort(), 0, 0, 0, 0, sendConnectionAttemptCount, timeBetweenSendConnectionAttemptsMS) == CONNECTION_ATTEMPT_STARTED);
 		}
 	}
 

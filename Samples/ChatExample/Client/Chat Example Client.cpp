@@ -123,7 +123,7 @@ int main(void)
 	SLNet::PublicKey pk;
 	pk.remoteServerPublicKey=public_key;
 	pk.publicKeyMode= SLNet::PKM_USE_KNOWN_PUBLIC_KEY;
-	bool b = client->Connect(ip, atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"), &pk)== SLNet::CONNECTION_ATTEMPT_STARTED;
+	client->Connect(ip, atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"), &pk)== SLNet::CONNECTION_ATTEMPT_STARTED;
 #else
 	SLNet::ConnectionAttemptResult car = client->Connect(ip, atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));
 	RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);

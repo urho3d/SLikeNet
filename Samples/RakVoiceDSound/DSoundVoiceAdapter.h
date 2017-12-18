@@ -111,12 +111,12 @@ private:
 	DSoundVoiceAdapter(DSoundVoiceAdapter &) {}
 
 	static DSoundVoiceAdapter instance;
-	RakVoice *rakVoice;
+	RakVoice *m_rakVoice;
 	IDirectSound8 *ds; // Pointer to the DirectSound Device Object
 	IDirectSoundCapture8 *dsC; // Pointer to the DirectSound Capture Device Object
 	IDirectSoundBuffer8 *dsbIncoming; // DirectSound buffer for incoming sound (what  you'll hear)
 	IDirectSoundCaptureBuffer8 *dsbOutgoing; // DirectSound buffer used for outgoing sound (capture from your microphone and send to the other players)
-	bool mute;
+	bool m_mute;
 
 	// DirectSound notification positions with the required Win32 Event objects
 	DSBPOSITIONNOTIFY incomingBufferNotifications[FRAMES_IN_SOUND];

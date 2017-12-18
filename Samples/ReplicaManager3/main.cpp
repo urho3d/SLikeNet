@@ -462,7 +462,7 @@ class ReplicaManager3Sample : public ReplicaManager3
 
 int main(void)
 {
-	char ch;
+	int ch;
 	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	char ip[128];
@@ -630,7 +630,7 @@ int main(void)
 		}
 
 		RakSleep(30);
-		for (int i=0; i < 4; i++)
+		for (unsigned short i=0; i < 4; i++)
 		{
 			if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=SERVER_PORT+i)
 				rakPeer->AdvertiseSystem("255.255.255.255", SERVER_PORT+i, 0,0,0);

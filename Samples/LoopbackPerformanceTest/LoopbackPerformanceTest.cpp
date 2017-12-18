@@ -40,9 +40,11 @@ int main(void)
 	int systemType;
 	unsigned char byteBlock[4096];
 	SLNet::TimeMS time, quitTime, nextStatsTime;
-	unsigned int packetsPerSecond, bytesPerPacket, num,index, bytesInPackets;
+	unsigned int packetsPerSecond = 0; // unnecessary assignment - added to workaround false-positive of C4701
+	unsigned int bytesPerPacket = 0; // unnecessary assignment - added to workaround false-positive of C4701
+	unsigned int num, index, bytesInPackets;
 	SLNet::TimeMS lastSendTime;
-	int sendMode;
+	int sendMode = 0; // unnecessary assignment - added to workaround false-positive of C4701
 	int verbosityLevel;
 	unsigned int showStatsInterval;
 	bool connectionCompleted, incomingConnectionCompleted;

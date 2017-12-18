@@ -207,7 +207,7 @@ public:
 					json_t *endpointArrayElement = json_array_get(endpointArray, j);
 					json_t *publicURLJson = json_object_get(endpointArrayElement, "publicURL");
 					const char *publicURLStr = json_string_value(publicURLJson);
-					json_t *regionJson = json_object_get(endpointArrayElement, "region");
+					regionJson = json_object_get(endpointArrayElement, "region");
 					if (regionJson)
 					{
 						const char *regionStr = json_string_value(regionJson);
@@ -358,7 +358,7 @@ public:
 				const char *elementNameStr = json_string_value(elementNameJson);
 				if (strcmp(elementNameStr, patcherHostSubdomainURL)==0)
 				{
-					json_t *arrayElement = json_array_get(domainsArray, i);
+					arrayElement = json_array_get(domainsArray, i);
 					json_t *elementIPJson = json_object_get(arrayElement, "data");
 					strcpy_s(dnsHostIP, json_string_value(elementIPJson));
 					json_t *elementIDJson = json_object_get(arrayElement, "id");
@@ -896,9 +896,9 @@ class AutopatcherPostgreRepository2_WithXDelta : public SLNet::AutopatcherPostgr
 			}
 			if (error!=0)
 			{
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch, errno, buff, commandLine);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch, errno, buff2, commandLine);
 				return 1;
 			}
 			fseek(fpPatch, 0, SEEK_END);
@@ -915,9 +915,9 @@ class AutopatcherPostgreRepository2_WithXDelta : public SLNet::AutopatcherPostgr
 				unlinkRes = _unlink(pathToPatch);
 			}
 			if (unlinkRes!=0) {
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, buff);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, buff2);
 			}
 
 			return 0;
@@ -1173,8 +1173,6 @@ int main(int argc, char **argv)
 					printf("Downloaded server list. %i servers.\n", cloudQueryResult.rowsReturned.Size());
 					*/
 
-				unsigned short connectionsOnOurServer=65535;
-				unsigned short lowestConnectionsServer=65535;
 				SLNet::SystemAddress lowestConnectionAddress;
 
 				int totalConnections=0;

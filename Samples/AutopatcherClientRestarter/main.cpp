@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 	}
 
 	char buff[256];
-	int offset=0;
 
 	if (fgets(buff,255,fp)==0)
 		return 1;

@@ -132,9 +132,9 @@ class AutopatcherPostgreRepository2_WithXDelta : public SLNet::AutopatcherPostgr
 				unlinkRes = _unlink(pathToPatch);
 			}
 			if (unlinkRes!=0) {
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, buff);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch, errno, buff2);
 			}
 
 			return 0;
@@ -228,7 +228,7 @@ int main(int, char **)
 
 	printf("(D)rop database\n(C)reate database.\n(A)dd application\n(U)pdate revision.\n(R)emove application\n(Q)uit\n");
 
-	char ch;
+	int ch;
 	SLNet::Packet *p;
 	for(;;)
 	{

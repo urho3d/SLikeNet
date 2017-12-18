@@ -40,7 +40,7 @@ int main()
 	FullyConnectedMesh2 fcm2[NUM_PEERS];
 	ConnectionGraph2 cg2[NUM_PEERS];
 
-	for (int i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 	{
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 		rakPeer[i]->AttachPlugin(&fcm2[i]);
@@ -48,27 +48,25 @@ int main()
 		fcm2[i].SetAutoparticipateConnections(true);
 		SLNet::SocketDescriptor sd;
 		sd.port=60000+i;
-		StartupResult sr = rakPeer[i]->Startup(NUM_PEERS,&sd,1);
-		RakAssert(sr==RAKNET_STARTED);
+		SLNET_VERIFY(rakPeer[i]->Startup(NUM_PEERS,&sd,1) == RAKNET_STARTED);
 		rakPeer[i]->SetMaximumIncomingConnections(NUM_PEERS);
 		rakPeer[i]->SetTimeoutTime(1000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 		printf("Our guid is %s\n", rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
 	}
 
-	for (int i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 	{
-		for (int j=0; j < NUM_PEERS; j++)
+		for (unsigned short j=0; j < NUM_PEERS; j++)
 		{
 			if (i==j)
 				continue;
-			ConnectionAttemptResult car = rakPeer[i]->Connect("127.0.0.1", 60000+j, 0, 0 );
-			RakAssert(car==CONNECTION_ATTEMPT_STARTED);
+			SLNET_VERIFY(rakPeer[i]->Connect("127.0.0.1", 60000+j, 0, 0 ) == CONNECTION_ATTEMPT_STARTED);
 		}
 	}
 
 	bool quit=false;
 	SLNet::Packet *packet;
-	char ch;
+	int ch;
 	while (!quit)
 	{
 		for (int i=0; i < NUM_PEERS; i++)

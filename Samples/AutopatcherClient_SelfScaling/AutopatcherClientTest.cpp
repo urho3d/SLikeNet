@@ -158,9 +158,9 @@ public:
 			}
 			if (error!=0)
 			{
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch2, errno, buff, commandLine);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nERROR: Could not open %s.\nerr=%i (%s)\narguments=%s\n", pathToPatch2, errno, buff2, commandLine);
 				return PC_ERROR_PATCH_TARGET_MISSING;
 			}
 
@@ -183,14 +183,14 @@ public:
 			}
 
 			if (unlinkRes1!=0) {
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch1, errno, buff);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch1, errno, buff2);
 			}
 			if (unlinkRes2!=0) {
-				char buff[1024];
-				strerror_s(buff, errno);
-				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch2, errno, buff);
+				char buff2[1024];
+				strerror_s(buff2, errno);
+				printf("\nWARNING: unlink %s failed.\nerr=%i (%s)\n", pathToPatch2, errno, buff2);
 			}
 
 			return PC_WRITE_FILE;
@@ -287,12 +287,12 @@ int main(int argc, char **argv)
 		{
 			if (p->data[0]==ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR)
 			{
-				char buff[256];
+				char buff2[256];
 				SLNet::BitStream temp(p->data, p->length, false);
 				temp.IgnoreBits(8);
-				SLNet::StringCompressor::Instance()->DecodeString(buff, 256, &temp);
+				SLNet::StringCompressor::Instance()->DecodeString(buff2, 256, &temp);
 				printf("ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR\n");
-				printf("%s\n", buff);
+				printf("%s\n", buff2);
 				autopatcherClient.SetFileListTransferPlugin(0);
 				autopatcherClient.Clear();
 				packetizedTCP.Stop();

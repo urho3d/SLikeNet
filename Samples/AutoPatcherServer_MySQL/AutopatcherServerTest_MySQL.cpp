@@ -124,7 +124,7 @@ int main(int, char **)
 
 	printf("(D)rop database\n(C)reate database.\n(A)dd application\n(U)pdate revision.\n(R)emove application\n(Q)uit\n");
 
-	char ch;
+	int ch;
 	SLNet::Packet *p;
 	for(;;)
 	{

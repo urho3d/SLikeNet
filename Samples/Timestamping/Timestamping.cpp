@@ -39,7 +39,7 @@ int main(void)
 	rakClient->SetOccasionalPing(true);
 	rakServer->SetOccasionalPing(true);
 
-	char ch;
+	int ch;
 	bool isServer;
 	
 	printf("Demonstrates RakNet's timestamping system, used to get a common\n");

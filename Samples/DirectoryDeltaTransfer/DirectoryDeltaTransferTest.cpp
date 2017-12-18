@@ -81,7 +81,7 @@ public:
 
 int main(void)
 {
-	char ch;
+	int ch;
 
 #ifdef USE_TCP
 	SLNet::PacketizedTCP tcp1;
@@ -125,8 +125,7 @@ int main(void)
 		localPort=atoi(str);
 	SLNet::SocketDescriptor socketDescriptor(localPort,0);
 #ifdef USE_TCP
-	bool b=tcp1.Start(localPort,8);
-	RakAssert(b);
+	SLNET_VERIFY(tcp1.Start(localPort,8));
 #else
 	if (rakPeer->Startup(8,&socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 	{
@@ -146,7 +145,7 @@ int main(void)
 	printf("(Q)uit.\n");
 
 	SLNet::SystemAddress sysAddrZero= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
-	SLNet::TimeMS nextStatTime = SLNet::GetTimeMS() + 1000;
+	// SLNet::TimeMS nextStatTime = SLNet::GetTimeMS() + 1000;
 
 	SLNet::Packet *p;
 	for(;;)

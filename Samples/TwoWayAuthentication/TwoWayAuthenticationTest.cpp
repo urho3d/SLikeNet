@@ -67,8 +67,7 @@ int main(void)
 	twoWayAuthenticationPlugin[0]->AddPassword("PWD0", "Password0");
 	twoWayAuthenticationPlugin[0]->AddPassword("PWD1", "Password1");
 	twoWayAuthenticationPlugin[1]->AddPassword("PWD0", "Password0");
-	bool b = twoWayAuthenticationPlugin[0]->Challenge("PWD0", rakPeer[0]->GetGUIDFromIndex(0));
-	RakAssert(b);
+	SLNET_VERIFY(twoWayAuthenticationPlugin[0]->Challenge("PWD0", rakPeer[0]->GetGUIDFromIndex(0)));
 	printf("Stage 0, instance 0 challenges instance 1 (should pass)\n");
 	int stage=0;
 	int stage4FailureCount=0;
