@@ -45,7 +45,7 @@ int main()
 {
 	FullyConnectedMesh2_UserData fcm2[NUM_PEERS];
 
-	for (int i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 	{
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 		rakPeer[i]->AttachPlugin(&fcm2[i]);
@@ -76,7 +76,7 @@ int main()
 
 	bool quit=false;
 	SLNet::Packet *packet;
-	char ch;
+	int ch;
 	while (!quit)
 	{
 		for (int peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)

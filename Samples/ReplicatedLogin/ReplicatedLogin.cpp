@@ -235,7 +235,7 @@ int main(void)
 	replicaManager3->SetNetworkIDManager(networkIDManager);
 
 	printf("(S)erver or (C)lient?\n");
-	char ch = _getch();
+	int ch = _getch();
 	if (ch=='s' || ch=='S')
 		return serverMain();
 	else

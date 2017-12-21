@@ -43,7 +43,7 @@ using namespace SLNet;
 int main(void)
 {
 	RakPeerInterface *peers[NUM_PEERS];
-	int peerIndex;
+	unsigned short peerIndex;
 	float nextAction;
 
 	printf("This is just a test app to run a bit of everything to test for crashes.\n");

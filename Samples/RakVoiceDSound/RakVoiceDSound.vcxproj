@@ -404,7 +404,14 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\speex-1.1.12\libspeex\speex.c" />
-    <ClCompile Include="..\..\DependentExtensions\speex-1.1.12\libspeex\speex_callbacks.c" />
+    <ClCompile Include="..\..\DependentExtensions\speex-1.1.12\libspeex\speex_callbacks.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4244</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\speex-1.1.12\libspeex\speex_header.c" />
     <ClCompile Include="..\..\DependentExtensions\speex-1.1.12\libspeex\stereo.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244</DisableSpecificWarnings>

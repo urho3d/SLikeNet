@@ -29,18 +29,14 @@ SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
 SLNet::TwoWayAuthentication *twoWayAuthenticationPlugin[NUM_PEERS];
 int main(void)
 {
-	int i;
-
-	for (i=0; i < NUM_PEERS; i++)
+	for (int i=0; i < NUM_PEERS; i++)
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("This project tests and demonstrates the two way authentication plugin.\n");
 	printf("Difficulty: Beginner\n\n");
 
-	int peerIndex;
-
 	// Initialize the message handlers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		twoWayAuthenticationPlugin[peerIndex]= SLNet::OP_NEW<SLNet::TwoWayAuthentication>(_FILE_AND_LINE_);
 		rakPeer[peerIndex]->AttachPlugin(twoWayAuthenticationPlugin[peerIndex]);
@@ -48,14 +44,14 @@ int main(void)
 	}
 
 	// Initialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
 	}
 	
 	// Connect each peer to the prior peer
-	for (peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
 	{
         rakPeer[peerIndex]->Connect("127.0.0.1", 60000+peerIndex-1, 0, 0);
 	}
@@ -77,7 +73,7 @@ int main(void)
 	while (!quit)
 	{
 		SLNet::Packet *packet;
-		for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+		for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 		{
 			packet=rakPeer[peerIndex]->Receive();
 			if (packet)
@@ -185,10 +181,10 @@ int main(void)
 	}
 
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (int i=0; i < NUM_PEERS; i++)
 		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 		SLNet::OP_DELETE(twoWayAuthenticationPlugin[peerIndex], _FILE_AND_LINE_);
 
 	return 1;

@@ -871,7 +871,7 @@ int main(void)
 
 	printf("\nDo you have a server running the NATCompleteServer project? (y/n): ");
 
-	char responseLetter=_getche();
+	int responseLetter=_getche();
 	bool hasServer=responseLetter=='y' || responseLetter=='Y' || responseLetter==' ';
 	printf("\n");
 	if (hasServer==false)

@@ -161,7 +161,7 @@ int main()
 		}
 
 		RakSleep(30);
-		for (int i=0; i < 32; i++)
+		for (unsigned short i=0; i < 32; i++)
 		{
 			if (rakPeer->GetInternalID(SLNet::UNASSIGNED_SYSTEM_ADDRESS,0).GetPort()!=60000+i)
 				rakPeer->AdvertiseSystem("255.255.255.255", 60000+i, 0,0,0);

@@ -84,7 +84,7 @@ int main(void)
 	{
 		if (_kbhit())
 		{
-			char ch = _getch();
+			int ch = _getch();
 			if (ch=='a' || ch=='A')
 			{
 				printf("Enter name of participant: ");

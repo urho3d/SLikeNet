@@ -84,7 +84,7 @@ int main(void)
 	SLNet::CloudServer cloudServer[CLOUD_SERVER_COUNT];
 	SLNet::CloudClient cloudClient[CLOUD_CLIENT_COUNT];
 	SLNet::RakPeerInterface *rakPeer[RAKPEER_COUNT];
-	for (unsigned int i=0; i < RAKPEER_COUNT; i++)
+	for (unsigned short i=0; i < RAKPEER_COUNT; i++)
 	{
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 		SLNet::SocketDescriptor sd(STARTING_PORT+i,0);
@@ -104,9 +104,9 @@ int main(void)
 		rakPeer[i]->AttachPlugin(&cloudServer[j]);
 	}
 	// Connect servers to each other
-	for (unsigned int i=SERVER_1; i < RAKPEER_COUNT-1; i++)
+	for (unsigned short i=SERVER_1; i < RAKPEER_COUNT-1; i++)
 	{
-		for (unsigned int j=i+1; j < RAKPEER_COUNT; j++)
+		for (unsigned short j=i+1; j < RAKPEER_COUNT; j++)
 		{
 			rakPeer[j]->Connect("127.0.0.1", STARTING_PORT+i, 0, 0);
 		}
@@ -126,7 +126,7 @@ int main(void)
 	}
 
 	// Connect clients to servers, assume equal counts
-	for (unsigned int i=CLIENT_1; i < SERVER_1; i++)
+	for (unsigned short i=CLIENT_1; i < SERVER_1; i++)
 	{
 		rakPeer[i]->Connect("127.0.0.1", STARTING_PORT+SERVER_1+i, 0, 0);
 	}
@@ -144,7 +144,7 @@ int main(void)
 	SLNet::Packet *packet;
 	for(;;)
 	{
-		char command;
+		int command;
 		if (_kbhit())
 		{
 			command=_getch();

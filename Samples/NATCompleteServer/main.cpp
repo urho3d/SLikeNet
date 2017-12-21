@@ -321,7 +321,7 @@ struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerRe
 			if (coordinatorAddress== SLNet::UNASSIGNED_SYSTEM_ADDRESS)
 			{
 				printf("Warning: RakPeer is not currently connected to any system.\nEnter option:\n(1). UDPProxyCoordinator is on localhost\n(2). Connect to a remote system\n(3). Fail.\nOption: ");
-				char ch=_getche();
+				int ch=_getche();
 				printf("\n");
 				if (ch=='1' || ch==13) // 13 is just pressing return
 				{
@@ -550,7 +550,7 @@ int main(int argc, char **argv)
 			}
 			printf("\n%s\nRequirements: %s\nDescription: %s\n", samples[i]->QueryName(), samples[i]->QueryRequirements(), samples[i]->QueryFunction());
 			printf("Support %s? (y/n): ", samples[i]->QueryName());
-			char supported=_getche();
+			int supported=_getche();
 			if (supported=='y' || supported=='Y' || supported==13) // 13 is just pressing return
 			{
 				samples[i]->isSupported=SUPPORTED;
@@ -573,7 +573,7 @@ int main(int argc, char **argv)
 				if (samples[i]->isSupported==QUERY)
 				{
 					printf(" Retry? (y/n): ");
-					char supported=_getche();
+					int supported=_getche();
 					if (supported=='y' || supported=='Y')
 					{
 						samples[i]->isSupported=SUPPORTED;
@@ -637,7 +637,7 @@ int main(int argc, char **argv)
 
 		if (_kbhit())
 		{
-			char ch = _getch();
+			int ch = _getch();
 			if (ch=='q')
 			{
 				quit=true;

@@ -286,7 +286,7 @@ INT WINAPI wWinMain( HINSTANCE hInst, HINSTANCE, LPWSTR, INT )
                               NULL, NULL, hInst, NULL );
 	
 	DWORD timeSinceLastLog, timeSinceLastTick, lastLogTime=0;
-	float lastFps;
+	float lastFps = 0.f; // unnecessary assignment - added to workaround false-positive of C4701
 	timeSinceLastTick=0;
 	
     // Initialize Direct3D

@@ -81,7 +81,7 @@ int main(void)
 	printf("' ' to print wait status\n");
 
 	char str[128];
-	char ch=0;
+	int ch=0;
 	for(;;)
 	{
 		if (_kbhit())

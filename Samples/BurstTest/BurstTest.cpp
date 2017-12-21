@@ -88,7 +88,7 @@ int main(int, char **)
 	{
 		if (_kbhit())
 		{
-			char ch=_getch();
+			int ch=_getch();
 			if (ch=='q')
 				return 1;
 			else if (ch==' ')
