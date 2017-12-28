@@ -16,6 +16,7 @@
 // Common includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 
 #include "slikenet/GetTime.h"
@@ -196,7 +197,12 @@ int main(int argc, char **argv)
 	unsigned short localPort=0;
 	if (argc>=6)
 	{
-		localPort=atoi(argv[5]);
+		const int intLocalPort = atoi(argv[5]);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
 	}
 #ifdef USE_TCP
 	SLNet::PacketizedTCP packetizedTCP;

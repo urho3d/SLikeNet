@@ -27,7 +27,7 @@ using namespace SLNet;
 
 RakPeerInterface *rakPeer;
 NetworkIDManager *networkIDManager;
-ReplicaManager3Irrlicht *replicaManager3;
+ReplicaManager3Irrlicht *irrlichtReplicaManager3;
 NatPunchthroughClient *natPunchthroughClient;
 CloudClient *cloudClient;
 SLNet::FullyConnectedMesh2 *fullyConnectedMesh2;
@@ -100,8 +100,7 @@ void InstantiateRakNetClasses(void)
 	while (IRNS2_Berkley::IsPortInUse(sd.port, sd.hostAddress, sd.socketFamily, SOCK_DGRAM)==true)
 		sd.port++;
 	// +1 is for the connection to the NAT punchthrough server
-	SLNet::StartupResult sr = rakPeer->Startup(MAX_PLAYERS+1,&sd,1);
-	RakAssert(sr== SLNet::RAKNET_STARTED);
+	SLNET_VERIFY(rakPeer->Startup(MAX_PLAYERS+1,&sd,1) == SLNet::RAKNET_STARTED);
 	rakPeer->SetMaximumIncomingConnections(MAX_PLAYERS);
 	// Fast disconnect for easier testing of host migration
 	rakPeer->SetTimeoutTime(5000,UNASSIGNED_SYSTEM_ADDRESS);
@@ -109,14 +108,14 @@ void InstantiateRakNetClasses(void)
 	// It's a class in case you wanted to have multiple worlds, then you could have multiple instances of NetworkIDManager
 	networkIDManager=new NetworkIDManager;
 	// Automatically sends around new / deleted / changed game objects
-	replicaManager3=new ReplicaManager3Irrlicht;
-	replicaManager3->SetNetworkIDManager(networkIDManager);
-	rakPeer->AttachPlugin(replicaManager3);
+	irrlichtReplicaManager3=new ReplicaManager3Irrlicht;
+	irrlichtReplicaManager3->SetNetworkIDManager(networkIDManager);
+	rakPeer->AttachPlugin(irrlichtReplicaManager3);
 	// Automatically destroy connections, but don't create them so we have more control over when a system is considered ready to play
-	replicaManager3->SetAutoManageConnections(false,true);
+	irrlichtReplicaManager3->SetAutoManageConnections(false,true);
 	// Create and register the network object that represents the player
 	playerReplica = new PlayerReplica;
-	replicaManager3->Reference(playerReplica);
+	irrlichtReplicaManager3->Reference(playerReplica);
 	// Lets you connect through routers
 	natPunchthroughClient=new NatPunchthroughClient;
 	rakPeer->AttachPlugin(natPunchthroughClient);
@@ -129,8 +128,7 @@ void InstantiateRakNetClasses(void)
 	fullyConnectedMesh2->SetConnectOnNewRemoteConnection(false, "");
 	rakPeer->AttachPlugin(fullyConnectedMesh2);
 	// Connect to the NAT punchthrough server
-	ConnectionAttemptResult car = rakPeer->Connect(DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_IP, DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_PORT,0,0);
-	RakAssert(car==CONNECTION_ATTEMPT_STARTED);
+	SLNET_VERIFY(rakPeer->Connect(DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_IP, DEFAULT_NAT_PUNCHTHROUGH_FACILITATOR_PORT,0,0) == CONNECTION_ATTEMPT_STARTED);
 
 	// Advertise ourselves on the lAN if the NAT punchthrough server is not available
  	//for (int i=0; i < 8; i++)
@@ -142,7 +140,7 @@ void DeinitializeRakNetClasses(void)
 	rakPeer->Shutdown(100,0);
 	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
 	delete networkIDManager;
-	delete replicaManager3;
+	delete irrlichtReplicaManager3;
 	delete natPunchthroughClient;
 	delete cloudClient;
 	delete fullyConnectedMesh2;
@@ -507,7 +505,7 @@ void BallReplica::Update(SLNet::TimeMS curTime)
 	{
 		if (playerReplica->IsDead()==false)
 		{
-			float playerHalfHeight=demo->GetSyndeyBoundingBox().getExtent().Y/2;
+			//float playerHalfHeight=demo->GetSyndeyBoundingBox().getExtent().Y/2;
 			irr::core::vector3df positionRelativeToCharacter = updatedPosition-playerReplica->position;//+core::vector3df(0,playerHalfHeight,0);
 			if (demo->GetSyndeyBoundingBox().isPointInside(positionRelativeToCharacter))
 			//if ((playerReplica->position+core::vector3df(0,playerHalfHeight,0)-updatedPosition).getLengthSQ() < BALL_DIAMETER*BALL_DIAMETER/4.0f)

@@ -55,14 +55,15 @@ int FSM::GetStateHistorySize(void) const
 {
 	return stateHistory.Size();
 }
+// #med - change index parameter to unsigned int
 void FSM::RemoveState(const int index)
 {
 	RakAssert(index>=0 && index < (int) stateHistory.Size());
-	if (index==stateHistory.Size()-1)
+	if (static_cast<unsigned int>(index)==stateHistory.Size()-1)
 		stateHistory[index]->OnLeave(this, true);
 	stateHistory[index]->FSMRemoveRef(this);
 	stateHistory.RemoveAtIndex((const unsigned int)index);
-	if (index==stateHistory.Size())
+	if (static_cast<unsigned int>(index)==stateHistory.Size())
 		stateHistory[stateHistory.Size()-1]->OnEnter(this, false);
 }
 void FSM::AddState(State *state)
@@ -73,20 +74,22 @@ void FSM::AddState(State *state)
 	state->OnEnter(this, true);
 	stateHistory.Insert(state, _FILE_AND_LINE_ );
 }
+// #med - change index parameter to unsigned int
 void FSM::ReplaceState(const int index, State *state)
 {
 	RakAssert(index>=0 && index < (int) stateHistory.Size());
 	if (state!=stateHistory[index])
 	{
-		if (index==stateHistory.Size()-1)
+		if (static_cast<unsigned int>(index)==stateHistory.Size()-1)
 			stateHistory[index]->OnLeave(this, true);
 		stateHistory[index]->FSMRemoveRef(this);
 		state->FSMAddRef(this);
-		if (index==stateHistory.Size()-1)
+		if (static_cast<unsigned int>(index)==stateHistory.Size()-1)
 			state->OnEnter(this, true);
 		stateHistory[index]=state;
 	}
 }
+// #med - change index parameter to unsigned int
 void FSM::SetPriorState(const int index)
 {
 	RakAssert(index>=0 && index < (int) stateHistory.Size());

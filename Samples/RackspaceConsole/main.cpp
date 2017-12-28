@@ -176,7 +176,7 @@ int main()
 #if OPEN_SSL_CLIENT_SUPPORT!=1
 	printf("RakNet must be built with OPEN_SSL_CLIENT_SUPPORT");
 	return 1;
-#endif
+#else
 
 	SLNet::Rackspace rackspaceApi;
 	SLNet::TCPInterface tcpInterface;
@@ -430,4 +430,5 @@ int main()
 	}
 
 	return 0;
+#endif
 }

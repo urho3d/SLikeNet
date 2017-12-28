@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Gets.h"
 #include "slikenet/linux_adapter.h"
 #include "slikenet/osx_adapter.h"
@@ -66,6 +67,11 @@ int main(void)
 	Gets(portstring,sizeof(portstring));
 	if (portstring[0]==0)
 		strcpy_s(portstring,"60000");
+	int intServerPort = atoi(portstring);
+	if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+		return 2;
+	}
 
 	// Enumeration data
 	puts("Enter offline ping response data (for return by a LAN discovery for example)");
@@ -78,7 +84,7 @@ int main(void)
 	puts("Starting server.");
 
 	// The server has to be started to respond to pings.
-	SLNet::SocketDescriptor socketDescriptor(atoi(portstring),0);
+	SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intServerPort),0);
 	bool b = server->Startup(2, &socketDescriptor, 1)== SLNet::RAKNET_STARTED;
 	server->SetMaximumIncomingConnections(2);
 	if (b)
@@ -121,8 +127,13 @@ int main(void)
 				Gets(serverPort,sizeof(serverPort));
 				if (serverPort[0]==0)
 					strcpy_s(serverPort, "60000");
+				intServerPort = atoi(serverPort);
+				if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+					printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+					return 2;
+				}
 
-				client->Ping(ip, atoi(serverPort), false);
+				client->Ping(ip, static_cast<unsigned short>(intServerPort), false);
 
 				puts("Pinging");
 			}

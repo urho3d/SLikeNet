@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 #include <stdio.h>
 #include <string.h>
@@ -97,16 +98,21 @@ int main(void)
 	Gets(portstring,sizeof(portstring));
 	if (portstring[0]==0)
 		strcpy_s(portstring, "1234");
-	
+	const int intServerPort = atoi(portstring);
+	if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+		return 1;
+	}
+
 	puts("Starting server.");
 	// Starting the server is very simple.  2 players allowed.
 	// 0 means we don't care about a connectionValidationInteger, and false
 	// for low priority threads
 	// I am creating two socketDesciptors, to create two sockets. One using IPV6 and the other IPV4
 	SLNet::SocketDescriptor socketDescriptors[2];
-	socketDescriptors[0].port=atoi(portstring);
+	socketDescriptors[0].port=static_cast<unsigned short>(intServerPort);
 	socketDescriptors[0].socketFamily=AF_INET; // Test out IPV4
-	socketDescriptors[1].port=atoi(portstring);
+	socketDescriptors[1].port=static_cast<unsigned short>(intServerPort);
 	socketDescriptors[1].socketFamily=AF_INET6; // Test out IPV6
 	bool b = server->Startup(4, socketDescriptors, 2 )== SLNet::RAKNET_STARTED;
 	server->SetMaximumIncomingConnections(4);
@@ -189,7 +195,12 @@ int main(void)
 			Gets(portstring,sizeof(portstring));
 			if (portstring[0]==0)
 				strcpy_s(portstring, "1234");
-			server->Ping(message, atoi(portstring), false);
+			const int intPort = atoi(portstring);
+			if ((intPort < 0) || (intPort > std::numeric_limits<unsigned short>::max())) {
+				printf("Specified port %d is outside valid bounds [0, %u]", intPort, std::numeric_limits<unsigned short>::max());
+				continue;
+			}
+			server->Ping(message, static_cast<unsigned short>(intPort), false);
 
 			continue;
 		}

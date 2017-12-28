@@ -22,6 +22,7 @@
 #include "slikenet/MessageIdentifiers.h"
 #include "slikenet/linux_adapter.h"
 #include "slikenet/osx_adapter.h"
+#include <limits> // used for std::numeric_limits
 
 using namespace SLNet;
 
@@ -42,12 +43,17 @@ int main(void)
 	Gets(listenPort,sizeof(listenPort));
 	if (listenPort[0]==0)
 		strcpy_s(listenPort, "1234");
+	const int intListenPort = atoi(listenPort);
+	if ((intListenPort < 0) || (intListenPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified listen port %d is outside valid bounds [0, %u]", intListenPort, std::numeric_limits<unsigned short>::max());
+		return 2;
+	}
 
 	relayPlugin->SetAcceptAddParticipantRequests(true);
 
 	// Connecting the client is very simple.  0 means we don't care about
 	// a connectionValidationInteger, and false for low priority threads
-	SLNet::SocketDescriptor socketDescriptor(atoi(listenPort),0);
+	SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intListenPort),0);
 	socketDescriptor.socketFamily=AF_INET;
 	peer->Startup(8,&socketDescriptor, 1);
 	peer->SetMaximumIncomingConnections(8);
@@ -62,8 +68,13 @@ int main(void)
 		Gets(serverPort,sizeof(serverPort));
 		if (serverPort[0]==0)
 			strcpy_s(serverPort, "1234");
+		const int intServerPort = atoi(serverPort);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
 
-		SLNET_VERIFY(peer->Connect(ip, atoi(serverPort), 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
+		SLNET_VERIFY(peer->Connect(ip, static_cast<unsigned short>(intServerPort), 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 	}
 
 	peer->SetTimeoutTime(30000, UNASSIGNED_SYSTEM_ADDRESS);

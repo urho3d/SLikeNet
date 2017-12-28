@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/peerinterface.h"
 #include "slikenet/MessageIdentifiers.h"
 
@@ -153,7 +154,12 @@ int main(void)
 	if (port[0]==0)
 #endif
 		strcpy_s(port, "60000");
-	SLNet::SocketDescriptor socketDescriptor(atoi(port),0);
+	const int intLocalPort = atoi(port);
+	if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Failed. Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+		return -1;
+	}
+	SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intLocalPort),0);
 
 	rakPeer->Startup(4, &socketDescriptor, 1);
 
@@ -226,7 +232,12 @@ int main(void)
 				Gets(port, sizeof(port));
 				if (port[0]==0)
 					strcpy_s(port, "60000");
-				rakPeer->Connect(ip, atoi(port), 0,0);
+				const int intRemotePort = atoi(port);
+				if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+					printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+					return -1;
+				}
+				rakPeer->Connect(ip, static_cast<unsigned short>(intRemotePort), 0,0);
 			}
 			else if (ch=='m')
 			{

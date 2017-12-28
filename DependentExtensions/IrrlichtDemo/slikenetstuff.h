@@ -32,6 +32,9 @@
 #ifdef _MSC_VER
 	#pragma warning(push)
 	#pragma warning(disable:4100) // unreferenced formal parameter
+	#pragma warning(disable:4127) // conditional expression is constant
+	#pragma warning(disable:4244) // type-conversion with possible loss of data
+	#pragma warning(disable:4458) // declaration of 'identifier' hides class member
 #endif
 
 #include "IAnimatedMeshSceneNode.h"
@@ -51,7 +54,7 @@ class PlayerReplica;
 // Most of these classes has a manual entry, all of them have a demo
 extern SLNet::RakPeerInterface *rakPeer; // Basic communication
 extern SLNet::NetworkIDManager *networkIDManager; // Unique IDs per network object
-extern ReplicaManager3Irrlicht *replicaManager3; // Autoreplicate network objects
+extern ReplicaManager3Irrlicht *irrlichtReplicaManager3; // Autoreplicate network objects
 extern SLNet::NatPunchthroughClient *natPunchthroughClient; // Connect peer to peer through routers
 extern SLNet::CloudClient *cloudClient; // Used to upload game instance to the cloud
 extern SLNet::FullyConnectedMesh2 *fullyConnectedMesh2; // Used to find out who is the session host

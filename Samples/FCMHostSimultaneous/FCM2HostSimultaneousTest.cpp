@@ -48,7 +48,7 @@ int main()
 		fcm2[i].SetAutoparticipateConnections(true);
 		SLNet::SocketDescriptor sd;
 		sd.port=60000+i;
-		SLNET_VERIFY(rakPeer[i]->Startup(NUM_PEERS,&sd,1) == RAKNET_STARTED);
+		SLNET_VERIFY(rakPeer[i]->Startup(NUM_PEERS, &sd, 1) == RAKNET_STARTED);
 		rakPeer[i]->SetMaximumIncomingConnections(NUM_PEERS);
 		rakPeer[i]->SetTimeoutTime(1000, SLNet::UNASSIGNED_SYSTEM_ADDRESS);
 		printf("Our guid is %s\n", rakPeer[i]->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
@@ -60,7 +60,7 @@ int main()
 		{
 			if (i==j)
 				continue;
-			SLNET_VERIFY(rakPeer[i]->Connect("127.0.0.1", 60000+j, 0, 0 ) == CONNECTION_ATTEMPT_STARTED);
+			SLNET_VERIFY(rakPeer[i]->Connect("127.0.0.1", 60000 + j, 0, 0) == CONNECTION_ATTEMPT_STARTED);
 		}
 	}
 

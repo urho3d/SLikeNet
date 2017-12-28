@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 #include "slikenet/MessageIdentifiers.h"
 #include "slikenet/BitStream.h"
@@ -58,7 +59,7 @@ enum FeatureList
 	FEATURE_LIST_COUNT,
 };
 
-static int DEFAULT_RAKPEER_PORT=61111;
+static unsigned short DEFAULT_RAKPEER_PORT=61111;
 
 #define NatTypeDetectionServerFramework_Supported QUERY
 #define NatPunchthroughServerFramework_Supported QUERY
@@ -267,6 +268,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 };
 SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *hostName)
 {
+	SystemAddress returnvalue = SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	char ipAddr[64];
 	printf("Enter IP of system %s is running on: ", hostName);
 	Gets(ipAddr,sizeof(ipAddr));
@@ -283,28 +285,29 @@ SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *host
 		printf("Failed. Not connected to %s.\n", hostName);
 		return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	}
-	if (rakPeer->Connect(ipAddr, atoi(port), 0, 0)!= SLNet::CONNECTION_ATTEMPT_STARTED)
+	const int intPort = atoi(port);
+	if ((intPort < 0) || (intPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Failed. Specified port %d is outside valid bounds [0, %u]", intPort, std::numeric_limits<unsigned short>::max());
+		return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
+	}
+	if (rakPeer->Connect(ipAddr, static_cast<unsigned short>(intPort), 0, 0)!= SLNet::CONNECTION_ATTEMPT_STARTED)
 	{
 		printf("Failed connect call for %s.\n", hostName);
 		return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	}
 	printf("Connecting...\n");
 	SLNet::Packet *packet;
-	for(;;)
-	{
-		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
-		{
-			if (packet->data[0]==ID_CONNECTION_REQUEST_ACCEPTED)
-			{
-				return packet->systemAddress;
-			}
-			else
-			{
-				return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
-			}
-			RakSleep(100);
-		}
-	}
+	// #med - review --- at least we'd add a sleep interval here - also review whether the behavior is correct to only check the very first received packet (old RakNet code was bogus in this regards)
+	do {
+		packet = rakPeer->Receive();
+	} while (packet == nullptr);
+
+	if (packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
+		returnvalue = packet->systemAddress;
+
+	rakPeer->DeallocatePacket(packet);
+
+	return returnvalue;
 }
 struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerResultHandler
 {
@@ -503,7 +506,12 @@ int main(int argc, char **argv)
 	SLNet::SocketDescriptor sd[2];
 	if (argc>1)
 	{
-		DEFAULT_RAKPEER_PORT = atoi(argv[1]);
+		const int intPeerPort = atoi(argv[1]);
+		if ((intPeerPort < 0) || (intPeerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified peer port %d is outside valid bounds [0, %u]", intPeerPort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		DEFAULT_RAKPEER_PORT = static_cast<unsigned short>(intPeerPort);
 	}
 	
 	sd[0].port=DEFAULT_RAKPEER_PORT;

@@ -19,6 +19,7 @@
 #include "slikenet/peerinterface.h"
 #include "slikenet/sleep.h"
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 
 void PrintHelp(void)
 {
@@ -60,7 +61,14 @@ int main(int argc, char **argv)
 	else serverAddress=argv[1];
 
 	if (argc<3) serverPort=DEFAULT_SERVER_PORT;
-	else serverPort=atoi(argv[2]);
+	else {
+		const int intServerPort = atoi(argv[2]);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return 1;
+		}
+		serverPort = static_cast<unsigned short>(intServerPort);
+	}
 
 	// ---- RAKPEER -----
 	SLNet::RakPeerInterface *rakPeer;
@@ -220,8 +228,9 @@ int main(int argc, char **argv)
 		RakSleep(30);
 	}
 
-	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
-	return 0;
+	// #med - add proper termination handling (then reenable the following code)
+	/*SLNet::RakPeerInterface::DestroyInstance(rakPeer);
+	return 0;*/
 }
 
 void UploadInstanceToCloud(SLNet::CloudClient *cloudClient, SLNet::RakNetGUID serverGuid)

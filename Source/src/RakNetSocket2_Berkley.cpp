@@ -57,7 +57,7 @@ void RNS2_Berkley::SetSocketOptions(void)
 void RNS2_Berkley::SetNonBlockingSocket(unsigned long nonblocking)
 {
 #ifdef _WIN32
-		SLNET_VERIFY( ioctlsocket__( rns2Socket, FIONBIO, &nonblocking ) == 0);
+	SLNET_VERIFY( ioctlsocket__( rns2Socket, FIONBIO, &nonblocking ) == 0);
 #else
 	if (nonblocking)
 		fcntl( rns2Socket, F_SETFL, O_NONBLOCK );

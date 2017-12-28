@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #ifdef _WIN32
 #include "slikenet/Kbhit.h"
 #include "slikenet/WindowsIncludes.h" // Sleep
@@ -56,6 +57,7 @@ int main()
 	printf("/Disconnect\n");
 	printf("/Quit\n");
 	printf("Any other command goes to the remote console\n");
+	int exitcode = 0;
 	for(;;)
 	{
 		if (_kbhit())
@@ -66,7 +68,7 @@ int main()
 			{
 				printf("Goodbye.\n");
 				rakPeer->Shutdown(500, 0);
-				return 0;
+				break;
 			}
 			else if (_stricmp(command, "/disconnect")==0)
 			{
@@ -101,15 +103,27 @@ int main()
 					do {
 						Gets(remotePort,sizeof(remotePort));
 					} while(remotePort[0]==0);
+					const int intRemotePort = atoi(remotePort);
+					if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+						printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+						exitcode = 1;
+						break;
+					}
 					printf("Enter local port (enter for 0): ");
 					Gets(localPort,sizeof(localPort));
 					if (localPort[0]==0)
 					{
 						strcpy_s(localPort, "0");
 					}
+					const int intLocalPort = atoi(localPort);
+					if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+						printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+						exitcode = 2;
+						break;
+					}
 					printf("Enter console password (enter for none): ");
 					Gets(password,sizeof(password));
-					SLNet::SocketDescriptor socketDescriptor((int) atoi(localPort),0);
+					SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intLocalPort),0);
 					if (rakPeer->Startup(1, &socketDescriptor, 1)== SLNet::RAKNET_STARTED)
 					{
 						int passwordLen;
@@ -117,7 +131,7 @@ int main()
 							passwordLen=(int) strlen(password)+1;
 						else
 							passwordLen=0;
-						if (rakPeer->Connect(ip, (int) atoi(remotePort), password, passwordLen)== SLNet::CONNECTION_ATTEMPT_STARTED)
+						if (rakPeer->Connect(ip, static_cast<unsigned short>(intRemotePort), password, passwordLen)== SLNet::CONNECTION_ATTEMPT_STARTED)
 							printf("Connecting...\nNote: if the password is wrong the other system will ignore us.\n");
 						else
 						{
@@ -191,5 +205,5 @@ int main()
 #endif
 	}
 
-	return 0;
+	return exitcode;
 }

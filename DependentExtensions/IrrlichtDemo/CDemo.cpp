@@ -167,10 +167,10 @@ void CDemo::run()
 			SLNet::RakString curMsg = GetCurrentMessage();
 			if (curMsg.IsEmpty()==false)
 			{
-				wchar_t dest[1024];
-				memset(dest,0,sizeof(dest));
-				mbstowcs_s(NULL, dest, curMsg.C_String(), curMsg.GetLength());
-				statusText->setText(dest);
+				wchar_t dest2[1024];
+				memset(dest2,0,sizeof(dest2));
+				mbstowcs_s(NULL, dest2, curMsg.C_String(), curMsg.GetLength());
+				statusText->setText(dest2);
 			}
 			else
 			{
@@ -281,7 +281,7 @@ void CDemo::switchToNextScene()
 		currentScene = 1;
 
 	scene::ISceneManager* sm = device->getSceneManager();
-	scene::ISceneNodeAnimator* sa = 0;
+	//scene::ISceneNodeAnimator* sa = 0;
 	scene::ICameraSceneNode* camera = 0;
 
 	camera = sm->getActiveCamera();
@@ -792,15 +792,6 @@ SLNet::TimeMS CDemo::shootFromOrigin(core::vector3df camPosition, core::vector3d
 		imp.outVector = out;
 		imp.pos = end;
 	}
-	else
-	{
-		// doesnt collide with wall
-		core::vector3df start = camPosition;
-		core::vector3df end = (camAt);
-		//end.normalize();
-		start += end*8.0f;
-		end = start + (end * camera->getFarValue());
-	}
 
 	// create fire ball
 	scene::ISceneNode* node = 0;
@@ -1167,8 +1158,7 @@ void CDemo::UpdateRakNet(void)
 				if (packet->data[1]==1)
 				{
 					PushMessage(SLNet::RakString("Connecting to existing game instance"));
-					SLNet::ConnectionAttemptResult car = rakPeer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
-					RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
+					SLNET_VERIFY(rakPeer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 				}
 			}
 			break;
@@ -1178,8 +1168,7 @@ void CDemo::UpdateRakNet(void)
 			{
 				char hostIP[32];
 				packet->systemAddress.ToString(false,hostIP,32);
-				SLNet::ConnectionAttemptResult car = rakPeer->Connect(hostIP,packet->systemAddress.GetPort(),0,0);
-				RakAssert(car== SLNet::CONNECTION_ATTEMPT_STARTED);
+				SLNET_VERIFY(rakPeer->Connect(hostIP,packet->systemAddress.GetPort(),0,0) == SLNet::CONNECTION_ATTEMPT_STARTED);
 			}
 			break;
 		}

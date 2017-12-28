@@ -26,6 +26,7 @@
 #include "slikenet/sleep.h"
 #include "slikenet/memoryoverride.h"
 #include <stdio.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Gets.h"
 #include "slikenet/Kbhit.h"
 #include "slikenet/linux_adapter.h"
@@ -73,6 +74,7 @@ void* LoggedRealloc(void *p, size_t size, const char *file, unsigned int line)
 		fprintf(fp,"Realloc %s:%i %i to %i bytes %i total\n", file,line,allocatedSize,size,memoryUsage);
 	return (char*)p+sizeof(size);
 }
+
 int main(int argc, char **argv)
 {
 	RakPeerInterface *sender, *receiver;
@@ -80,7 +82,9 @@ int main(int argc, char **argv)
 	SLNet::Time receivedTime;
 	char str[256];
 	char ip[32];
-	SLNet::Time sendInterval, nextSend, currentTime, quitTime;
+	// initialize to silence false-positive warning C4701 with VS2015+
+	SLNet::Time sendInterval = 0;
+	SLNet::Time nextSend, currentTime, quitTime;
 	unsigned short remotePort, localPort;
 	unsigned char streamNumber;
 	SLNet::BitStream bitStream;
@@ -131,13 +135,23 @@ int main(int argc, char **argv)
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "60000");
-		remotePort=atoi(str);
+		const int intRemotePort = atoi(str);
+		if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		remotePort = static_cast<unsigned short>(intRemotePort);
 
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "0");
-		localPort=atoi(str);
+		const int intLocalPort = atoi(str);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
 
 
 		printf("Connecting...\n");
@@ -156,7 +170,12 @@ int main(int argc, char **argv)
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "60000");
-		localPort=atoi(str);
+		const int intLocalPort = atoi(str);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
 
 		printf("Waiting for connections...\n");
 		SLNet::SocketDescriptor socketDescriptor(localPort,0);
@@ -184,7 +203,7 @@ int main(int argc, char **argv)
 #ifdef _WIN32
 		if (_kbhit())
 		{
-			char ch=_getch();
+			int ch=_getch();
 			if (ch=='q')
 				break;
 			else if (ch==' ')
@@ -258,16 +277,17 @@ int main(int argc, char **argv)
 					bitStream.Write(streamNumber);
 
                     PacketReliability reliability;
-                    if (0 && (randomMT()%2)==0)
+					// #med - review --- was commented out in RakNet via if(0)
+                    /*if (0 && (randomMT()%2)==0)
                     {
                         type="UNRELIABLE_SEQUENCED";
                         reliability=UNRELIABLE_SEQUENCED;
                     }
                     else
-                    {
+                    {*/
                         type="RELIABLE_ORDERED";
                         reliability=RELIABLE_ORDERED;
-                    }
+                    //}
 
                     int padLength;
 					padLength = (randomMT() % 25000) + 1;

@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <cstring>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/sleep.h"
 #include "slikenet/Gets.h"
 #include "slikenet/linux_adapter.h"
@@ -64,10 +65,15 @@ int main(void)
 		Gets(serverPort,sizeof(serverPort));
 		if (serverPort[0]==0)
 			strcpy_s(serverPort, "60001");
+		const int intServerPort = atoi(serverPort);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
 
 		printf("Starting server.\n");
 		// The server has to be started to respond to pings.
-		SLNet::SocketDescriptor socketDescriptor(atoi(serverPort),0);
+		SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intServerPort),0);
 		socketDescriptor.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 		b = server->Startup(2, &socketDescriptor, 1)== SLNet::RAKNET_STARTED;
 		server->SetMaximumIncomingConnections(2);
@@ -89,18 +95,31 @@ int main(void)
 		Gets(clientPort,sizeof(clientPort));
 		if (clientPort[0]==0)
 			strcpy_s(clientPort, "60000");
+		const int intClientPort = atoi(clientPort);
+		if ((intClientPort < 0) || (intClientPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified client port %d is outside valid bounds [0, %u]", intClientPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		unsigned short cPort = static_cast<unsigned short>(intClientPort);
+
 		printf("Enter the port to ping\n");
 		Gets(serverPort,sizeof(serverPort));
 		if (serverPort[0]==0)
 			strcpy_s(serverPort, "60001");
-		SLNet::SocketDescriptor socketDescriptor(atoi(clientPort),0);
+		const int intServerPort = atoi(serverPort);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		unsigned short sPort = static_cast<unsigned short>(intServerPort);
+		SLNet::SocketDescriptor socketDescriptor(cPort,0);
 		socketDescriptor.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 		client->Startup(1, &socketDescriptor, 1);
 
 		// Connecting the client is very simple.  0 means we don't care about
 		// a connectionValidationInteger, and false for low priority threads
 		// All 255's mean broadcast
-		client->Ping("255.255.255.255", atoi(serverPort), false);
+		client->Ping("255.255.255.255", sPort, false);
 
 		printf("Pinging\n");
 	}

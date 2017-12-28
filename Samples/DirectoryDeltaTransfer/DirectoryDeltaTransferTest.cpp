@@ -21,6 +21,7 @@
 #include "slikenet/FileListTransfer.h"
 #include <cstdio>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 #include "slikenet/FileList.h"
 #include "slikenet/DataCompressor.h"
@@ -121,11 +122,17 @@ int main(void)
 	Gets(str, sizeof(str));
 	if (str[0]==0)
 		localPort=60000;
-	else
-		localPort=atoi(str);
+	else {
+		const int intLocalPort = atoi(str);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
+	}
 	SLNet::SocketDescriptor socketDescriptor(localPort,0);
 #ifdef USE_TCP
-	SLNET_VERIFY(tcp1.Start(localPort,8));
+	SLNET_VERIFY(tcp1.Start(localPort, 8));
 #else
 	if (rakPeer->Startup(8,&socketDescriptor, 1)!= SLNet::RAKNET_STARTED)
 	{
@@ -278,8 +285,14 @@ int main(void)
 				Gets(str, sizeof(str));
 				if (str[0]==0)
 					remotePort=60000;
-				else
-					remotePort=atoi(str);
+				else {
+					const int intRemotePort = atoi(str);
+					if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+						printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+						return 3;
+					}
+					remotePort = static_cast<unsigned short>(intRemotePort);
+				}
 #ifdef USE_TCP
 				tcp1.Connect(host,remotePort,false);
 #else

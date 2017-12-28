@@ -43,9 +43,9 @@ using namespace SLNet;
 static const int NUM_CLIENTS=100;
 #define SERVER_PORT 1234
 #define RANDOM_DATA_SIZE_1 50
-char randomData1[RANDOM_DATA_SIZE_1];
+unsigned char randomData1[RANDOM_DATA_SIZE_1];
 #define RANDOM_DATA_SIZE_2 100
-char randomData2[RANDOM_DATA_SIZE_2];
+unsigned char randomData2[RANDOM_DATA_SIZE_2];
 char *remoteIPAddress=0;
 
 // Connects, sends data over time, disconnects, repeat
@@ -65,7 +65,7 @@ class Client
 			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=0;
 			nextSendTime=0;
-			SLNET_VERIFY(peer->Startup(1,&socketDescriptor,1) == RAKNET_STARTED);
+			SLNET_VERIFY(peer->Startup(1, &socketDescriptor, 1) == RAKNET_STARTED);
 			isConnected=false;
 		}
 		void Connect(void)
@@ -165,7 +165,7 @@ class Server
 		{
 			SLNet::SocketDescriptor socketDescriptor;
 			socketDescriptor.port=(unsigned short) SERVER_PORT;
-			SLNET_VERIFY(peer->Startup((unsigned short) 600,&socketDescriptor,1) == SLNet::RAKNET_STARTED);
+			SLNET_VERIFY(peer->Startup((unsigned short)600, &socketDescriptor, 1) == SLNet::RAKNET_STARTED);
 			peer->SetMaximumIncomingConnections(600);
 		}
 		unsigned ConnectionCount(void) const
@@ -257,11 +257,11 @@ int main(void)
 		}
 	}
 
-	randomData1[0]=(char) ID_USER_PACKET_ENUM;
-	for (char i=0; i < RANDOM_DATA_SIZE_1-1; i++)
+	randomData1[0]=(unsigned char)ID_USER_PACKET_ENUM;
+	for (unsigned char i=0; i < RANDOM_DATA_SIZE_1-1; i++)
 		randomData1[i+1]=i;
-	randomData2[0]=(char) ID_USER_PACKET_ENUM;
-	for (char i=0; i < RANDOM_DATA_SIZE_2-1; i++)
+	randomData2[0]=(unsigned char)ID_USER_PACKET_ENUM;
+	for (unsigned char i=0; i < RANDOM_DATA_SIZE_2-1; i++)
 		randomData2[i+1]=i;
 
 	if (mode==0 || mode==2)

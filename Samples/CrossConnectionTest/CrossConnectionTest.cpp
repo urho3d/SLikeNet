@@ -140,6 +140,6 @@ int main()
 		RakSleep(100);
 	}
 
-
-	return 0;
+	// #med - add proper termination handling (then reenable the following code)
+	// return 0;
 }

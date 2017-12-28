@@ -22,6 +22,7 @@
 #include "slikenet/MessageIdentifiers.h"
 #include "slikenet/ReadyEvent.h"
 #include <assert.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 #include "slikenet/sleep.h"
 #include "slikenet/SocketLayer.h"
@@ -115,7 +116,12 @@ int main(void)
 			gets_s(port);
 			if (port[0]==0)
 				strcpy_s(port, "60000");
-			SLNET_VERIFY(rakPeer->Connect(str, atoi(port), 0, 0, 0) == CONNECTION_ATTEMPT_STARTED);
+			const int intRemotePort = atoi(port);
+			if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+				printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+				return 2;
+			}
+			SLNET_VERIFY(rakPeer->Connect(str, static_cast<unsigned short>(intRemotePort), 0, 0, 0) == CONNECTION_ATTEMPT_STARTED);
 			printf("Connecting.\n");
 		}
 		if (ch=='d' || ch=='D')

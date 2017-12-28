@@ -93,7 +93,7 @@ namespace SLNet
 		void SetMemoryConstraint(unsigned int constraint);
 
 		// ---------------------------------- INTERNAL -------------------------------
-		SQLLogResult CheckQuery(bool isFunction, const char *tableName, const char *columnNames, int numParameters);
+		SQLLogResult CheckQuery(bool isFunction, const char *tableName, const char *columnNames, unsigned int numParameters);
 
 		struct ParameterListHelper
 		{
@@ -147,7 +147,7 @@ namespace SLNet
 			// Array doesn't work - no constructor initialization
 			//const LogParameter parms[12];
 			const LogParameter p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14;
-			const int paramCount;
+			const unsigned int paramCount;
 		};
 
 

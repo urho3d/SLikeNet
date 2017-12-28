@@ -27,6 +27,7 @@
 // Common includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Kbhit.h"
 
 #include "slikenet/GetTime.h"
@@ -79,7 +80,7 @@ int allowDownloadingUnmodifiedFiles;
 
 unsigned short autopatcherLoad=0;
 
-SLNet::RakPeerInterface *rakPeer;
+SLNet::RakPeerInterface *g_rakPeer;
 SLNet::AutopatcherServer *autopatcherServer;
 
 enum AppState
@@ -259,11 +260,11 @@ public:
 				//size_t publicAddressesArraySize = json_array_size(publicAddressesArray);
 				//for (size_t j=0; j < publicAddressesArraySize; j++)
 				//{
-				for (unsigned k=0; k < rakPeer->GetNumberOfAddresses(); k++)
+				for (unsigned k=0; k < g_rakPeer->GetNumberOfAddresses(); k++)
 				{
-					if (strcmp(rakPeer->GetLocalIP(k), json_string_value(json_object_get(arrayElement, "accessIPv4")))==0)
+					if (strcmp(g_rakPeer->GetLocalIP(k), json_string_value(json_object_get(arrayElement, "accessIPv4")))==0)
 					{
-						CopyServerDetails(arrayElement, rakPeer->GetLocalIP(k));
+						CopyServerDetails(arrayElement, g_rakPeer->GetLocalIP(k));
 
 						cshState=GOT_MY_SERVER;
 
@@ -283,13 +284,13 @@ public:
 // 				if (_getch()=='y')
 // 				{
 				
-				for (unsigned k=0; k < rakPeer->GetNumberOfAddresses(); k++)
+				for (unsigned k=0; k < g_rakPeer->GetNumberOfAddresses(); k++)
 				{
-					SystemAddress sa = rakPeer->GetInternalID(UNASSIGNED_SYSTEM_ADDRESS,k);
+					SystemAddress sa = g_rakPeer->GetInternalID(UNASSIGNED_SYSTEM_ADDRESS,k);
 					if (sa.IsLANAddress()==false)
 					{
 						json_t *arrayElement = json_array_get(serversArray, 0);
-						CopyServerDetails(arrayElement, rakPeer->GetLocalIP(0));
+						CopyServerDetails(arrayElement, g_rakPeer->GetLocalIP(0));
 						cshState=GOT_MY_SERVER;;
 						break;
 					}
@@ -368,7 +369,7 @@ public:
 					timeOfLastDNSHostCheck= SLNet::GetTime();
 					if (appState==AP_TERMINATE_IF_NOT_DNS_HOST)
 					{
-						if (strcmp(dnsHostIP, rakPeer->GetLocalIP(0))==0)
+						if (strcmp(dnsHostIP, g_rakPeer->GetLocalIP(0))==0)
 						{
 							// We are dns host. Just keep running
 							appState=AP_RUNNING;
@@ -616,9 +617,24 @@ public:
 			PrintHelp();
 
 		serverToServerPassword=argv[1];
-		rakPeerPort=atoi(argv[2]);
-		allowedIncomingConnections=atoi(argv[3]);
-		allowedOutgoingConnections=atoi(argv[4]);
+		const int intServerPort = atoi(argv[2]);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		rakPeerPort = static_cast<unsigned short>(intServerPort);
+		int intConnections = atoi(argv[3]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed incoming connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedIncomingConnections = static_cast<unsigned short>(intConnections);
+		intConnections = atoi(argv[4]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed outgoing connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedOutgoingConnections = static_cast<unsigned short>(intConnections);
 		strcpy_s(patcherHostSubdomainURL, argv[5]);
 		strcpy_s(patcherHostDomainURL, argv[6]);
 		strcpy_s(rackspaceAuthenticationURL, argv[7]);
@@ -769,7 +785,8 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		(void)requestType;
 		(void)queueOperation;
 
-		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
+		// #med - consider changing autopatcherLoad to unsigned int
+		autopatcherLoad=static_cast<unsigned short>(autopatcherState->requestsQueued+autopatcherState->requestsWorking);
 
 		//AutopatcherServerLoadNotifier_Printf::OnQueueUpdate(remoteSystem, requestType, queueOperation, autopatcherState);
 	}
@@ -783,7 +800,7 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		(void)remoteSystem;
 		(void)getChangelistResult;
 
-		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
+		autopatcherLoad=static_cast<unsigned short>(autopatcherState->requestsQueued+autopatcherState->requestsWorking);
 
 		//AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(remoteSystem, getChangelistResult, autopatcherState);
 	}
@@ -796,7 +813,7 @@ class AutopatcherLoadNotifier : public SLNet::AutopatcherServerLoadNotifier
 		(void)remoteSystem;
 		(void)patchResult;
 
-		autopatcherLoad=autopatcherState->requestsQueued+autopatcherState->requestsWorking;
+		autopatcherLoad=static_cast<unsigned short>(autopatcherState->requestsQueued+autopatcherState->requestsWorking);
 
 		//AutopatcherServerLoadNotifier_Printf::OnGetPatchCompleted(remoteSystem, patchResult, autopatcherState);
 	}
@@ -938,7 +955,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	rakPeer = SLNet::RakPeerInterface::GetInstance();
+	g_rakPeer = SLNet::RakPeerInterface::GetInstance();
 
 
 	SLNet::Time timeForNextLoadCheck= SLNet::GetTime()+LOAD_CHECK_INTERVAL;
@@ -995,23 +1012,23 @@ int main(int argc, char **argv)
 	// Used to tell servers about each other
 	SLNet::ConnectionGraph2 connectionGraph2;
 
-	rakPeer->AttachPlugin(&cloudServer);
-	rakPeer->AttachPlugin(&cloudClient);
-	rakPeer->AttachPlugin(&fullyConnectedMesh2);
-	rakPeer->AttachPlugin(&twoWayAuthentication);
-	rakPeer->AttachPlugin(&connectionGraph2);
+	g_rakPeer->AttachPlugin(&cloudServer);
+	g_rakPeer->AttachPlugin(&cloudClient);
+	g_rakPeer->AttachPlugin(&fullyConnectedMesh2);
+	g_rakPeer->AttachPlugin(&twoWayAuthentication);
+	g_rakPeer->AttachPlugin(&connectionGraph2);
 	
-	if (!cloudServerHelper->StartRakPeer(rakPeer))
+	if (!cloudServerHelper->StartRakPeer(g_rakPeer))
 		return 1;
 
 	SLNet::CloudServerHelperFilter sampleFilter; // Keeps clients from updating stuff to the server they are not supposed to
-	sampleFilter.serverGuid=rakPeer->GetMyGUID();
+	sampleFilter.serverGuid= g_rakPeer->GetMyGUID();
 	cloudServerHelper->SetupPlugins(&cloudServer, &sampleFilter, &cloudClient, &fullyConnectedMesh2, &twoWayAuthentication,&connectionGraph2, cloudServerHelper->serverToServerPassword);
 
 	int ret;
 	do 
 	{
-		ret = cloudServerHelper->JoinCloud(rakPeer, &cloudServer, &cloudClient, &fullyConnectedMesh2, &twoWayAuthentication, &connectionGraph2, cloudServerHelper->GetCloudHostAddress());
+		ret = cloudServerHelper->JoinCloud(g_rakPeer, &cloudServer, &cloudClient, &fullyConnectedMesh2, &twoWayAuthentication, &connectionGraph2, cloudServerHelper->GetCloudHostAddress());
 	} while (ret==2);
 	if (ret==1)
 		return 1;
@@ -1063,7 +1080,7 @@ int main(int argc, char **argv)
 
 	printf("(D)rop database\n(C)reate database.\n(U)pdate revision.\n(S)pawn a clone of this server\n(M)ax concurrent users (this server only)\n(I)mage the current state of this server\n(L)ist images\n(T)erminate cloud\n(Q)uit\n");
 
-	char ch;
+	int ch;
 	SLNet::Packet *p;
 	while (appState!=AP_TERMINATED)
 	{
@@ -1100,7 +1117,7 @@ int main(int argc, char **argv)
 			timeSinceZeroUsers=0;
 		}
 
-		p=rakPeer->Receive();
+		p= g_rakPeer->Receive();
 		while (p)
 		{
 			/*
@@ -1121,7 +1138,7 @@ int main(int argc, char **argv)
 					RakNetGUID oldHost;
 					bs.Read(oldHost);
 
-					if (p->guid==rakPeer->GetMyGUID())
+					if (p->guid== g_rakPeer->GetMyGUID())
 					{
 						if (oldHost!=UNASSIGNED_RAKNET_GUID)
 						{
@@ -1157,7 +1174,7 @@ int main(int argc, char **argv)
 
 					// Disconnect from the cloud, and do not accept new connections from users
 					// The autopatcher will still run since it is on TCP
-					rakPeer->Shutdown(1000);
+					g_rakPeer->Shutdown(1000);
 				}
 
 			}
@@ -1210,10 +1227,10 @@ int main(int argc, char **argv)
 				cloudClient.DeallocateWithDefaultAllocator(&cloudQueryResult);
 			}
 
-			cloudServerHelper->OnPacket(p, rakPeer, &cloudClient, &cloudServer, &fullyConnectedMesh2, &twoWayAuthentication, &connectionGraph2);
+			cloudServerHelper->OnPacket(p, g_rakPeer, &cloudClient, &cloudServer, &fullyConnectedMesh2, &twoWayAuthentication, &connectionGraph2);
 
-			rakPeer->DeallocatePacket(p);
-			p=rakPeer->Receive();
+			g_rakPeer->DeallocatePacket(p);
+			p=g_rakPeer->Receive();
 		}
 
 		if (timeSinceZeroUsers!=0 && appState==AP_RUNNING && autopatcherServer->GetMaxConurrentUsers()>0)
@@ -1265,7 +1282,7 @@ int main(int argc, char **argv)
 				SLNet::CloudQuery cloudQuery;
 				cloudQuery.keys.Push(SLNet::CloudKey("CloudConnCount",0),_FILE_AND_LINE_); // CloudConnCount is defined at the top of CloudServerHelper.cpp
 				cloudQuery.subscribeToResults=false;
-				cloudClient.Get(&cloudQuery, rakPeer->GetMyGUID());
+				cloudClient.Get(&cloudQuery, g_rakPeer->GetMyGUID());
 			}
 		}
 
@@ -1329,17 +1346,17 @@ int main(int argc, char **argv)
 				cloudServer.GetRemoteServers(remoteServersOut);
 				for (unsigned int i=0; i < remoteServersOut.Size(); i++)
 				{
-					rakPeer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, remoteServersOut[i], false);
-					rakPeer->CloseConnection(remoteServersOut[i], true);
+					g_rakPeer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, remoteServersOut[i], false);
+					g_rakPeer->CloseConnection(remoteServersOut[i], true);
 				}
 
 				printf("Remote servers will shutdown when all users are done\n");
 				printf("Disconnected from remote servers\n");
 				
 
-				for (unsigned int i=0; i < rakPeer->GetNumberOfAddresses(); i++)
+				for (unsigned int i=0; i < g_rakPeer->GetNumberOfAddresses(); i++)
 				{
-					SystemAddress sa = rakPeer->GetInternalID(UNASSIGNED_SYSTEM_ADDRESS,i);
+					SystemAddress sa = g_rakPeer->GetInternalID(UNASSIGNED_SYSTEM_ADDRESS,i);
 					if (sa.IsLANAddress()==false)
 					{
 						printf("Updating host DNS entry to this server\n");
@@ -1387,7 +1404,7 @@ int main(int argc, char **argv)
 	SLNet::OP_DELETE_ARRAY(connectionObject, _FILE_AND_LINE_);
 	SLNet::OP_DELETE_ARRAY(connectionObjectAddresses, _FILE_AND_LINE_);
 	packetizedTCP.Stop();
-	SLNet::RakPeerInterface::DestroyInstance(rakPeer);
+	SLNet::RakPeerInterface::DestroyInstance(g_rakPeer);
 	SLNet::OP_DELETE(cloudServerHelper, _FILE_AND_LINE_);
 
 

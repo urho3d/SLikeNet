@@ -330,7 +330,7 @@ class PopcornDemoRM3 : public ReplicaManager3
 	virtual Connection_RM3* AllocConnection(const SystemAddress &systemAddress, RakNetGUID rakNetGUID) const {return new PopcornSampleConnection(systemAddress,rakNetGUID);}
 	virtual void DeallocConnection(Connection_RM3 *connection) const {delete connection;}
 };
-PopcornDemoRM3 replicaManager3;
+PopcornDemoRM3 popcornReplicaManager3;
 class ExampleApp : public App3D
 {
 public:
@@ -450,8 +450,8 @@ public:
 				rakPeer = SLNet::RakPeerInterface::GetInstance();
 				StartupResult sr = rakPeer->Startup(isServer ? 32 : 1,&sd,1);
 				RakAssert(sr==RAKNET_STARTED);
-				rakPeer->AttachPlugin(&replicaManager3);
-				replicaManager3.SetNetworkIDManager(&networkIdManager);
+				rakPeer->AttachPlugin(&popcornReplicaManager3);
+				popcornReplicaManager3.SetNetworkIDManager(&networkIdManager);
 				//rakPeer->SetNetworkIDManager(&networkIdManager);
 				// The server should allow systems to connect. Clients do not need to unless you want to use RakVoice or for some other reason want to transmit directly between systems.
 				if (isServer)
@@ -464,7 +464,7 @@ public:
 					RakAssert(car==CONNECTION_ATTEMPT_STARTED);
 
 				}
-				replicaManager3.SetAutoSerializeInterval(DEFAULT_SERVER_MILLISECONDS_BETWEEN_UPDATES);
+				popcornReplicaManager3.SetAutoSerializeInterval(DEFAULT_SERVER_MILLISECONDS_BETWEEN_UPDATES);
 
 				// StringTable has to be called after RakPeer started, or else first call StringTable::AddRef() yourself
 				StringTable::Instance()->AddString("Popcorn",false);
@@ -505,7 +505,7 @@ public:
 				if (popcornLifetimeCountdown<=elapsedTimeMS)
 				{
 					Popcorn::ClearPopcorn();
-					CreateKernels(&replicaManager3);
+					CreateKernels(&popcornReplicaManager3);
 					popcornLifetimeCountdown=RESTART_TIMER_MS;
 				}
 				popcornLifetimeCountdown-=elapsedTimeMS;
@@ -579,7 +579,15 @@ public:
 	{
 		RakAssert(isServer);
 		unsigned int kernelCount;
+		// #med - consider using a template function instead of the if/else construct and/or introduce a cleaner/simpler macro
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
+#endif
 		if (KERNELS_VARIANCE!=0)
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 			kernelCount = MIN_KERNELS + randomMT() % KERNELS_VARIANCE;
 		else
 			kernelCount = MIN_KERNELS;

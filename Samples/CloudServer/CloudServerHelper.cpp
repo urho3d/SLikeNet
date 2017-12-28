@@ -27,6 +27,7 @@
 #include "slikenet/peerinterface.h"
 #include "slikenet/ConnectionGraph2.h"
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/linux_adapter.h"
 #include "slikenet/osx_adapter.h"
 
@@ -88,13 +89,34 @@ bool CloudServerHelper::ParseCommandLineParameters(int argc, char **argv)
 	else serverToServerPassword=argv[1];
 
 	if (argc<3) rakPeerPort=DEFAULT_SERVER_PORT;
-	else rakPeerPort=atoi(argv[2]);
+	else {
+		const int intPeerPort = atoi(argv[2]);
+		if ((intPeerPort < 0) || (intPeerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified peer port %d is outside valid bounds [0, %u]", intPeerPort, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		rakPeerPort = static_cast<unsigned short>(rakPeerPort);
+	}
 
 	if (argc<4) allowedIncomingConnections=DEFAULT_ALLOWED_INCOMING_CONNECTIONS;
-	else allowedIncomingConnections=atoi(argv[3]);
+	else {
+		const int intConnections = atoi(argv[3]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed incoming connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedIncomingConnections = static_cast<unsigned short>(intConnections);
+	}
 
 	if (argc<5) allowedOutgoingConnections=DEFAULT_ALLOWED_OUTGOING_CONNECTIONS;
-	else allowedOutgoingConnections=atoi(argv[4]);
+	else {
+		const int intConnections = atoi(argv[4]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed outgoing connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedOutgoingConnections = static_cast<unsigned short>(intConnections);
+	}
 
 	return true;
 }
@@ -132,13 +154,34 @@ bool CloudServerHelper_DynDns::ParseCommandLineParameters(int argc, char **argv)
 #endif
 
 	if (argc<5) rakPeerPort=DEFAULT_SERVER_PORT;
-	else rakPeerPort=atoi(argv[4]);
+	else {
+		const int intPeerPort = atoi(argv[4]);
+		if ((intPeerPort < 0) || (intPeerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified peer port %d is outside valid bounds [0, %u]", intPeerPort, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		rakPeerPort = static_cast<unsigned short>(rakPeerPort);
+	}
 
 	if (argc<6) allowedIncomingConnections=DEFAULT_ALLOWED_INCOMING_CONNECTIONS;
-	else allowedIncomingConnections=atoi(argv[5]);
+	else {
+		const int intConnections = atoi(argv[5]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed incoming connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedIncomingConnections = static_cast<unsigned short>(intConnections);
+	}
 
 	if (argc<7) allowedOutgoingConnections=DEFAULT_ALLOWED_OUTGOING_CONNECTIONS;
-	else allowedOutgoingConnections=atoi(argv[6]);
+	else {
+		const int intConnections = atoi(argv[6]);
+		if ((intConnections < 0) || (intConnections > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified allowed outgoing connections %d is outside valid bounds [0, %u]", intConnections, std::numeric_limits<unsigned short>::max());
+			return false;
+		}
+		allowedOutgoingConnections = static_cast<unsigned short>(intConnections);
+	}
 
 	return true;
 }
@@ -240,19 +283,20 @@ bool CloudServerHelper_DynDns::SetHostDNSToThisSystemBlocking(void)
 		dynDNSUsernameAndPassword);
 
 	// Wait for the DNS update to complete
-	for(;;)
+	do
 	{
 		dynDNS->Update();
 
 		if (dynDNS->IsCompleted())
 		{
 			printf("%s\n", dynDNS->GetCompletedDescription());
-			return dynDNS->WasResultSuccessful();
+			break;
 		}
 
 		RakSleep(30);
-	}
-	return false;
+	} while (!dynDNS->IsCompleted());
+
+	return dynDNS->WasResultSuccessful();
 }
 
 MessageID CloudServerHelper::AuthenticateRemoteServerBlocking(RakPeerInterface *rakPeer, TwoWayAuthentication *twoWayAuthentication, RakNetGUID remoteSystem)

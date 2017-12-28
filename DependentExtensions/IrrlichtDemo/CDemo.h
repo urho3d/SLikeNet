@@ -26,6 +26,9 @@
 #ifdef _MSC_VER
 	#pragma warning(push)
 	#pragma warning(disable:4100) // unreferenced formal parameter
+	#pragma warning(disable:4127) // conditional expression is constant
+	#pragma warning(disable:4244) // type-conversion with possible loss of data
+	#pragma warning(disable:4458) // declaration of 'identifier' hides class member
 #endif
 
 #include <irrlicht.h>

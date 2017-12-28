@@ -57,7 +57,7 @@ SQLLogResult SQLiteClientLoggerPlugin::SqlLog( bool isFunctionCall, const char *
 	SLNet::BitStream bitStream;
 	// #med - proper bounds check for paramCount required
 	SerializeHeader(&bitStream, isFunctionCall, tableName, columnNames, file, line, static_cast<unsigned char>(parameterList.paramCount));
-//	int i;
+//	unsigned int i;
 	//for (i=0; i < parameterList.paramCount; i++)
 	//	parameterList.parms[i].Serialize(&bitStream);
 	if (parameterList.paramCount>=1)
@@ -276,7 +276,7 @@ SQLLogResult SQLiteClientLoggerPlugin::SqlLog( bool isFunctionCall, const char *
 	return SQLLR_OK;
 }
 */
-SQLLogResult SQLiteClientLoggerPlugin::CheckQuery(bool isFunction, const char *tableName, const char *columnNames, int numParameters)
+SQLLogResult SQLiteClientLoggerPlugin::CheckQuery(bool isFunction, const char *tableName, const char *columnNames, unsigned int numParameters)
 {
 	(void) isFunction;
 

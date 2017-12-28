@@ -24,6 +24,7 @@
 #include "slikenet/DS_Queue.h"
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/LinuxStrings.h"
 #include "slikenet/Gets.h"
 #include "slikenet/linux_adapter.h"
@@ -43,12 +44,12 @@ struct AutoExecutionPlanNode
 };
 DataStructures::Queue<AutoExecutionPlanNode> executionPlan;
 
-void PrintCommands(SLNet::Lobby2MessageFactory *messageFactory)
+void PrintCommands()
 {
 	unsigned int i;
 	for (i=0; i < SLNet::L2MID_COUNT; i++)
 	{
-		SLNet::Lobby2Message *m = messageFactory->Alloc((SLNet::Lobby2MessageID)i);
+		SLNet::Lobby2Message *m = messageFactory.Alloc((SLNet::Lobby2MessageID)i);
 		if (m)
 		{
 			printf("%i. %s", i+1, m->GetName());
@@ -57,7 +58,7 @@ void PrintCommands(SLNet::Lobby2MessageFactory *messageFactory)
 			if (m->RequiresRankingPermission())
 				printf(" (Ranking server command)");
 			printf("\n");
-			messageFactory->Dealloc(m);
+			messageFactory.Dealloc(m);
 		}		
 		
 	}
@@ -191,7 +192,12 @@ int main()
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 	puts("Enter the rakPeer1 port to listen on");
 	clientPort[0]=0;
-	SLNet::SocketDescriptor socketDescriptor(atoi(clientPort),0);
+	const int intClientPort = atoi(clientPort);
+	if ((intClientPort < 0) || (intClientPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified client port %d is outside valid bounds [0, %u]", intClientPort, std::numeric_limits<unsigned short>::max());
+		return 1;
+	}
+	SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intClientPort),0);
 	Gets(clientPort,sizeof(clientPort));
 	if (clientPort[0]==0)
 		strcpy_s(clientPort, "0");
@@ -207,11 +213,16 @@ int main()
 	Gets(serverPort,sizeof(serverPort));
 	if (serverPort[0]==0)
 		strcpy_s(serverPort, "61111");
+	const int intServerPort = atoi(serverPort);
+	if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+		return 2;
+	}
 
 	for (i=0; i < NUM_CONNECTIONS; i++)
 	{
 		rakPeer[i]->Startup(1,&socketDescriptor, 1);
-		rakPeer[i]->Connect(ip, atoi(serverPort), 0,0);
+		rakPeer[i]->Connect(ip, static_cast<unsigned short>(intServerPort), 0,0);
 
 		rakPeer[i]->AttachPlugin(&lobby2Client[i]);
 		lobby2Client[i].SetMessageFactory(&messageFactory);

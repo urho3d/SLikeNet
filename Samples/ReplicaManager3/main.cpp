@@ -77,7 +77,7 @@ struct SampleReplica : public Replica3
 	}
 
 	virtual void SerializeConstruction(SLNet::BitStream *constructionBitstream, SLNet::Connection_RM3 *destinationConnection)
-	{	
+	{
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call adds another remote system to track
 		variableDeltaSerializer.AddRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
@@ -93,12 +93,12 @@ struct SampleReplica : public Replica3
 		return true;
 	}
 	virtual void SerializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *destinationConnection)
-	{	
+	{
 		// variableDeltaSerializer is a helper class that tracks what variables were sent to what remote system
 		// This call removes a remote system
 		variableDeltaSerializer.RemoveRemoteSystemVariableHistory(destinationConnection->GetRakNetGUID());
 
-		destructionBitstream->Write(GetName() + SLNet::RakString(" SerializeDestruction"));	
+		destructionBitstream->Write(GetName() + SLNet::RakString(" SerializeDestruction"));
 	}
 	virtual bool DeserializeDestruction(SLNet::BitStream *destructionBitstream, SLNet::Connection_RM3 *sourceConnection)
 	{

@@ -89,8 +89,6 @@ const char *GetSqlDataTypeName2(SQLLoggerPrimaryDataType idx) {return sqlDataTyp
 
 void CompressAsJpeg(char **cptrInOut, uint32_t *sizeInOut, uint16_t imageWidth, uint16_t imageHeight, int16_t linePitch, unsigned char input_components)
 {
-	SLNet::TimeUS t1= SLNet::GetTimeUS();
-
 	// Compress to jpg
 	// http://www.google.com/codesearch/p?hl=en#I-_InJ6STRE/gthumb-1.108/libgthumb/pixbuf-utils.c&q=jpeg_create_compress
 	// http://ftp.gnome.org	/ pub/	GNOME	/	sources	/gthumb	/1.108/	gthumb-1.108.tar.gz/ 
@@ -133,9 +131,6 @@ void CompressAsJpeg(char **cptrInOut, uint32_t *sizeInOut, uint16_t imageWidth, 
 	rakFree_Ex(*cptrInOut,_FILE_AND_LINE_);
 	*cptrInOut = (char*) rakRealloc_Ex(storage, jpegSizeAfterCompression,_FILE_AND_LINE_);
 	*sizeInOut=jpegSizeAfterCompression;
-
-	SLNet::TimeUS t2= SLNet::GetTimeUS();
-	SLNet::TimeUS diff=t2-t1;
 }
 static bool needsDxtInit=true;
 static bool dxtCompressionSupported=false;
@@ -1215,12 +1210,13 @@ void SQLiteServerLoggerPlugin::StopCPUSQLThreads(void)
 	ClearCpuThreadInput();
 	for (i=0; i < cpuLoggerThreadPool.InputSize(); i++)
 	{
-		CPUThreadInput *cpuThreadInput = cpuLoggerThreadPool.GetInputAtIndex(i);
-		for (j=0; j < cpuThreadInput->arraySize; j++)
+		// #med - change class member - then revert name to cpuThradInput
+		CPUThreadInput *curCPUThreadInput = cpuLoggerThreadPool.GetInputAtIndex(i);
+		for (j=0; j < curCPUThreadInput->arraySize; j++)
 		{
-			DeallocPacketUnified(cpuThreadInput->cpuInputArray[j].packet);
+			DeallocPacketUnified(curCPUThreadInput->cpuInputArray[j].packet);
 		}
-		SLNet::OP_DELETE(cpuThreadInput,_FILE_AND_LINE_);
+		SLNet::OP_DELETE(curCPUThreadInput,_FILE_AND_LINE_);
 	}
 	cpuLoggerThreadPool.ClearInput();
 	for (i=0; i < cpuLoggerThreadPool.OutputSize(); i++)

@@ -153,13 +153,13 @@ int main(void)
 				{
 					printf("Starting send\n");
 					start= SLNet::GetTimeMS();
-					if (BIG_PACKET_SIZE<=100000)
-					{
-						for (int i=0; i < BIG_PACKET_SIZE; i++)
-							text[i]=255-(i&255);
-					}
-					else
-						text[0]=(unsigned char) 255;
+					// #med - replace BIG_PACKET_SIZE macro with static const
+#if BIG_PACKET_SIZE <= 100000
+					for (int i=0; i < BIG_PACKET_SIZE; i++)
+						text[i]=255-(i&255);
+#else
+					text[0]=(unsigned char) 255;
+#endif
 					server->Send(text, BIG_PACKET_SIZE, LOW_PRIORITY, RELIABLE_ORDERED_WITH_ACK_RECEIPT, 0, packet->systemAddress, false);
 					// Keep the stat from updating until the messages move to the thread or it quits right away
 					nextStatTime= SLNet::GetTimeMS()+1000;
@@ -220,18 +220,18 @@ int main(void)
 						quit=true;
 						break;
 					}
-					if (BIG_PACKET_SIZE<=100000)
+					// #med - replace BIG_PACKET_SIZE macro with static const
+#if BIG_PACKET_SIZE <= 100000
+					for (int i=0; i < BIG_PACKET_SIZE; i++)
 					{
-						for (int i=0; i < BIG_PACKET_SIZE; i++)
+						if  (packet->data[i]!=255-(i&255))
 						{
-							if  (packet->data[i]!=255-(i&255))
-							{
-								printf("Test failed. %i bytes (bad data).\n", packet->length);
-								quit=true;
-								break;
-							}
+							printf("Test failed. %i bytes (bad data).\n", packet->length);
+							quit=true;
+							break;
 						}
 					}
+#endif
 
 					if (quit==false)
 					{

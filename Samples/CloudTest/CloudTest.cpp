@@ -299,10 +299,11 @@ int main(void)
 		RakSleep(30);
 	}
 
-	for (unsigned int i=0; i < RAKPEER_COUNT; i++)
+	// #med - add proper termination handling (then reenable the following code)
+	/*for (unsigned int i=0; i < RAKPEER_COUNT; i++)
 	{
 		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 	}
 
-	return 0;
+	return 0;*/
 }

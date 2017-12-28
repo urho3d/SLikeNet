@@ -18,6 +18,7 @@
 #include "slikenet/Kbhit.h"
 #include <string.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/BitStream.h"
 #include "slikenet/MessageIdentifiers.h"
 #include "slikenet/Router2.h"
@@ -162,14 +163,20 @@ int main(void)
 				Gets(str,sizeof(str));
 				if (str[0]==0)
 					strcpy_s(str, "127.0.0.1");
+				int intRemotePort = 0;
 				do
 				{
 					printf("Enter port to connect to: ");
 					Gets(str2,sizeof(str2));
-				} while (str2[0]==0);
+					intRemotePort = atoi(str2);
+					if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+						printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+						intRemotePort = 0;
+					}
+				} while (intRemotePort == 0);
 
 				// Connect
-				rakPeer->Connect(str,atoi(str2),0,0);
+				rakPeer->Connect(str, static_cast<unsigned short>(intRemotePort),0,0);
 			}
 		}
 

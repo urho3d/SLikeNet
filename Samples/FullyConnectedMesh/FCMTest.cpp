@@ -35,19 +35,15 @@ void PrintConnections(void);
 
 int main(void)
 {
-	int i;
-
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 		rakPeer[i]= SLNet::RakPeerInterface::GetInstance();
 
 	printf("This project tests and demonstrates the fully connected mesh plugin.\n");
 	printf("No data is actually sent so it's mostly a sample of how to use a plugin.\n");
 	printf("Difficulty: Beginner\n\n");
 
-	int peerIndex;
-
 	// Initialize the message handlers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 //		fullyConnectedMeshPlugin[peerIndex].Startup(0,0);
 		rakPeer[peerIndex]->AttachPlugin(&fullyConnectedMeshPlugin[peerIndex]);
@@ -57,7 +53,7 @@ int main(void)
 	}
 
 	// Initialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
@@ -70,7 +66,7 @@ int main(void)
 	printf("Connecting each peer to the prior peer\n");
 	
 	// Connect each peer to the prior peer
-	for (peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
 	{
         rakPeer[peerIndex]->Connect("127.0.0.1", 60000+peerIndex-1, 0, 0);
 	}
@@ -78,13 +74,13 @@ int main(void)
 	PrintConnections();
 
 	// Close all connections
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->Shutdown(100);
 	}
 
 	// Reinitialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS,&socketDescriptor, 1 );
@@ -92,7 +88,7 @@ int main(void)
 
 	printf("Connecting each peer to a central peer.\n");
 	// Connect each peer to a central peer
-	for (peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=1; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->Connect("127.0.0.1", 60000, 0, 0);
 	}
@@ -100,13 +96,13 @@ int main(void)
 	PrintConnections();
 
 	// Close all connections
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->Shutdown(100);
 	}
 
 	// Reinitialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
@@ -114,7 +110,7 @@ int main(void)
 
 	printf("Cross connecting each pair of peers, then first and last peer.\n");
 	// Connect each peer to a central peer
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->Connect("127.0.0.1", 60000+peerIndex+(((peerIndex%2)==0) ? 1 : -1), 0, 0);
 	}
@@ -126,13 +122,13 @@ int main(void)
 	PrintConnections();
 
 	// Close all connections
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		rakPeer[peerIndex]->Shutdown(100);
 	}
 
 	// Reinitialize the peers
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		SLNet::SocketDescriptor socketDescriptor(60000+peerIndex,0);
 		rakPeer[peerIndex]->Startup(NUM_PEERS, &socketDescriptor, 1);
@@ -142,9 +138,9 @@ int main(void)
 	unsigned int seed = (unsigned int)SLNet::GetTimeMS();
 	seedMT(seed);
 	printf("Connecting each peer to a random peer with seed %u.\n", seed);
-	int connectTo=0;
+	unsigned short connectTo=0;
 	// Connect each peer to a central peer
-	for (peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
+	for (unsigned short peerIndex=0; peerIndex < NUM_PEERS; peerIndex++)
 	{
 		do 
 		{
@@ -156,7 +152,7 @@ int main(void)
 
 	PrintConnections();
 
-	for (i=0; i < NUM_PEERS; i++)
+	for (unsigned short i=0; i < NUM_PEERS; i++)
 		SLNet::RakPeerInterface::DestroyInstance(rakPeer[i]);
 
 	return 1;
@@ -165,7 +161,7 @@ int main(void)
 void PrintConnections()
 {
 	int i,j;
-	char ch=0;
+	int ch=0;
 	SLNet::SystemAddress systemAddress;
 	SLNet::Packet *packet;
 	printf("Connecting.  Press space to see status or c to continue.\n");
@@ -180,7 +176,16 @@ void PrintConnections()
 			printf("--------------------------------\n");
 			for (i=0; i < NUM_PEERS; i++)
 			{
+				// #med - consider using a template function instead of the if/else construct
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
+#endif
 				if (NUM_PEERS<=10)
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 				{
 					/*
 					printf("%i (Mesh): ", 60000+i);

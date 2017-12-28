@@ -35,20 +35,21 @@ bool endThreads;
 
 RAK_THREAD_DECLARATION(ProducerThread)
 {
-	char i = *((char *) arguments);
-	char out[2];
-	out[0]=(char) ID_USER_PACKET_ENUM;
+	unsigned char i = *((unsigned char *) arguments);
+	unsigned char out[2];
+	out[0]=(unsigned char)ID_USER_PACKET_ENUM;
 	out[1]=i;
 
 	while (endThreads==false)
 	{
-//		printf("Thread %i writing...\n", i);
+//		printf("Thread %u writing...\n", i);
+		// #high - (char*)-cast hack to simply send unsigned char types to the peer - consider changing Send() to accept unsigned char (i.e. ID_USER_PACKET_ENUM exceeds 127)
 		if (i&1)
-			peer1->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			peer1->Send((char*)out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 		else
-			peer2->Send(out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+			peer2->Send((char*)out, 2, HIGH_PRIORITY, RELIABLE_ORDERED, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
-//		printf("Thread %i done writing\n", i);
+//		printf("Thread %u done writing\n", i);
 		RakSleep(30);
 	}
 	
@@ -57,21 +58,21 @@ RAK_THREAD_DECLARATION(ProducerThread)
 
 RAK_THREAD_DECLARATION(ConsumerThread)
 {
-	char i = *((char *) arguments);
+	unsigned char i = *((unsigned char *) arguments);
 	SLNet::Packet *p;
 	while (endThreads==false)
 	{
-//		printf("Thread %i reading...\n", i);
+//		printf("Thread %u reading...\n", i);
 		if (i&1)
 			p=peer1->Receive();
 		else
 			p=peer2->Receive();
-	//	printf("Thread %i done reading...\n", i);
+	//	printf("Thread %u done reading...\n", i);
 
 		if (p)
 		{
 			if (p->data[0]==ID_USER_PACKET_ENUM)
-				printf("Got data from thread %i\n", p->data[1]);
+				printf("Got data from thread %u\n", p->data[1]);
 			if (i&1)
 				peer1->DeallocatePacket(p);
 			else
@@ -104,17 +105,17 @@ int main()
 
 
 	endThreads=false;
-	char count[20];
+	unsigned char count[20];
 	printf("Starting threads\n");
-	for (char i=0; i< 10; i++)
+	for (unsigned char i=0; i < 10; i++)
 	{
 		count[i]=i;
 		SLNet::RakThread::Create(&ProducerThread, count+i);
 	}
-	for (char i=10; i < 20; i++)
+	for (unsigned char i=10; i < 20; i++)
 	{
 		count[i]=i;
-		SLNet::RakThread::Create(&ConsumerThread, count+i );
+		SLNet::RakThread::Create(&ConsumerThread, count+i);
 	}
 
 	printf("Running test\n");

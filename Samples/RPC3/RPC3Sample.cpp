@@ -76,7 +76,11 @@ public:
 
 class D : public B, public SLNet::NetworkIDObject {
 public:
-	D() {for (char i=0; i < 10; i++) tenBytes[i]=i;}
+	D()
+	{
+		for (char i=0; i < 10; i++)
+			tenBytes[i]=i;
+	}
 	char tenBytes[10];
 	bool Verify(void) {for (int i=0; i < 10; i++) if (tenBytes[i]!=i) return false; return true;}
 	virtual void TestSlot(void) {printf("D::TestSlot\n");}
@@ -176,7 +180,6 @@ int main(void)
 	ol.Insert(4,4,false,_FILE_AND_LINE_);
 	ol.Insert(5,5,false,_FILE_AND_LINE_);
 	ol.Insert(4,4,false,_FILE_AND_LINE_);
-	bool objectExists;
 
 	SLNet::RakPeerInterface *rakPeer;
 	SLNet::SystemAddress tempAddr = SLNet::UNASSIGNED_SYSTEM_ADDRESS;

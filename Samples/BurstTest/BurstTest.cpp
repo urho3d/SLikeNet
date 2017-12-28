@@ -26,6 +26,7 @@
 #include "slikenet/sleep.h"
 #include "slikenet/memoryoverride.h"
 #include <stdio.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/Gets.h"
 #include "slikenet/Kbhit.h"
 #include "slikenet/sleep.h"
@@ -55,13 +56,23 @@ int main(int, char **)
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "60000");
-		remotePort=atoi(str);
+		const int intRemotePort = atoi(str);
+		if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+			return 2;
+		}
+		remotePort = static_cast<unsigned short>(intRemotePort);
 		
 		printf("Enter local port: ");
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "0");
-		localPort=atoi(str);
+		const int intLocalPort = atoi(str);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
 		
 		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakPeer->Startup(32, &socketDescriptor, 1);
@@ -75,7 +86,12 @@ int main(int, char **)
 		Gets(str, sizeof(str));
 		if (str[0]==0)
 			strcpy_s(str, "60000");
-		localPort=atoi(str);
+		const int intLocalPort = atoi(str);
+		if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		localPort = static_cast<unsigned short>(intLocalPort);
 		
 		SLNet::SocketDescriptor socketDescriptor(localPort,0);
 		rakPeer->Startup(32, &socketDescriptor, 1);
@@ -90,7 +106,7 @@ int main(int, char **)
 		{
 			int ch=_getch();
 			if (ch=='q')
-				return 1;
+				break;
 			else if (ch==' ')
 			{
 				RakNetStatistics *rss;

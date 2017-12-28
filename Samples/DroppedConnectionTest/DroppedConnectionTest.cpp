@@ -32,9 +32,9 @@ using namespace SLNet;
 #endif
 
 #ifdef _DEBUG
-static const int NUMBER_OF_CLIENTS=9;
+static const short NUMBER_OF_CLIENTS=9;
 #else
-static const int NUMBER_OF_CLIENTS=100;
+static const short NUMBER_OF_CLIENTS=100;
 #endif
 
 void ShowHelp(void)
@@ -46,8 +46,8 @@ int main(void)
 {
 	RakPeerInterface *server;
 	RakPeerInterface *clients[NUMBER_OF_CLIENTS];
-	unsigned index, connectionCount;
-	unsigned char ch;
+	unsigned connectionCount;
+	int ch;
 	SystemAddress serverID;
 	SLNet::Packet *p;
 	unsigned short numberOfSystems;
@@ -71,7 +71,7 @@ int main(void)
 	server->SetMaximumIncomingConnections(NUMBER_OF_CLIENTS);
 	server->SetTimeoutTime(10000,UNASSIGNED_SYSTEM_ADDRESS);
 
-	for (index=0; index < NUMBER_OF_CLIENTS; index++)
+	for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 	{
 		clients[index]= SLNet::RakPeerInterface::GetInstance();
 		SLNet::SocketDescriptor socketDescriptor2(serverPort+1+index,0);
@@ -84,7 +84,7 @@ int main(void)
 		#else
 				usleep(10 * 1000);
 		#endif
-		printf("%i. ", index);
+		printf("%u. ", index);
 	}
 
 	ShowHelp();
@@ -103,30 +103,30 @@ int main(void)
 
 			if (ch=='d' || ch=='D')
 			{
-				index = randomMT() % NUMBER_OF_CLIENTS;
+				unsigned short index = randomMT() % NUMBER_OF_CLIENTS;
 				
 				clients[index]->GetConnectionList(0, &numberOfSystems);
 				clients[index]->CloseConnection(serverID, false,0);
 				if (numberOfSystems==0)
-					printf("Client %i silently closing inactive connection.\n",index);
+					printf("Client %u silently closing inactive connection.\n",index);
 				else
-					printf("Client %i silently closing active connection.\n",index);
+					printf("Client %u silently closing active connection.\n",index);
 			}
 			else if (ch=='c' || ch=='C')
 			{
-				index = randomMT() % NUMBER_OF_CLIENTS;
+				unsigned short index = randomMT() % NUMBER_OF_CLIENTS;
 
 				clients[index]->GetConnectionList(0, &numberOfSystems);
 				clients[index]->Connect("127.0.0.1", serverPort, 0, 0);
 				if (numberOfSystems==0)
-					printf("Client %i connecting to same existing connection.\n",index);
+					printf("Client %u connecting to same existing connection.\n",index);
 				else
-					printf("Client %i connecting to closed connection.\n",index);
+					printf("Client %u connecting to closed connection.\n",index);
 			}
 			else if (ch=='r' || ch=='R' || ch=='n' || ch=='N')
 			{
 				printf("Randomly connecting and disconnecting each client\n");
-				for (index=0; index < NUMBER_OF_CLIENTS; index++)
+				for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 				{
 					if (NUMBER_OF_CLIENTS==1 || (randomMT()%2)==0)
 					{
@@ -149,11 +149,11 @@ int main(void)
 				server->GetConnectionList(0, &numberOfSystems);
 				printf("The server thinks %i clients are connected.\n", numberOfSystems);
 				connectionCount=0;
-				for (index=0; index < NUMBER_OF_CLIENTS; index++)
+				for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 				{
 					clients[index]->GetConnectionList(0, &numberOfSystems);
 					if (numberOfSystems>1)
-						printf("Bug: Client %i has %i connections\n", index, numberOfSystems);
+						printf("Bug: Client %u has %i connections\n", index, numberOfSystems);
 					if (numberOfSystems==1)
 					{
 						connectionCount++;
@@ -181,7 +181,7 @@ int main(void)
 			sender=NUMBER_OF_CLIENTS;
 			if (p==0)
 			{
-				for (index=0; index < NUMBER_OF_CLIENTS; index++)
+				for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 				{
 					p = clients[index]->Receive();
 					if (p!=0)
@@ -240,7 +240,7 @@ int main(void)
 		ch=255;
 		server->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 
-		for (index=0; index < NUMBER_OF_CLIENTS; index++)
+		for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 			clients[index]->Send((char*)&ch, 1, HIGH_PRIORITY, RELIABLE, 0, SLNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 			*/
 
@@ -255,7 +255,7 @@ int main(void)
 	}
 
 	SLNet::RakPeerInterface::DestroyInstance(server);
-	for (index=0; index < NUMBER_OF_CLIENTS; index++)
+	for (unsigned short index=0; index < NUMBER_OF_CLIENTS; index++)
 		SLNet::RakPeerInterface::DestroyInstance(clients[index]);
 	return 1;
 }

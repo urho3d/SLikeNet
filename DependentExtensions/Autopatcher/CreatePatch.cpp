@@ -630,7 +630,6 @@ int TestDiffInMemory(int argc,char *argv[])
 		(_read(fd,_new,newsize)!=newsize) ||
 		(_close(fd)==-1)) err(1,"%s",argv[2]);
 
-
 	int res = CreatePatch(old, oldsize, _new, newsize, &out, &outSize);
 
 	if (fopen_s(&pf, argv[3], "wb") != 0)

@@ -19,6 +19,7 @@
 #include "slikenet/Kbhit.h"
 #include <string.h>
 #include <stdlib.h>
+#include <limits> // used for std::numeric_limits
 #include "slikenet/sleep.h"
 #include "slikenet/BitStream.h"
 #include "slikenet/MessageIdentifiers.h"
@@ -79,8 +80,13 @@ int main(void)
 	Gets(clientPort,sizeof(clientPort));
 	if (clientPort[0]==0)
 		strcpy_s(clientPort, "0");
-	
-	SLNet::SocketDescriptor sd1(atoi(clientPort),0);
+	const int intClientPort = atoi(clientPort);
+	if ((intClientPort < 0) || (intClientPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified client port %d is outside valid bounds [0, %u]", intClientPort, std::numeric_limits<unsigned short>::max());
+		return 2;
+	}
+
+	SLNet::SocketDescriptor sd1(static_cast<unsigned short>(intClientPort),0);
 	rakPeer->Startup(8,&sd1,1);
 	rakPeer->SetMaximumIncomingConnections(8);
 
@@ -99,7 +105,12 @@ int main(void)
 	{
 		puts("Enter the port to connect to");
 		Gets(serverPort,sizeof(serverPort));
-		rakPeer->Connect(ip, atoi(serverPort), 0, 0);
+		const int intServerPort = atoi(serverPort);
+		if ((intServerPort < 0) || (intServerPort > std::numeric_limits<unsigned short>::max())) {
+			printf("Specified server port %d is outside valid bounds [0, %u]", intServerPort, std::numeric_limits<unsigned short>::max());
+			return 3;
+		}
+		rakPeer->Connect(ip, static_cast<unsigned short>(intServerPort), 0, 0);
 
 		RakSleep(1000);
 

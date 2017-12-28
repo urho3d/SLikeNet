@@ -101,7 +101,7 @@ int main(void)
 				if ( dataLength > 0 )
 				{
 					printf( "Data is %s\n", packet->data + sizeof( unsigned char ) + sizeof(SLNet::TimeMS ) );
-					RakAssert((int)strlen("Offline Ping Data")+1==packet->length-(sizeof( unsigned char ) + sizeof(SLNet::TimeMS )));
+					RakAssert(strlen("Offline Ping Data")+1==packet->length-(sizeof( unsigned char ) + sizeof(SLNet::TimeMS )));
 				}
 
 				nextTest++;
