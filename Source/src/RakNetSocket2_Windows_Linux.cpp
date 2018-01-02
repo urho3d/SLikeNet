@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -35,8 +35,7 @@ void GetMyIP_Windows_Linux_IPV4And6( SystemAddress addresses[MAXIMUM_NUMBER_OF_I
 {
 	int idx=0;
 	char ac[ 80 ];
-	int err = gethostname( ac, sizeof( ac ) );
-	RakAssert(err != -1);
+	SLNET_VERIFY(gethostname( ac, sizeof( ac ) ) != -1);
 	
 	struct addrinfo hints;
 	struct addrinfo *servinfo=0, *aip;  // will point to the results

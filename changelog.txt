@@ -41,6 +41,8 @@ Extensions:
 Samples:
   ComprehensiveTest:
     * fixed very rare occasional crash (#148)
+  Lobby3:
+    * fixed incorrectly referenced string.h header file in VS project file (#105)
   NAT Punchthrough:
     * fixed memory/resource leak in NATCompleteServer/NATCompleteClient's ConnectBlocking() functions (#150)
   ReplicaManager3:
