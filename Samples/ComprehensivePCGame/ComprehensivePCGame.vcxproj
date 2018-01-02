@@ -241,30 +241,93 @@
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\igd_desc_parse.c" />
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\minisoap.c" />
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\miniupnpc.c">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4100;4456;4706;4996</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\miniwget.c" />
+    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\miniwget.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4100</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\minixml.c" />
-    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\portlistingparse.c" />
-    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\receivedata.c" />
-    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\upnpcommands.c" />
+    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\portlistingparse.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4100</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\receivedata.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4389</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4389</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4389</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4389</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4389</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4389</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\upnpcommands.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4245;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4245;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4245;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4245;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4245;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4245;4706</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\upnperrors.c" />
     <ClCompile Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\upnpreplyparse.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\dump.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\dump.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\error.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\hashtable.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\load.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\hashtable.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4706</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\load.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\memory.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\pack_unpack.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\strbuffer.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\strconv.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\utf.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\value.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\utf.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\value.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4706</DisableSpecificWarnings>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\DependentExtensions\miniupnpc-1.6.20120410\bsdqueue.h" />

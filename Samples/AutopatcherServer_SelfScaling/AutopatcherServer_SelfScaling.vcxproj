@@ -369,19 +369,47 @@
     <ClCompile Include="..\..\Source\src\VariadicSQLParser.cpp" />
     <ClCompile Include="..\..\Source\src\VitaIncludes.cpp" />
     <ClCompile Include="..\..\Source\src\WSAStartupSingleton.cpp" />
-    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\blocksort.c" />
-    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\bzlib.c">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4996</DisableSpecificWarnings>
+    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\blocksort.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4127</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\compress.c" />
+    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\bzlib.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4100;4127;4244;4996</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\compress.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\crctable.c" />
-    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\decompress.c" />
-    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\huffman.c" />
+    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\decompress.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\huffman.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4127;4244</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\bzip2-1.0.6\randtable.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="..\CloudServer\CloudServerHelper.cpp" />
@@ -391,16 +419,51 @@
     <ClCompile Include="..\..\DependentExtensions\Autopatcher\CreatePatch.cpp" />
     <ClCompile Include="..\..\DependentExtensions\Autopatcher\MemoryCompressor.cpp" />
     <ClCompile Include="..\..\DependentExtensions\PostgreSQLInterface\PostgreSQLInterface.cpp" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\dump.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\dump.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4701;4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4701;4706</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\error.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\hashtable.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\load.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\hashtable.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4706</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\load.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244;4456</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4244;4456</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\memory.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\pack_unpack.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\strbuffer.c" />
     <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\strconv.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\utf.c" />
-    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\value.c" />
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\utf.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\DependentExtensions\jansson-2.4\src\value.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4706</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">4706</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="..\..\DependentExtensions\Rackspace\Rackspace2.cpp" />
   </ItemGroup>
   <ItemGroup>

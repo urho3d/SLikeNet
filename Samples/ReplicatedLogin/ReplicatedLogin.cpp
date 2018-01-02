@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -32,7 +32,7 @@ RakPeerInterface *rakPeer;
 
 // Purpose: Game object replication
 // Required?: No, but manages object replication automatically. Some form of this is required for almost every game
-ReplicaManager3 *replicaManager3;
+ReplicaManager3 *g_replicaManager3;
 
 // Purpose: Lookup game objects given ID. Used by ReplicaManager3
 // Required?: Required to use ReplicaManager3, and some form of this is required for almost every game
@@ -145,13 +145,13 @@ public:
 
 	static void DeleteUserWithGuid(RakNetGUID guid)
 	{
-		for (unsigned int i=0; i < replicaManager3->GetReplicaCount(); i++)
+		for (unsigned int i=0; i < g_replicaManager3->GetReplicaCount(); i++)
 		{
-			User *u = (User *) replicaManager3->GetReplicaAtIndex(i);
+			User *u = (User *)g_replicaManager3->GetReplicaAtIndex(i);
 			if (u->guid==guid)
 			{
 				u->BroadcastDestruction();
-				replicaManager3->Dereference(u);
+				g_replicaManager3->Dereference(u);
 				delete u;
 				break;
 			}
@@ -224,15 +224,15 @@ int main(void)
 {
 	rakPeer= SLNet::RakPeerInterface::GetInstance();
 	networkIDManager = NetworkIDManager::GetInstance();
-	replicaManager3=new SampleRM3;
+	g_replicaManager3=new SampleRM3;
 
 	// ---------------------------------------------------------------------------------------------------------------------
 	// Attach plugins
 	// ---------------------------------------------------------------------------------------------------------------------
-	rakPeer->AttachPlugin(replicaManager3);
+	rakPeer->AttachPlugin(g_replicaManager3);
 
 	// Tell ReplicaManager3 which networkIDManager to use for object lookup, used for automatic serialization
-	replicaManager3->SetNetworkIDManager(networkIDManager);
+	g_replicaManager3->SetNetworkIDManager(networkIDManager);
 
 	printf("(S)erver or (C)lient?\n");
 	int ch = _getch();
@@ -288,7 +288,7 @@ int serverMain(void)
 					newUser->score=0;
 					newUser->guid=packet->guid;
 					newUser->username = username;
-					replicaManager3->Reference(newUser);
+					g_replicaManager3->Reference(newUser);
 				}
 				break;
 			}

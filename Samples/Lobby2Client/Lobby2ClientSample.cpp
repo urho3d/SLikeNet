@@ -276,7 +276,7 @@ int main()
 						lobby2Client[j].SetServerAddress(packet->systemAddress);
 					if (i==NUM_CONNECTIONS-1)
 					{
-						PrintCommands(&messageFactory);
+						PrintCommands();
 						printf("Enter instance number 1 to %i followed by command number.\n", NUM_CONNECTIONS);
 
 						if (executionPlan.Size())
@@ -341,7 +341,7 @@ int main()
 				if (command <=0 || command > SLNet::L2MID_COUNT)
 				{
 					printf("Invalid message index %i. Commands:\n", command);
-					PrintCommands(&messageFactory);
+					PrintCommands();
 				}
 				else
 				{

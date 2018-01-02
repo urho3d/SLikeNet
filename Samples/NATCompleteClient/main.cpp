@@ -169,7 +169,6 @@ SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *host
 	rakPeer->DeallocatePacket(packet);
 
 	return returnvalue;
-	}
 }
 struct UPNPFramework : public SampleFramework
 {
@@ -903,7 +902,8 @@ int main(void)
 		}
 	}
 
-	for(;;)
+	bool running = true;
+	while(running)
 	{
 		printf("Executing %s\n", samples[(int) currentStage]->QueryName());
 		samples[(int) currentStage]->Init(rakPeer);
@@ -940,8 +940,8 @@ int main(void)
 						printf("Connectivity not possible. Exiting\n");
 						rakPeer->Shutdown(100);
 						SLNet::RakPeerInterface::DestroyInstance(rakPeer);
-						_getch();
-						return 1;
+						running = false;
+						break;
 					}
 					else
 					{
@@ -975,8 +975,8 @@ int main(void)
 						printf("Press enter to quit.\n");
 						char temp[32];
 						Gets(temp,sizeof(temp));
-						_getch();
-						return 1;
+						running = false;
+						break;
 					}
 
 					printf("Proceeding to next stage.\n");
@@ -1006,8 +1006,8 @@ int main(void)
 
 						rakPeer->Shutdown(100);
 						SLNet::RakPeerInterface::DestroyInstance(rakPeer);
-						_getch();
-						return 1;
+						running = false;
+						break;
 					}
 					break;
 				}
@@ -1018,5 +1018,5 @@ int main(void)
 	}
 
 	_getch();
-	return 0;
+	return 1;
 }

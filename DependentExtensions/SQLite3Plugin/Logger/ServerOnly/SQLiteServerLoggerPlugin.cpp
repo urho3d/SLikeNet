@@ -2,7 +2,7 @@
  * This file was taken from RakNet 4.082.
  * Please see licenses/RakNet license.txt for the underlying license and related copyright.
  *
- * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ * Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  * license found in the license.txt file in the root directory of this source tree.
@@ -21,7 +21,14 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4505) // unreferenced local function
+#endif
 #include "DXTCompressor.h"
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include "slikenet/linux_adapter.h"
 
 // http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html
@@ -190,7 +197,7 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 		{
 			SLNet::RakString columnName;
 		//	printf("2. parameterCount=%i, ",outputNode->parameterCount);
-			for (int i=0; i < outputNode->parameterCount; i++)
+			for (int j=0; j < outputNode->parameterCount; j++)
 			{
 				bitStream.Read(columnName);
 				columnName.SQLEscape();
@@ -585,10 +592,9 @@ SQLiteServerLoggerPlugin::SQLThreadOutput ExecSQLLoggingThread(SQLiteServerLogge
 			return sqlThreadOutput;
 		}
 
-		int rc = sqlite3_step(pragmaTableInfo);
+		rc = sqlite3_step(pragmaTableInfo);
 		DataStructures::List<SLNet::RakString> existingColumnNames;
 		DataStructures::List<SLNet::RakString> existingColumnTypes;
-		char *errorMsg;
 		while (rc==SQLITE_ROW)
 		{
 			/*
@@ -854,7 +860,8 @@ void SQLiteServerLoggerPlugin::Update(void)
 				if (dbHandles.GetSize()>0)
 					idx=0;
 				else
-					idx=-1;
+					// #high - use a better approach than this static case here
+					idx=static_cast<unsigned int>(-1);
 			}
 			else
 			{
@@ -1168,7 +1175,8 @@ unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(SLNet::RakString dbIdentif
 	if (sqlite3_open_v2(fileNameWithPath.C_String(), &database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0)!=SQLITE_OK)
 	{
 		RakAssert("sqlite3_open_v2 failed in SQLiteServerLoggerPlugin.cpp" && 0);
-		return -1;
+		// #high - change this - return value to int?
+		return static_cast<unsigned int>(-1);
 	}
 	if (AddDBHandle(dbIdentifier, database, true))
 	{
@@ -1184,12 +1192,10 @@ unsigned int SQLiteServerLoggerPlugin::CreateDBHandle(SLNet::RakString dbIdentif
 		printf("Created %s\n", fileNameWithPath.C_String());
 		return dbHandles.GetIndexOf(dbIdentifier);
 	}
-	else
-	{
-		RakAssert("Failed to call AddDbHandle" && 0);
-		return -1;
-	}
-	return -1;
+
+	RakAssert("Failed to call AddDbHandle" && 0);
+	// #high - change this - return value to int?
+	return static_cast<unsigned int>(-1);
 }
 void SQLiteServerLoggerPlugin::SetSessionManagementMode(SessionManagementMode _sessionManagementMode, bool _createDirectoryForFile, const char *_newDatabaseFilePath)
 {

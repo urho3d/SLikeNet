@@ -19,7 +19,7 @@ Samples:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
 Building:
   General:
-    * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153)
+    * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155)
 
 version 0.1.1 (xx-xx-xxxx xx:xx UTC)
 *** This release satisfies/processes 2 GitHub pull request
@@ -50,6 +50,8 @@ Building:
     * added missing libcat big_x64.o object file (#117)
     * fixed different compiler warnings with VS2015+ (#119)
     * fixed RakNet backwards compatibility and SLikeNet projects sharing the same intermediate directories (#118)
+  Core:
+    * fixed compile error with Windows SDK >= 10.x on 64-bit (with LIBCAT_SECURITY) (#120)
   AutopatcherServer_MySQL:
     * fixed incorrect mysql repository library references for certain configurations (#121)
 

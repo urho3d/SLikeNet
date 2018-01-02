@@ -114,7 +114,7 @@ void CDemo::run()
 	// Hook RakNet stuff into this class
 	playerReplica->playerName= SLNet::RakString(dest);
 	playerReplica->demo=this;
-	replicaManager3->demo=this;
+	irrlichtReplicaManager3->demo=this;
 
 	CalculateSyndeyBoundingBox();
 
@@ -868,7 +868,7 @@ void CDemo::shoot()
 	br->position=camPosition;
 	br->shotDirection=camAt;
 	br->shotLifetime= SLNet::GetTimeMS() + shootFromOrigin(camPosition, camAt);
-	replicaManager3->Reference(br);
+	irrlichtReplicaManager3->Reference(br);
 }
 
 void CDemo::createParticleImpacts()
@@ -1031,7 +1031,7 @@ void CDemo::UpdateRakNet(void)
 				// fullyConnectedMesh2->GetParticipantList(participantList);
 
 				for (unsigned int i=0; i < systemsAccepted.Size(); i++)
-					replicaManager3->PushConnection(replicaManager3->AllocConnection(rakPeer->GetSystemAddressFromGuid(systemsAccepted[i]), systemsAccepted[i]));
+					irrlichtReplicaManager3->PushConnection(irrlichtReplicaManager3->AllocConnection(rakPeer->GetSystemAddressFromGuid(systemsAccepted[i]), systemsAccepted[i]));
 			}
 			break;
 		case ID_CONNECTION_REQUEST_ACCEPTED:
@@ -1178,8 +1178,8 @@ void CDemo::UpdateRakNet(void)
 	if (currentScene>=1)
 	{
 		unsigned int idx;
-		for (idx=0; idx < replicaManager3->GetReplicaCount(); idx++)
-			((BaseIrrlichtReplica*)(replicaManager3->GetReplicaAtIndex(idx)))->Update(curTime);;
+		for (idx=0; idx < irrlichtReplicaManager3->GetReplicaCount(); idx++)
+			((BaseIrrlichtReplica*)(irrlichtReplicaManager3->GetReplicaAtIndex(idx)))->Update(curTime);;
 	}	
 }
 
