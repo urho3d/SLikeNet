@@ -1,4 +1,4 @@
-﻿/* -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
  * See licenses/SWIG library files license.txt for license and copyright information.
  * 
  * Modified work : Copyright(c) 2017, SLikeSoft UG(haftungsbeschränkt)

@@ -1,7 +1,8 @@
+@echo off
+
 REM This file was taken from RakNet 4.082 without any modifications.
 REM Please see licenses/RakNet license.txt for the underlying license and related copyright.
 
-@echo off
 SetLocal EnableDelayedExpansion
 set sourceDir=%1
 CALL :dequote sourceDir
@@ -13,7 +14,7 @@ if "%swigPath%"=="" goto :SKIPADDSLASH
 if "%swigPath:~-1%"=="\" goto :SKIPADDSLASH 
 SET swigPath=%swigPath%\
 :SKIPADDSLASH
-del /F /Q SwigOutput\SwigCSharpOutput\*
+if exist SwigOutput\SwigCSharpOutput del /F /Q SwigOutput\SwigCSharpOutput\*
 set option=%4
 CALL :dequote option
 set dependentDir=%3

@@ -28,6 +28,7 @@ General:
   * dropped optional license requirement to notifiy "Mersenne Twister"-algorithm devs due to lack of valid contact information (#105)
   * several small documentation updates (#105, #112 - SLNET_10)
   * corrected text encoding throughout all files (#116)
+  * several smaller fixes (#105, #156)
 Core:
   RakNetSocket2:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
@@ -54,8 +55,10 @@ Building:
     * fixed RakNet backwards compatibility and SLikeNet projects sharing the same intermediate directories (#118)
   Core:
     * fixed compile error with Windows SDK >= 10.x on 64-bit (with LIBCAT_SECURITY) (#120)
-  AutopatcherServer_MySQL:
+  Autopatcher:
     * fixed incorrect mysql repository library references for certain configurations (#121)
+  CrashReporter:
+    * enabled treating compile warnings as errors in the VS project file (#105)
 
 version 0.1.0 (07-26-2017 21:00 UTC)
 *** This release satisfies/processes 29 complete and 3 partial GitHub pull requests (up to pull request RAKNET_78)
