@@ -1,6 +1,6 @@
 SLikeNet™ 0.1.0
 ===============
-Copyright © 2016-2017 SLikeSoft™ UG (haftungsbeschränkt)
+Copyright © 2016-2018 SLikeSoft™ UG (haftungsbeschränkt)
 
 Part of the documentation in this readme file was taken from RakNet 4.082
 readme files. These sections are marked with [partially copied from RakNet].
@@ -231,7 +231,7 @@ library, we consider already these early versions way more stable than what you
 would normally excpect from a library with such a version number.
 Furthermore, since our aim for SLikeNet 1.0.0 is to keep ABI/API/Protocol
 compaitibilty with RakNet 4.081/4.082, we consider the API/ABI/Protocol of the
-0.x.y releases already stable and do planto change them only in order to fix
+0.x.y releases already stable and do plan to change them only in order to fix
 (undesired/unintended) API/ABI/Protocol incompatibility with RakNet which might
 have slipped in during development.
 Hence, in contrast to what the Semantic Versioning 2.0.0 permits, we are

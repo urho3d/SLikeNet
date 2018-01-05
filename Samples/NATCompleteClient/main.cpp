@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -691,9 +691,9 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)targetGuid;
-		(void)sourceAddress;
 		(void)proxyCoordinator;
+		(void)sourceAddress;
+		(void)targetGuid;
 
 		printf("Datagrams forwarded by proxy %s:%i to target %s.\n", proxyIPAddress, proxyPort, targetAddress.ToString(false));
 		printf("Connecting to proxy, which will be received by target.\n");
@@ -704,10 +704,10 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 		SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
 		(void)proxyCoordinator;
+		(void)targetAddress;
+		(void)targetGuid;
+		(void)proxyClientPlugin;
 
 		printf("Source %s has setup forwarding to us through proxy %s:%i.\n", sourceAddress.ToString(false), proxyIPAddress, proxyPort);
 
@@ -716,11 +716,11 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnNoServersOnline(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
 		(void)proxyCoordinator;
+		(void)sourceAddress;
+		(void)targetAddress;
+		(void)targetGuid;
+		(void)proxyClientPlugin;
 
 		printf("Failure: No servers logged into coordinator.\n");
 		sampleResult=FAILED;
@@ -728,11 +728,11 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnRecipientNotConnected(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
 		(void)proxyCoordinator;
+		(void)sourceAddress;
+		(void)targetAddress;
+		(void)targetGuid;
+		(void)proxyClientPlugin;
 
 		printf("Failure: Recipient not connected to coordinator.\n");
 		sampleResult=FAILED;
@@ -740,11 +740,11 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnAllServersBusy(SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
 		(void)proxyCoordinator;
+		(void)sourceAddress;
+		(void)targetAddress;
+		(void)targetGuid;
+		(void)proxyClientPlugin;
 
 		printf("Failure: No servers have available forwarding ports.\n");
 		sampleResult=FAILED;
@@ -752,13 +752,13 @@ struct UDPProxyClientFramework : public SampleFramework, public UDPProxyClientRe
 	virtual void OnForwardingInProgress(const char *proxyIPAddress, unsigned short proxyPort, SystemAddress proxyCoordinator, SystemAddress sourceAddress, SystemAddress targetAddress, RakNetGUID targetGuid, SLNet::UDPProxyClient *proxyClientPlugin)
 	{
 		// unused parameters
-		(void)proxyClientPlugin;
-		(void)targetGuid;
-		(void)targetAddress;
-		(void)sourceAddress;
-		(void)proxyCoordinator;
-		(void)proxyPort;
 		(void)proxyIPAddress;
+		(void)proxyPort;
+		(void)proxyCoordinator;
+		(void)sourceAddress;
+		(void)targetAddress;
+		(void)targetGuid;
+		(void)proxyClientPlugin;
 
 		printf("Notification: Forwarding already in progress.\n");
 	}

@@ -45,6 +45,7 @@ struct CloudServerHelper
 {
 	char *serverToServerPassword;
 	unsigned short rakPeerPort;
+	// #med - consider changing to (unsigned?) int
 	unsigned short allowedIncomingConnections;
 	unsigned short allowedOutgoingConnections;
 

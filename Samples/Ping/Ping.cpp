@@ -107,7 +107,7 @@ int main(void)
 		if (_kbhit())
 		{
 			// Holds user data
-			char ip[64], serverPort[30], clientPort[30];
+			char ip[64], serverPort[30];
 
 			if (Gets(buff,sizeof(buff))&&(buff[0]=='q'))
 				break;
@@ -115,10 +115,6 @@ int main(void)
 			{
 
 				// Get our input
-				puts("Enter the client port to listen on, or 0");
-				Gets(clientPort,sizeof(clientPort));
-				if (clientPort[0]==0)
-					strcpy_s(clientPort, "0");
 				puts("Enter IP to ping");
 				Gets(ip, sizeof(ip));
 				if (ip[0]==0)

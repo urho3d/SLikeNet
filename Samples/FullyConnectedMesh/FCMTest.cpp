@@ -27,7 +27,7 @@
 #include "slikenet/Kbhit.h"
 #include "slikenet/sleep.h"
 
-static const int NUM_PEERS=8;
+static const unsigned short NUM_PEERS=8;
 SLNet::RakPeerInterface *rakPeer[NUM_PEERS];
 SLNet::FullyConnectedMesh2 fullyConnectedMeshPlugin[NUM_PEERS];
 SLNet::ConnectionGraph2 connectionGraphPlugin[NUM_PEERS];

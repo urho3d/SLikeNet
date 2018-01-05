@@ -466,7 +466,7 @@ int main(void)
 	SLNet::SocketDescriptor sd;
 	sd.socketFamily=AF_INET; // Only IPV4 supports broadcast on 255.255.255.255
 	char ip[128];
-	static const int SERVER_PORT=12345;
+	static const unsigned short SERVER_PORT=12345;
 
 
 	// ReplicaManager3 requires NetworkIDManager to lookup pointers from numbers.
