@@ -428,7 +428,7 @@ support for these platforms, please contact us (see chapter 6).
 
 2.2 Compiler support
    Microsoft Visual Studio™: 2010 SP1, 2012 Update 1, 2013 Update 5, 2015
-                             Update 3, 2017 15.2 (26430.16)
+                             Update 3, 2017 15.4.1
    GNU Compiler Collection: 4.6.4, 4.7.4, 4.8.5, 4.9.3, 5.4.0
    Xcode: 7.3.1 (limited support for 3.0+ with OSXSDK 10.5+)
    CMake®: 2.6.4 2.8.12.2, 3.0.2, 3.1.3, 3.2.3, 3.3.2, 3.4.3, 3.5.2, 3.6.3,
