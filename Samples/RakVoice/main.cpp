@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <limits> // used for std::numeric_limits
 #include "portaudio.h"
 #include "slikenet/Kbhit.h"
 #include "slikenet/peerinterface.h"
@@ -96,7 +97,7 @@ int main(void)
 	mute=false;
 
 	bool quit;
-	char ch;
+	int ch;
 
 	printf("A sample on how to use RakVoice. You need a microphone for this sample.\n");
 	printf("RakVoice relies on Speex for voice encoding and decoding.\n");
@@ -115,7 +116,12 @@ int main(void)
 	Gets(port, sizeof(port));
 	if (port[0]==0)
 		strcpy_s(port, "60000");
-	SLNet::SocketDescriptor socketDescriptor(atoi(port),0);
+	const int intLocalPort = atoi(port);
+	if ((intLocalPort < 0) || (intLocalPort > std::numeric_limits<unsigned short>::max())) {
+		printf("Specified local port %d is outside valid bounds [0, %u]", intLocalPort, std::numeric_limits<unsigned short>::max());
+		return 1;
+	}
+	SLNet::SocketDescriptor socketDescriptor(static_cast<unsigned short>(intLocalPort), 0);
 	rakPeer->Startup(4, &socketDescriptor, 1);
 	rakPeer->SetMaximumIncomingConnections(4);
 	rakPeer->AttachPlugin(&rakVoice);
@@ -218,7 +224,12 @@ int main(void)
 					Gets(port, sizeof(port));
 					if (port[0]==0)
 						strcpy_s(port, "60000");
-					rakPeer->Connect(ip, atoi(port), 0,0);
+					const int intRemotePort = atoi(port);
+					if ((intRemotePort < 0) || (intRemotePort > std::numeric_limits<unsigned short>::max())) {
+						printf("Specified remote port %d is outside valid bounds [0, %u]", intRemotePort, std::numeric_limits<unsigned short>::max());
+						return 2;
+					}
+					rakPeer->Connect(ip, static_cast<unsigned short>(intRemotePort), 0,0);
 
 				}
 			}

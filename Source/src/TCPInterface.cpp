@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -314,6 +314,13 @@ void TCPInterface::Stop(void)
 	SLNet::OP_DELETE_ARRAY(remoteClients,_FILE_AND_LINE_);
 	remoteClients=0;
 
+	// #low review whether we'd rather use PopInaccurate() here (i.e. check whether related threads accessing the queue terminated already)
+	// consider even adding a dtor to Packet which would then clear its data (at this point drop this explicit packet deallocation here)
+	SLNet::Packet* packet = incomingMessages.Pop();
+	while (packet != nullptr) {
+		DeallocatePacket(packet);
+		packet = incomingMessages.Pop();
+	}
 	incomingMessages.Clear(_FILE_AND_LINE_);
 	newIncomingConnections.Clear(_FILE_AND_LINE_);
 	newRemoteClients.Clear(_FILE_AND_LINE_);

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -128,9 +128,7 @@ int main(void)
 	fopen_s(&fp,"publicKey.dat","rb");
 	fread(public_key,sizeof(public_key),1,fp);
 	fclose(fp);
-#endif
 
-#if LIBCAT_SECURITY==1
 	SLNet::PublicKey pk;
 	pk.remoteServerPublicKey=public_key;
 	pk.publicKeyMode= SLNet::PKM_USE_KNOWN_PUBLIC_KEY;

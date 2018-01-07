@@ -19,7 +19,7 @@ Samples:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
 Building:
   General:
-    * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155)
+    * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
 
 version 0.1.1 (xx-xx-xxxx xx:xx UTC)
 *** This release satisfies/processes 2 GitHub pull request
@@ -34,6 +34,8 @@ Core:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
   SocketLayer:
     * fixed certain error messages producing garbled output in unicode configurations (#119)
+  TCPInterface:
+    * fixed memory leak upon stopping TCP servers (#125)
 Extensions:
   Autopatcher:
     * fixed crash/undefined behavior upon file read error in postgreSQL-based Autopatcher (#143)
