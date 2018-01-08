@@ -76,6 +76,7 @@ Table of Contents
    3.5.1   General notes
    3.5.2   Retail configuration
    3.5.3   OSX usage of @rpath for install_name
+   3.5.4   CMake install destinations for non-Windows platforms
    4.      Dependent Extensions
    4.1     AutopatcherMySQLRepository
    4.2     AutopatcherPostgreRepository
@@ -991,6 +992,14 @@ See the CMake documentation regarding MACOSX_RPATH for further details.
 Since this property was introduced in CMake 2.8.18 building SLikeNet with CMake
 2.6.4 will not use this property and instead set the "install_name" field to an
 absolute path like RakNet did.
+
+3.5.4 CMake install destinations for non-Windows platforms
+RakNet used to install its libs/headers into the source directory rather than
+lib/include destinations commonly used on Linux/OSX platforms. Since this
+prevented straight forward usage of the library on these platforms, it was
+changed in SLikeNet 0.2.0. As of this version, running 'make install' will
+install the lib/header files in the usual locations which are configurable via
+the CMAKE_INSTALL_PREFIX variable.
 
 
 
