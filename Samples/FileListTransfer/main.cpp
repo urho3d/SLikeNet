@@ -45,7 +45,7 @@ public:
 	bool OnFile(
 		OnFileStruct *onFileStruct)
 	{
-		printf("OnFile: %i. (100%%) %i/%i %s %ib / %ib\n",
+		printf("OnFile: %u. (100%%) %u/%u %s %ub / %ub\n",
 			onFileStruct->setID,
 			onFileStruct->fileIndex+1,
 			onFileStruct->numberOfFilesInThisSet,
@@ -75,9 +75,9 @@ public:
 
 	virtual void OnFileProgress(FileProgressStruct *fps)
 	{
-		printf("OnFileProgress: %i partCount=%i partTotal=%i (%i%%) %i/%i %s %ib/%ib %ib/%ib total\n",
+		printf("OnFileProgress: %u partCount=%u partTotal=%u (%u%%) %u/%u %s %ub/%ub %ub/%ub total\n",
 			fps->onFileStruct->setID,
-			fps->partCount, fps->partTotal, (int) (100.0*(double)fps->onFileStruct->bytesDownloadedForThisFile/(double)fps->onFileStruct->byteLengthOfThisFile),
+			fps->partCount, fps->partTotal, (unsigned int) (100.0*(double)fps->onFileStruct->bytesDownloadedForThisFile/(double)fps->onFileStruct->byteLengthOfThisFile),
 			fps->onFileStruct->fileIndex+1,
 			fps->onFileStruct->numberOfFilesInThisSet,
 			fps->onFileStruct->fileName,
@@ -111,7 +111,7 @@ class TestFileListProgress : public SLNet::FileListProgress
 		(void)targetSystem;
 		(void)setID;
 
-		printf("Sending %s bytes=%i offset=%i\n", fileName, bytesBeingSent, offset);
+		printf("Sending %s bytes=%u offset=%u\n", fileName, bytesBeingSent, offset);
 	}
 
     virtual void OnFilePushesComplete(SLNet::SystemAddress systemAddress, unsigned short setID )

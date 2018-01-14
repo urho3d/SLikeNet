@@ -77,6 +77,8 @@ Table of Contents
    3.5.2   Retail configuration
    3.5.3   OSX usage of @rpath for install_name
    3.5.4   CMake install destinations for non-Windows platforms
+   3.6     Configuring SLikeNet
+   3.6.1   Security relevant settings
    4.      Dependent Extensions
    4.1     AutopatcherMySQLRepository
    4.2     AutopatcherPostgreRepository
@@ -1000,6 +1002,28 @@ prevented straight forward usage of the library on these platforms, it was
 changed in SLikeNet 0.2.0. As of this version, running 'make install' will
 install the lib/header files in the usual locations which are configurable via
 the CMAKE_INSTALL_PREFIX variable.
+
+3.6 Configuring SLikeNet
+
+SLikeNet uses macros to control certain settings. The overview of the available
+settings can be found in the accompanying Doxygen generated documentation
+(refer to the documentation regarding defines.h and NativeFeatureIncludes.h).
+These "settings" can be redefined in the corresponding override-headers
+(definesoverrides.h / NativeFeatureIncludeOverrides.h).
+
+3.6.1 Security relevant settings
+
+When using SLikeNet to transfer files between peers (f.e. via the AutoPatcher
+or directly via FileListTransfer), SLikeNet allocates a single memory chunk to
+retrieve the incoming file. For rather large files (up to 4 GiB), this can
+trigger crashes (due to running out of memory) especially on 32-bit targets or
+on Windows the receiving peer becoming unresponsive (due to falling back to
+using page files).
+
+To mitigate these cases, it's *strongly* suggested to redefine
+SLNET_MAX_RETRIEVABLE_FILESIZE to a reasonable value for your application. In
+principle a lower setting is always preferred. So if you know that you never
+transmit files > 20 MiB over the wire, you'd define the macro to 20971520.
 
 
 
