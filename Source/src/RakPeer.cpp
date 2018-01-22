@@ -1092,8 +1092,6 @@ void RakPeer::Shutdown( unsigned int blockDuration, unsigned char orderingChanne
 		pluginListNTS[i]->OnRakPeerShutdown();
 	}
 
-	activeSystemListSize=0;
-
 	quitAndDataEvents.SetEvent();
 
 	endThreads = true;
@@ -1122,9 +1120,10 @@ void RakPeer::Shutdown( unsigned int blockDuration, unsigned char orderingChanne
 
 	while ( isMainLoopThreadActive )
 	{
-		endThreads = true;
 		RakSleep(15);
 	}
+
+	activeSystemListSize = 0;
 
 	/*
 	timeout = SLNet::GetTimeMS()+1000;
@@ -5853,7 +5852,11 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 				}
 			}
 
-			remoteSystem->reliabilityLayer.Update( remoteSystem->rakNetSocket, systemAddress, remoteSystem->MTUSize, timeNS, maxOutgoingBPS, pluginListNTS, &rnr, updateBitStream ); // systemAddress only used for the internet simulator test
+			if (endThreads)
+				// for the final call, make sure we send out any outstanding ACKs
+				remoteSystem->reliabilityLayer.UpdateAndForceACKs( remoteSystem->rakNetSocket, systemAddress, remoteSystem->MTUSize, timeNS, maxOutgoingBPS, pluginListNTS, &rnr, updateBitStream ); // systemAddress only used for the internet simulator test
+			else
+				remoteSystem->reliabilityLayer.Update( remoteSystem->rakNetSocket, systemAddress, remoteSystem->MTUSize, timeNS, maxOutgoingBPS, pluginListNTS, &rnr, updateBitStream ); // systemAddress only used for the internet simulator test
 
 			// Check for failure conditions
 			if ( remoteSystem->reliabilityLayer.IsDeadConnection() ||
@@ -5901,6 +5904,10 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 #ifdef _DO_PRINTF
 				RAKNET_DEBUG_PRINTF("Connection dropped for player %i:%i\n", systemAddress);
 #endif
+				// we are about to close the connection to the remote system, we'd still make sure to send any outstanding ACKs, so for the remote system not unnecessarily waiting for these until its timeout
+				// (and trying to resend them unnecessarily)
+				remoteSystem->reliabilityLayer.UpdateAndForceACKs(remoteSystem->rakNetSocket, systemAddress, remoteSystem->MTUSize, timeNS, maxOutgoingBPS, pluginListNTS, &rnr, updateBitStream);
+
 				CloseConnectionInternal( systemAddress, false, true, 0, LOW_PRIORITY );
 				continue;
 			}
@@ -6326,8 +6333,14 @@ RAK_THREAD_DECLARATION(SLNet::UpdateNetworkLoop)
 // 
 	rakPeer->isMainLoopThreadActive = true;
 
-	while ( rakPeer->endThreads == false )
+	bool running = true;
+	while ( running )
 	{
+		if (rakPeer->endThreads) {
+			// allow just one more final update-run prior to shutting down this thread to make sure that outstanding acks are still sent and the peers don't unnecessary wait for already retrieved packets
+			// note: this fixes part of SLNET-123
+			running = false;
+		}
 // #ifdef _DEBUG
 // 		// Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time
 // 		RakNetTime thisCall=SLNet::GetTime();

@@ -1685,7 +1685,24 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 							  DataStructures::List<PluginInterface2*> &messageHandlerList,
 							  RakNetRandom *rnr,
 							  BitStream &updateBitStream)
+{
+	UpdateInternal(s, systemAddress, MTUSize, time, bitsPerSecondLimit, messageHandlerList, rnr, updateBitStream, false);
+}
 
+void ReliabilityLayer::UpdateAndForceACKs( RakNetSocket2 *s, SystemAddress &systemAddress, int MTUSize, CCTimeType time,
+							  unsigned bitsPerSecondLimit,
+							  DataStructures::List<PluginInterface2*> &messageHandlerList,
+							  RakNetRandom *rnr,
+							  BitStream &updateBitStream)
+{
+	UpdateInternal(s, systemAddress, MTUSize, time, bitsPerSecondLimit, messageHandlerList, rnr, updateBitStream, true);
+}
+
+void ReliabilityLayer::UpdateInternal( RakNetSocket2 *s, SystemAddress &systemAddress, int MTUSize, CCTimeType time,
+							  unsigned bitsPerSecondLimit,
+							  DataStructures::List<PluginInterface2*> &messageHandlerList,
+							  RakNetRandom *rnr,
+							  BitStream &updateBitStream, bool forceSendACKs)
 {
 	(void) MTUSize;
 
@@ -1721,7 +1738,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 #endif
 
 	// This line is necessary because the timer isn't accurate
-	if (time <= lastUpdateTime)
+	if ((!forceSendACKs) && (time <= lastUpdateTime))
 	{
 		// Always set the last time in case of overflow
 		lastUpdateTime=time;
@@ -1800,7 +1817,7 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 		return;
 	}
 
-	if (congestionManager.ShouldSendACKs(time,timeSinceLastTick))
+	if (forceSendACKs || congestionManager.ShouldSendACKs(time,timeSinceLastTick))
 	{
 		SendACKs(s, systemAddress, time, rnr, updateBitStream);
 	}

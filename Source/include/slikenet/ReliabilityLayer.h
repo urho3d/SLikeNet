@@ -182,7 +182,15 @@ public:
 	void Update( RakNetSocket2 *s, SystemAddress &systemAddress, int MTUSize, CCTimeType time,
 		unsigned bitsPerSecondLimit,
 		DataStructures::List<PluginInterface2*> &messageHandlerList,
-		RakNetRandom *rnr, BitStream &updateBitStream);
+		RakNetRandom *rnr, BitStream &updateBitStream );
+
+	// #med 0.2.0 - review whether we'd rather have this defined as a private method and declare RakPeer a friend of ReliabilityLayer
+	/// @since 0.2.0: added
+	/// Same as \see Update() except that outstanding ACKs are ensured to be sent.
+	void UpdateAndForceACKs( RakNetSocket2 *s, SystemAddress &systemAddress, int MTUSize, CCTimeType time,
+		unsigned bitsPerSecondLimit,
+		DataStructures::List<PluginInterface2*> &messageHandlerList,
+		RakNetRandom *rnr, BitStream &updateBitStream );
 	
 	/// Were you ever unable to deliver a packet despite retries?
 	/// \return true means the connection has been lost.  Otherwise not.
@@ -314,6 +322,10 @@ private:
 	// Make it so we don't do resends within a minimum threshold of time
 	void UpdateNextActionTime(void);
 
+	void UpdateInternal( RakNetSocket2 *s, SystemAddress &systemAddress, int MTUSize, CCTimeType time,
+		unsigned bitsPerSecondLimit,
+		DataStructures::List<PluginInterface2*> &messageHandlerList,
+		RakNetRandom *rnr, BitStream &updateBitStream, bool forceSendACKs );
 
 	/// Does this packet number represent a packet that was skipped (out of order?)
 	//unsigned int IsReceivedPacketHole(unsigned int input, SLNet::TimeMS currentTime) const;
