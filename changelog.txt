@@ -34,6 +34,7 @@ version 0.1.1 (xx-xx-xxxx xx:xx UTC)
 *** This release satisfies/processes 3 complete and 3 partial GitHub pull requests/issues
 General:
   * several smaller changes, fixes, and code cleanup (#105, #156, #165 - RAKNET_29)
+  * added new chapter about configuring SLikeNet (#105)
   * changed GitHub pull request markers to support pull requests from different GitHub forks (#105)
   * dropped optional license requirement to notifiy "Mersenne Twister"-algorithm devs due to lack of valid contact information (#105)
   * corrected text encoding throughout all files (#116)
@@ -81,6 +82,8 @@ Building:
     * fixed incorrect mysql repository library references for certain configurations (#121)
   CrashReporter:
     * enabled treating compile warnings as errors in the VS project file (#105)
+  NAT Punchthrough:
+    * fixed server sample not building via CMake projects (#172)
 
 version 0.1.0 (07-26-2017 21:00 UTC)
 *** This release satisfies/processes 29 complete and 3 partial GitHub pull requests (up to pull request RAKNET_78)
