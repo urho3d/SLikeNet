@@ -31,6 +31,8 @@
 #include "slikenet/UDPProxyClient.h"
 #include "slikenet/Gets.h"
 #include "slikenet/Itoa.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // To include miniupnp, see Samples\NATCompleteClient\readme.txt
 #include "miniupnpc.h"

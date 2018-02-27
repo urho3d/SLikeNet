@@ -2608,7 +2608,7 @@ const char* RakPeer::GetLocalIP( unsigned int index )
 
 
 	static char str[128];
-	ipList[index].ToString(false,str,128);
+	ipList[index].ToString(false,str,static_cast<size_t>(128));
 	return str;
 
 
@@ -3649,7 +3649,7 @@ RakPeer::RemoteSystemStruct * RakPeer::AssignSystemAddressToRemoteSystemList( co
 			else
 			{
 				char str[256];
-				bindingAddress.ToString(true,str,256);
+				bindingAddress.ToString(true,str,static_cast<size_t>(256));
 				// See if this is an internal IP address.
 				// If so, force binding on it so we reply on the same IP address as they sent to.
 				unsigned int ipListIndex, foundIndex=(unsigned int)-1;
@@ -4541,7 +4541,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 
 	char str1[64];
-	systemAddress.ToString(false, str1,64);
+	systemAddress.ToString(false, str1,static_cast<size_t>(64));
 	if (rakPeer->IsBanned( str1 ))
 	{
 		for (i=0; i < rakPeer->pluginListNTS.Size(); i++)
@@ -5745,7 +5745,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 					bitStream.PadWithZeroToByteLength(mtuSizes[MTUSizeIndex]-UDP_HEADER_SIZE);
 
 					char str[256];
-					rcs->systemAddress.ToString(true,str,256);
+					rcs->systemAddress.ToString(true,str,static_cast<size_t>(256));
 
 					//RAKNET_DEBUG_PRINTF("%i:IOCR, ", __LINE__);
 
@@ -5959,7 +5959,7 @@ bool RakPeer::RunUpdateCycle(BitStream &updateBitStream )
 #endif
 
 						char str1[64];
-						systemAddress.ToString(false, str1, 64);
+						systemAddress.ToString(false, str1, static_cast<size_t>(64));
 						AddToBanList(str1, remoteSystem->reliabilityLayer.GetTimeoutTime());
 
 

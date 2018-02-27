@@ -375,7 +375,7 @@ SystemAddress TCPInterface::Connect(const char* host, unsigned short remotePort,
 		systemAddress.SetPortHostOrder(remotePort);
 		systemAddress.systemIndex=(SystemIndex) newRemoteClientIndex;
 		char buffout[128];
-		systemAddress.ToString(false,buffout,128);
+		systemAddress.ToString(false,buffout, static_cast<size_t>(128));
 
 		__TCPSOCKET__ sockfd = SocketConnect(buffout, remotePort, socketFamily, bindAddress);
 		// Windows RT TODO
@@ -929,7 +929,7 @@ RAK_THREAD_DECLARATION(SLNet::ConnectionAttemptLoop)
 	SLNet::OP_DELETE(s, _FILE_AND_LINE_);
 
 	char str1[64];
-	systemAddress.ToString(false, str1, 64);
+	systemAddress.ToString(false, str1, static_cast<size_t>(64));
 	__TCPSOCKET__ sockfd = tcpInterface->SocketConnect(str1, systemAddress.GetPort(), socketFamily, s->bindAddress);
 	if (sockfd==0)
 	{

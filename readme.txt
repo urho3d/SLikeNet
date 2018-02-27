@@ -25,7 +25,7 @@ Table of Contents
    1.2.6   Client / Server compatibility
    1.2.7   API deprecation and dropping support for 3rd party versions
    1.3     Changes between RakNet (4.081/4.082) and SLikeNet
-   2.      System/Depedency requirements
+   2.      System/Dependency requirements
    2.1     Limitations on supported OSs, build environments, and 3rd party
            libraries
    2.2     Compiler support
@@ -76,7 +76,8 @@ Table of Contents
    3.5.1   General notes
    3.5.2   Retail configuration
    3.5.3   OSX usage of @rpath for install_name
-   3.5.4   CMake install destinations for non-Windows platforms
+   3.5.4   PacketLogger FormatLine() changes
+   3.5.5   CMake install destinations for non-Windows platforms
    3.6     Configuring SLikeNet
    3.6.1   Security relevant settings
    4.      Dependent Extensions
@@ -163,8 +164,9 @@ Table of Contents
    7.2.13   (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake,
             FindPkgMacros.cmake, PreprocessorUtils.cmake
    7.2.14   (Samples/Ogre3D related) BspCollision.cpp
-   8.       Thanks / Acknowledgements
-   9.       Trademark Notes / Affiliation Statement
+   8.       Donations
+   9.       Thanks / Acknowledgments
+   10.      Trademark Notes / Affiliation Statement
 
 
 
@@ -369,13 +371,13 @@ The following list presents the known restrictions:
 
 
 
-2. System/Depedency requirements
+2. System/Dependency requirements
 
 2.1 Limitations on supported OSs, build environments, and 3rd party libraries
 SLikeNet supports a brought variety of different compilers, OSs, build tools,
 and 3rd part libraries.
 We are aiming to provide a stable environment for our users to have SLikeNet
-build with the supported compilers/build tools/3rd party librares and run on
+build with the supported compilers/build tools/3rd party libraries and run on
 all the supported OSs.
 Obviously it's unfeasible to test each release with all possible combinations
 of compilers(-versions), on all OSs, and with all versions of the 3rd party
@@ -406,7 +408,7 @@ with a compiler version, 3rd party library version or OS version which is not
 listed here. It simply means that we haven't tested that combination and you
 might run into issues or warnings might show up during the build. SLikeNet
 however might still work just fine.
-If your prefered (build) environment is not listed here and you'd like to get
+If your preferred (build) environment is not listed here and you'd like to get
 full support for it, please contact us (see chapter 6) so we can see whether we
 can add full support for your combination.
 If a compiler/OS/3rd party is listed as supported, we are considering any issue
@@ -511,7 +513,7 @@ of the license file.
 
 2.4.5 Irrlicht Engine
    Description: The Irrlicht Engine is an open source high performance realtime
-                3D engine wirtten in C++.
+                3D engine written in C++.
    URL: http://irrlicht.sourceforge.net/
    Supported versions: 1.8.4 (some binary files bundled)
    Dependencies:
@@ -605,7 +607,7 @@ of the license file.
    Supported versions: 2.2 (bundled)
    Used in:
       - DXTCompressor (see 4.4)
-   License: NVIDIA licese
+   License: NVIDIA license
    License file(s): licenses/NVIDIA Cg Toolkit.txt
 
 2.4.13 NVIDIA Compress YCoCg-DXT
@@ -631,7 +633,7 @@ of the license file.
    Description: OGRE (Object-Oriented Graphics Rendering Engine) is a
                 scene-oriented, flexible 3D engine written in C++ designed to
                 make it easier and more intuitive for developers to produce
-                games and demos utilising 3D harware.
+                games and demos utilizing 3D hardware.
    URL: http://www.ogre3d.org/
    Supported versions: 1.7.4
    Dependencies:
@@ -785,9 +787,9 @@ for SLikeNet.
 Since the packages are however quite large, we also provide the source packages
 which contain the complete package (including source code and documentation)
 except for the large prebuild libraries.
-ZIP and RAR archives are containing the source cource code and text files with
-Windows line endings while the TAR.GZ archive contains the files with Linux
-line endings.
+ZIP and RAR archives are containing the source code and text files with Windows
+line endings while the TAR.GZ archive contains the files with Linux line
+endings.
 
 3.1.1.1 Verifying the file integrity
 The used RAR, TAR.GZ, and ZIP archives have built-in checksums to verify the
@@ -841,7 +843,7 @@ the Visual Studio IDE.
    chapter 3.2.3)
 
 That's all you need to get started using SLikeNet. No additional steps are
-requried. You won't even have to compile SLikeNet yourself.
+required. You won't even have to compile SLikeNet yourself.
 
 3.2.2 Building SLikeNet yourself with Microsoft Visual Studio
 If you need a special configuration which we don't provide or if you simply
@@ -872,7 +874,7 @@ yourself. The prebuilt libraries are located under
 VS_2010 corresponds to the Visual Studio version the contained libraries have
 been built with/for.
 The naming scheme follows the following pattern:
-SLikeNet libraries: SLikNet(_DLL)_[Debug|Release|Retail]( - Unicode)_[core|ext]_[Win32|x64]
+SLikeNet libraries: SLikeNet(_DLL)_[Debug|Release|Retail]( - Unicode)_[core|ext]_[Win32|x64]
 RakNet compatibility libraries RakNet(_DLL)_[Debug|Release|Retail]_[core|ext]_[Win32|x64]
 
 _DLL indicates the library is built as a dynamic link library. The absence of
@@ -988,14 +990,22 @@ configurations, you'd use the retail configuration for the dynamic library and
 the release configuration in case of a static library.
 
 3.5.3 OSX usage of @rpath for install_name
-SLikeNet uses the @rpath for the directory portion of the "install_name" field
-of shared libraries, if CMake >= 2.8.18 is used.
+SLikeNet uses @rpath for the directory portion of the "install_name" field of
+shared libraries, if CMake >= 2.8.18 is used.
 See the CMake documentation regarding MACOSX_RPATH for further details.
 Since this property was introduced in CMake 2.8.18 building SLikeNet with CMake
 2.6.4 will not use this property and instead set the "install_name" field to an
 absolute path like RakNet did.
 
-3.5.4 CMake install destinations for non-Windows platforms
+3.5.4 PacketLogger FormatLine() changes
+For security improvements SLikeNet introduces two overloads of the virtual
+PacketLogger::FormatLine() method which take an additional size parameter for
+the output buffer. Internally only these new overloads are called. If you
+overwrote the implementation of the FormatLine() method and relied on this
+being used/called from the library, you will have to adjust your overwrote to
+overwrite the new variants instead.
+
+3.5.5 CMake install destinations for non-Windows platforms
 RakNet used to install its libs/headers into the source directory rather than
 lib/include destinations commonly used on Linux/OSX platforms. Since this
 prevented straight forward usage of the library on these platforms, it was
@@ -1181,7 +1191,7 @@ extensions:
    Description: Demonstrates how to lag a client in the past using the
                 interpolation history class in order to get smooth visuals
                 despite the choppy input.
-   Depdendencies:
+   Dependencies:
       - Boost (see 2.4.1)
       - Ogre3D (see 2.4.14)
    Notes:
@@ -1820,9 +1830,9 @@ their associated licenses.
 If you are distributing the SLikeNet source, we also explicitly permit you to
 rename (and move) the license.txt file to a different location within the
 package without having to update all the references to the location of the
-license.txt file, as long as you make it clear in any acoompanying
-documentation where to locate the license terms and clarify that the sourcecode
-references outdated locations.
+license.txt file, as long as you make it clear in any accompanying
+documentation where to locate the license terms and clarify that the source
+code references outdated locations.
 
 In cases where SLikeNet contains modifications to 3rd-party code/libraries, we
 provide the modifications under the 3rd-party code's/libraries' own license in
@@ -1974,13 +1984,13 @@ is provided completely free without an explicit license requirement.
 
 
 
-8. Thanks / Acknowledgements
+8. Thanks / Acknowledgments
 
 First of all we'd like to thank Kevin Jenkins for his year long work on RakNet.
 Without his work SLikeNet wouldn't have seen the light of day at all.
 Second, we'd like to thank Oculus VR, LLC. which put the RakNet source code
 under the Simplified BSD License. Without having done that, it would have been
-impossible for us to continue the effort wich went into the RakNet library.
+impossible for us to continue the effort which went into the RakNet library.
 
 Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
@@ -2000,14 +2010,14 @@ We'd also like to thank those contributors who have requested to remain
 anonymous and/or those who we could not contact at all (due to lack of contact
 information).
 If you spot your contribution in our library and haven't been mentioned in the
-acknowledgement section, simply send us a mail and we'll update the section as
+acknowledgment section, simply send us a mail and we'll update the section as
 soon as possible.
 
 Last but not least, we also acknowledge all the work of the developers and
 companies related to incorporated/depending 3rd-party libraries (see chapter
 2.4) and code snippets (see chapter 7.2).
 
-To comply with the license requirements, we further list these acknowledgement
+To comply with the license requirements, we further list these acknowledgment
 statements:
 This product includes software developed by the OpenSSL Project for use in the
 OpenSSL Toolkit. (http://www.openssl.org/)
@@ -2016,6 +2026,21 @@ This product includes cryptographic software written by Eric Young
 This product includes software written by Tim Hudson (tjh@cryptsoft.com)
 this software is based in part on the work of the Independent JPEG Group
 This software contains source code provided by NVIDIA Corporation.
+
+
+
+8. Donations
+
+We provide SLikeNet completely free of charge and fully rely on donations.
+
+If you are happy with the library and want to support its further development,
+we would appreciate a donation so we can at least to some degree cover the
+running costs.
+
+To make a donation, head over to the donation page on our webpage at
+https://www.slikesoft.com/?page_id=1437&lang=en which provides additional
+details on benefits for donors and transparency on how we spend the money on
+the project.
 
 
 

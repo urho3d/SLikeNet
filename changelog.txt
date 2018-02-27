@@ -40,6 +40,8 @@ General:
   * corrected text encoding throughout all files (#116)
   * several small documentation updates (#105, #112 - SLNET_10, #168)
 Core:
+  General:
+    * fixed several cases of API/ABI breakage with RakNet 4.081/4.082 (#175)
   FileListTransfer:
     * provide compile time setting to limit the max file size for retrieving files (#168 - SLNET_19)
   RakNetSocket2:
@@ -55,6 +57,7 @@ Extensions:
     * fixed crash/undefined behavior upon file read error in postgreSQL-based Autopatcher (#143)
   Lobby2:
     * fixed Clans_GetMemberProperties::clanMemberState not being populated (#141)
+    * fixed API/ABI breakage of ProfanityFilter::FilterProfanity() with RakNet 4.081/4.082 (#175)
 Samples:
   ComprehensiveTest:
     * fixed very rare occasional crash (#148)
@@ -84,6 +87,9 @@ Building:
     * enabled treating compile warnings as errors in the VS project file (#105)
   NAT Punchthrough:
     * fixed server sample not building via CMake projects (#172)
+    * fixed client sample compile errors on Linux/OSX (#174)
+  Router2:
+    * fixed compile errors on OSX (#174)
 
 version 0.1.0 (07-26-2017 21:00 UTC)
 *** This release satisfies/processes 29 complete and 3 partial GitHub pull requests (up to pull request RAKNET_78)
