@@ -60,6 +60,81 @@
 
 namespace SLNet {
 
+class SplitPacketSort
+{
+private:
+	InternalPacket ** data;
+	unsigned int allocation_size;
+	unsigned int addedPacketsCount;
+	SplitPacketIdType packetId;
+
+public:
+	SplitPacketSort()
+	{
+		data = NULL;
+		allocation_size = 0;
+		addedPacketsCount = 0;
+	}
+	~SplitPacketSort()
+	{
+		if(allocation_size)
+			OP_DELETE_ARRAY(data, _FILE_AND_LINE_);
+	}
+
+	void Preallocate(InternalPacket * internalPacket, const char *file, unsigned int line)
+	{
+		RakAssert(data == NULL);
+		allocation_size = internalPacket->splitPacketCount;
+		data = OP_NEW_ARRAY<InternalPacket*>(allocation_size, file, line);
+		packetId = internalPacket->splitPacketId;
+
+		for(unsigned int i = 0; i < allocation_size; ++i) 
+			data[i] = NULL;
+	}
+
+	bool Add(InternalPacket * internalPacket, const char *file, unsigned int line)
+	{
+		RakAssert(data != NULL);
+		RakAssert(internalPacket->splitPacketIndex < allocation_size);
+		RakAssert(packetId == internalPacket->splitPacketId);
+		RakAssert(data[internalPacket->splitPacketIndex] == NULL);
+
+		(void)file;
+		(void)line;
+
+		if(data[internalPacket->splitPacketIndex] == NULL)
+		{
+			data[internalPacket->splitPacketIndex] = internalPacket;
+			++addedPacketsCount;
+			return true;
+		}
+		return false;
+	}
+
+	unsigned int AllocSize() const
+	{
+		return allocation_size;
+	}
+
+	unsigned int AddedPacketsCount() const
+	{
+		return addedPacketsCount;
+	}
+
+	InternalPacket *& operator[](unsigned int index)
+	{
+		RakAssert(data != NULL);
+		RakAssert(index < allocation_size);
+		return data[index];
+	}
+
+	SplitPacketIdType PacketId() const
+	{
+		RakAssert(data != NULL);
+		return packetId;
+	}
+};
+
 	/// Forward declarations
 class PluginInterface2;
 class RakNetRandom;
@@ -70,7 +145,7 @@ struct SplitPacketChannel//<SplitPacketChannel>
 {
 	CCTimeType lastUpdateTime;
 
-	DataStructures::List<InternalPacket*> splitPacketList;
+	SplitPacketSort splitPacketList;
 
 #if PREALLOCATE_LARGE_MESSAGES==1
 	InternalPacket *returnedPacket;
