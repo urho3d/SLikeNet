@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -185,7 +185,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">char</span> guidStr[128], ipStr[128];</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    guid.ToString(guidStr, 128);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    systemAddress.ToString(<span class="keyword">true</span>,ipStr,128);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    systemAddress.ToString(<span class="keyword">true</span>,ipStr,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    rs= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;User systemAddress=%s guid=%s\n&quot;</span>, ipStr, guidStr);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    rs+= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;%i attempts in list:\n&quot;</span>, connectionAttempts.Size());</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">for</span> (index=0; index &lt; connectionAttempts.Size(); index++)</div>
@@ -206,12 +206,12 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">if</span> (connectionAttempts[index]-&gt;sender==<span class="keyword">this</span>)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        {</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            connectionAttempts[index]-&gt;recipient-&gt;guid.<a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml#a524083fd24bb6b0369e89c6fd181afef">ToString</a>(guidStr, 128);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            connectionAttempts[index]-&gt;recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,ipStr,128);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            connectionAttempts[index]-&gt;recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,ipStr,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        }</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        {</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            connectionAttempts[index]-&gt;sender-&gt;guid.ToString(guidStr, 128);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            connectionAttempts[index]-&gt;sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,ipStr,128);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            connectionAttempts[index]-&gt;sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,ipStr,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        rs+= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;Target systemAddress=%s, guid=%s.\n&quot;</span>, ipStr, guidStr);</div>
@@ -313,8 +313,8 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                            <span class="keywordtype">char</span> str[1024];</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                            <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                            <span class="comment">// 8/01/09 Fixed bug where this was after DeleteConnectionAttempt()</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                            connectionAttempt-&gt;sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr1,128);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                            connectionAttempt-&gt;recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr2,128);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                            connectionAttempt-&gt;sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                            connectionAttempt-&gt;recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr2,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                            sprintf_s(str, <span class="stringliteral">&quot;Sending ID_NAT_TARGET_UNRESPONSIVE to sender %s and recipient %s.&quot;</span>, addr1, addr2);</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                            <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(str);</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                            <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a> log;</div>
@@ -565,7 +565,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    {</div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a> log;</div>
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;        packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,128);</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;        packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;        packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>.<a class="code" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#a3338612fd4cc4d26497d7fa27ee19d87">ToString</a>(addr2, 128);</div>
 <div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;        log= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;Got ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s. port=%i. sessionId=%i. userFound=%i.&quot;</span>, addr1, addr2, mostRecentPort, curSessionId, objectExists);</div>
 <div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;        <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(log.<a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml#ac661bded7f8850f8cf7bbcad8406d3e4" title="Same as std::string::c_str.">C_String</a>());</div>
@@ -612,7 +612,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;                {</div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                    <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a> log;</div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;                    <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                    recipientSystemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,128);</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                    recipientSystemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;                    connectionAttempt-&gt;recipient-&gt;guid.ToString(addr2, 128);</div>
 <div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;                    log= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;Sending ID_NAT_CONNECT_AT_TIME to recipient systemAddress %s guid %s&quot;</span>, addr1, addr2);</div>
 <div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;                    <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(log.<a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml#ac661bded7f8850f8cf7bbcad8406d3e4" title="Same as std::string::c_str.">C_String</a>());</div>
@@ -636,7 +636,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;                {</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;                    <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a> log;</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;                    <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;                    senderSystemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,128);</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;                    senderSystemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;                    connectionAttempt-&gt;sender-&gt;guid.ToString(addr2, 128);</div>
 <div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;                    log= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;Sending ID_NAT_CONNECT_AT_TIME to sender systemAddress %s guid %s&quot;</span>, addr1, addr2);</div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;                    <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(log.<a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml#ac661bded7f8850f8cf7bbcad8406d3e4" title="Same as std::string::c_str.">C_String</a>());</div>
@@ -671,7 +671,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        {</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;            <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a> log;</div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;            <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;            packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,128);</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;            packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;            packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>.<a class="code" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#a3338612fd4cc4d26497d7fa27ee19d87">ToString</a>(addr2, 128);</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;            log= <a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml" title="String class.">SLNet::RakString</a>(<span class="stringliteral">&quot;Ignoring ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s&quot;</span>, addr1, addr2);</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;            <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(log.<a class="code" href="../../d2/d66/class_s_l_net_1_1_rak_string.xhtml#ac661bded7f8850f8cf7bbcad8406d3e4" title="Same as std::string::c_str.">C_String</a>());</div>
@@ -709,8 +709,8 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;            {</div>
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;                <span class="keywordtype">char</span> str[1024];</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;                <span class="keywordtype">char</span> addr1[128], addr2[128];</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;                sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr1,128);</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;                recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr2,128);</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;                sender-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr1,static_cast&lt;size_t&gt;(128));</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;                recipient-&gt;systemAddress.ToString(<span class="keyword">true</span>,addr2,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;                sprintf_s(str, <span class="stringliteral">&quot;Sending NAT_ATTEMPT_PHASE_GETTING_RECENT_PORTS to sender %s and recipient %s.&quot;</span>, addr1, addr2);</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;                <a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#a28dc7d8afe7644f11f4950ae3bf02358">natPunchthroughServerDebugInterface</a>-&gt;<a class="code" href="../../db/d81/group___n_a_t___p_u_n_c_h_t_h_r_o_u_g_h___g_r_o_u_p.xhtml#af072aeff9c35eb2e7b35c39bda38cb89">OnServerMessage</a>(str);</div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;            }</div>
@@ -743,7 +743,7 @@ $(document).ready(function(){initNavTree('d2/dfe/_nat_punchthrough_server_8cpp_s
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d2/dfe/_nat_punchthrough_server_8cpp.xhtml">NatPunchthroughServer.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:05 for SLikeNet by
+    <li class="footer">Generated on Sun Mar 4 2018 23:36:06 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

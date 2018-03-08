@@ -390,7 +390,10 @@ bool RakWString::Deserialize(wchar_t *str, BitStream *bs)
 	}
 	else
 	{
+#pragma warning(push)
+#pragma warning(disable:4996)
 		wcscpy(str, L"");
+#pragma warning(pop)
 	}
 	return true;
 }

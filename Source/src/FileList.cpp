@@ -793,7 +793,10 @@ bool FileList::FixEndingSlash(char *str)
 #ifdef _WIN32
 	if (str[strlen(str) - 1] != '/' && str[strlen(str) - 1] != '\\')
 	{
+#pragma warning(push)
+#pragma warning(disable:4996)
 		strcat(str, "\\"); // Only \ works with system commands, used by AutopatcherClient
+#pragma warning(pop)
 		return true;
 	}
 #else

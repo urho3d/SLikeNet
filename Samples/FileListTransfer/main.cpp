@@ -120,13 +120,13 @@ class TestFileListProgress : public SLNet::FileListProgress
 		(void)setID;
 
 		char str[32];
-		systemAddress.ToString(true, (char*) str, 32);
+		systemAddress.ToString(true, (char*) str, static_cast<size_t>(32));
 		RAKNET_DEBUG_PRINTF("File pushes complete to %s\n", str);	
 	}
 	virtual void OnSendAborted(SLNet::SystemAddress systemAddress )
 	{
 		char str[32];
-		systemAddress.ToString(true, (char*) str, 32);
+		systemAddress.ToString(true, (char*) str, static_cast<size_t>(32));
 		RAKNET_DEBUG_PRINTF("Send aborted to %s\n", str);	
 	}
 

@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d5/da7/_rak_net_command_parser_8cpp_so
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -261,7 +261,7 @@ $(document).ready(function(){initNavTree('d5/da7/_rak_net_command_parser_8cpp_so
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                <span class="keywordflow">for</span> (i=0; i &lt; count; i++)</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                {</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                    <span class="keywordtype">char</span> str1[64];</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                    remoteSystems[i].<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, str1, 64);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                    remoteSystems[i].<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, str1, static_cast&lt;size_t&gt;(64));</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;                    transport-&gt;<a class="code" href="../../d0/d4e/class_s_l_net_1_1_transport_interface.xhtml#ab6f5d46268e400149496babd9df74125">Send</a>(systemAddress, <span class="stringliteral">&quot;%i %s\r\n&quot;</span>, i, str1);</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                }</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            }</div>
@@ -421,7 +421,7 @@ $(document).ready(function(){initNavTree('d5/da7/_rak_net_command_parser_8cpp_so
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d5/da7/_rak_net_command_parser_8cpp.xhtml">RakNetCommandParser.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:06 for SLikeNet by
+    <li class="footer">Generated on Sun Mar 4 2018 23:36:06 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -248,7 +248,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 		char buff[64];
 		for (unsigned int i=0; i < addresses.Size(); i++)
 		{
-			addresses[i].ToString(true, buff, 64);
+			addresses[i].ToString(true, buff, static_cast<size_t>(64));
 			printf("%i. %s\n", i+1, buff);
 		}
 		Gets(buff,sizeof(buff));

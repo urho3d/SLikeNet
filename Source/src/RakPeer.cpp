@@ -5197,7 +5197,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 			if (rakPeer->_using_security)
 			{
-				systemAddress.ToString(false, str1, 64);
+				systemAddress.ToString(false, str1, static_cast<size_t>(64));
 				requiresSecurityOfThisClient=rakPeer->IsInSecurityExceptionList(str1)==false;
 
 				uint32_t cookie;

@@ -47,7 +47,7 @@ void ReadAllPackets(void)
 	for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 	{
 		packet->guid.ToString(str, 64);
-		packet->systemAddress.ToString(true,str2,64);
+		packet->systemAddress.ToString(true,str2,static_cast<size_t>(64));
 		if (packet->data[0]==ID_NEW_INCOMING_CONNECTION)
 		{
 			printf("ID_NEW_INCOMING_CONNECTION from %s on %s\n", str, str2);
@@ -77,7 +77,7 @@ void ReadAllPackets(void)
 			unsigned short sourceToDestPort;
 			bs.Read(sourceToDestPort);
 			char ipAddressString[32];
-			packet->systemAddress.ToString(false, ipAddressString,32);
+			packet->systemAddress.ToString(false, ipAddressString,static_cast<size_t>(32));
 			rakPeer->Connect(ipAddressString, sourceToDestPort, 0,0);
 		}
 		else if (packet->data[0]==ID_ROUTER_2_REROUTED)
@@ -94,7 +94,7 @@ void ReadAllPackets(void)
 			intermediateAddress.SetPortHostOrder(port);
 
 			char str3[32];
-			intermediateAddress.ToString(true, str3, 32);
+			intermediateAddress.ToString(true, str3, static_cast<size_t>(32));
 			printf("Connection to %s rerouted through %s\n", str, str3);
 
 			// Test sending a message to the endpoint

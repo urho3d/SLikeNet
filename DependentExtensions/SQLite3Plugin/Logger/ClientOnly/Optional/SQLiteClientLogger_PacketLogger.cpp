@@ -2,7 +2,7 @@
  * This file was taken from RakNet 4.082.
  * Please see licenses/RakNet license.txt for the underlying license and related copyright.
  *
- * Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ * Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  * license found in the license.txt file in the root directory of this source tree.
@@ -28,9 +28,9 @@ void SQLiteClientLogger_PacketLogger::OnDirectSocketSend(const char *data, const
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1, 64);
+	localSystemAddress.ToString(true, str1, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
-	remoteSystemAddress.ToString(true, str3, 64);
+	remoteSystemAddress.ToString(true, str3, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 
 	
@@ -41,9 +41,9 @@ void SQLiteClientLogger_PacketLogger::OnDirectSocketReceive(const char *data, co
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1, 64);
+	localSystemAddress.ToString(true, str1, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
-	remoteSystemAddress.ToString(true, str3, 64);
+	remoteSystemAddress.ToString(true, str3, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
@@ -56,9 +56,9 @@ void SQLiteClientLogger_PacketLogger::OnInternalPacket(InternalPacket *internalP
 
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1, 64);
+	localSystemAddress.ToString(true, str1, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
-	remoteSystemAddress.ToString(true, str3, 64);
+	remoteSystemAddress.ToString(true, str3, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	unsigned char typeByte;
@@ -86,9 +86,9 @@ void SQLiteClientLogger_PacketLogger::OnAck(unsigned int messageNumber, SystemAd
 
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1, 64);
+	localSystemAddress.ToString(true, str1, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
-	remoteSystemAddress.ToString(true, str3, 64);
+	remoteSystemAddress.ToString(true, str3, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \
@@ -98,9 +98,9 @@ void SQLiteClientLogger_PacketLogger::OnPushBackPacket(const char *data, const B
 {
 	char str1[64], str2[62], str3[64], str4[64];
 	SystemAddress localSystemAddress = rakPeerInterface->GetExternalID(remoteSystemAddress);
-	localSystemAddress.ToString(true, str1, 64);
+	localSystemAddress.ToString(true, str1, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(SLNet::UNASSIGNED_SYSTEM_ADDRESS).ToString(str2, 62);
-	remoteSystemAddress.ToString(true, str3, 64);
+	remoteSystemAddress.ToString(true, str3, static_cast<size_t>(64));
 	rakPeerInterface->GetGuidFromSystemAddress(remoteSystemAddress).ToString(str4, 64);
 	
 	rakSqlLog(DEFAULT_PACKET_LOGGER_TABLE, "SndRcv,Type,PacketNumber,FrameNumber,PacketID,BitLength,LocalIP,LocalGuid,RemoteIP,RemoteGuid,splitPacketId,SplitPacketIndex,splitPacketCount,orderingIndex,misc", \

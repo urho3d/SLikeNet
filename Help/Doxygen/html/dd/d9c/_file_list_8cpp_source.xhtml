@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -204,13 +204,13 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    (void) setID;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordtype">char</span> str[32];</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, (<span class="keywordtype">char</span>*) str, 32);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, (<span class="keywordtype">char</span>*) str, static_cast&lt;size_t&gt;(32));</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="../../d8/db0/defines_8h.xhtml#a2a5d867f7ae6521f217847a78f17ab4a">RAKNET_DEBUG_PRINTF</a>(<span class="stringliteral">&quot;File pushes complete to %s\n&quot;</span>, str);   </div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d2/d30/class_s_l_net_1_1_f_l_p___printf.xhtml#ac9ee250fcbbdb9f4ec040899e679c041" title="This function is called when a send to a system was aborted (probably due to disconnection)">FLP_Printf::OnSendAborted</a>( <a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> systemAddress )</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;{</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordtype">char</span> str[32];</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, (<span class="keywordtype">char</span>*) str, 32);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>, (<span class="keywordtype">char</span>*) str, static_cast&lt;size_t&gt;(32));</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="../../d8/db0/defines_8h.xhtml#a2a5d867f7ae6521f217847a78f17ab4a">RAKNET_DEBUG_PRINTF</a>(<span class="stringliteral">&quot;Send aborted to %s\n&quot;</span>, str);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a19ab0e14e22582685586ef566f211198">FileList::FileList</a>()</div>
@@ -355,7 +355,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">if</span> (rootLen)</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    {</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        strcpy_s(dirSoFar, 520, root);</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(dirSoFar, 520))</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(dirSoFar, 520))</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            rootLen++;</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    }</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordflow">else</span></div>
@@ -364,7 +364,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordflow">if</span> (subDirectory)</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    {</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        strcat_s(dirSoFar, 520, subDirectory);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(dirSoFar, 520);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(dirSoFar, 520);</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    }</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> flpcIndex=0; flpcIndex &lt; <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aee849214ab2bea4516ebc91f3af56dbb">fileListProgressCallbacks</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); flpcIndex++)</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aee849214ab2bea4516ebc91f3af56dbb">fileListProgressCallbacks</a>[flpcIndex]-&gt;OnAddFilesFromDirectoryStarted(<span class="keyword">this</span>, dirSoFar);</div>
@@ -661,7 +661,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    <span class="keywordflow">for</span> (i=0; i &lt; <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
 <div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    {</div>
 <div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        strcpy_s(fullPath, applicationDirectory);</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(fullPath, 512);</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(fullPath, 512);</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        strcat_s(fullPath,<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>[i].filename);</div>
 <div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        <span class="keywordflow">if</span> (fopen_s(&amp;fp, fullPath, <span class="stringliteral">&quot;rb&quot;</span>) != 0)</div>
 <div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;        {</div>
@@ -719,7 +719,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    {</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#ab91fbe0570bf501cd97a53c6cffcef8f">rakFree_Ex</a>(<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>[i].data, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a> );</div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        strcpy_s(fullPath, applicationDirectory);</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(fullPath, 512);</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(fullPath, 512);</div>
 <div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        strcat_s(fullPath,<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>[i].filename.C_String());</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;        <span class="keywordflow">if</span> (fopen_s(&amp;fp, fullPath, <span class="stringliteral">&quot;rb&quot;</span>) == 0)</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        {</div>
@@ -810,7 +810,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <span class="keywordflow">for</span> (i=0; i &lt; <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    {</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;        strcpy_s(fullPath, applicationDirectory);</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(fullPath, 512);</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(fullPath, 512);</div>
 <div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;        strcat_s(fullPath,<a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>[i].filename.C_String());</div>
 <div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;        </div>
 <div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;        <span class="comment">// Security - Don&#39;t allow .. in the filename anywhere so you can&#39;t write outside of the root directory</span></div>
@@ -854,7 +854,7 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        }</div>
 <div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;</div>
 <div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        strcpy_s(fullPath, applicationDirectory);</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FixEndingSlash</a>(fullPath, 512);</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FixEndingSlash</a>(fullPath, 512);</div>
 <div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        strcat_s(fullPath, <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aba78be96dad9e9014e2392cae3d731eb">fileList</a>[i].filename.C_String());</div>
 <div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    </div>
 <div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        <span class="comment">// Do not rename to _unlink as linux uses unlink</span></div>
@@ -894,34 +894,52 @@ $(document).ready(function(){initNavTree('dd/d9c/_file_list_8cpp_source.xhtml','
 <div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    callbacks = <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#aee849214ab2bea4516ebc91f3af56dbb">fileListProgressCallbacks</a>;</div>
 <div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;}</div>
 <div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4">FileList::FixEndingSlash</a>(<span class="keywordtype">char</span> *str, <span class="keywordtype">size_t</span> strLength)</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;{</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str)-1]!=<span class="charliteral">&#39;/&#39;</span> &amp;&amp; str[strlen(str)-1]!=<span class="charliteral">&#39;\\&#39;</span>)</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    {</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;        strcat_s(str, strLength, <span class="stringliteral">&quot;\\&quot;</span>); <span class="comment">// Only \ works with system commands, used by AutopatcherClient</span></div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    }</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str)-1]!=<span class="charliteral">&#39;\\&#39;</span> &amp;&amp; str[strlen(str)-1]!=<span class="charliteral">&#39;/&#39;</span>)</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    {</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        strcat_s(str, strLength, <span class="stringliteral">&quot;/&quot;</span>); <span class="comment">// Only / works with Linux</span></div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    }</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;}</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;<span class="preprocessor">#endif // _RAKNET_SUPPORT_FileOperations</span></div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FileList::FixEndingSlash</a>(<span class="keywordtype">char</span> *str)</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;{</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str) - 1] != <span class="charliteral">&#39;/&#39;</span> &amp;&amp; str[strlen(str) - 1] != <span class="charliteral">&#39;\\&#39;</span>)</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    {</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        strcat(str, <span class="stringliteral">&quot;\\&quot;</span>); <span class="comment">// Only \ works with system commands, used by AutopatcherClient</span></div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    }</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str) - 1] != <span class="charliteral">&#39;\\&#39;</span> &amp;&amp; str[strlen(str) - 1] != <span class="charliteral">&#39;/&#39;</span>)</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    {</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        strcat(str, <span class="stringliteral">&quot;/&quot;</span>); <span class="comment">// Only / works with Linux</span></div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    }</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;}</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9">FileList::FixEndingSlash</a>(<span class="keywordtype">char</span> *str, <span class="keywordtype">size_t</span> strLength)</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;{</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str)-1]!=<span class="charliteral">&#39;/&#39;</span> &amp;&amp; str[strlen(str)-1]!=<span class="charliteral">&#39;\\&#39;</span>)</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    {</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        strcat_s(str, strLength, <span class="stringliteral">&quot;\\&quot;</span>); <span class="comment">// Only \ works with system commands, used by AutopatcherClient</span></div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    }</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">if</span> (str[strlen(str)-1]!=<span class="charliteral">&#39;\\&#39;</span> &amp;&amp; str[strlen(str)-1]!=<span class="charliteral">&#39;/&#39;</span>)</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    {</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        strcat_s(str, strLength, <span class="stringliteral">&quot;/&quot;</span>); <span class="comment">// Only / works with Linux</span></div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    }</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;}</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;<span class="preprocessor">#endif // _RAKNET_SUPPORT_FileOperations</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../dd/d9c/_file_list_8cpp.xhtml">FileList.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:05 for SLikeNet by
+    <li class="footer">Generated on Sun Mar 4 2018 23:36:06 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

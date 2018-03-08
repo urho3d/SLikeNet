@@ -1,4 +1,4 @@
-SLikeNet™ 0.1.0
+SLikeNet™ 0.1.1
 ===============
 Copyright © 2016-2018 SLikeSoft™ UG (haftungsbeschränkt)
 

@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -141,6 +141,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac9d938134d82e42d216903e2d4bc152f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a994f9c414b5fd7094017b43e7c102b"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a> (bool writePort=true, char portDelineator='|') const </td></tr>
 <tr class="separator:a7a994f9c414b5fd7094017b43e7c102b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ed3718bc19678614905b94c2396edd5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a1ed3718bc19678614905b94c2396edd5">ToString</a> (bool writePort, char *dest, char portDelineator= '|') const </td></tr>
+<tr class="separator:a1ed3718bc19678614905b94c2396edd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a930f9743c27f8c88f4dd445baf2eba39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a930f9743c27f8c88f4dd445baf2eba39">ToString</a> (bool writePort, char *dest, size_t destLength, char portDelineator='|') const </td></tr>
 <tr class="separator:a930f9743c27f8c88f4dd445baf2eba39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdd52cd5981fd1b58ff68ba52a98a13e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#acdd52cd5981fd1b58ff68ba52a98a13e">FromString</a> (const char *str, char portDelineator='|', int ipVersion=0)</td></tr>
@@ -166,9 +168,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a34071dfa14d9faa8a7e28e6d1491cb92"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a34071dfa14d9faa8a7e28e6d1491cb92">SetBinaryAddress</a> (const char *str, char portDelineator=':')</td></tr>
 <tr class="memdesc:a34071dfa14d9faa8a7e28e6d1491cb92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Old version, for crap platforms that don't support newer socket functions.  <a href="#a34071dfa14d9faa8a7e28e6d1491cb92"></a><br/></td></tr>
 <tr class="separator:a34071dfa14d9faa8a7e28e6d1491cb92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ea21e9d77b884208ec4c3e96fbb76e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a5ea21e9d77b884208ec4c3e96fbb76e1">ToString_Old</a> (bool writePort, char *dest, size_t destLength, char portDelineator=':') const </td></tr>
-<tr class="memdesc:a5ea21e9d77b884208ec4c3e96fbb76e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Old version, for crap platforms that don't support newer socket functions.  <a href="#a5ea21e9d77b884208ec4c3e96fbb76e1"></a><br/></td></tr>
-<tr class="separator:a5ea21e9d77b884208ec4c3e96fbb76e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6fa77027c7b71489430e9acc6bcdd0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#ae6fa77027c7b71489430e9acc6bcdd0c">ToString_Old</a> (bool writePort, char *dest, char portDelineator= ':') const </td></tr>
+<tr class="memdesc:ae6fa77027c7b71489430e9acc6bcdd0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Old version, for crap platforms that don't support newer socket functions.  <a href="#ae6fa77027c7b71489430e9acc6bcdd0c"></a><br/></td></tr>
+<tr class="separator:ae6fa77027c7b71489430e9acc6bcdd0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44b753f9891b3e7ca67129b5ba18609d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a44b753f9891b3e7ca67129b5ba18609d">ToString_Old</a> (bool writePort, char *dest, size_t destLength, char portDelineator= ':') const </td></tr>
+<tr class="separator:a44b753f9891b3e7ca67129b5ba18609d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa583d4ecc056ca5430eec9081213d52e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#aa583d4ecc056ca5430eec9081213d52e">FixForIPVersion</a> (const <a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml">SystemAddress</a> &amp;boundAddressToSocket)</td></tr>
 <tr class="separator:aa583d4ecc056ca5430eec9081213d52e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4de69b4e577f31f50aba4a4d9a7f0a19"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a4de69b4e577f31f50aba4a4d9a7f0a19">IsLANAddress</a> (void)</td></tr>
@@ -228,9 +232,9 @@ Public Attributes</h2></td></tr>
 
 <p>Constructors. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00385">385</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00421">421</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00309">systemIndex</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00311">systemIndex</a>.</p>
 
 </div>
 </div>
@@ -248,9 +252,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00393">393</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00429">429</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00149">SetPortHostOrder()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00309">systemIndex</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00155">SetPortHostOrder()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00311">systemIndex</a>.</p>
 
 </div>
 </div>
@@ -278,9 +282,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00400">400</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00436">436</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00735">FromStringExplicitPort()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00309">systemIndex</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00771">FromStringExplicitPort()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00311">systemIndex</a>.</p>
 
 </div>
 </div>
@@ -301,7 +305,7 @@ Public Attributes</h2></td></tr>
 
 <p>Copy the port from another <a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> structure. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00747">747</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00783">783</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>.</p>
 
@@ -325,11 +329,11 @@ Public Attributes</h2></td></tr>
 
 <p>Returns if two system addresses have the same IP (port is not checked) </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00133">133</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00139">139</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03584">SLNet::RakPeer::AssignSystemAddressToRemoteSystemList()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03995">SLNet::RakPeer::IsLoopbackAddress()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00159">operator==()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03584">SLNet::RakPeer::AssignSystemAddressToRemoteSystemList()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03995">SLNet::RakPeer::IsLoopbackAddress()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00165">operator==()</a>.</p>
 
 </div>
 </div>
@@ -347,9 +351,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00444">444</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00480">480</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00218">GetIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00310">ToString()</a>.</p>
+<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">GetIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00321">ToString()</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04106">SLNet::RakPeer::CloseConnectionInternal()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02079">SLNet::RakPeer::Ping()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02986">SLNet::RakPeer::SendOutOfBand()</a>, and <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02720">SLNet::RakPeer::SendTTL()</a>.</p>
 
@@ -396,11 +400,11 @@ Public Attributes</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>The current port is unchanged if a port is not specified in <em>str</em> </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success, false on ipVersion does not match type of passed string </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">593</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">629</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../dc/d26/_w_s_a_startup_singleton_8cpp_source.xhtml#l00046">WSAStartupSingleton::AddRef()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../dc/d26/_w_s_a_startup_singleton_8cpp_source.xhtml#l00077">WSAStartupSingleton::Deref()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00079">SLNet::NonNumericHostString()</a>, <a class="el" href="../../d8/db0/defines_8h_source.xhtml#l00114">RakAssert</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00481">SetBinaryAddress()</a>.</p>
+<p>References <a class="el" href="../../dc/d26/_w_s_a_startup_singleton_8cpp_source.xhtml#l00046">WSAStartupSingleton::AddRef()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../dc/d26/_w_s_a_startup_singleton_8cpp_source.xhtml#l00077">WSAStartupSingleton::Deref()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00085">SLNet::NonNumericHostString()</a>, <a class="el" href="../../d8/db0/defines_8h_source.xhtml#l00114">RakAssert</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00517">SetBinaryAddress()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00444">FixForIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00735">FromStringExplicitPort()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00238">SetToLoopback()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00393">SystemAddress()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00480">FixForIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00771">FromStringExplicitPort()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00244">SetToLoopback()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00429">SystemAddress()</a>.</p>
 
 </div>
 </div>
@@ -436,11 +440,11 @@ Public Attributes</h2></td></tr>
 
 <p>Same as <a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#acdd52cd5981fd1b58ff68ba52a98a13e">FromString()</a>, but you explicitly set a port at the same time. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00735">735</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00771">771</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00364">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00368">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02079">SLNet::RakPeer::Ping()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03255">SLNet::RakPeer::SendConnectionRequest()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02986">SLNet::RakPeer::SendOutOfBand()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02720">SLNet::RakPeer::SendTTL()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00400">SystemAddress()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02079">SLNet::RakPeer::Ping()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03255">SLNet::RakPeer::SendConnectionRequest()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02986">SLNet::RakPeer::SendOutOfBand()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02720">SLNet::RakPeer::SendTTL()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00436">SystemAddress()</a>.</p>
 
 </div>
 </div>
@@ -458,7 +462,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">224</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00230">230</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
@@ -480,11 +484,11 @@ Public Attributes</h2></td></tr>
 <p>Return the IP version, either IPV4 or IPV6 </p>
 <dl class="section return"><dt>Returns</dt><dd>Either 4 or 6 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00218">218</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">224</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00444">FixForIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00249">IsLoopback()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00234">SetToLoopback()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00978">SLNet::BitStream::Write()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00480">FixForIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00255">IsLoopback()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00240">SetToLoopback()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00982">SLNet::BitStream::Write()</a>.</p>
 
 </div>
 </div>
@@ -504,11 +508,11 @@ Public Attributes</h2></td></tr>
 
 <p>Returns the port in host order (this is what you normally use) </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00141">141</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00147">147</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00486">SLNet::SocketLayer::GetLocalPort()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05407">SLNet::ProcessNetworkPacket()</a>, <a class="el" href="../../d5/dd3/_rak_net_socket2_8cpp_source.xhtml#l00351">SLNet::RNS2_Berkley::RecvFromLoopInt()</a>, <a class="el" href="../../d9/daa/_command_parser_interface_8cpp_source.xhtml#l00161">SLNet::CommandParserInterface::ReturnResult()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00269">ToString_Old()</a>.</p>
+<p>Referenced by <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00486">SLNet::SocketLayer::GetLocalPort()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05407">SLNet::ProcessNetworkPacket()</a>, <a class="el" href="../../d5/dd3/_rak_net_socket2_8cpp_source.xhtml#l00351">SLNet::RNS2_Berkley::RecvFromLoopInt()</a>, <a class="el" href="../../d9/daa/_command_parser_interface_8cpp_source.xhtml#l00161">SLNet::CommandParserInterface::ReturnResult()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00275">ToString_Old()</a>.</p>
 
 </div>
 </div>
@@ -526,11 +530,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00145">145</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00151">151</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00978">SLNet::BitStream::Write()</a>.</p>
+<p>Referenced by <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00982">SLNet::BitStream::Write()</a>.</p>
 
 </div>
 </div>
@@ -548,7 +552,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00472">472</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00508">508</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
@@ -569,9 +573,9 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>If was set to 127.0.0.1 or ::1 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00249">249</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00255">255</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00218">GetIPVersion()</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">GetIPVersion()</a>.</p>
 
 </div>
 </div>
@@ -589,7 +593,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00164">164</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00170">170</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 </div>
 </div>
@@ -607,7 +611,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00184">184</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00190">190</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
@@ -627,9 +631,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00126">126</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00132">132</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00309">systemIndex</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00311">systemIndex</a>.</p>
 
 </div>
 </div>
@@ -647,9 +651,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00159">159</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00165">165</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00133">EqualsExcludingPort()</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00139">EqualsExcludingPort()</a>.</p>
 
 </div>
 </div>
@@ -667,7 +671,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00169">169</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00175">175</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>.</p>
 
@@ -699,11 +703,11 @@ Public Attributes</h2></td></tr>
 
 <p>Old version, for crap platforms that don't support newer socket functions. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00481">481</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00517">517</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../d5/dd3/_rak_net_socket2_8cpp_source.xhtml#l00135">SLNet::RakNetSocket2::DomainNameToIP()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00079">SLNet::NonNumericHostString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00149">SetPortHostOrder()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00364">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>, <a class="el" href="../../d5/dd3/_rak_net_socket2_8cpp_source.xhtml#l00135">SLNet::RakNetSocket2::DomainNameToIP()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00085">SLNet::NonNumericHostString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00155">SetPortHostOrder()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00368">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>.</p>
 
 </div>
 </div>
@@ -722,11 +726,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Sets the port. The port value should be in host order (this is what you normally use) Renamed from SetPort because of winspool.h <a href="http://edn.embarcadero.com/article/21494">http://edn.embarcadero.com/article/21494</a> </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00149">149</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00155">155</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00481">SetBinaryAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l00372">SLNet::RakPeer::Startup()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00393">SystemAddress()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00517">SetBinaryAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l00372">SLNet::RakPeer::Startup()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00429">SystemAddress()</a>.</p>
 
 </div>
 </div>
@@ -744,7 +748,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00154">154</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00160">160</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">debugPort</a>.</p>
 
@@ -768,9 +772,9 @@ Public Attributes</h2></td></tr>
 
 <p>Call <a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#aca7760ea7186a59a70697634d9d585d7" title="Call SetToLoopback(), with whatever IP version is currently held. Defaults to IPV4.">SetToLoopback()</a>, with whatever IP version is currently held. Defaults to IPV4. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00234">234</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00240">240</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00218">GetIPVersion()</a>.</p>
+<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">GetIPVersion()</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>.</p>
 
@@ -797,9 +801,9 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00238">238</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00244">244</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>.</p>
+<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00053">IPV4_LOOPBACK</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00052">IPV6_LOOPBACK</a>.</p>
 
 </div>
 </div>
@@ -825,7 +829,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00198">198</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00204">204</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 </div>
 </div>
@@ -853,7 +857,7 @@ Public Attributes</h2></td></tr>
 
 <p>Hash the system address. </p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00206">206</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00212">212</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, and <a class="el" href="../../d4/dcf/_super_fast_hash_8cpp_source.xhtml#l00058">SuperFastHashIncremental()</a>.</p>
 
@@ -885,9 +889,45 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00310">310</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00321">321</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03584">SLNet::RakPeer::AssignSystemAddressToRemoteSystemList()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00444">FixForIPVersion()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00591">SLNet::SocketLayer::GetFirstBindableIP()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02600">SLNet::RakPeer::GetLocalIP()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d9/daa/_command_parser_interface_8cpp_source.xhtml#l00161">SLNet::CommandParserInterface::ReturnResult()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00067">SLNet::AddressOrGUID::ToString()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03584">SLNet::RakPeer::AssignSystemAddressToRemoteSystemList()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00480">FixForIPVersion()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00591">SLNet::SocketLayer::GetFirstBindableIP()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02600">SLNet::RakPeer::GetLocalIP()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d9/daa/_command_parser_interface_8cpp_source.xhtml#l00161">SLNet::CommandParserInterface::ReturnResult()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00067">SLNet::AddressOrGUID::ToString()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1ed3718bc19678614905b94c2396edd5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SystemAddress::ToString </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>writePort</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>portDelineator</em> = <code>'|'</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00404">404</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+
+<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00275">ToString_Old()</a>.</p>
 
 </div>
 </div>
@@ -927,13 +967,53 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00376">376</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00412">412</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00269">ToString_Old()</a>.</p>
+<p>References <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00275">ToString_Old()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a5ea21e9d77b884208ec4c3e96fbb76e1"></a>
+<a class="anchor" id="ae6fa77027c7b71489430e9acc6bcdd0c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SystemAddress::ToString_Old </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>writePort</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>portDelineator</em> = <code>':'</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Old version, for crap platforms that don't support newer socket functions. </p>
+
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00275">275</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00147">GetPort()</a>, <a class="el" href="../../db/dad/_itoa_8cpp_source.xhtml#l00024">Itoa()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00368">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00404">ToString()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a44b753f9891b3e7ca67129b5ba18609d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -969,13 +1049,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Old version, for crap platforms that don't support newer socket functions. </p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00299">299</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00269">269</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
-
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00141">GetPort()</a>, <a class="el" href="../../db/dad/_itoa_8cpp_source.xhtml#l00024">Itoa()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00364">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
-
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00376">ToString()</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">address</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00147">GetPort()</a>, <a class="el" href="../../db/dad/_itoa_8cpp_source.xhtml#l00024">Itoa()</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00368">SLNet::UNASSIGNED_SYSTEM_ADDRESS</a>.</p>
 
 </div>
 </div>
@@ -992,7 +1068,7 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00220">220</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00747">CopyPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00133">EqualsExcludingPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00735">FromStringExplicitPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">GetIPPROTO()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00218">GetIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00141">GetPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00145">GetPortNetworkOrder()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00492">SLNet::SocketLayer::GetSystemAddress_Old()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00472">IsLANAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00249">IsLoopback()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00184">operator&lt;()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00126">operator=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00159">operator==()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00169">operator&gt;()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01323">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00481">SetBinaryAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00149">SetPortHostOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00154">SetPortNetworkOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00385">SystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00206">ToInteger()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00269">ToString_Old()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00978">SLNet::BitStream::Write()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00783">CopyPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00139">EqualsExcludingPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00771">FromStringExplicitPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00230">GetIPPROTO()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00224">GetIPVersion()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00147">GetPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00151">GetPortNetworkOrder()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00492">SLNet::SocketLayer::GetSystemAddress_Old()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00508">IsLANAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00255">IsLoopback()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00190">operator&lt;()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00132">operator=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00165">operator==()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00175">operator&gt;()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01327">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00517">SetBinaryAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00155">SetPortHostOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00160">SetPortNetworkOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00421">SystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00212">ToInteger()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00275">ToString_Old()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l00982">SLNet::BitStream::Write()</a>.</p>
 
 </div>
 </div>
@@ -1010,7 +1086,7 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00223">223</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00747">CopyPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00593">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00735">FromStringExplicitPort()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00126">operator=()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01323">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00481">SetBinaryAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00149">SetPortHostOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00154">SetPortNetworkOrder()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00385">SystemAddress()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00783">CopyPort()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00629">FromString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00771">FromStringExplicitPort()</a>, <a class="el" href="../../d8/d4f/_socket_layer_8cpp_source.xhtml#l00528">SLNet::SocketLayer::GetSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00132">operator=()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01327">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00517">SetBinaryAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00155">SetPortHostOrder()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00160">SetPortNetworkOrder()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00421">SystemAddress()</a>.</p>
 
 </div>
 </div>
@@ -1024,9 +1100,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00309">309</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00311">311</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l01647">SLNet::RakPeer::CloseConnection()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02464">SLNet::RakPeer::GetClientPublicKeyFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02383">SLNet::RakPeer::GetGuidFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03128">SLNet::RakPeer::GetIndexFromSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00126">operator=()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00385">SystemAddress()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l01647">SLNet::RakPeer::CloseConnection()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02464">SLNet::RakPeer::GetClientPublicKeyFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02383">SLNet::RakPeer::GetGuidFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03128">SLNet::RakPeer::GetIndexFromSystemAddress()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00132">operator=()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, and <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00421">SystemAddress()</a>.</p>
 
 </div>
 </div>
@@ -1063,7 +1139,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dd/d30/namespace_s_l_net.xhtml">SLNet</a></li><li class="navelem"><a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml">SystemAddress</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:11 for SLikeNet by
+    <li class="footer">Generated on Sun Mar 4 2018 23:36:11 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

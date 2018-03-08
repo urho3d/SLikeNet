@@ -157,7 +157,10 @@ void Table::Cell::Get(double *output)
 void Table::Cell::Get(char *output)
 {
 	RakAssert(isEmpty == false);
+#pragma warning(push)
+#pragma warning(disable:4996)
 	strcpy(output, c);
+#pragma warning(pop)
 }
 void Table::Cell::Get(char *output, size_t outputLength)
 {

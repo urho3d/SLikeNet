@@ -181,7 +181,7 @@ SQLiteServerLoggerPlugin::CPUThreadOutput* ExecCPULoggingThread(SQLiteServerLogg
 		// outputNode->whenMessageArrived = cpuThreadInput->cpuInputArray[i].whenMessageArrived;
 		outputNode->packet=packet;
 		
-		packet->systemAddress.ToString(true,outputNode->ipAddressString,32);
+		packet->systemAddress.ToString(true,outputNode->ipAddressString,static_cast<size_t>(32));
 		SLNet::BitStream bitStream(packet->data, packet->length, false);
 		bitStream.IgnoreBytes(1);
 		bitStream.Read(outputNode->dbIdentifier);
@@ -949,7 +949,7 @@ PluginReceiveResult SQLiteServerLoggerPlugin::OnReceive(Packet *packet)
 			if (sessionManagementMode==CREATE_EACH_NAMED_DB_HANDLE)
 			{
 				unsigned char senderAddr[32];
-				packet->systemAddress.ToString(true,(char*) senderAddr, 32);
+				packet->systemAddress.ToString(true,(char*) senderAddr, static_cast<size_t>(32));
 				dbIdentifier+=':';
 				dbIdentifier+=senderAddr;
 			}

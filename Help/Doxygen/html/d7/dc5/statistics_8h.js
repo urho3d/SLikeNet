@@ -11,5 +11,6 @@ var statistics_8h =
       [ "ACTUAL_BYTES_RECEIVED", "d7/dc5/statistics_8h.xhtml#a4957d87c7d01c02ee3365ea01aec40aca17bea4f08c3fc293454388eacfbd192f", null ],
       [ "RNS_PER_SECOND_METRICS_COUNT", "d7/dc5/statistics_8h.xhtml#a4957d87c7d01c02ee3365ea01aec40aca766e442d17c52434750d2c2208555237", null ]
     ] ],
+    [ "StatisticsToString", "d7/dc5/statistics_8h.xhtml#a854e3d51d7a166b75dbc316aadceaf2b", null ],
     [ "StatisticsToString", "d7/dc5/statistics_8h.xhtml#ac8bf220926665542f7d19b785acccbc7", null ]
 ];

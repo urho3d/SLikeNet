@@ -163,6 +163,8 @@ void PacketLogger::FormatLine(char* into, const char* dir, const char* type, uns
 		sprintf_s(str3, "%5u", reliableMessageNumber);
 	}
 
+#pragma warning(push)
+#pragma warning(disable:4996)
 	sprintf(into, "%s,%s%s,%s,%s,%5u,%s,%u,%" PRINTF_64_BIT_MODIFIER "u,%s,%s,%i,%i,%i,%i,%s,"
 		, localtime
 		, prefix
@@ -181,6 +183,7 @@ void PacketLogger::FormatLine(char* into, const char* dir, const char* type, uns
 		, orderingIndex
 		, suffix
 	);
+#pragma warning(pop)
 }
 void PacketLogger::OnDirectSocketSend(const char *data, const BitSize_t bitsUsed, SystemAddress remoteSystemAddress)
 {

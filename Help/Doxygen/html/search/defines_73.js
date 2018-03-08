@@ -23,6 +23,7 @@ var searchData=
   ['slikenet_5fversion',['SLIKENET_VERSION',['../df/dfc/version_8h.xhtml#a25b68bf5985cd24cfc8a5a49fb68d8a1',1,'version.h']]],
   ['slikenet_5fversion_5fnumber',['SLIKENET_VERSION_NUMBER',['../df/dfc/version_8h.xhtml#a0a2c3f231e4772553ccfc6e33a58ad6c',1,'version.h']]],
   ['slikenet_5fversion_5fnumber_5fint',['SLIKENET_VERSION_NUMBER_INT',['../df/dfc/version_8h.xhtml#a915fdbddbcea9c2684eed9703c2d50c7',1,'version.h']]],
+  ['slnet_5fmax_5fretrievable_5ffilesize',['SLNET_MAX_RETRIEVABLE_FILESIZE',['../d8/db0/defines_8h.xhtml#a69f86bebc837357076fea17426799455',1,'defines.h']]],
   ['socket_5f_5f',['socket__',['../df/ded/_socket_defines_8h.xhtml#af9f142186ba41aca27cf6bdd4d118121',1,'SocketDefines.h']]],
   ['static_5ffactory_5fdeclarations',['STATIC_FACTORY_DECLARATIONS',['../db/dbd/_export_8h.xhtml#af3e49377f340027d211b2814949efc48',1,'Export.h']]],
   ['static_5ffactory_5fdefinitions',['STATIC_FACTORY_DEFINITIONS',['../db/dbd/_export_8h.xhtml#aa00165c970bdb25e1c757b432509533b',1,'Export.h']]]

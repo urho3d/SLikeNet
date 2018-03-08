@@ -23,6 +23,7 @@ var defines_8h =
     [ "RESEND_BUFFER_ARRAY_MASK", "d8/db0/defines_8h.xhtml#a3abde4cfe6a8c3a20ce719c1cad27a07", null ],
     [ "RPC4_GLOBAL_REGISTRATION_MAX_FUNCTION_NAME_LENGTH", "d8/db0/defines_8h.xhtml#afbacf5808b1cd387e42d32823cafa5b8", null ],
     [ "RPC4_GLOBAL_REGISTRATION_MAX_FUNCTIONS", "d8/db0/defines_8h.xhtml#aeed5dc2e94045a66017b9cf04488aa6f", null ],
+    [ "SLNET_MAX_RETRIEVABLE_FILESIZE", "d8/db0/defines_8h.xhtml#a69f86bebc837357076fea17426799455", null ],
     [ "USE_ALLOCA", "d8/db0/defines_8h.xhtml#add1080711227ddca8bcc85a3976c989b", null ],
     [ "USE_SLIDING_WINDOW_CONGESTION_CONTROL", "d8/db0/defines_8h.xhtml#aee2e1bf9d15e3408ca6c75897a5d8249", null ],
     [ "USE_WAIT_FOR_MULTIPLE_EVENTS", "d8/db0/defines_8h.xhtml#ab8f9344fbb8569309f4b11df52aad058", null ],

@@ -30,7 +30,7 @@ Building:
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
 
-version 0.1.1 (xx-xx-xxxx xx:xx UTC)
+version 0.1.1 (03-01-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 3 partial GitHub pull requests/issues
 General:
   * several smaller changes, fixes, and code cleanup (#105, #156, #165 - RAKNET_29)

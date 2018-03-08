@@ -89,7 +89,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 		char buff[64];
 		for (unsigned int i=0; i < addresses.Size(); i++)
 		{
-			addresses[i].ToString(true, buff, 64);
+			addresses[i].ToString(true, buff, static_cast<size_t>(64));
 			printf("%i. %s\n", i+1, buff);
 		}
 		Gets(buff,sizeof(buff));

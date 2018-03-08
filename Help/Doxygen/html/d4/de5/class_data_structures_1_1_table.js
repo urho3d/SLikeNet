@@ -42,6 +42,7 @@ var class_data_structures_1_1_table =
     [ "DeleteRow", "d4/de5/class_data_structures_1_1_table.xhtml#a29caf257d5c491a56c897e35b82fd7d6", null ],
     [ "GetAvailableRowId", "d4/de5/class_data_structures_1_1_table.xhtml#a68cc0e1cf1e1d03ca5087ddf91c74c6f", null ],
     [ "GetCellValueByIndex", "d4/de5/class_data_structures_1_1_table.xhtml#a9161220f934e20abf9fbd00b149540b8", null ],
+    [ "GetCellValueByIndex", "d4/de5/class_data_structures_1_1_table.xhtml#afc8a0582ca67cd833f46c76e145069b5", null ],
     [ "GetCellValueByIndex", "d4/de5/class_data_structures_1_1_table.xhtml#ac55ae24585dbf6bda8bbc0217c3e0e45", null ],
     [ "GetCellValueByIndex", "d4/de5/class_data_structures_1_1_table.xhtml#a40ec8206e20b0ca897baacb74bb48a1c", null ],
     [ "GetColumnCount", "d4/de5/class_data_structures_1_1_table.xhtml#ae2b9b78e1442c3141966159fcafdbec9", null ],

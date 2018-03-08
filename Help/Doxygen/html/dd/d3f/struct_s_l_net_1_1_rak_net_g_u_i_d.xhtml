@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -124,6 +124,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a52523d2fb1100c77f359899444b4a3b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3338612fd4cc4d26497d7fa27ee19d87"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#a3338612fd4cc4d26497d7fa27ee19d87">ToString</a> (void) const </td></tr>
 <tr class="separator:a3338612fd4cc4d26497d7fa27ee19d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa77f22bcdd49698ea6f5d864f30f9283"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#aa77f22bcdd49698ea6f5d864f30f9283">ToString</a> (char *dest) const </td></tr>
+<tr class="separator:aa77f22bcdd49698ea6f5d864f30f9283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac81ebf55a3d80f2eeab0b740d947c127"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#ac81ebf55a3d80f2eeab0b740d947c127">ToString</a> (char *dest, size_t destSize) const </td></tr>
 <tr class="separator:ac81ebf55a3d80f2eeab0b740d947c127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7baa2a578f53f69cb6d4775d68511217"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml#a7baa2a578f53f69cb6d4775d68511217">FromString</a> (const char *source)</td></tr>
@@ -156,7 +158,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Uniquely identifies an instance of <a class="el" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml" title="Main interface for network communications.">RakPeer</a>. Use <a class="el" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a223d75e8471d565ea4be7f6b44da6e8d" title="Given a connected system address, this method gives the unique GUID representing that instance of Rak...">RakPeer::GetGuidFromSystemAddress()</a> and <a class="el" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a7b99f10bb48b76fcef310226c277870a" title="Gives the system address of a connected system, given its GUID. The GUID will be the same on all syst...">RakPeer::GetSystemAddressFromGuid()</a> to go between <a class="el" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> and <a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml">RakNetGUID</a> Use RakPeer::GetGuidFromSystemAddress(UNASSIGNED_SYSTEM_ADDRESS) to get your own GUID </p>
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00320">320</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00323">323</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="adb747346200d7e4248b4ade6f4a5df7a"></a>
 <div class="memitem">
@@ -171,9 +173,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00752">752</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00788">788</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00349">systemIndex</a>, and <a class="el" href="../../dd/d30/namespace_s_l_net.xhtml#a242c86300509ec068e5e2ea534bbba51">SLNet::UNASSIGNED_RAKNET_GUID()</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00353">systemIndex</a>, and <a class="el" href="../../dd/d30/namespace_s_l_net.xhtml#a242c86300509ec068e5e2ea534bbba51">SLNet::UNASSIGNED_RAKNET_GUID()</a>.</p>
 
 </div>
 </div>
@@ -199,7 +201,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00323">323</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00326">326</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
 </div>
 </div>
@@ -218,9 +220,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00792">792</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00837">837</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 </div>
 </div>
@@ -238,9 +240,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00761">761</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00797">797</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 </div>
 </div>
@@ -258,9 +260,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00769">769</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00805">805</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 </div>
 </div>
@@ -286,9 +288,9 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00341">341</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00345">345</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00349">systemIndex</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>, and <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00353">systemIndex</a>.</p>
 
 </div>
 </div>
@@ -306,9 +308,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00757">757</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00793">793</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 </div>
 </div>
@@ -326,9 +328,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00765">765</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00801">801</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 </div>
 </div>
@@ -354,7 +356,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00350">350</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00354">354</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>, and <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02986">SLNet::RakPeer::SendOutOfBand()</a>.</p>
 
@@ -374,9 +376,29 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00773">773</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00809">809</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00067">SLNet::AddressOrGUID::ToString()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa77f22bcdd49698ea6f5d864f30f9283"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RakNetGUID::ToString </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>dest</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00819">819</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00108">PRINTF_64_BIT_MODIFIER</a>, and <a class="el" href="../../dd/d30/namespace_s_l_net.xhtml#a242c86300509ec068e5e2ea534bbba51">SLNet::UNASSIGNED_RAKNET_GUID()</a>.</p>
 
 </div>
 </div>
@@ -404,9 +426,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00783">783</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00828">828</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00108">PRINTF_64_BIT_MODIFIER</a>, and <a class="el" href="../../dd/d30/namespace_s_l_net.xhtml#a242c86300509ec068e5e2ea534bbba51">SLNet::UNASSIGNED_RAKNET_GUID()</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00108">PRINTF_64_BIT_MODIFIER</a>, and <a class="el" href="../../dd/d30/namespace_s_l_net.xhtml#a242c86300509ec068e5e2ea534bbba51">SLNet::UNASSIGNED_RAKNET_GUID()</a>.</p>
 
 </div>
 </div>
@@ -432,9 +454,9 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00810">810</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00855">855</a> of file <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml">RakNetTypes.cpp</a>.</p>
 
-<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">g</a>.</p>
+<p>References <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">g</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00061">SLNet::AddressOrGUID::ToInteger()</a>.</p>
 
@@ -451,9 +473,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00325">325</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00328">328</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00792">FromString()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04514">SLNet::RakPeer::GenerateGUID()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05452">SLNet::RakPeer::GenerateSeedFromGuid()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00761">operator!=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00769">operator&lt;()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00341">operator=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00757">operator==()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00765">operator&gt;()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01380">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l00372">SLNet::RakPeer::Startup()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00783">ToString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00810">ToUint32()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01023">SLNet::BitStream::Write()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00837">FromString()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04514">SLNet::RakPeer::GenerateGUID()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05452">SLNet::RakPeer::GenerateSeedFromGuid()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00797">operator!=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00805">operator&lt;()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00345">operator=()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00793">operator==()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00801">operator&gt;()</a>, <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01384">SLNet::BitStream::Read()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l00372">SLNet::RakPeer::Startup()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00819">ToString()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00855">ToUint32()</a>, and <a class="el" href="../../d7/dc3/_bit_stream_8h_source.xhtml#l01027">SLNet::BitStream::Write()</a>.</p>
 
 </div>
 </div>
@@ -467,9 +489,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00349">349</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00353">353</a> of file <a class="el" href="../../d9/d49/types_8h_source.xhtml">types.h</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l01647">SLNet::RakPeer::CloseConnection()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02383">SLNet::RakPeer::GetGuidFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03158">SLNet::RakPeer::GetIndexFromGuid()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02436">SLNet::RakPeer::GetSystemAddressFromGuid()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02408">SLNet::RakPeer::GetSystemIndexFromGuid()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00341">operator=()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00752">RakNetGUID()</a>, and <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l01647">SLNet::RakPeer::CloseConnection()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02383">SLNet::RakPeer::GetGuidFromSystemAddress()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l03158">SLNet::RakPeer::GetIndexFromGuid()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02436">SLNet::RakPeer::GetSystemAddressFromGuid()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l02408">SLNet::RakPeer::GetSystemIndexFromGuid()</a>, <a class="el" href="../../d9/d49/types_8h_source.xhtml#l00345">operator=()</a>, <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l04529">SLNet::ProcessOfflineNetworkPacket()</a>, <a class="el" href="../../d3/d93/_rak_net_types_8cpp_source.xhtml#l00788">RakNetGUID()</a>, and <a class="el" href="../../d5/d55/_rak_peer_8cpp_source.xhtml#l05545">SLNet::RakPeer::RunUpdateCycle()</a>.</p>
 
 </div>
 </div>
@@ -483,7 +505,7 @@ Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dd/d30/namespace_s_l_net.xhtml">SLNet</a></li><li class="navelem"><a class="el" href="../../dd/d3f/struct_s_l_net_1_1_rak_net_g_u_i_d.xhtml">RakNetGUID</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:11 for SLikeNet by
+    <li class="footer">Generated on Sun Mar 4 2018 23:36:11 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>
