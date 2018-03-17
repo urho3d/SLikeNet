@@ -30,7 +30,7 @@ Building:
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
 
-version 0.1.1 (03-01-2018 21:00 UTC)
+version 0.1.1 (03-10-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 3 partial GitHub pull requests/issues
 General:
   * several smaller changes, fixes, and code cleanup (#105, #156, #165 - RAKNET_29)
@@ -73,6 +73,7 @@ Samples:
     * fixed spelling mistake in ClientCreateible structs (#122 - SLNET_15)
 Building:
   General:
+    * added support for Windows SDK 10.0.16299.0 (#179)
     * added missing libcat big_x64.o object file (#117)
     * fixed different compiler warnings with VS2015+ (#119)
     * fixed RakNet backwards compatibility and SLikeNet projects sharing the same intermediate directories (#118)

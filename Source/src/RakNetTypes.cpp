@@ -350,7 +350,10 @@ void SystemAddress::ToString_New(bool writePort, char *dest, char portDelineator
 
 	if (*this == UNASSIGNED_SYSTEM_ADDRESS)
 	{
+#pragma warning(push)
+#pragma warning(disable:4996)
 		strcpy(dest, "UNASSIGNED_SYSTEM_ADDRESS");
+#pragma warning(pop)
 		return;
 	}
 
@@ -372,7 +375,10 @@ void SystemAddress::ToString_New(bool writePort, char *dest, char portDelineator
 		unsigned char ch[2];
 		ch[0] = portDelineator;
 		ch[1] = 0;
+#pragma warning(push)
+#pragma warning(disable:4996)
 		strcat(dest, (const char*)ch);
+#pragma warning(pop)
 		Itoa(ntohs(address.addr4.sin_port), dest + strlen(dest), 10);
 	}
 }

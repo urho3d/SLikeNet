@@ -165,7 +165,10 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString(RakNetStatistics *s, char *buffer,
 				(long long unsigned int) s->BPSLimitByCongestionControl,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByCongestionControl
 			);
+#pragma warning(push)
+#pragma warning(disable:4996)
 			strcat(buffer, buff2);
+#pragma warning(pop)
 		}
 		if (s->BPSLimitByOutgoingBandwidthLimit != 0)
 		{
@@ -175,7 +178,10 @@ void RAK_DLL_EXPORT SLNet::StatisticsToString(RakNetStatistics *s, char *buffer,
 				(long long unsigned int) s->BPSLimitByOutgoingBandwidthLimit,
 				100.0f * s->valueOverLastSecond[ACTUAL_BYTES_SENT] / s->BPSLimitByOutgoingBandwidthLimit
 			);
+#pragma warning(push)
+#pragma warning(disable:4996)
 			strcat(buffer, buff2);
+#pragma warning(pop)
 		}
 	}
 }

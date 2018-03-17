@@ -564,7 +564,7 @@ of the license file.
                       sample source code and uses some DX resource files) /
                       WinPhone8: Windows SDK 8.0, 8.0A, 8.1, 8.1A, 10 (builds:
                       10.0.10240.0, 10.0.10586.212, 10.0.14393.795,
-                      10.0.15063.0)
+                      10.0.15063.0, 10.0.16299.0)
    Dependencies:
       - Independent JPEG Group's free JPEG software (see 2.4.4)
    Used in:
