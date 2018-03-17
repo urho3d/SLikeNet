@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d3/d01/_message_filter_8cpp_source.xht
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -379,7 +379,7 @@ $(document).ready(function(){initNavTree('d3/d01/_message_filter_8cpp_source.xht
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">if</span> (filterSet-&gt;<a class="code" href="../../d3/db6/struct_s_l_net_1_1_filter_set.xhtml#a173297bbb59348714737e2c48f0601d4">banOnDisallowedMessage</a> &amp;&amp; <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#adac8deadf450a4e1d69c11b1db588bec">rakPeerInterface</a>)</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    {</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordtype">char</span> str1[64];</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        systemAddress.<a class="code" href="../../d3/da8/struct_s_l_net_1_1_address_or_g_u_i_d.xhtml#a4d7090b1b5269c293f58fee1da43e098">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1,64);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        systemAddress.<a class="code" href="../../d3/da8/struct_s_l_net_1_1_address_or_g_u_i_d.xhtml#a4d7090b1b5269c293f58fee1da43e098">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1, static_cast&lt;size_t&gt;(64));</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#adac8deadf450a4e1d69c11b1db588bec">rakPeerInterface</a>-&gt;<a class="code" href="../../da/d27/class_s_l_net_1_1_rak_peer_interface.xhtml#a3b10ced4928f92596b272f97b9bae6be">AddToBanList</a>(str1, filterSet-&gt;<a class="code" href="../../d3/db6/struct_s_l_net_1_1_filter_set.xhtml#a30628699a65e58ea82f7459183f352b0">disallowedMessageBanTimeMS</a>);</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    }</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span> (filterSet-&gt;<a class="code" href="../../d3/db6/struct_s_l_net_1_1_filter_set.xhtml#aff04a8d4b2314dd8409ae056b9696d60">kickOnDisallowedMessage</a>)</div>
@@ -527,7 +527,7 @@ $(document).ready(function(){initNavTree('d3/d01/_message_filter_8cpp_source.xht
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d3/d01/_message_filter_8cpp.xhtml">MessageFilter.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:05 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:02 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

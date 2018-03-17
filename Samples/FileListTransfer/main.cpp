@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -45,7 +45,7 @@ public:
 	bool OnFile(
 		OnFileStruct *onFileStruct)
 	{
-		printf("OnFile: %i. (100%%) %i/%i %s %ib / %ib\n",
+		printf("OnFile: %u. (100%%) %u/%u %s %ub / %ub\n",
 			onFileStruct->setID,
 			onFileStruct->fileIndex+1,
 			onFileStruct->numberOfFilesInThisSet,
@@ -75,9 +75,9 @@ public:
 
 	virtual void OnFileProgress(FileProgressStruct *fps)
 	{
-		printf("OnFileProgress: %i partCount=%i partTotal=%i (%i%%) %i/%i %s %ib/%ib %ib/%ib total\n",
+		printf("OnFileProgress: %u partCount=%u partTotal=%u (%u%%) %u/%u %s %ub/%ub %ub/%ub total\n",
 			fps->onFileStruct->setID,
-			fps->partCount, fps->partTotal, (int) (100.0*(double)fps->onFileStruct->bytesDownloadedForThisFile/(double)fps->onFileStruct->byteLengthOfThisFile),
+			fps->partCount, fps->partTotal, (unsigned int) (100.0*(double)fps->onFileStruct->bytesDownloadedForThisFile/(double)fps->onFileStruct->byteLengthOfThisFile),
 			fps->onFileStruct->fileIndex+1,
 			fps->onFileStruct->numberOfFilesInThisSet,
 			fps->onFileStruct->fileName,
@@ -102,19 +102,19 @@ class TestFileListProgress : public SLNet::FileListProgress
 {
     virtual void OnFilePush(const char *fileName, unsigned int fileLengthBytes, unsigned int offset, unsigned int bytesBeingSent, bool done, SLNet::SystemAddress targetSystem, unsigned short setID)
 	{
-		printf("Sending %s bytes=%i offset=%i\n", fileName, bytesBeingSent, offset);
+		printf("Sending %s bytes=%u offset=%u\n", fileName, bytesBeingSent, offset);
 	}
 
     virtual void OnFilePushesComplete(SLNet::SystemAddress systemAddress, unsigned short setID )
 	{
 		char str[32];
-		systemAddress.ToString(true, (char*) str, 32);
+		systemAddress.ToString(true, (char*) str, static_cast<size_t>(32));
 		RAKNET_DEBUG_PRINTF("File pushes complete to %s\n", str);	
 	}
 	virtual void OnSendAborted(SLNet::SystemAddress systemAddress )
 	{
 		char str[32];
-		systemAddress.ToString(true, (char*) str, 32);
+		systemAddress.ToString(true, (char*) str, static_cast<size_t>(32));
 		RAKNET_DEBUG_PRINTF("Send aborted to %s\n", str);	
 	}
 

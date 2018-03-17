@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d6/dc8/_secure_handshake_8cpp_source.x
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -160,24 +160,31 @@ $(document).ready(function(){initNavTree('d6/dc8/_secure_handshake_8cpp_source.x
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/rand/EntropyLinux.cpp&quot;</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/rand/EntropyWindowsCE.cpp&quot;</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/rand/EntropyGeneric.cpp&quot;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/rand/Fortuna.cpp&quot;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreement.cpp&quot;</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/AuthenticatedEncryption.cpp&quot;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreementInitiator.cpp&quot;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreementResponder.cpp&quot;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyMaker.cpp&quot;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/EasyHandshake.cpp&quot;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif // LIBCAT_SECURITY</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#ifdef _M_X64</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(push)</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(disable:4838)</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &quot;cat/src/crypt/rand/Fortuna.cpp&quot;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#ifdef _M_X64</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(pop)</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreement.cpp&quot;</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/AuthenticatedEncryption.cpp&quot;</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreementInitiator.cpp&quot;</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyAgreementResponder.cpp&quot;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/KeyMaker.cpp&quot;</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include &quot;cat/src/crypt/tunnel/EasyHandshake.cpp&quot;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#endif // LIBCAT_SECURITY</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d6/dc8/_secure_handshake_8cpp.xhtml">SecureHandshake.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:06 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:03 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

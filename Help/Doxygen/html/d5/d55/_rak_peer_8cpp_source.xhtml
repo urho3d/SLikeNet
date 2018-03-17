@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -1200,39 +1200,39 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;        <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a229049c7a658a2740ec30d774838d33b">pluginListNTS</a>[i]-&gt;OnRakPeerShutdown();</div>
 <div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;    }</div>
 <div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;</div>
-<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a3d64adb5812fb891bb03b9fd9c331f97">activeSystemListSize</a>=0;</div>
+<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a15b5ee1db6ab9f6620954e2ed07e2093">quitAndDataEvents</a>.<a class="code" href="../../df/d28/class_s_l_net_1_1_signaled_event.xhtml#a31c7d09f76fc2f9042905c68ff1a5491">SetEvent</a>();</div>
 <div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;</div>
-<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a15b5ee1db6ab9f6620954e2ed07e2093">quitAndDataEvents</a>.<a class="code" href="../../df/d28/class_s_l_net_1_1_signaled_event.xhtml#a31c7d09f76fc2f9042905c68ff1a5491">SetEvent</a>();</div>
+<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a> = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;</div>
-<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;</div>
-<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;<span class="comment">//  SLNet::TimeMS timeout;</span></div>
-<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;<span class="preprocessor">#if RAKPEER_USER_THREADED!=1</span></div>
-<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;<span class="preprocessor">#if !defined(__native_client__) &amp;&amp; !defined(WINDOWS_STORE_RT)</span></div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">for</span> (i=0; i &lt; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
-<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;    {</div>
-<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>[i]-&gt;IsBerkleySocket())</div>
-<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;        {</div>
-<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;            ((<a class="code" href="../../d1/d4f/class_s_l_net_1_1_r_n_s2___berkley.xhtml">RNS2_Berkley</a> *)<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>[i])-&gt;SignalStopRecvPollingThread();</div>
-<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;        }</div>
-<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;    }</div>
-<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;    <span class="comment">/*</span></div>
-<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;<span class="comment">    // Get recvfrom to unblock</span></div>
-<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;<span class="comment">    for (i=0; i &lt; socketList.Size(); i++)</span></div>
-<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;<span class="comment">    {</span></div>
-<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;<span class="comment">        if (SocketLayer::SendTo(socketList[i], (const char*) &amp;i,1,socketList[i]-&gt;GetBoundAddress(), _FILE_AND_LINE_)!=0)</span></div>
-<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;<span class="comment">            break;</span></div>
-<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;<span class="comment">    }</span></div>
-<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;</div>
-<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;    <span class="keywordflow">while</span> ( <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aeaa8130143d14b02ed37c51ebd4e0031" title="true if the peer thread is active.">isMainLoopThreadActive</a> )</div>
-<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;    {</div>
-<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;        <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;        <a class="code" href="../../df/d30/_rak_sleep_8cpp.xhtml#a5b4f72ab4031078e87f5ed1b6828e1c7">RakSleep</a>(15);</div>
-<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;    }</div>
+<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;<span class="comment">//  SLNet::TimeMS timeout;</span></div>
+<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;<span class="preprocessor">#if RAKPEER_USER_THREADED!=1</span></div>
+<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;<span class="preprocessor">#if !defined(__native_client__) &amp;&amp; !defined(WINDOWS_STORE_RT)</span></div>
+<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;<span class="preprocessor"></span>    <span class="keywordflow">for</span> (i=0; i &lt; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
+<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;    {</div>
+<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>[i]-&gt;IsBerkleySocket())</div>
+<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;        {</div>
+<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;            ((<a class="code" href="../../d1/d4f/class_s_l_net_1_1_r_n_s2___berkley.xhtml">RNS2_Berkley</a> *)<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a6b259e14ae3bf3ebdf93c59ede553d2c">socketList</a>[i])-&gt;SignalStopRecvPollingThread();</div>
+<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;        }</div>
+<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;    }</div>
+<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;    <span class="comment">/*</span></div>
+<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;<span class="comment">    // Get recvfrom to unblock</span></div>
+<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;<span class="comment">    for (i=0; i &lt; socketList.Size(); i++)</span></div>
+<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;<span class="comment">    {</span></div>
+<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;<span class="comment">        if (SocketLayer::SendTo(socketList[i], (const char*) &amp;i,1,socketList[i]-&gt;GetBoundAddress(), _FILE_AND_LINE_)!=0)</span></div>
+<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;<span class="comment">            break;</span></div>
+<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;<span class="comment">    }</span></div>
+<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;</div>
+<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;    <span class="keywordflow">while</span> ( <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aeaa8130143d14b02ed37c51ebd4e0031" title="true if the peer thread is active.">isMainLoopThreadActive</a> )</div>
+<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;    {</div>
+<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;        <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;        <a class="code" href="../../df/d30/_rak_sleep_8cpp.xhtml#a5b4f72ab4031078e87f5ed1b6828e1c7">RakSleep</a>(15);</div>
+<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;    }</div>
+<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;</div>
+<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a3d64adb5812fb891bb03b9fd9c331f97">activeSystemListSize</a> = 0;</div>
 <div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;</div>
 <div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;    <span class="comment">/*</span></div>
 <div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;<span class="comment">    timeout = SLNet::GetTimeMS()+1000;</span></div>
@@ -2711,7 +2711,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l02609"></a><span class="lineno"> 2609</span>&#160;</div>
 <div class="line"><a name="l02610"></a><span class="lineno"> 2610</span>&#160;</div>
 <div class="line"><a name="l02611"></a><span class="lineno"> 2611</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">char</span> str[128];</div>
-<div class="line"><a name="l02612"></a><span class="lineno"> 2612</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[index].<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,str,128);</div>
+<div class="line"><a name="l02612"></a><span class="lineno"> 2612</span>&#160;    <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[index].<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,str,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l02613"></a><span class="lineno"> 2613</span>&#160;    <span class="keywordflow">return</span> str;</div>
 <div class="line"><a name="l02614"></a><span class="lineno"> 2614</span>&#160;</div>
 <div class="line"><a name="l02615"></a><span class="lineno"> 2615</span>&#160;</div>
@@ -3745,7 +3745,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l03643"></a><span class="lineno"> 3643</span>&#160;            <span class="keywordflow">else</span></div>
 <div class="line"><a name="l03644"></a><span class="lineno"> 3644</span>&#160;            {</div>
 <div class="line"><a name="l03645"></a><span class="lineno"> 3645</span>&#160;                <span class="keywordtype">char</span> str[256];</div>
-<div class="line"><a name="l03646"></a><span class="lineno"> 3646</span>&#160;                bindingAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,str,256);</div>
+<div class="line"><a name="l03646"></a><span class="lineno"> 3646</span>&#160;                bindingAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,str,static_cast&lt;size_t&gt;(256));</div>
 <div class="line"><a name="l03647"></a><span class="lineno"> 3647</span>&#160;                <span class="comment">// See if this is an internal IP address.</span></div>
 <div class="line"><a name="l03648"></a><span class="lineno"> 3648</span>&#160;                <span class="comment">// If so, force binding on it so we reply on the same IP address as they sent to.</span></div>
 <div class="line"><a name="l03649"></a><span class="lineno"> 3649</span>&#160;                <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ipListIndex, foundIndex=(<span class="keywordtype">unsigned</span> int)-1;</div>
@@ -4637,7 +4637,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l04535"></a><span class="lineno"> 4535</span>&#160;</div>
 <div class="line"><a name="l04536"></a><span class="lineno"> 4536</span>&#160;</div>
 <div class="line"><a name="l04537"></a><span class="lineno"> 4537</span>&#160;    <span class="keywordtype">char</span> str1[64];</div>
-<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1,64);</div>
+<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1,static_cast&lt;size_t&gt;(64));</div>
 <div class="line"><a name="l04539"></a><span class="lineno"> 4539</span>&#160;    <span class="keywordflow">if</span> (rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae1ad09ea9ca5ea8bd4a00f78e22a5abc" title="Returns true or false indicating if a particular IP is banned.">IsBanned</a>( str1 ))</div>
 <div class="line"><a name="l04540"></a><span class="lineno"> 4540</span>&#160;    {</div>
 <div class="line"><a name="l04541"></a><span class="lineno"> 4541</span>&#160;        <span class="keywordflow">for</span> (i=0; i &lt; rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a229049c7a658a2740ec30d774838d33b">pluginListNTS</a>.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
@@ -5293,7 +5293,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l05191"></a><span class="lineno"> 5191</span>&#160;</div>
 <div class="line"><a name="l05192"></a><span class="lineno"> 5192</span>&#160;            <span class="keywordflow">if</span> (rakPeer-&gt;_using_security)</div>
 <div class="line"><a name="l05193"></a><span class="lineno"> 5193</span>&#160;            {</div>
-<div class="line"><a name="l05194"></a><span class="lineno"> 5194</span>&#160;                systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1, 64);</div>
+<div class="line"><a name="l05194"></a><span class="lineno"> 5194</span>&#160;                systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1, static_cast&lt;size_t&gt;(64));</div>
 <div class="line"><a name="l05195"></a><span class="lineno"> 5195</span>&#160;                requiresSecurityOfThisClient=rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a4541da876eef1161bd7460f2cbfcc3bd" title="Checks to see if a given IP is in the security exception list.">IsInSecurityExceptionList</a>(str1)==<span class="keyword">false</span>;</div>
 <div class="line"><a name="l05196"></a><span class="lineno"> 5196</span>&#160;</div>
 <div class="line"><a name="l05197"></a><span class="lineno"> 5197</span>&#160;                <a class="code" href="../../df/df2/_native_types_8h.xhtml#a6eb1e68cc391dd753bc8ce896dbb8315">uint32_t</a> cookie;</div>
@@ -5841,7 +5841,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l05739"></a><span class="lineno"> 5739</span>&#160;                    bitStream.<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a76ea2ef937a428e9d907a7367fd92b12" title="Write zeros until the bitstream is filled up to bytes.">PadWithZeroToByteLength</a>(<a class="code" href="../../d5/d55/_rak_peer_8cpp.xhtml#a015aab2264db77f793cc6ef1b81da9bb">mtuSizes</a>[MTUSizeIndex]-<a class="code" href="../../d0/dfb/_c_c_rak_net_sliding_window_8h.xhtml#a8a0fae83e487dc04b3cd774b3d4ee637" title="Sizeof an UDP header in byte.">UDP_HEADER_SIZE</a>);</div>
 <div class="line"><a name="l05740"></a><span class="lineno"> 5740</span>&#160;</div>
 <div class="line"><a name="l05741"></a><span class="lineno"> 5741</span>&#160;                    <span class="keywordtype">char</span> str[256];</div>
-<div class="line"><a name="l05742"></a><span class="lineno"> 5742</span>&#160;                    rcs-&gt;<a class="code" href="../../dd/d9f/struct_s_l_net_1_1_rak_peer_1_1_requested_connection_struct.xhtml#ab5c97b9bd57ef8afdf44be5658d56c9f">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,str,256);</div>
+<div class="line"><a name="l05742"></a><span class="lineno"> 5742</span>&#160;                    rcs-&gt;<a class="code" href="../../dd/d9f/struct_s_l_net_1_1_rak_peer_1_1_requested_connection_struct.xhtml#ab5c97b9bd57ef8afdf44be5658d56c9f">systemAddress</a>.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">true</span>,str,static_cast&lt;size_t&gt;(256));</div>
 <div class="line"><a name="l05743"></a><span class="lineno"> 5743</span>&#160;</div>
 <div class="line"><a name="l05744"></a><span class="lineno"> 5744</span>&#160;                    <span class="comment">//RAKNET_DEBUG_PRINTF(&quot;%i:IOCR, &quot;, __LINE__);</span></div>
 <div class="line"><a name="l05745"></a><span class="lineno"> 5745</span>&#160;</div>
@@ -6047,7 +6047,7 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l05945"></a><span class="lineno"> 5945</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l05946"></a><span class="lineno"> 5946</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l05947"></a><span class="lineno"> 5947</span>&#160;                        <span class="keywordtype">char</span> str1[64];</div>
-<div class="line"><a name="l05948"></a><span class="lineno"> 5948</span>&#160;                        systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1, 64);</div>
+<div class="line"><a name="l05948"></a><span class="lineno"> 5948</span>&#160;                        systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>, str1, static_cast&lt;size_t&gt;(64));</div>
 <div class="line"><a name="l05949"></a><span class="lineno"> 5949</span>&#160;                        <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aa0df3df6ab4e04ae2ef0696670d7f776" title="Bans an IP from connecting.">AddToBanList</a>(str1, remoteSystem-&gt;<a class="code" href="../../df/dab/struct_s_l_net_1_1_rak_peer_1_1_remote_system_struct.xhtml#a71bc3dc9a3abcf6a0dda287f190a8e2a" title="Their internal IP, behind the LAN.">reliabilityLayer</a>.<a class="code" href="../../d2/d55/class_s_l_net_1_1_reliability_layer.xhtml#ad7ae8c962a75dee167d2ba844bf571e1">GetTimeoutTime</a>());</div>
 <div class="line"><a name="l05950"></a><span class="lineno"> 5950</span>&#160;</div>
 <div class="line"><a name="l05951"></a><span class="lineno"> 5951</span>&#160;</div>
@@ -6421,170 +6421,176 @@ $(document).ready(function(){initNavTree('d5/d55/_rak_peer_8cpp_source.xhtml','.
 <div class="line"><a name="l06319"></a><span class="lineno"> 6319</span>&#160;<span class="comment">// </span></div>
 <div class="line"><a name="l06320"></a><span class="lineno"> 6320</span>&#160;    rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aeaa8130143d14b02ed37c51ebd4e0031" title="true if the peer thread is active.">isMainLoopThreadActive</a> = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l06321"></a><span class="lineno"> 6321</span>&#160;</div>
-<div class="line"><a name="l06322"></a><span class="lineno"> 6322</span>&#160;    <span class="keywordflow">while</span> ( rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a> == <span class="keyword">false</span> )</div>
-<div class="line"><a name="l06323"></a><span class="lineno"> 6323</span>&#160;    {</div>
-<div class="line"><a name="l06324"></a><span class="lineno"> 6324</span>&#160;<span class="comment">// #ifdef _DEBUG</span></div>
-<div class="line"><a name="l06325"></a><span class="lineno"> 6325</span>&#160;<span class="comment">//      // Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time</span></div>
-<div class="line"><a name="l06326"></a><span class="lineno"> 6326</span>&#160;<span class="comment">//      RakNetTime thisCall=SLNet::GetTime();</span></div>
-<div class="line"><a name="l06327"></a><span class="lineno"> 6327</span>&#160;<span class="comment">//      RakAssert(thisCall-lastCall&lt;250);</span></div>
-<div class="line"><a name="l06328"></a><span class="lineno"> 6328</span>&#160;<span class="comment">//      lastCall=thisCall;</span></div>
-<div class="line"><a name="l06329"></a><span class="lineno"> 6329</span>&#160;<span class="comment">// #endif</span></div>
-<div class="line"><a name="l06330"></a><span class="lineno"> 6330</span>&#160;        <span class="keywordflow">if</span> (rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a20fcdb099d34697499fac5cc66c3cc3a">userUpdateThreadPtr</a>)</div>
-<div class="line"><a name="l06331"></a><span class="lineno"> 6331</span>&#160;            rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a20fcdb099d34697499fac5cc66c3cc3a">userUpdateThreadPtr</a>(rakPeer, rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a28a260ba6e476355e67a7c794f4f54d2">userUpdateThreadData</a>);</div>
-<div class="line"><a name="l06332"></a><span class="lineno"> 6332</span>&#160;</div>
-<div class="line"><a name="l06333"></a><span class="lineno"> 6333</span>&#160;        rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a601d36de413c7b94fb689e205921df9e">RunUpdateCycle</a>(updateBitStream);</div>
-<div class="line"><a name="l06334"></a><span class="lineno"> 6334</span>&#160;</div>
-<div class="line"><a name="l06335"></a><span class="lineno"> 6335</span>&#160;        <span class="comment">// Pending sends go out this often, unless quitAndDataEvents is set</span></div>
-<div class="line"><a name="l06336"></a><span class="lineno"> 6336</span>&#160;        rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a15b5ee1db6ab9f6620954e2ed07e2093">quitAndDataEvents</a>.<a class="code" href="../../df/d28/class_s_l_net_1_1_signaled_event.xhtml#a2fd996cd5b65eaac7aec7e57a47a4609">WaitOnEvent</a>(10);</div>
-<div class="line"><a name="l06337"></a><span class="lineno"> 6337</span>&#160;</div>
-<div class="line"><a name="l06338"></a><span class="lineno"> 6338</span>&#160;        <span class="comment">/*</span></div>
-<div class="line"><a name="l06339"></a><span class="lineno"> 6339</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l06340"></a><span class="lineno"> 6340</span>&#160;<span class="comment">// #if ((_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)) &amp;&amp;</span></div>
-<div class="line"><a name="l06341"></a><span class="lineno"> 6341</span>&#160;<span class="comment">#if defined(USE_WAIT_FOR_MULTIPLE_EVENTS) &amp;&amp; defined(_WIN32)</span></div>
-<div class="line"><a name="l06342"></a><span class="lineno"> 6342</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l06343"></a><span class="lineno"> 6343</span>&#160;<span class="comment">        if (rakPeer-&gt;threadSleepTimer&gt;0)</span></div>
-<div class="line"><a name="l06344"></a><span class="lineno"> 6344</span>&#160;<span class="comment">        {</span></div>
-<div class="line"><a name="l06345"></a><span class="lineno"> 6345</span>&#160;<span class="comment">            WSAEVENT eventArray[256];</span></div>
-<div class="line"><a name="l06346"></a><span class="lineno"> 6346</span>&#160;<span class="comment">            unsigned int i, eventArrayIndex;</span></div>
-<div class="line"><a name="l06347"></a><span class="lineno"> 6347</span>&#160;<span class="comment">            for (i=0,eventArrayIndex=0; i &lt; rakPeer-&gt;socketList.Size(); i++)</span></div>
-<div class="line"><a name="l06348"></a><span class="lineno"> 6348</span>&#160;<span class="comment">            {</span></div>
-<div class="line"><a name="l06349"></a><span class="lineno"> 6349</span>&#160;<span class="comment">                if (rakPeer-&gt;socketList[i]-&gt;recvEvent!=INVALID_HANDLE_VALUE)</span></div>
-<div class="line"><a name="l06350"></a><span class="lineno"> 6350</span>&#160;<span class="comment">                {</span></div>
-<div class="line"><a name="l06351"></a><span class="lineno"> 6351</span>&#160;<span class="comment">                    eventArray[eventArrayIndex]=rakPeer-&gt;socketList[i]-&gt;recvEvent;</span></div>
-<div class="line"><a name="l06352"></a><span class="lineno"> 6352</span>&#160;<span class="comment">                    eventArrayIndex++;</span></div>
-<div class="line"><a name="l06353"></a><span class="lineno"> 6353</span>&#160;<span class="comment">                    if (eventArrayIndex==256)</span></div>
-<div class="line"><a name="l06354"></a><span class="lineno"> 6354</span>&#160;<span class="comment">                        break;</span></div>
-<div class="line"><a name="l06355"></a><span class="lineno"> 6355</span>&#160;<span class="comment">                }</span></div>
-<div class="line"><a name="l06356"></a><span class="lineno"> 6356</span>&#160;<span class="comment">            }</span></div>
-<div class="line"><a name="l06357"></a><span class="lineno"> 6357</span>&#160;<span class="comment">            WSAWaitForMultipleEvents(eventArrayIndex,(const HANDLE*) &amp;eventArray,FALSE,rakPeer-&gt;threadSleepTimer,FALSE);</span></div>
-<div class="line"><a name="l06358"></a><span class="lineno"> 6358</span>&#160;<span class="comment">        }</span></div>
-<div class="line"><a name="l06359"></a><span class="lineno"> 6359</span>&#160;<span class="comment">        else</span></div>
-<div class="line"><a name="l06360"></a><span class="lineno"> 6360</span>&#160;<span class="comment">        {</span></div>
-<div class="line"><a name="l06361"></a><span class="lineno"> 6361</span>&#160;<span class="comment">            RakSleep(0);</span></div>
-<div class="line"><a name="l06362"></a><span class="lineno"> 6362</span>&#160;<span class="comment">        }</span></div>
-<div class="line"><a name="l06363"></a><span class="lineno"> 6363</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l06364"></a><span class="lineno"> 6364</span>&#160;<span class="comment">#else // ((_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)) &amp;&amp; defined(USE_WAIT_FOR_MULTIPLE_EVENTS)</span></div>
-<div class="line"><a name="l06365"></a><span class="lineno"> 6365</span>&#160;<span class="comment">        #pragma message(&quot;-- RakNet: Using Sleep(). Uncomment USE_WAIT_FOR_MULTIPLE_EVENTS in defines.h if you want to use WaitForSingleObject instead. --&quot;)</span></div>
-<div class="line"><a name="l06366"></a><span class="lineno"> 6366</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l06367"></a><span class="lineno"> 6367</span>&#160;<span class="comment">        RakSleep( rakPeer-&gt;threadSleepTimer );</span></div>
-<div class="line"><a name="l06368"></a><span class="lineno"> 6368</span>&#160;<span class="comment">#endif</span></div>
-<div class="line"><a name="l06369"></a><span class="lineno"> 6369</span>&#160;<span class="comment">        */</span></div>
-<div class="line"><a name="l06370"></a><span class="lineno"> 6370</span>&#160;    }</div>
-<div class="line"><a name="l06371"></a><span class="lineno"> 6371</span>&#160;</div>
-<div class="line"><a name="l06372"></a><span class="lineno"> 6372</span>&#160;    rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aeaa8130143d14b02ed37c51ebd4e0031" title="true if the peer thread is active.">isMainLoopThreadActive</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l06373"></a><span class="lineno"> 6373</span>&#160;</div>
-<div class="line"><a name="l06374"></a><span class="lineno"> 6374</span>&#160;    <span class="comment">/*</span></div>
-<div class="line"><a name="l06375"></a><span class="lineno"> 6375</span>&#160;<span class="comment">#ifdef _WIN32</span></div>
-<div class="line"><a name="l06376"></a><span class="lineno"> 6376</span>&#160;<span class="comment">#if (_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)</span></div>
-<div class="line"><a name="l06377"></a><span class="lineno"> 6377</span>&#160;<span class="comment">    CloseHandle(timerHandle);</span></div>
-<div class="line"><a name="l06378"></a><span class="lineno"> 6378</span>&#160;<span class="comment">#endif</span></div>
-<div class="line"><a name="l06379"></a><span class="lineno"> 6379</span>&#160;<span class="comment">#endif</span></div>
-<div class="line"><a name="l06380"></a><span class="lineno"> 6380</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l06381"></a><span class="lineno"> 6381</span>&#160;</div>
-<div class="line"><a name="l06382"></a><span class="lineno"> 6382</span>&#160;</div>
-<div class="line"><a name="l06383"></a><span class="lineno"> 6383</span>&#160;</div>
-<div class="line"><a name="l06384"></a><span class="lineno"> 6384</span>&#160;</div>
-<div class="line"><a name="l06385"></a><span class="lineno"> 6385</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l06386"></a><span class="lineno"> 6386</span>&#160;</div>
-<div class="line"><a name="l06387"></a><span class="lineno"> 6387</span>&#160;}</div>
+<div class="line"><a name="l06322"></a><span class="lineno"> 6322</span>&#160;    <span class="keywordtype">bool</span> running = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l06323"></a><span class="lineno"> 6323</span>&#160;    <span class="keywordflow">while</span> ( running )</div>
+<div class="line"><a name="l06324"></a><span class="lineno"> 6324</span>&#160;    {</div>
+<div class="line"><a name="l06325"></a><span class="lineno"> 6325</span>&#160;        <span class="keywordflow">if</span> (rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#ae362305e23379edf573a4cbff2df19ef" title="Set this to true to terminate the Peer thread execution.">endThreads</a>) {</div>
+<div class="line"><a name="l06326"></a><span class="lineno"> 6326</span>&#160;            <span class="comment">// allow just one more final update-run prior to shutting down this thread to make sure that outstanding acks are still sent and the peers don&#39;t unnecessary wait for already retrieved packets</span></div>
+<div class="line"><a name="l06327"></a><span class="lineno"> 6327</span>&#160;            <span class="comment">// note: this fixes part of SLNET-123</span></div>
+<div class="line"><a name="l06328"></a><span class="lineno"> 6328</span>&#160;            running = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l06329"></a><span class="lineno"> 6329</span>&#160;        }</div>
+<div class="line"><a name="l06330"></a><span class="lineno"> 6330</span>&#160;<span class="comment">// #ifdef _DEBUG</span></div>
+<div class="line"><a name="l06331"></a><span class="lineno"> 6331</span>&#160;<span class="comment">//      // Sanity check, make sure RunUpdateCycle does not block or not otherwise get called for a long time</span></div>
+<div class="line"><a name="l06332"></a><span class="lineno"> 6332</span>&#160;<span class="comment">//      RakNetTime thisCall=SLNet::GetTime();</span></div>
+<div class="line"><a name="l06333"></a><span class="lineno"> 6333</span>&#160;<span class="comment">//      RakAssert(thisCall-lastCall&lt;250);</span></div>
+<div class="line"><a name="l06334"></a><span class="lineno"> 6334</span>&#160;<span class="comment">//      lastCall=thisCall;</span></div>
+<div class="line"><a name="l06335"></a><span class="lineno"> 6335</span>&#160;<span class="comment">// #endif</span></div>
+<div class="line"><a name="l06336"></a><span class="lineno"> 6336</span>&#160;        <span class="keywordflow">if</span> (rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a20fcdb099d34697499fac5cc66c3cc3a">userUpdateThreadPtr</a>)</div>
+<div class="line"><a name="l06337"></a><span class="lineno"> 6337</span>&#160;            rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a20fcdb099d34697499fac5cc66c3cc3a">userUpdateThreadPtr</a>(rakPeer, rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a28a260ba6e476355e67a7c794f4f54d2">userUpdateThreadData</a>);</div>
+<div class="line"><a name="l06338"></a><span class="lineno"> 6338</span>&#160;</div>
+<div class="line"><a name="l06339"></a><span class="lineno"> 6339</span>&#160;        rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a601d36de413c7b94fb689e205921df9e">RunUpdateCycle</a>(updateBitStream);</div>
+<div class="line"><a name="l06340"></a><span class="lineno"> 6340</span>&#160;</div>
+<div class="line"><a name="l06341"></a><span class="lineno"> 6341</span>&#160;        <span class="comment">// Pending sends go out this often, unless quitAndDataEvents is set</span></div>
+<div class="line"><a name="l06342"></a><span class="lineno"> 6342</span>&#160;        rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a15b5ee1db6ab9f6620954e2ed07e2093">quitAndDataEvents</a>.<a class="code" href="../../df/d28/class_s_l_net_1_1_signaled_event.xhtml#a2fd996cd5b65eaac7aec7e57a47a4609">WaitOnEvent</a>(10);</div>
+<div class="line"><a name="l06343"></a><span class="lineno"> 6343</span>&#160;</div>
+<div class="line"><a name="l06344"></a><span class="lineno"> 6344</span>&#160;        <span class="comment">/*</span></div>
+<div class="line"><a name="l06345"></a><span class="lineno"> 6345</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l06346"></a><span class="lineno"> 6346</span>&#160;<span class="comment">// #if ((_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)) &amp;&amp;</span></div>
+<div class="line"><a name="l06347"></a><span class="lineno"> 6347</span>&#160;<span class="comment">#if defined(USE_WAIT_FOR_MULTIPLE_EVENTS) &amp;&amp; defined(_WIN32)</span></div>
+<div class="line"><a name="l06348"></a><span class="lineno"> 6348</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l06349"></a><span class="lineno"> 6349</span>&#160;<span class="comment">        if (rakPeer-&gt;threadSleepTimer&gt;0)</span></div>
+<div class="line"><a name="l06350"></a><span class="lineno"> 6350</span>&#160;<span class="comment">        {</span></div>
+<div class="line"><a name="l06351"></a><span class="lineno"> 6351</span>&#160;<span class="comment">            WSAEVENT eventArray[256];</span></div>
+<div class="line"><a name="l06352"></a><span class="lineno"> 6352</span>&#160;<span class="comment">            unsigned int i, eventArrayIndex;</span></div>
+<div class="line"><a name="l06353"></a><span class="lineno"> 6353</span>&#160;<span class="comment">            for (i=0,eventArrayIndex=0; i &lt; rakPeer-&gt;socketList.Size(); i++)</span></div>
+<div class="line"><a name="l06354"></a><span class="lineno"> 6354</span>&#160;<span class="comment">            {</span></div>
+<div class="line"><a name="l06355"></a><span class="lineno"> 6355</span>&#160;<span class="comment">                if (rakPeer-&gt;socketList[i]-&gt;recvEvent!=INVALID_HANDLE_VALUE)</span></div>
+<div class="line"><a name="l06356"></a><span class="lineno"> 6356</span>&#160;<span class="comment">                {</span></div>
+<div class="line"><a name="l06357"></a><span class="lineno"> 6357</span>&#160;<span class="comment">                    eventArray[eventArrayIndex]=rakPeer-&gt;socketList[i]-&gt;recvEvent;</span></div>
+<div class="line"><a name="l06358"></a><span class="lineno"> 6358</span>&#160;<span class="comment">                    eventArrayIndex++;</span></div>
+<div class="line"><a name="l06359"></a><span class="lineno"> 6359</span>&#160;<span class="comment">                    if (eventArrayIndex==256)</span></div>
+<div class="line"><a name="l06360"></a><span class="lineno"> 6360</span>&#160;<span class="comment">                        break;</span></div>
+<div class="line"><a name="l06361"></a><span class="lineno"> 6361</span>&#160;<span class="comment">                }</span></div>
+<div class="line"><a name="l06362"></a><span class="lineno"> 6362</span>&#160;<span class="comment">            }</span></div>
+<div class="line"><a name="l06363"></a><span class="lineno"> 6363</span>&#160;<span class="comment">            WSAWaitForMultipleEvents(eventArrayIndex,(const HANDLE*) &amp;eventArray,FALSE,rakPeer-&gt;threadSleepTimer,FALSE);</span></div>
+<div class="line"><a name="l06364"></a><span class="lineno"> 6364</span>&#160;<span class="comment">        }</span></div>
+<div class="line"><a name="l06365"></a><span class="lineno"> 6365</span>&#160;<span class="comment">        else</span></div>
+<div class="line"><a name="l06366"></a><span class="lineno"> 6366</span>&#160;<span class="comment">        {</span></div>
+<div class="line"><a name="l06367"></a><span class="lineno"> 6367</span>&#160;<span class="comment">            RakSleep(0);</span></div>
+<div class="line"><a name="l06368"></a><span class="lineno"> 6368</span>&#160;<span class="comment">        }</span></div>
+<div class="line"><a name="l06369"></a><span class="lineno"> 6369</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l06370"></a><span class="lineno"> 6370</span>&#160;<span class="comment">#else // ((_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)) &amp;&amp; defined(USE_WAIT_FOR_MULTIPLE_EVENTS)</span></div>
+<div class="line"><a name="l06371"></a><span class="lineno"> 6371</span>&#160;<span class="comment">        #pragma message(&quot;-- RakNet: Using Sleep(). Uncomment USE_WAIT_FOR_MULTIPLE_EVENTS in defines.h if you want to use WaitForSingleObject instead. --&quot;)</span></div>
+<div class="line"><a name="l06372"></a><span class="lineno"> 6372</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l06373"></a><span class="lineno"> 6373</span>&#160;<span class="comment">        RakSleep( rakPeer-&gt;threadSleepTimer );</span></div>
+<div class="line"><a name="l06374"></a><span class="lineno"> 6374</span>&#160;<span class="comment">#endif</span></div>
+<div class="line"><a name="l06375"></a><span class="lineno"> 6375</span>&#160;<span class="comment">        */</span></div>
+<div class="line"><a name="l06376"></a><span class="lineno"> 6376</span>&#160;    }</div>
+<div class="line"><a name="l06377"></a><span class="lineno"> 6377</span>&#160;</div>
+<div class="line"><a name="l06378"></a><span class="lineno"> 6378</span>&#160;    rakPeer-&gt;<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#aeaa8130143d14b02ed37c51ebd4e0031" title="true if the peer thread is active.">isMainLoopThreadActive</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l06379"></a><span class="lineno"> 6379</span>&#160;</div>
+<div class="line"><a name="l06380"></a><span class="lineno"> 6380</span>&#160;    <span class="comment">/*</span></div>
+<div class="line"><a name="l06381"></a><span class="lineno"> 6381</span>&#160;<span class="comment">#ifdef _WIN32</span></div>
+<div class="line"><a name="l06382"></a><span class="lineno"> 6382</span>&#160;<span class="comment">#if (_WIN32_WINNT &gt;= 0x0400) || (_WIN32_WINDOWS &gt; 0x0400)</span></div>
+<div class="line"><a name="l06383"></a><span class="lineno"> 6383</span>&#160;<span class="comment">    CloseHandle(timerHandle);</span></div>
+<div class="line"><a name="l06384"></a><span class="lineno"> 6384</span>&#160;<span class="comment">#endif</span></div>
+<div class="line"><a name="l06385"></a><span class="lineno"> 6385</span>&#160;<span class="comment">#endif</span></div>
+<div class="line"><a name="l06386"></a><span class="lineno"> 6386</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l06387"></a><span class="lineno"> 6387</span>&#160;</div>
 <div class="line"><a name="l06388"></a><span class="lineno"> 6388</span>&#160;</div>
-<div class="line"><a name="l06389"></a><span class="lineno"><a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a78343590e47d7f2ffddcd81cb72dcf0a"> 6389</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a78343590e47d7f2ffddcd81cb72dcf0a">RakPeer::CallPluginCallbacks</a>(<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml">DataStructures::List&lt;PluginInterface2*&gt;</a> &amp;pluginList, <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#d8/d23/struct_s_l_net_1_1_packet" title="This represents a user message from another system.">Packet</a> *packet)</div>
-<div class="line"><a name="l06390"></a><span class="lineno"> 6390</span>&#160;{</div>
-<div class="line"><a name="l06391"></a><span class="lineno"> 6391</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0; i &lt; pluginList.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
-<div class="line"><a name="l06392"></a><span class="lineno"> 6392</span>&#160;    {</div>
-<div class="line"><a name="l06393"></a><span class="lineno"> 6393</span>&#160;        <span class="keywordflow">switch</span> (packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#aff6d115daef2787d582f9a20efd64fc0" title="The data from the sender.">data</a>[0])</div>
-<div class="line"><a name="l06394"></a><span class="lineno"> 6394</span>&#160;        {</div>
-<div class="line"><a name="l06395"></a><span class="lineno"> 6395</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3aa3c9ab42767af4b738cceb5a5b3600ae">ID_DISCONNECTION_NOTIFICATION</a>:</div>
-<div class="line"><a name="l06396"></a><span class="lineno"> 6396</span>&#160;            pluginList[i]-&gt;OnClosedConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga4d3ac5ca8821fadad6d22d0267e06803a01e30ee7b1590feeaf2e6171580f1c05" title="Got ID_DISCONNECTION_NOTIFICATION.">LCR_DISCONNECTION_NOTIFICATION</a>);</div>
-<div class="line"><a name="l06397"></a><span class="lineno"> 6397</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06398"></a><span class="lineno"> 6398</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a28dffd6d158f4003cb58fbe9b483a9a9">ID_CONNECTION_LOST</a>:</div>
-<div class="line"><a name="l06399"></a><span class="lineno"> 6399</span>&#160;            pluginList[i]-&gt;OnClosedConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga4d3ac5ca8821fadad6d22d0267e06803a5c693a8b52ee37ff6bd413e732260914" title="GOT ID_CONNECTION_LOST.">LCR_CONNECTION_LOST</a>);</div>
-<div class="line"><a name="l06400"></a><span class="lineno"> 6400</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06401"></a><span class="lineno"> 6401</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a884712d974b7a5747131dcce61538180" title="RakPeer - A remote system has successfully connected.">ID_NEW_INCOMING_CONNECTION</a>:</div>
-<div class="line"><a name="l06402"></a><span class="lineno"> 6402</span>&#160;            pluginList[i]-&gt;OnNewConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l06389"></a><span class="lineno"> 6389</span>&#160;</div>
+<div class="line"><a name="l06390"></a><span class="lineno"> 6390</span>&#160;</div>
+<div class="line"><a name="l06391"></a><span class="lineno"> 6391</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l06392"></a><span class="lineno"> 6392</span>&#160;</div>
+<div class="line"><a name="l06393"></a><span class="lineno"> 6393</span>&#160;}</div>
+<div class="line"><a name="l06394"></a><span class="lineno"> 6394</span>&#160;</div>
+<div class="line"><a name="l06395"></a><span class="lineno"><a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a78343590e47d7f2ffddcd81cb72dcf0a"> 6395</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a78343590e47d7f2ffddcd81cb72dcf0a">RakPeer::CallPluginCallbacks</a>(<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml">DataStructures::List&lt;PluginInterface2*&gt;</a> &amp;pluginList, <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#d8/d23/struct_s_l_net_1_1_packet" title="This represents a user message from another system.">Packet</a> *packet)</div>
+<div class="line"><a name="l06396"></a><span class="lineno"> 6396</span>&#160;{</div>
+<div class="line"><a name="l06397"></a><span class="lineno"> 6397</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0; i &lt; pluginList.<a class="code" href="../../d4/d78/class_data_structures_1_1_list.xhtml#a6f13a4519693cbd16cd13b1fe284f330">Size</a>(); i++)</div>
+<div class="line"><a name="l06398"></a><span class="lineno"> 6398</span>&#160;    {</div>
+<div class="line"><a name="l06399"></a><span class="lineno"> 6399</span>&#160;        <span class="keywordflow">switch</span> (packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#aff6d115daef2787d582f9a20efd64fc0" title="The data from the sender.">data</a>[0])</div>
+<div class="line"><a name="l06400"></a><span class="lineno"> 6400</span>&#160;        {</div>
+<div class="line"><a name="l06401"></a><span class="lineno"> 6401</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3aa3c9ab42767af4b738cceb5a5b3600ae">ID_DISCONNECTION_NOTIFICATION</a>:</div>
+<div class="line"><a name="l06402"></a><span class="lineno"> 6402</span>&#160;            pluginList[i]-&gt;OnClosedConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga4d3ac5ca8821fadad6d22d0267e06803a01e30ee7b1590feeaf2e6171580f1c05" title="Got ID_DISCONNECTION_NOTIFICATION.">LCR_DISCONNECTION_NOTIFICATION</a>);</div>
 <div class="line"><a name="l06403"></a><span class="lineno"> 6403</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06404"></a><span class="lineno"> 6404</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a8e1677131f83c52ed49001d6401fd2e7" title="RakPeer - In a client/server environment, our connection request to the server has been accepted...">ID_CONNECTION_REQUEST_ACCEPTED</a>:</div>
-<div class="line"><a name="l06405"></a><span class="lineno"> 6405</span>&#160;            pluginList[i]-&gt;OnNewConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l06404"></a><span class="lineno"> 6404</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a28dffd6d158f4003cb58fbe9b483a9a9">ID_CONNECTION_LOST</a>:</div>
+<div class="line"><a name="l06405"></a><span class="lineno"> 6405</span>&#160;            pluginList[i]-&gt;OnClosedConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga4d3ac5ca8821fadad6d22d0267e06803a5c693a8b52ee37ff6bd413e732260914" title="GOT ID_CONNECTION_LOST.">LCR_CONNECTION_LOST</a>);</div>
 <div class="line"><a name="l06406"></a><span class="lineno"> 6406</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06407"></a><span class="lineno"> 6407</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a7d4e094a2d30cd58511ebe6934a34c0e" title="RakPeer - Sent to the player when a connection request cannot be completed due to inability to connec...">ID_CONNECTION_ATTEMPT_FAILED</a>:</div>
-<div class="line"><a name="l06408"></a><span class="lineno"> 6408</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca8b987e31c1a50418295eebc8a32d7bd9">FCAR_CONNECTION_ATTEMPT_FAILED</a>);</div>
+<div class="line"><a name="l06407"></a><span class="lineno"> 6407</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a884712d974b7a5747131dcce61538180" title="RakPeer - A remote system has successfully connected.">ID_NEW_INCOMING_CONNECTION</a>:</div>
+<div class="line"><a name="l06408"></a><span class="lineno"> 6408</span>&#160;            pluginList[i]-&gt;OnNewConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l06409"></a><span class="lineno"> 6409</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06410"></a><span class="lineno"> 6410</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5d4b064d4e8e1c0a24c9bb8d7eef82a0" title="RakPeer - Remote system requires secure connections, pass a public key to RakPeerInterface::Connect()...">ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY</a>:</div>
-<div class="line"><a name="l06411"></a><span class="lineno"> 6411</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca477a883f833f0cf823b8de018af68b44">FCAR_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY</a>);</div>
+<div class="line"><a name="l06410"></a><span class="lineno"> 6410</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a8e1677131f83c52ed49001d6401fd2e7" title="RakPeer - In a client/server environment, our connection request to the server has been accepted...">ID_CONNECTION_REQUEST_ACCEPTED</a>:</div>
+<div class="line"><a name="l06411"></a><span class="lineno"> 6411</span>&#160;            pluginList[i]-&gt;OnNewConnection(packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a5c9d18515892239712a5d8fcb46c4245" title="The system that send this packet.">systemAddress</a>, packet-&gt;<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#a4f42e82893aff6aade8a45c79d1b8fd3">guid</a>, <span class="keyword">false</span>);</div>
 <div class="line"><a name="l06412"></a><span class="lineno"> 6412</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06413"></a><span class="lineno"> 6413</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a56d4a0816670c5c7beed7f6fbe88dced" title="RakPeer - We passed a public key to RakPeerInterface::Connect(), but the other system did not have se...">ID_OUR_SYSTEM_REQUIRES_SECURITY</a>:</div>
-<div class="line"><a name="l06414"></a><span class="lineno"> 6414</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca544a956633e3805a45a7c34a053a924f">FCAR_OUR_SYSTEM_REQUIRES_SECURITY</a>);</div>
+<div class="line"><a name="l06413"></a><span class="lineno"> 6413</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a7d4e094a2d30cd58511ebe6934a34c0e" title="RakPeer - Sent to the player when a connection request cannot be completed due to inability to connec...">ID_CONNECTION_ATTEMPT_FAILED</a>:</div>
+<div class="line"><a name="l06414"></a><span class="lineno"> 6414</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca8b987e31c1a50418295eebc8a32d7bd9">FCAR_CONNECTION_ATTEMPT_FAILED</a>);</div>
 <div class="line"><a name="l06415"></a><span class="lineno"> 6415</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06416"></a><span class="lineno"> 6416</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3abc74d727a1ced27473d58b3084172eb9" title="RakPeer - Wrong public key passed to RakPeerInterface::Connect()">ID_PUBLIC_KEY_MISMATCH</a>:</div>
-<div class="line"><a name="l06417"></a><span class="lineno"> 6417</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca6728016c187c2e0c09093ea93aa6b859">FCAR_PUBLIC_KEY_MISMATCH</a>);</div>
+<div class="line"><a name="l06416"></a><span class="lineno"> 6416</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5d4b064d4e8e1c0a24c9bb8d7eef82a0" title="RakPeer - Remote system requires secure connections, pass a public key to RakPeerInterface::Connect()...">ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY</a>:</div>
+<div class="line"><a name="l06417"></a><span class="lineno"> 6417</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca477a883f833f0cf823b8de018af68b44">FCAR_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY</a>);</div>
 <div class="line"><a name="l06418"></a><span class="lineno"> 6418</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06419"></a><span class="lineno"> 6419</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5d00a59a0b9f0b8a50a041f2032184b5" title="RakPeer - Sent a connect request to a system we are currently connected to.">ID_ALREADY_CONNECTED</a>:</div>
-<div class="line"><a name="l06420"></a><span class="lineno"> 6420</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca3c351b48407e1209326942227afa181d">FCAR_ALREADY_CONNECTED</a>);</div>
+<div class="line"><a name="l06419"></a><span class="lineno"> 6419</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a56d4a0816670c5c7beed7f6fbe88dced" title="RakPeer - We passed a public key to RakPeerInterface::Connect(), but the other system did not have se...">ID_OUR_SYSTEM_REQUIRES_SECURITY</a>:</div>
+<div class="line"><a name="l06420"></a><span class="lineno"> 6420</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca544a956633e3805a45a7c34a053a924f">FCAR_OUR_SYSTEM_REQUIRES_SECURITY</a>);</div>
 <div class="line"><a name="l06421"></a><span class="lineno"> 6421</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06422"></a><span class="lineno"> 6422</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a7d040cf221aa9a12604d0293348946c2" title="RakPeer - The system we attempted to connect to is not accepting new connections.">ID_NO_FREE_INCOMING_CONNECTIONS</a>:</div>
-<div class="line"><a name="l06423"></a><span class="lineno"> 6423</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26caac6fb767a3055a217b885a369ecb1a42">FCAR_NO_FREE_INCOMING_CONNECTIONS</a>);</div>
+<div class="line"><a name="l06422"></a><span class="lineno"> 6422</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3abc74d727a1ced27473d58b3084172eb9" title="RakPeer - Wrong public key passed to RakPeerInterface::Connect()">ID_PUBLIC_KEY_MISMATCH</a>:</div>
+<div class="line"><a name="l06423"></a><span class="lineno"> 6423</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca6728016c187c2e0c09093ea93aa6b859">FCAR_PUBLIC_KEY_MISMATCH</a>);</div>
 <div class="line"><a name="l06424"></a><span class="lineno"> 6424</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06425"></a><span class="lineno"> 6425</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a68c1b5b947ff46814ffb7fdf4853f350" title="RakPeer - We are banned from the system we attempted to connect to.">ID_CONNECTION_BANNED</a>:</div>
-<div class="line"><a name="l06426"></a><span class="lineno"> 6426</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca56b69510bdfa6387034db12755fb77b6">FCAR_CONNECTION_BANNED</a>);</div>
+<div class="line"><a name="l06425"></a><span class="lineno"> 6425</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5d00a59a0b9f0b8a50a041f2032184b5" title="RakPeer - Sent a connect request to a system we are currently connected to.">ID_ALREADY_CONNECTED</a>:</div>
+<div class="line"><a name="l06426"></a><span class="lineno"> 6426</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca3c351b48407e1209326942227afa181d">FCAR_ALREADY_CONNECTED</a>);</div>
 <div class="line"><a name="l06427"></a><span class="lineno"> 6427</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06428"></a><span class="lineno"> 6428</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a2c69119824c8bd3faa96d9953d02a41d" title="RakPeer - The remote system is using a password and has refused our connection because we did not set...">ID_INVALID_PASSWORD</a>:</div>
-<div class="line"><a name="l06429"></a><span class="lineno"> 6429</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca39b3cb106c029534bc8e335381df704c">FCAR_INVALID_PASSWORD</a>);</div>
+<div class="line"><a name="l06428"></a><span class="lineno"> 6428</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a7d040cf221aa9a12604d0293348946c2" title="RakPeer - The system we attempted to connect to is not accepting new connections.">ID_NO_FREE_INCOMING_CONNECTIONS</a>:</div>
+<div class="line"><a name="l06429"></a><span class="lineno"> 6429</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26caac6fb767a3055a217b885a369ecb1a42">FCAR_NO_FREE_INCOMING_CONNECTIONS</a>);</div>
 <div class="line"><a name="l06430"></a><span class="lineno"> 6430</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06431"></a><span class="lineno"> 6431</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5762f213c6741b179d62a751ec2ef804">ID_INCOMPATIBLE_PROTOCOL_VERSION</a>:</div>
-<div class="line"><a name="l06432"></a><span class="lineno"> 6432</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca18fe8bb7d6c06b9011b25a02d2b5145a">FCAR_INCOMPATIBLE_PROTOCOL</a>);</div>
+<div class="line"><a name="l06431"></a><span class="lineno"> 6431</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a68c1b5b947ff46814ffb7fdf4853f350" title="RakPeer - We are banned from the system we attempted to connect to.">ID_CONNECTION_BANNED</a>:</div>
+<div class="line"><a name="l06432"></a><span class="lineno"> 6432</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca56b69510bdfa6387034db12755fb77b6">FCAR_CONNECTION_BANNED</a>);</div>
 <div class="line"><a name="l06433"></a><span class="lineno"> 6433</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06434"></a><span class="lineno"> 6434</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a74191a2391c30daa47c0e98f44896fa5" title="RakPeer::SetLimitIPConnectionFrequency()">ID_IP_RECENTLY_CONNECTED</a>:</div>
-<div class="line"><a name="l06435"></a><span class="lineno"> 6435</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca5363f84c5a008eed4ba59c38e4c6cecb">FCAR_IP_RECENTLY_CONNECTED</a>);</div>
+<div class="line"><a name="l06434"></a><span class="lineno"> 6434</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a2c69119824c8bd3faa96d9953d02a41d" title="RakPeer - The remote system is using a password and has refused our connection because we did not set...">ID_INVALID_PASSWORD</a>:</div>
+<div class="line"><a name="l06435"></a><span class="lineno"> 6435</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca39b3cb106c029534bc8e335381df704c">FCAR_INVALID_PASSWORD</a>);</div>
 <div class="line"><a name="l06436"></a><span class="lineno"> 6436</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l06437"></a><span class="lineno"> 6437</span>&#160;        }</div>
-<div class="line"><a name="l06438"></a><span class="lineno"> 6438</span>&#160;    }</div>
-<div class="line"><a name="l06439"></a><span class="lineno"> 6439</span>&#160;}</div>
-<div class="line"><a name="l06440"></a><span class="lineno"> 6440</span>&#160;</div>
-<div class="line"><a name="l06441"></a><span class="lineno"><a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a8285f205b3b5df5dd74ca7676710376c"> 6441</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a8285f205b3b5df5dd74ca7676710376c">RakPeer::FillIPList</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l06442"></a><span class="lineno"> 6442</span>&#160;{</div>
-<div class="line"><a name="l06443"></a><span class="lineno"> 6443</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[0]!=<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>)</div>
-<div class="line"><a name="l06444"></a><span class="lineno"> 6444</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l06445"></a><span class="lineno"> 6445</span>&#160;</div>
-<div class="line"><a name="l06446"></a><span class="lineno"> 6446</span>&#160;    <span class="comment">// Fill out ipList structure</span></div>
-<div class="line"><a name="l06447"></a><span class="lineno"> 6447</span>&#160;<span class="preprocessor">#if  !defined(WINDOWS_STORE_RT)</span></div>
-<div class="line"><a name="l06448"></a><span class="lineno"> 6448</span>&#160;<span class="preprocessor"></span>    <a class="code" href="../../d1/dde/class_s_l_net_1_1_rak_net_socket2.xhtml#a608c0a4dead80c0f5d77504cc20d5450">RakNetSocket2::GetMyIP</a>( <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a> );</div>
-<div class="line"><a name="l06449"></a><span class="lineno"> 6449</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l06450"></a><span class="lineno"> 6450</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l06451"></a><span class="lineno"> 6451</span>&#160;    <span class="comment">// Sort the addresses from lowest to highest</span></div>
-<div class="line"><a name="l06452"></a><span class="lineno"> 6452</span>&#160;    <span class="keywordtype">int</span> startingIdx = 0;</div>
-<div class="line"><a name="l06453"></a><span class="lineno"> 6453</span>&#160;    <span class="keywordflow">while</span> (startingIdx &lt; <a class="code" href="../../d8/db0/defines_8h.xhtml#aaac58d0b7314b7f900c0045e0c303b80">MAXIMUM_NUMBER_OF_INTERNAL_IDS</a>-1 &amp;&amp; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx] != <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>)</div>
-<div class="line"><a name="l06454"></a><span class="lineno"> 6454</span>&#160;    {</div>
-<div class="line"><a name="l06455"></a><span class="lineno"> 6455</span>&#160;        <span class="keywordtype">int</span> lowestIdx = startingIdx;</div>
-<div class="line"><a name="l06456"></a><span class="lineno"> 6456</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> curIdx = startingIdx + 1; curIdx &lt; <a class="code" href="../../d8/db0/defines_8h.xhtml#aaac58d0b7314b7f900c0045e0c303b80">MAXIMUM_NUMBER_OF_INTERNAL_IDS</a>-1 &amp;&amp; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[curIdx] != <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>; curIdx++ )</div>
-<div class="line"><a name="l06457"></a><span class="lineno"> 6457</span>&#160;        {</div>
-<div class="line"><a name="l06458"></a><span class="lineno"> 6458</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[curIdx] &lt; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx])</div>
-<div class="line"><a name="l06459"></a><span class="lineno"> 6459</span>&#160;            {</div>
-<div class="line"><a name="l06460"></a><span class="lineno"> 6460</span>&#160;                lowestIdx = curIdx;</div>
-<div class="line"><a name="l06461"></a><span class="lineno"> 6461</span>&#160;            }</div>
-<div class="line"><a name="l06462"></a><span class="lineno"> 6462</span>&#160;        }</div>
-<div class="line"><a name="l06463"></a><span class="lineno"> 6463</span>&#160;        <span class="keywordflow">if</span> (startingIdx != lowestIdx)</div>
-<div class="line"><a name="l06464"></a><span class="lineno"> 6464</span>&#160;        {</div>
-<div class="line"><a name="l06465"></a><span class="lineno"> 6465</span>&#160;            <a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> temp = <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx];</div>
-<div class="line"><a name="l06466"></a><span class="lineno"> 6466</span>&#160;            <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx] = <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[lowestIdx];</div>
-<div class="line"><a name="l06467"></a><span class="lineno"> 6467</span>&#160;            <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[lowestIdx] = temp;</div>
+<div class="line"><a name="l06437"></a><span class="lineno"> 6437</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a5762f213c6741b179d62a751ec2ef804">ID_INCOMPATIBLE_PROTOCOL_VERSION</a>:</div>
+<div class="line"><a name="l06438"></a><span class="lineno"> 6438</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca18fe8bb7d6c06b9011b25a02d2b5145a">FCAR_INCOMPATIBLE_PROTOCOL</a>);</div>
+<div class="line"><a name="l06439"></a><span class="lineno"> 6439</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l06440"></a><span class="lineno"> 6440</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="../../d6/d83/_message_identifiers_8h.xhtml#ac1b471af280629f5ace02e586d5bcfd3a74191a2391c30daa47c0e98f44896fa5" title="RakPeer::SetLimitIPConnectionFrequency()">ID_IP_RECENTLY_CONNECTED</a>:</div>
+<div class="line"><a name="l06441"></a><span class="lineno"> 6441</span>&#160;            pluginList[i]-&gt;OnFailedConnectionAttempt(packet, <a class="code" href="../../de/d14/group___p_l_u_g_i_n___i_n_t_e_r_f_a_c_e___g_r_o_u_p.xhtml#gga111ccf3400cb3830cc7ef8c042c9b26ca5363f84c5a008eed4ba59c38e4c6cecb">FCAR_IP_RECENTLY_CONNECTED</a>);</div>
+<div class="line"><a name="l06442"></a><span class="lineno"> 6442</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l06443"></a><span class="lineno"> 6443</span>&#160;        }</div>
+<div class="line"><a name="l06444"></a><span class="lineno"> 6444</span>&#160;    }</div>
+<div class="line"><a name="l06445"></a><span class="lineno"> 6445</span>&#160;}</div>
+<div class="line"><a name="l06446"></a><span class="lineno"> 6446</span>&#160;</div>
+<div class="line"><a name="l06447"></a><span class="lineno"><a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a8285f205b3b5df5dd74ca7676710376c"> 6447</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a8285f205b3b5df5dd74ca7676710376c">RakPeer::FillIPList</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l06448"></a><span class="lineno"> 6448</span>&#160;{</div>
+<div class="line"><a name="l06449"></a><span class="lineno"> 6449</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[0]!=<a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>)</div>
+<div class="line"><a name="l06450"></a><span class="lineno"> 6450</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l06451"></a><span class="lineno"> 6451</span>&#160;</div>
+<div class="line"><a name="l06452"></a><span class="lineno"> 6452</span>&#160;    <span class="comment">// Fill out ipList structure</span></div>
+<div class="line"><a name="l06453"></a><span class="lineno"> 6453</span>&#160;<span class="preprocessor">#if  !defined(WINDOWS_STORE_RT)</span></div>
+<div class="line"><a name="l06454"></a><span class="lineno"> 6454</span>&#160;<span class="preprocessor"></span>    <a class="code" href="../../d1/dde/class_s_l_net_1_1_rak_net_socket2.xhtml#a608c0a4dead80c0f5d77504cc20d5450">RakNetSocket2::GetMyIP</a>( <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a> );</div>
+<div class="line"><a name="l06455"></a><span class="lineno"> 6455</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l06456"></a><span class="lineno"> 6456</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l06457"></a><span class="lineno"> 6457</span>&#160;    <span class="comment">// Sort the addresses from lowest to highest</span></div>
+<div class="line"><a name="l06458"></a><span class="lineno"> 6458</span>&#160;    <span class="keywordtype">int</span> startingIdx = 0;</div>
+<div class="line"><a name="l06459"></a><span class="lineno"> 6459</span>&#160;    <span class="keywordflow">while</span> (startingIdx &lt; <a class="code" href="../../d8/db0/defines_8h.xhtml#aaac58d0b7314b7f900c0045e0c303b80">MAXIMUM_NUMBER_OF_INTERNAL_IDS</a>-1 &amp;&amp; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx] != <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>)</div>
+<div class="line"><a name="l06460"></a><span class="lineno"> 6460</span>&#160;    {</div>
+<div class="line"><a name="l06461"></a><span class="lineno"> 6461</span>&#160;        <span class="keywordtype">int</span> lowestIdx = startingIdx;</div>
+<div class="line"><a name="l06462"></a><span class="lineno"> 6462</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> curIdx = startingIdx + 1; curIdx &lt; <a class="code" href="../../d8/db0/defines_8h.xhtml#aaac58d0b7314b7f900c0045e0c303b80">MAXIMUM_NUMBER_OF_INTERNAL_IDS</a>-1 &amp;&amp; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[curIdx] != <a class="code" href="../../dd/d30/namespace_s_l_net.xhtml#acea7714c995aae0e1feaf79c9e7f073d" title="Index of an invalid SystemAddress.">UNASSIGNED_SYSTEM_ADDRESS</a>; curIdx++ )</div>
+<div class="line"><a name="l06463"></a><span class="lineno"> 6463</span>&#160;        {</div>
+<div class="line"><a name="l06464"></a><span class="lineno"> 6464</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[curIdx] &lt; <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx])</div>
+<div class="line"><a name="l06465"></a><span class="lineno"> 6465</span>&#160;            {</div>
+<div class="line"><a name="l06466"></a><span class="lineno"> 6466</span>&#160;                lowestIdx = curIdx;</div>
+<div class="line"><a name="l06467"></a><span class="lineno"> 6467</span>&#160;            }</div>
 <div class="line"><a name="l06468"></a><span class="lineno"> 6468</span>&#160;        }</div>
-<div class="line"><a name="l06469"></a><span class="lineno"> 6469</span>&#160;        ++startingIdx;</div>
-<div class="line"><a name="l06470"></a><span class="lineno"> 6470</span>&#160;    }</div>
-<div class="line"><a name="l06471"></a><span class="lineno"> 6471</span>&#160;}</div>
-<div class="line"><a name="l06472"></a><span class="lineno"> 6472</span>&#160;</div>
-<div class="line"><a name="l06473"></a><span class="lineno"> 6473</span>&#160;</div>
-<div class="line"><a name="l06474"></a><span class="lineno"> 6474</span>&#160;<span class="comment">// #if defined(RMO_NEW_UNDEF_ALLOCATING_QUEUE)</span></div>
-<div class="line"><a name="l06475"></a><span class="lineno"> 6475</span>&#160;<span class="comment">// #pragma pop_macro(&quot;new&quot;)</span></div>
-<div class="line"><a name="l06476"></a><span class="lineno"> 6476</span>&#160;<span class="comment">// #undef RMO_NEW_UNDEF_ALLOCATING_QUEUE</span></div>
-<div class="line"><a name="l06477"></a><span class="lineno"> 6477</span>&#160;<span class="comment">// #endif</span></div>
+<div class="line"><a name="l06469"></a><span class="lineno"> 6469</span>&#160;        <span class="keywordflow">if</span> (startingIdx != lowestIdx)</div>
+<div class="line"><a name="l06470"></a><span class="lineno"> 6470</span>&#160;        {</div>
+<div class="line"><a name="l06471"></a><span class="lineno"> 6471</span>&#160;            <a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> temp = <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx];</div>
+<div class="line"><a name="l06472"></a><span class="lineno"> 6472</span>&#160;            <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[startingIdx] = <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[lowestIdx];</div>
+<div class="line"><a name="l06473"></a><span class="lineno"> 6473</span>&#160;            <a class="code" href="../../d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a0b340485a6df5ba285ab315ad62216a4">ipList</a>[lowestIdx] = temp;</div>
+<div class="line"><a name="l06474"></a><span class="lineno"> 6474</span>&#160;        }</div>
+<div class="line"><a name="l06475"></a><span class="lineno"> 6475</span>&#160;        ++startingIdx;</div>
+<div class="line"><a name="l06476"></a><span class="lineno"> 6476</span>&#160;    }</div>
+<div class="line"><a name="l06477"></a><span class="lineno"> 6477</span>&#160;}</div>
 <div class="line"><a name="l06478"></a><span class="lineno"> 6478</span>&#160;</div>
+<div class="line"><a name="l06479"></a><span class="lineno"> 6479</span>&#160;</div>
+<div class="line"><a name="l06480"></a><span class="lineno"> 6480</span>&#160;<span class="comment">// #if defined(RMO_NEW_UNDEF_ALLOCATING_QUEUE)</span></div>
+<div class="line"><a name="l06481"></a><span class="lineno"> 6481</span>&#160;<span class="comment">// #pragma pop_macro(&quot;new&quot;)</span></div>
+<div class="line"><a name="l06482"></a><span class="lineno"> 6482</span>&#160;<span class="comment">// #undef RMO_NEW_UNDEF_ALLOCATING_QUEUE</span></div>
+<div class="line"><a name="l06483"></a><span class="lineno"> 6483</span>&#160;<span class="comment">// #endif</span></div>
+<div class="line"><a name="l06484"></a><span class="lineno"> 6484</span>&#160;</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d5/d55/_rak_peer_8cpp.xhtml">RakPeer.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:06 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:02 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

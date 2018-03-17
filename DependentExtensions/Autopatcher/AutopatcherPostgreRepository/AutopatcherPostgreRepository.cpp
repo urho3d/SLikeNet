@@ -1318,7 +1318,6 @@ bool AutopatcherPostgreRepository::UpdateApplicationFiles(const char *applicatio
 		if (fopen_s(&fp, path, "rb") != 0)
 		{
 			newFiles.Clear();
-			PQclear(fileRows);
 			RakAssert(0);
 			return false;
 		}

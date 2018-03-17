@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -31,7 +31,8 @@ public:
 	bool HasProfanity(const char *str);
 
 	// Removes profanity. Returns number of occurrences of profanity matches (including 0)
-	int FilterProfanity(const char *str, char *output, size_t outputLength, bool filter = true); 		
+	int FilterProfanity(const char *input, char *output, bool filter = true);
+	int FilterProfanity(const char *input, char *output, size_t outputLength, bool filter = true); 		
 	
 	// Number of profanity words loaded
 	int Count();

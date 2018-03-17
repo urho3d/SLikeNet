@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d5/dc1/wstring_8h_source.xhtml','../..
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -197,27 +197,28 @@ $(document).ready(function(){initNavTree('d5/dc1/wstring_8h_source.xhtml','../..
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordtype">bool</span> Deserialize(<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keyword">static</span> <span class="keywordtype">bool</span> Deserialize(<span class="keywordtype">wchar_t</span> *str, <span class="keywordtype">size_t</span> strLength, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keyword">static</span> <span class="keywordtype">bool</span> Deserialize(<span class="keywordtype">wchar_t</span> *str, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keyword">static</span> <span class="keywordtype">bool</span> Deserialize(<span class="keywordtype">wchar_t</span> *str, <span class="keywordtype">size_t</span> strLength, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs);</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ad503fb6bfdf970e3bc646d863461e493">  119</a></span>&#160;        <span class="keywordtype">wchar_t</span>* <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ad503fb6bfdf970e3bc646d863461e493">c_str</a>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">  120</a></span>&#160;        <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    };</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> <a class="code" href="../../db/dbd/_export_8h.xhtml#ab0579394e418800d5c85e46ad6fcd61d">RAK_DLL_EXPORT</a> <a class="code" href="../../dd/d5f/_rak_string_8cpp.xhtml#a625af79cc78a3921cfa6a7116754bd6c">operator+</a>(<span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> &amp;lhs, <span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> &amp;rhs);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00120"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ad503fb6bfdf970e3bc646d863461e493">  120</a></span>&#160;        <span class="keywordtype">wchar_t</span>* <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ad503fb6bfdf970e3bc646d863461e493">c_str</a>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">  121</a></span>&#160;        <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    };</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> <a class="code" href="../../db/dbd/_export_8h.xhtml#ab0579394e418800d5c85e46ad6fcd61d">RAK_DLL_EXPORT</a> <a class="code" href="../../dd/d5f/_rak_string_8cpp.xhtml#a625af79cc78a3921cfa6a7116754bd6c">operator+</a>(<span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> &amp;lhs, <span class="keyword">const</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml" title="String class for Unicode.">SLNet::RakWString</a> &amp;rhs);</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_bbb90e3ef9167a594ae33323139a2595.xhtml">include</a></li><li class="navelem"><a class="el" href="../../dir_88467e66686deb9d3756fe4fc298e321.xhtml">slikenet</a></li><li class="navelem"><a class="el" href="../../d5/dc1/wstring_8h.xhtml">wstring.h</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:05 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:01 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

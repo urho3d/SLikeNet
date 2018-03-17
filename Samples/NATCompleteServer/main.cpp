@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -236,7 +236,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 		char buff[64];
 		for (unsigned int i=0; i < addresses.Size(); i++)
 		{
-			addresses[i].ToString(true, buff, 64);
+			addresses[i].ToString(true, buff, static_cast<size_t>(64));
 			printf("%i. %s\n", i+1, buff);
 		}
 		Gets(buff,sizeof(buff));
@@ -256,6 +256,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 };
 SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *hostName)
 {
+	SystemAddress returnvalue = SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	char ipAddr[64];
 	printf("Enter IP of system %s is running on: ", hostName);
 	Gets(ipAddr,sizeof(ipAddr));
@@ -279,21 +280,17 @@ SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *host
 	}
 	printf("Connecting...\n");
 	SLNet::Packet *packet;
-	for(;;)
-	{
-		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
-		{
-			if (packet->data[0]==ID_CONNECTION_REQUEST_ACCEPTED)
-			{
-				return packet->systemAddress;
-			}
-			else
-			{
-				return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
-			}
-			RakSleep(100);
-		}
-	}
+	// #med - review --- at least we'd add a sleep interval here - also review whether the behavior is correct to only check the very first received packet (old RakNet code was bogus in this regards)
+	do {
+		packet = rakPeer->Receive();
+	} while (packet == nullptr);
+
+	if (packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
+		returnvalue = packet->systemAddress;
+
+	rakPeer->DeallocatePacket(packet);
+
+	return returnvalue;
 }
 struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerResultHandler
 {

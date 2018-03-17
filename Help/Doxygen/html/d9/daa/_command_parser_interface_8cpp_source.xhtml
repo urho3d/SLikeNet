@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d9/daa/_command_parser_interface_8cpp_
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -269,9 +269,9 @@ $(document).ready(function(){initNavTree('d9/daa/_command_parser_interface_8cpp_
 <div class="line"><a name="l00161"></a><span class="lineno"><a class="code" href="../../d5/d9a/class_s_l_net_1_1_command_parser_interface.xhtml#a7409a39e68431493d7194720cbae91f9">  161</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="../../d5/d9a/class_s_l_net_1_1_command_parser_interface.xhtml#aaa19fe99cd9223c972ff11369cd9179c" title="Just writes a string to the remote system based on the result ( res ) of your operation.">CommandParserInterface::ReturnResult</a>(<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> res, <span class="keyword">const</span> <span class="keywordtype">char</span> *command, <a class="code" href="../../d0/d4e/class_s_l_net_1_1_transport_interface.xhtml" title="Defines an interface that is used to send and receive null-terminated strings.">TransportInterface</a> *transport, <span class="keyword">const</span> <a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml" title="Network address for a system.">SystemAddress</a> &amp;systemAddress)</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">char</span> addr[128];</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,addr,128);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    systemAddress.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,addr,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordtype">char</span> addr2[128];</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    res.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,addr2,128);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    res.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#a7a994f9c414b5fd7094017b43e7c102b">ToString</a>(<span class="keyword">false</span>,addr2,static_cast&lt;size_t&gt;(128));</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    transport-&gt;<a class="code" href="../../d0/d4e/class_s_l_net_1_1_transport_interface.xhtml#ab6f5d46268e400149496babd9df74125">Send</a>(systemAddress, <span class="stringliteral">&quot;%s returned %s %s:%i\r\n&quot;</span>, command,addr,addr2,res.<a class="code" href="../../d8/dbe/struct_s_l_net_1_1_system_address.xhtml#afdd4a14b98b7e7b9f69afc30e8fe0d47" title="Returns the port in host order (this is what you normally use)">GetPort</a>());</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
@@ -280,7 +280,7 @@ $(document).ready(function(){initNavTree('d9/daa/_command_parser_interface_8cpp_
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d9/daa/_command_parser_interface_8cpp.xhtml">CommandParserInterface.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:05 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:01 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

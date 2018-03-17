@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -41,7 +41,7 @@ void AutopatcherServerLoadNotifier_Printf::OnQueueUpdate(SystemAddress remoteSys
 	char *operationString;
 	char *requestTypeString;
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString, 32);
+	remoteSystem.ToString(true, systemAddressString, static_cast<size_t>(32));
 	if (requestType==ASUMC_GET_CHANGELIST)
 		requestTypeString="GetChangelist";
 	else
@@ -61,7 +61,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(
 									  AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 {
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString, 32);
+	remoteSystem.ToString(true, systemAddressString, static_cast<size_t>(32));
 
 	char *changelistString;
 	if (getChangelistResult==GCR_DELETE_FILES)
@@ -80,7 +80,7 @@ void AutopatcherServerLoadNotifier_Printf::OnGetChangelistCompleted(
 void AutopatcherServerLoadNotifier_Printf::OnGetPatchCompleted(SystemAddress remoteSystem, AutopatcherServerLoadNotifier::PatchResult patchResult, AutopatcherServerLoadNotifier::AutopatcherState *autopatcherState)
 {
 	char systemAddressString[32];
-	remoteSystem.ToString(true, systemAddressString, 32);
+	remoteSystem.ToString(true, systemAddressString, static_cast<size_t>(32));
 
 	char *patchResultString;
 	if (patchResult==PR_NO_FILES_NEEDED_PATCHING)

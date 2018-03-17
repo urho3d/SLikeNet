@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -159,8 +159,8 @@ int main(void)
 						connectionCount++;
 					}
 				}
-				printf("%i clients are actually connected.\n", connectionCount);
-				printf("server->NumberOfConnections==%i.\n", server->NumberOfConnections());
+				printf("%u clients are actually connected.\n", connectionCount);
+				printf("server->NumberOfConnections==%u.\n", server->NumberOfConnections());
 			}
 			else if (ch=='h' || ch=='H')
 			{

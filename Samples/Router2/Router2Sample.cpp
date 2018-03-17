@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -29,6 +29,7 @@
 #include "slikenet/Getche.h"
 #include "slikenet/Gets.h"
 #include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 using namespace SLNet;
 
@@ -45,7 +46,7 @@ void ReadAllPackets(void)
 	for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
 	{
 		packet->guid.ToString(str, 64);
-		packet->systemAddress.ToString(true,str2,64);
+		packet->systemAddress.ToString(true,str2,static_cast<size_t>(64));
 		if (packet->data[0]==ID_NEW_INCOMING_CONNECTION)
 		{
 			printf("ID_NEW_INCOMING_CONNECTION from %s on %s\n", str, str2);
@@ -75,7 +76,7 @@ void ReadAllPackets(void)
 			unsigned short sourceToDestPort;
 			bs.Read(sourceToDestPort);
 			char ipAddressString[32];
-			packet->systemAddress.ToString(false, ipAddressString,32);
+			packet->systemAddress.ToString(false, ipAddressString,static_cast<size_t>(32));
 			rakPeer->Connect(ipAddressString, sourceToDestPort, 0,0);
 		}
 		else if (packet->data[0]==ID_ROUTER_2_REROUTED)
@@ -92,7 +93,7 @@ void ReadAllPackets(void)
 			intermediateAddress.SetPortHostOrder(port);
 
 			char str2[32];
-			intermediateAddress.ToString(true, str2,32);
+			intermediateAddress.ToString(true, str2,static_cast<size_t>(32));
 			printf("Connection to %s rerouted through %s\n", str, str2);
 
 			// Test sending a message to the endpoint

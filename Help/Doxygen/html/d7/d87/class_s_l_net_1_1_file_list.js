@@ -10,6 +10,7 @@ var class_s_l_net_1_1_file_list =
     [ "ClearCallbacks", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a2455084df77821aa4e5f2b01f2ea2b73", null ],
     [ "DeleteFiles", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a6fd1833f922daaa1b079dbea6ed7ead8", null ],
     [ "Deserialize", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a51a1f369424577edcfd6d476272ace14", null ],
+    [ "FixEndingSlash", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a65dc316d9f3e4ad6a6a22a0b0649b1f9", null ],
     [ "FixEndingSlash", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a658f7465415cbd4444b849fea0b9d2c4", null ],
     [ "FlagFilesAsReferences", "d7/d87/class_s_l_net_1_1_file_list.xhtml#a9ac96052c10248bd8fce56a78f9fdcca", null ],
     [ "GetCallbacks", "d7/d87/class_s_l_net_1_1_file_list.xhtml#af59721be7f19d6bbb3baa14061d926b9", null ],

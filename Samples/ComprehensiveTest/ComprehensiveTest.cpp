@@ -131,6 +131,7 @@ int main(void)
 			priority=(PacketPriority)(randomMT()%(int)NUMBER_OF_PRIORITIES);
 			reliability=(PacketReliability)(randomMT()%((int)RELIABLE_SEQUENCED+1));
 			orderingChannel=randomMT()%32;
+			peerIndex = randomMT() % NUM_PEERS;
 			if ((randomMT()%NUM_PEERS)==0)
 				target= SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 			else
@@ -141,7 +142,6 @@ int main(void)
 			broadcast=false; // Temporarily in so I can check recipients
 #endif
 
-			peerIndex=randomMT()%NUM_PEERS;
 			sprintf_s(data+3, 8093, "dataLength=%i priority=%i reliability=%i orderingChannel=%i target=%i broadcast=%i\n", dataLength, priority, reliability, orderingChannel, target.GetPort(), broadcast);
 			//unsigned short localPort=60000+i;
 #ifdef _VERIFY_RECIPIENTS
@@ -199,8 +199,8 @@ int main(void)
 		{
 			// Online Ping
 			SystemAddress target;
-			target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
 			peerIndex=randomMT()%NUM_PEERS;
+			target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
 			peers[peerIndex]->Ping(target);
 		}
 		else if (nextAction < .24f)
@@ -212,9 +212,9 @@ int main(void)
 			// GetStatistics
 			SystemAddress target, mySystemAddress;
 			RakNetStatistics *rss;
+			peerIndex=randomMT()%NUM_PEERS;
 			mySystemAddress=peers[peerIndex]->GetInternalID();
 			target=peers[peerIndex]->GetSystemAddressFromIndex(randomMT()%NUM_PEERS);
-			peerIndex=randomMT()%NUM_PEERS;
 			rss=peers[peerIndex]->GetStatistics(mySystemAddress);
 			if (rss)
 			{

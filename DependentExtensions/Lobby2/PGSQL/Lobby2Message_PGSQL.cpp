@@ -3352,8 +3352,8 @@ bool SLNet::Clans_GetMemberProperties_PGSQL::ServerDBImpl( Lobby2ServerCommand *
 		resultCode=L2RC_Clans_GetMemberProperties_UNKNOWN_TARGET_HANDLE;
 		return true;
 	}
-	SLNet::ClanMemberState clanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
-	if (clanMemberState==CMD_UNDEFINED)
+	SLNet::ClanMemberState curClanMemberState = GetClanMemberState(clanId, targetUserId, &isSubleader, pgsql);
+	if (curClanMemberState==CMD_UNDEFINED)
 	{
 		resultCode=L2RC_Clans_GetMemberProperties_TARGET_NOT_IN_CLAN;
 		return true;

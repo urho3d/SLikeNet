@@ -31,6 +31,8 @@
 #include "slikenet/UDPProxyClient.h"
 #include "slikenet/Gets.h"
 #include "slikenet/Itoa.h"
+#include "slikenet/linux_adapter.h"
+#include "slikenet/osx_adapter.h"
 
 // To include miniupnp, see Samples\NATCompleteClient\readme.txt
 #include "miniupnpc.h"
@@ -87,7 +89,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 		char buff[64];
 		for (unsigned int i=0; i < addresses.Size(); i++)
 		{
-			addresses[i].ToString(true, buff, 64);
+			addresses[i].ToString(true, buff, static_cast<size_t>(64));
 			printf("%i. %s\n", i+1, buff);
 		}
 		Gets(buff,sizeof(buff));
@@ -107,6 +109,7 @@ SystemAddress SelectAmongConnectedSystems(SLNet::RakPeerInterface *rakPeer, cons
 };
 SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *hostName, const char *defaultAddress, const char *defaultPort)
 {
+	SystemAddress returnvalue = SLNet::UNASSIGNED_SYSTEM_ADDRESS;
 	char ipAddr[64];
 	if (defaultAddress==0 || defaultAddress[0]==0)
 		printf("Enter IP of system %s is running on: ", hostName);
@@ -150,26 +153,19 @@ SystemAddress ConnectBlocking(SLNet::RakPeerInterface *rakPeer, const char *host
 	}
 	printf("Connecting...\n");
 	SLNet::Packet *packet;
-	for(;;)
-	{
-		for (packet=rakPeer->Receive(); packet; rakPeer->DeallocatePacket(packet), packet=rakPeer->Receive())
-		{
-			if (packet->data[0]==ID_CONNECTION_REQUEST_ACCEPTED)
-			{
-				return packet->systemAddress;
-			}
-			else if (packet->data[0]==ID_NO_FREE_INCOMING_CONNECTIONS)
-			{
-				printf("ID_NO_FREE_INCOMING_CONNECTIONS");
-				return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
-			}
-			else
-			{
-				return SLNet::UNASSIGNED_SYSTEM_ADDRESS;
-			}
-			RakSleep(100);
-		}
-	}
+	// #med - review --- at least we'd add a sleep interval here - also review whether the behavior is correct to only check the very first received packet (old RakNet code was bogus in this regards)
+	do {
+		packet = rakPeer->Receive();
+	} while (packet == nullptr);
+
+	if (packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
+		returnvalue = packet->systemAddress;
+	else if (packet->data[0] == ID_NO_FREE_INCOMING_CONNECTIONS)
+		printf("ID_NO_FREE_INCOMING_CONNECTIONS");
+
+	rakPeer->DeallocatePacket(packet);
+
+	return returnvalue;
 }
 struct UPNPFramework : public SampleFramework
 {

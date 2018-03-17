@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d0/dea/_rak_w_string_8cpp_source.xhtml
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -464,75 +464,116 @@ $(document).ready(function(){initNavTree('d0/dea/_rak_w_string_8cpp_source.xhtml
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    }</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;}</div>
-<div class="line"><a name="l00359"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#a6f4b48c7b7b36a060246f69d1efbd199">  359</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#a1ee57c7ac7e350d2a0402cca38ff9e5f">RakWString::Deserialize</a>(<span class="keywordtype">wchar_t</span> *str, <span class="keywordtype">size_t</span> strLength, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs)</div>
+<div class="line"><a name="l00359"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#aae56491cbeb74e93620d3c2f834724c4">  359</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#a1ee57c7ac7e350d2a0402cca38ff9e5f">RakWString::Deserialize</a>(<span class="keywordtype">wchar_t</span> *str, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs)</div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;{</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordtype">size_t</span> mbByteLength;</div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a544430a7ba9f9dd8b7f49ece417dbc68">ReadCasted</a>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>&gt;(mbByteLength);</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordflow">if</span> (mbByteLength&gt;0)</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordflow">if</span> (mbByteLength &gt; 0)</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    {</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="preprocessor">#if 0</span></div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">char</span> *multiByteBuffer;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        multiByteBuffer = (<span class="keywordtype">char</span>*) <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#aebeb2e4754399ea3e2c7af3dd9bbe8c3">rakMalloc_Ex</a>(mbByteLength+1, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordtype">bool</span> result = bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a8770a882b3b97c3ce51d5b0b1a0315e0" title="Read bits, starting at the next aligned bits.">ReadAlignedBytes</a>((<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>*) multiByteBuffer,(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>) mbByteLength);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        <span class="keywordflow">if</span> (result==<span class="keyword">false</span>)</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        multiByteBuffer = (<span class="keywordtype">char</span>*)<a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#aebeb2e4754399ea3e2c7af3dd9bbe8c3">rakMalloc_Ex</a>(mbByteLength + 1, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordtype">bool</span> result = bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a8770a882b3b97c3ce51d5b0b1a0315e0" title="Read bits, starting at the next aligned bits.">ReadAlignedBytes</a>((<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>*)multiByteBuffer, (<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>)mbByteLength);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        <span class="keywordflow">if</span> (result == <span class="keyword">false</span>)</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        {</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#ab91fbe0570bf501cd97a53c6cffcef8f">rakFree_Ex</a>(multiByteBuffer, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        }</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        multiByteBuffer[mbByteLength]=0;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        multiByteBuffer[mbByteLength] = 0;</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>;</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        mbstowcs_s(&amp;c_strCharLength, str, strLength, multiByteBuffer, mbByteLength);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        mbstowcs(&amp;c_strCharLength, str, multiByteBuffer, mbByteLength);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#ab91fbe0570bf501cd97a53c6cffcef8f">rakFree_Ex</a>(multiByteBuffer, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        str[<a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>]=0;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        str[<a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>] = 0;</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0; i &lt; mbByteLength; i++)</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; mbByteLength; i++)</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;        {</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            <a class="code" href="../../df/df2/_native_types_8h.xhtml#a273cf69d639a59973b6019625df33e30">uint16_t</a> t;</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;            <span class="comment">// Force endian swapping, and read 16 bits</span></div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;            bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a59f38126d8d19bfd264a2e2cace7d1db" title="Read any integral type from a bitstream.">Read</a>(t);</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            str[i]=t;</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            str[i] = t;</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        }</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        str[mbByteLength]=0;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        str[mbByteLength] = 0;</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    }</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    {</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        wcscpy_s(str,strLength,L<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    }</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;}</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment">SLNet::BitStream bsTest;</span></div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="comment">SLNet::RakWString testString(&quot;cat&quot;), testString2;</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">testString = &quot;Hllo&quot;;</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment">testString = L&quot;Hello&quot;;</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">testString += L&quot; world&quot;;</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment">testString2 += testString2;</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment">SLNet::RakWString ts3(L&quot; from here&quot;);</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="comment">testString2+=ts3;</span></div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="comment">SLNet::RakWString ts4(L&quot; 222&quot;);</span></div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="comment">testString2=ts4;</span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="comment">SLNet::RakString rs(&quot;rakstring&quot;);</span></div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment">testString2+=rs;</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">testString2=rs;</span></div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment">bsTest.Write(L&quot;one&quot;);</span></div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="comment">bsTest.Write(testString2);</span></div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="comment">bsTest.SetReadOffset(0);</span></div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="comment">SLNet::RakWString ts5, ts6;</span></div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="comment">wchar_t buff[99];</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="comment">wchar_t *wptr = (wchar_t*)buff;</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">bsTest.Read(wptr);</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">bsTest.Read(ts5);</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="preprocessor">#pragma warning(push)</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(disable:4996)</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="preprocessor"></span>        wcscpy(str, L<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="preprocessor">#pragma warning(pop)</span></div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="preprocessor"></span>    }</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;}</div>
+<div class="line"><a name="l00400"></a><span class="lineno"><a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#a6f4b48c7b7b36a060246f69d1efbd199">  400</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#a1ee57c7ac7e350d2a0402cca38ff9e5f">RakWString::Deserialize</a>(<span class="keywordtype">wchar_t</span> *str, <span class="keywordtype">size_t</span> strLength, <a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml">BitStream</a> *bs)</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;{</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordtype">size_t</span> mbByteLength;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a544430a7ba9f9dd8b7f49ece417dbc68">ReadCasted</a>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>&gt;(mbByteLength);</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordflow">if</span> (mbByteLength&gt;0)</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">char</span> *multiByteBuffer;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        multiByteBuffer = (<span class="keywordtype">char</span>*) <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#aebeb2e4754399ea3e2c7af3dd9bbe8c3">rakMalloc_Ex</a>(mbByteLength+1, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordtype">bool</span> result = bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a8770a882b3b97c3ce51d5b0b1a0315e0" title="Read bits, starting at the next aligned bits.">ReadAlignedBytes</a>((<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>*) multiByteBuffer,(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>) mbByteLength);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keywordflow">if</span> (result==<span class="keyword">false</span>)</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        {</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#ab91fbe0570bf501cd97a53c6cffcef8f">rakFree_Ex</a>(multiByteBuffer, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        }</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        multiByteBuffer[mbByteLength]=0;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>;</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        mbstowcs_s(&amp;c_strCharLength, str, strLength, multiByteBuffer, mbByteLength);</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        <a class="code" href="../../d9/d4c/_rak_memory_override_8cpp.xhtml#ab91fbe0570bf501cd97a53c6cffcef8f">rakFree_Ex</a>(multiByteBuffer, <a class="code" href="../../d8/db0/defines_8h.xhtml#a8661ec2137eef33a8cd0cd618a748871">_FILE_AND_LINE_</a>);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        str[<a class="code" href="../../d8/d91/class_s_l_net_1_1_rak_w_string.xhtml#ab961508b79f1e13ba78293244ab2f121">c_strCharLength</a>]=0;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0; i &lt; mbByteLength; i++)</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            <a class="code" href="../../df/df2/_native_types_8h.xhtml#a273cf69d639a59973b6019625df33e30">uint16_t</a> t;</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;            <span class="comment">// Force endian swapping, and read 16 bits</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;            bs-&gt;<a class="code" href="../../df/d75/class_s_l_net_1_1_bit_stream.xhtml#a59f38126d8d19bfd264a2e2cace7d1db" title="Read any integral type from a bitstream.">Read</a>(t);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;            str[i]=t;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        }</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        str[mbByteLength]=0;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    {</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        wcscpy_s(str,strLength,L<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    }</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;}</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="comment">SLNet::BitStream bsTest;</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;<span class="comment">SLNet::RakWString testString(&quot;cat&quot;), testString2;</span></div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;<span class="comment">testString = &quot;Hllo&quot;;</span></div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">testString = L&quot;Hello&quot;;</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;<span class="comment">testString += L&quot; world&quot;;</span></div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="comment">testString2 += testString2;</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;<span class="comment">SLNet::RakWString ts3(L&quot; from here&quot;);</span></div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;<span class="comment">testString2+=ts3;</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;<span class="comment">SLNet::RakWString ts4(L&quot; 222&quot;);</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;<span class="comment">testString2=ts4;</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;<span class="comment">SLNet::RakString rs(&quot;rakstring&quot;);</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;<span class="comment">testString2+=rs;</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;<span class="comment">testString2=rs;</span></div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;<span class="comment">bsTest.Write(L&quot;one&quot;);</span></div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;<span class="comment">bsTest.Write(testString2);</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="comment">bsTest.SetReadOffset(0);</span></div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;<span class="comment">SLNet::RakWString ts5, ts6;</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;<span class="comment">wchar_t buff[99];</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<span class="comment">wchar_t *wptr = (wchar_t*)buff;</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;<span class="comment">bsTest.Read(wptr);</span></div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="comment">bsTest.Read(ts5);</span></div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="comment">*/</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_d1eb22c2ecfd8b50f59e9cbaf8260105.xhtml">src</a></li><li class="navelem"><a class="el" href="../../d0/dea/_rak_w_string_8cpp.xhtml">RakWString.cpp</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:06 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:02 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

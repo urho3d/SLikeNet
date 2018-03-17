@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -74,7 +74,7 @@ public:
 
 		// Remove dropped system by primary key system address
 		char systemAddressString[64];
-		systemAddress.ToString(true,systemAddressString,64);
+		systemAddress.ToString(true,systemAddressString,static_cast<size_t>(64));
 		SLNet::RakString query("DELETE FROM connectionState WHERE systemAddress='%s';",
 			SLNet::RakString(systemAddressString).SQLEscape().C_String());
 		sqlite3_exec(dbHandles[idx].dbHandle,query.C_String(),0,0,0);
@@ -93,7 +93,7 @@ public:
 
 		// Store new system's system address and guid. rowCreationTime column is created automatically
 		char systemAddressString[64];
-		systemAddress.ToString(true,systemAddressString,64);
+		systemAddress.ToString(true,systemAddressString,static_cast<size_t>(64));
 		char guidString[128];
 		rakNetGUID.ToString(guidString, 64);
 		SLNet::RakString query(

@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -597,7 +597,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 	if (ipProto==AF_UNSPEC)
 
 	{
-		ipList[0].ToString(false,firstBindable,128);
+		ipList[0].ToString(false,firstBindable,static_cast<size_t>(128));
 		return true;
 	}		
 
@@ -621,7 +621,7 @@ bool SocketLayer::GetFirstBindableIP(char firstBindable[128], int ipProto)
 // 		((char*)(&ipList[l].address.addr4.sin_addr.s_addr))[2],
 // 		((char*)(&ipList[l].address.addr4.sin_addr.s_addr))[3]
 // 	);
-	ipList[l].ToString(false,firstBindable,128);
+	ipList[l].ToString(false,firstBindable,static_cast<size_t>(128));
 	return true;
 
 }

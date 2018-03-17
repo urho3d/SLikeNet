@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -216,6 +216,16 @@
 
 
 //#define USE_THREADED_SEND
+
+// @since 0.1.1: added
+// Controls the maximum retrievable filesize for incoming files using FileListTransfer.
+// The configured limit only applies for files which are transferred incrementally (which basically applies to any larger file).
+// Note that this also impacts the upper limit for memory allocations. It's suggested to redefine the value to a reasonable smaller size in the defineoverrides.h header file.
+// For backwards compatibility with RakNet, the default is set to 4 GiB-1.
+// #low - consider introducing GiB/MiB/KiB-functions and then define as GiB(4)?
+#ifndef SLNET_MAX_RETRIEVABLE_FILESIZE
+#define SLNET_MAX_RETRIEVABLE_FILESIZE (0xFFFFFFFF)
+#endif
 
 #ifdef RAKNET_COMPATIBILITY
 // set the namespace RakNet as alias to the SLikeNet namespace

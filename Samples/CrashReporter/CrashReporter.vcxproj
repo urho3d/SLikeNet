@@ -110,6 +110,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Debug_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -133,6 +134,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Debug - Unicode_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -153,6 +155,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Release_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -174,6 +177,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -195,6 +199,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Release - Unicode_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -216,6 +221,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>

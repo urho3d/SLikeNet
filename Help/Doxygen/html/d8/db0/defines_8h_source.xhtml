@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">SLikeNet
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.1.1</span>
    </div>
   </td>
  </tr>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('d8/db0/defines_8h_source.xhtml','../..
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *  of patent rights can be found in the RakNet Patents.txt file in the same directory.</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschr‰nkt)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschr√§nkt)</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *  license found in the license.txt file in the root directory of this source tree.</span></div>
@@ -298,20 +298,30 @@ $(document).ready(function(){initNavTree('d8/db0/defines_8h_source.xhtml','../..
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="comment">//#define USE_THREADED_SEND</span></div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="preprocessor">#ifdef RAKNET_COMPATIBILITY</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="preprocessor"></span><span class="comment">// set the namespace RakNet as alias to the SLikeNet namespace</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="keyword">namespace </span>SLNet { }</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="keyword">namespace </span>RakNet = SLNet;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">#endif // __RAKNET_DEFINES_H</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="comment">// @since 0.1.1: added</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment">// Controls the maximum retrievable filesize for incoming files using FileListTransfer.</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment">// The configured limit only applies for files which are transferred incrementally (which basically applies to any larger file).</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="comment">// Note that this also impacts the upper limit for memory allocations. It&#39;s suggested to redefine the value to a reasonable smaller size in the defineoverrides.h header file.</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="comment">// For backwards compatibility with RakNet, the default is set to 4 GiB-1.</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="comment">// #low - consider introducing GiB/MiB/KiB-functions and then define as GiB(4)?</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">#ifndef SLNET_MAX_RETRIEVABLE_FILESIZE</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno"><a class="code" href="../../d8/db0/defines_8h.xhtml#a69f86bebc837357076fea17426799455">  227</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SLNET_MAX_RETRIEVABLE_FILESIZE (0xFFFFFFFF)</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="preprocessor">#ifdef RAKNET_COMPATIBILITY</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="preprocessor"></span><span class="comment">// set the namespace RakNet as alias to the SLikeNet namespace</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="keyword">namespace </span>SLNet { }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="keyword">namespace </span>RakNet = SLNet;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="preprocessor">#endif // __RAKNET_DEFINES_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="../../dir_74389ed8173ad57b461b9d623a1f3867.xhtml">Source</a></li><li class="navelem"><a class="el" href="../../dir_bbb90e3ef9167a594ae33323139a2595.xhtml">include</a></li><li class="navelem"><a class="el" href="../../dir_88467e66686deb9d3756fe4fc298e321.xhtml">slikenet</a></li><li class="navelem"><a class="el" href="../../d8/db0/defines_8h.xhtml">defines.h</a></li>
-    <li class="footer">Generated on Thu Jul 20 2017 23:56:03 for SLikeNet by
+    <li class="footer">Generated on Wed Mar 14 2018 00:57:00 for SLikeNet by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.8.2 </li>
   </ul>

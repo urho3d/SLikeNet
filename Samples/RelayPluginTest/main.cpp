@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -166,7 +166,7 @@ int main(void)
 		for (packet=peer->Receive(); packet; peer->DeallocatePacket(packet), packet=peer->Receive())
 		{
 			packet->guid.ToString(str, 64);
-			packet->systemAddress.ToString(true,str2,64);
+			packet->systemAddress.ToString(true,str2,static_cast<size_t>(64));
 			if (packet->data[0]==ID_NEW_INCOMING_CONNECTION)
 			{
 				printf("ID_NEW_INCOMING_CONNECTION from %s on %s\n", str, str2);
