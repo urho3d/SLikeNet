@@ -60,85 +60,45 @@
 
 namespace SLNet {
 
-class SplitPacketSort
-{
-private:
-	InternalPacket ** data;
-	unsigned int allocation_size;
-	unsigned int addedPacketsCount;
-	SplitPacketIdType packetId;
-
-public:
-	SplitPacketSort()
-	{
-		data = NULL;
-		allocation_size = 0;
-		addedPacketsCount = 0;
-	}
-	~SplitPacketSort()
-	{
-		if(allocation_size)
-			OP_DELETE_ARRAY(data, _FILE_AND_LINE_);
-	}
-
-	void Preallocate(InternalPacket * internalPacket, const char *file, unsigned int line)
-	{
-		RakAssert(data == NULL);
-		allocation_size = internalPacket->splitPacketCount;
-		data = OP_NEW_ARRAY<InternalPacket*>(allocation_size, file, line);
-		packetId = internalPacket->splitPacketId;
-
-		for(unsigned int i = 0; i < allocation_size; ++i) 
-			data[i] = NULL;
-	}
-
-	bool Add(InternalPacket * internalPacket, const char *file, unsigned int line)
-	{
-		RakAssert(data != NULL);
-		RakAssert(internalPacket->splitPacketIndex < allocation_size);
-		RakAssert(packetId == internalPacket->splitPacketId);
-		RakAssert(data[internalPacket->splitPacketIndex] == NULL);
-
-		(void)file;
-		(void)line;
-
-		if(data[internalPacket->splitPacketIndex] == NULL)
-		{
-			data[internalPacket->splitPacketIndex] = internalPacket;
-			++addedPacketsCount;
-			return true;
-		}
-		return false;
-	}
-
-	unsigned int AllocSize() const
-	{
-		return allocation_size;
-	}
-
-	unsigned int AddedPacketsCount() const
-	{
-		return addedPacketsCount;
-	}
-
-	InternalPacket *& operator[](unsigned int index)
-	{
-		RakAssert(data != NULL);
-		RakAssert(index < allocation_size);
-		return data[index];
-	}
-
-	SplitPacketIdType PacketId() const
-	{
-		RakAssert(data != NULL);
-		return packetId;
-	}
-};
-
 	/// Forward declarations
 class PluginInterface2;
 class RakNetRandom;
 typedef uint64_t reliabilityHeapWeightType;
+
+// #med - consider a more suitable name for the class / maybe even make an internal class to SplitPacketChannel?
+class SplitPacketSort
+{
+	// member variables
+private:
+	InternalPacket **m_data;
+	size_t m_allocationSize;
+	unsigned int m_addedPacketsCount;
+	SplitPacketIdType m_packetId;
+
+	// construction/destruction
+public:
+	SplitPacketSort();
+	~SplitPacketSort();
+
+	// initialization
+public:
+	void Preallocate(InternalPacket *internalPacket, const char *file, unsigned int line);
+
+	// accessors
+public:
+	bool AllPacketsAdded() const;
+	size_t GetAllocSize() const;
+	unsigned int GetNumAddedPackets() const;
+	SplitPacketIdType GetPacketId() const;
+
+	// operators
+public:
+	InternalPacket*& operator[](size_t index);
+
+	// container operations
+public:
+	bool Add(InternalPacket *internalPacket);
+};
 
 // int SplitPacketIndexComp( SplitPacketIndexType const &key, InternalPacket* const &data );
 struct SplitPacketChannel//<SplitPacketChannel>
