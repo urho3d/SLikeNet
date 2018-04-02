@@ -2006,6 +2006,7 @@ requests to the RakNet project on GitHub which are incorporated in SLikeNet:
 - AlιAѕѕaѕѕιN: https://github.com/0x416c69 (pull requests: SLNET_30)
 - GBearUK: https://github.com/GBearUK (pull request: RAKPR_67)
 - Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR_31)
+- Ian Clarkson: https://github.com/aardvarkk (pull request: RAKNET_84)
 - Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR_56)
 - jaynus: https://github.com/jaynus (pull request: RAKPR_64)
 - lenky0401: https://github.com/lenky0401 (pull request: RAKPR_60)
