@@ -695,7 +695,7 @@
     <ClInclude Include="..\..\Source\include\slikenet\defines.h">
       <Filter>RakNet</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\include\slikenet\definesoverrides.h">
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h">
       <Filter>RakNet</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h">

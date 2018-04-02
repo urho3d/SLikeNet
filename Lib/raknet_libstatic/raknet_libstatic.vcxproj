@@ -174,7 +174,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -196,7 +196,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -221,7 +221,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -246,7 +246,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -267,7 +267,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RELEASE;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RELEASE;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -285,7 +285,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RETAIL;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RETAIL;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -303,7 +303,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RELEASE;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RELEASE;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -321,7 +321,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RETAIL;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RETAIL;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -342,7 +342,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RELEASE;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RELEASE;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -363,7 +363,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RETAIL;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RETAIL;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -384,7 +384,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RELEASE;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RELEASE;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -405,7 +405,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions/openssl-1.0.0d/include;./../../DependentExtensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32;_RETAIL;_RAKNET_LIB;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_RETAIL;_RAKNET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>

@@ -469,7 +469,9 @@ WCHAR * RakString::ToWideChar(void)
 	if ( (sharedString->c_str == NULL) || (*sharedString->c_str == '\0') )
 	{
 		// Return empty string
-		return L"";
+		WCHAR* buf = SLNet::OP_NEW_ARRAY<WCHAR>(1, __FILE__, __LINE__);
+		buf[0] = L'\0';
+		return buf;
 	}
 
 	//

@@ -72,6 +72,7 @@ Table of Contents
    3.4.1   Migrating from RakNet to SLikeNet
    3.4.2   Building RakNet compatibility mode yourself
    3.4.3   In-place replacement of RakNet
+   3.4.4   Dealing with RakNet forward declarations
    3.5     Development notes on differences between RakNet and SLikeNet
    3.5.1   General notes
    3.5.2   Retail configuration
@@ -916,9 +917,9 @@ named RakNet. This will be changed in SLikeNet 0.2.0.
 3.4.1 Migrating from RakNet to SLikeNet
 SLikeNet provides a simple way to migrate from RakNet to SLikeNet. All you need
 to do is to make sure that your project defines RAKNET_COMPATIBILITY in
-NativeFeatureIncludesOverrides.h, redirect your include and library folders to
-the SLikeNet ones (see chapter 3.2.1 for how this is done with Visual Studio),
-adjust the .lib filename, and rebuild you game/application without further
+defineoverrides.h, redirect your include and library folders to the SLikeNet
+ones (see chapter 3.2.1 for how this is done with Visual Studio), adjust the
+.lib file name, and rebuild your game/application without further
 modifications.
 
 Note that you can also continue pointing your include directory to
@@ -928,8 +929,7 @@ if you need to.
 
 3.4.2 Building RakNet compatibility mode yourself
 If you want to build SLikeNet in RakNet compatibility mode yourself on Windows,
-follow the steps described in chapter 3.2.2, ensure RAKNET_COMPATIBILITY is
-defined in NativeFeatureIncludesOverrides.h and build the corresponding project
+follow the steps described in chapter 3.2.2 and build the corresponding project
 listed under RakNet_Backwards_Compatibility in the SLikeNet solution.
 
 Note that at the moment SLikeNet only provides building the RakNet
@@ -944,7 +944,15 @@ game/application will start and run without any issues and no further changes
 required.
 
 Since the protocol was kept compatible with RakNet, you can even run the server
-using RakNet and the client(s) run(ning) SLikeNet (or vice versa).
+using RakNet and the client(s) running SLikeNet (or vice versa).
+
+3.4.4 Dealing with RakNet forward declarations
+A limitation of the RakNet compatibility mode is to handle RakNet forward
+declarations of types/classes. If you use any forward declaration in your
+project, you'll run into compile issues when compiling in the compatibility
+mode.
+The suggested workaround for this case is to replace your forward declaration
+with an appropriate RakNet header include.
 
 3.5 Development notes on differences between RakNet and SLikeNet
 
@@ -959,7 +967,7 @@ using the libraries which are noteworthy:
 3. RAKNET_VERSION, RAKNET_VERSION_NUMBER, RAKNET_VERSION_NUMBER_INT, and
    RAKNET_DATE were kept due to backwards compatibility with RakNet but were
    updated to 4.082 and 7/26/2017 respectively and will stay at these values for
-   all SLikeNet 1.x.x releases.
+   all SLikeNet 0.x.x/1.x.x releases.
    In order to distinguish between different SLikeNet versions, you should use
    the newly introduced SLIKENET_VERSION, SLIKNET_VERSION_NUMBER,
    SLIKENET_VERSION_NUMBER_INT, and SLIKNET_DATE macros.
@@ -998,11 +1006,11 @@ Since this property was introduced in CMake 2.8.18 building SLikeNet with CMake
 absolute path like RakNet did.
 
 3.5.4 PacketLogger FormatLine() changes
-For security improvements SLikeNet introduces two overloads of the virtual
+For security reasons SLikeNet introduces two overloads of the virtual
 PacketLogger::FormatLine() method which take an additional size parameter for
 the output buffer. Internally only these new overloads are called. If you
 overwrote the implementation of the FormatLine() method and relied on this
-being used/called from the library, you will have to adjust your overwrote to
+being used/called from the library, you will have to adjust your overrides to
 overwrite the new variants instead.
 
 3.5.5 CMake install destinations for non-Windows platforms
@@ -1995,6 +2003,7 @@ impossible for us to continue the effort which went into the RakNet library.
 Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
 - Alex Howland: https://github.com/alliekins (pull request: RAKPR_48)
+- AlιAѕѕaѕѕιN: https://github.com/0x416c69 (pull requests: SLNET_30)
 - GBearUK: https://github.com/GBearUK (pull request: RAKPR_67)
 - Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR_31)
 - Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR_56)

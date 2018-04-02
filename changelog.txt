@@ -13,16 +13,20 @@ If you require a more detailed list on the changes, please refer to the
 Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
 
 version 0.2.0 (xx-xx-xxxx xx:xx UTC)
-*** This release satisfies/processes 1 complete 2 partial GitHub pull requests
+*** This release satisfies/processes 3 complete 2 partial GitHub pull requests (up to pull request RAKNET_84)
 General:
   * extended supported compilers to VS 2017 15.4.1 (#163)
-  * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_30)
+  * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30, #186 - RAKNET_80)
 Core:
   * RakPeer:
     * improve handling of disconnecting peers (#123 - SLNET_16)
+  * RakString:
+    * fixed crash/stack corruption if freeing the returned wide char pointer from RakString::ToWideChar() for an empty string (#190)
   * ReliabilityLayer:
     * fixed case where larger bitstreams/packets would be corrupted on the receiver's side (#177 - LARKU_2/SLNET_28/SLNET_30)
     * provide means to ensure sending outstanding ACKs (#123 - SLNET_16)
+  * SocketLayer:
+    * fixed socket resource leak on non-Windows platforms in an error case (#186 - RAKNET_80)
 Samples:
   General:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
@@ -30,9 +34,12 @@ Building:
   General:
     * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
   Core:
-    * fixed build error in RakNet compatibility mode (#180 - SLNET_30)
+    * fixed build error in RakNet compatibility mode (#180 - SLNET_28/SLNET_30)
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
+    * fixed build errors with CMake < 3.0.0 (#183)
+  iOS:
+    * updated file name reference in XCode project (#188 - RAKNET_84)
 
 version 0.1.1 (03-10-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 3 partial GitHub pull requests/issues
@@ -112,39 +119,39 @@ General:
   - dropped support for VS < 2010 and GCC < 4.6.4 (#1)
 Core:
   General:
-    * fixed case for Windows includes in WindowsIncludes.h (#42 - RAKPR_37)
+    * fixed case for Windows includes in WindowsIncludes.h (#42 - RAKNET_37)
   BitStream:
-    * fixed <<-operator for BitStream not accepting const parameters (#44 - RAKPR_53)
+    * fixed <<-operator for BitStream not accepting const parameters (#44 - RAKNET_53)
   CCRakNetSlidingWindow:
-    * use std::abs() instead of abs for proper C++11 support in CCRakNetSlidingWindow.cpp (#46 - RAKPR_64)
+    * use std::abs() instead of abs for proper C++11 support in CCRakNetSlidingWindow.cpp (#46 - RAKNET_64)
   DataStructures:
-    * minor improvement to DataStructures::Queue:WeightedGraph::GetShortestPath() by replacing Queue::Size() calls with Queue::IsEmpty() (#34 - RAKPR_14)
+    * minor improvement to DataStructures::Queue:WeightedGraph::GetShortestPath() by replacing Queue::Size() calls with Queue::IsEmpty() (#34 - RAKNET_14)
     * fixed incorrect DataStructures::Queue-copy-ctor (#26)
   NatPunchthrough:
-    * fixed NatPunchthroughClient::SendOutOfBand() producing undefined messages, if __GET_TIME_64BIT is set to 0 (#38 - RAKPR_34)
-    * fixed TestModeToString() returning non-const char pointer (#35, #59, #65 - RAKPR_22, RAKPR_31, RAKPR_61)
+    * fixed NatPunchthroughClient::SendOutOfBand() producing undefined messages, if __GET_TIME_64BIT is set to 0 (#38 - RAKNET_34)
+    * fixed TestModeToString() returning non-const char pointer (#35, #59, #65 - RAKNET_22, RAKNET_31, RAKNET_61)
   PacketFileLogger:
     * fixed incorrectly instantiating/destroying the PacketLogger class instead of the PacketFileLogger when calling PacketFileLogger::GetInstance()/DestroyInstance() (#81)
   RakNetSocket2:
-    * fixed incomplete zeroing of data in RakNetSocket2_Berkley_NativeClient with RAKNET_SUPPORT_IPV6 set to 1 (#31 - RAKPR_4)
+    * fixed incomplete zeroing of data in RakNetSocket2_Berkley_NativeClient with RAKNET_SUPPORT_IPV6 set to 1 (#31 - RAKNET_4)
   RakPeer:
-    * fixed RakPeer::GetTimeoutTime() always returning defaultTimeoutTime (#37 - RAKPR_30)
-    * fixed incorrect delete in RakPeer::DerefAllSockets() when using a custom allocator (#48 - RAKPR_72)
+    * fixed RakPeer::GetTimeoutTime() always returning defaultTimeoutTime (#37 - RAKNET_30)
+    * fixed incorrect delete in RakPeer::DerefAllSockets() when using a custom allocator (#48 - RAKNET_72)
     * fixed deadlock in ProcessOfflineNetworkPacket() when building with LIBCAT_SECURITY set to 1 (#43)
   RakString:
-    * fixed undefined behavior in RakString::Assign() on non-Windows platforms if either the passed or the formated string exceeds 511 characters (#64 - RAKPR_60)
+    * fixed undefined behavior in RakString::Assign() on non-Windows platforms if either the passed or the formated string exceeds 511 characters (#64 - RAKNET_60)
     * fixed undefined behavior in RakString::ToWideChar() if called with very long strings (#12)
     * fixed undefined behavior in RakString::FromWideChar() if called with very long strings (#102)
-    * fixed memory/resource leak in RakString format-ctors and Set() method on certain platforms/compilers (#40 - RAKPR_36)
+    * fixed memory/resource leak in RakString format-ctors and Set() method on certain platforms/compilers (#40 - RAKNET_36)
   ReplicaManager3:
-    * fixed resource leak caused by ReplicaManager3::OnConstruction() (#45 - RAKPR_63)
-    * fixed comparing pointer to boolean in ReplicaManager3::AutoCreateConnectionList() (#36, #63 - RAKPR_29, RAKPR_56)
+    * fixed resource leak caused by ReplicaManager3::OnConstruction() (#45 - RAKNET_63)
+    * fixed comparing pointer to boolean in ReplicaManager3::AutoCreateConnectionList() (#36, #63 - RAKNET_29, RAKNET_56)
   UDPProxy:
-    * fixed crash in UDPProxyClient::OnPingServers() (#39 - RAKPR_35)
-    * fixed wrong sort order in UDPProxyCoordinator::ForwardingRequestComp() and related incorrectly sorted UDPProxyCoordinator::forwardingRequestList (#47 - RAKPR_67)
+    * fixed crash in UDPProxyClient::OnPingServers() (#39 - RAKNET_35)
+    * fixed wrong sort order in UDPProxyCoordinator::ForwardingRequestComp() and related incorrectly sorted UDPProxyCoordinator::forwardingRequestList (#47 - RAKNET_67)
 Extensions:
   Autopatcher:
-    * fixed memory leak in ApplyPatch: TestPatchInMemory() (#32 - RAKPR_7)
+    * fixed memory leak in ApplyPatch: TestPatchInMemory() (#32 - RAKNET_7)
   IrrlichtDemo:
     * fixed only partial upgrade of Irrlicht SDK to 1.8 (#91)
   XML:
@@ -155,7 +162,7 @@ Samples:
   Cloud:
     * fixed CloudServerHelper::OnJoinCloudResult() setting incorrect default port (#15)
   CrossConnectionTest:
-    * fixed incorrect check for incoming connection in CrossConnectionTest (#33 - RAKPR_10)
+    * fixed incorrect check for incoming connection in CrossConnectionTest (#33 - RAKNET_10)
   FileListTransfer:
     * fixed FileListTransfer sample passing incorrect values to TCPInterface::Start() (#21)
 Building:
@@ -164,10 +171,10 @@ Building:
     * resolved compile/link warnings (#11)
   CMake:
     * resolved CMake warnings/issues (#11, #78, #98, #99)
-    * update to CMake file to support VS 2015 (#46 - RAKPR_64)
+    * update to CMake file to support VS 2015 (#46 - RAKNET_64)
     * updated FindBoost CMake file from CMake 2.8.0 -> CMake 2.8.10.2 (#99)
     * updated CMake file to detect FMOD Ex up to version 4.44.59 (#78)
     * changed to not build sample projects on Linux/Mac by default (#79)
-    * fixed CMake not compiling samples by default (#30, #62 - RAKPR_51, RAKPR_54)
-    * fixed FindPortAudio CMake module ignoring libPortAudioCpp setting (#29 - RAKPR_48)
-    * fixed incorrect usage of PARENT_SCOPE and missing quoting of env-variable in CMake file (#77 - RAKPR_37)
+    * fixed CMake not compiling samples by default (#30, #62 - RAKNET_51, RAKNET_54)
+    * fixed FindPortAudio CMake module ignoring libPortAudioCpp setting (#29 - RAKNET_48)
+    * fixed incorrect usage of PARENT_SCOPE and missing quoting of env-variable in CMake file (#77 - RAKNET_37)
