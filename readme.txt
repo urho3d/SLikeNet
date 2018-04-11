@@ -2015,6 +2015,7 @@ requests to the RakNet project on GitHub which are incorporated in SLikeNet:
 - TheComet: https://github.com/TheComet (pull request: RAKPR_29)
 - Tim Ullrich: https://github.com/tullrich (pull request: RAKPR_63)
 - Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKPR_51, RAKPR_54, and RAKPR_57)
+- Viktor Korsun: https://github.com/bitekas (pull request: RAKPR_80)
 
 We'd also like to thank those contributors who have requested to remain
 anonymous and/or those who we could not contact at all (due to lack of contact
