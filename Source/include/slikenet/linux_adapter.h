@@ -9,6 +9,25 @@
  */
 #pragma once
 
+#ifdef __MINGW32__
+#include <cstdarg>  // for va_start, va_end, va_list
+#include <cstdio>   // for FILE
+#include <ctime>    // for time_t
+#include <stdint.h>
+#include "winsock2.h"
+#include "ws2tcpip.h"
+
+#define NS_INADDRSZ  4
+#define NS_IN6ADDRSZ 16
+#define NS_INT16SZ   2
+
+const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+int inet_pton4(const char *src, char *dst);
+int inet_pton6(const char *src, char *dst);
+int inet_pton(int af, const char *src, unsigned long *dst);
+
+#endif
+
 #ifdef __linux__
 #define _TRUNCATE ((size_t)-1)
 typedef int errno_t;

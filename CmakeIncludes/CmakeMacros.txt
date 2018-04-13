@@ -107,4 +107,4 @@ MACRO(FIXLINKOPTIONS)#Fix added link options that may cause problems
 	ENDIF(WIN32 AND NOT UNIX)
 ENDMACRO(FIXLINKOPTIONS)
 
-include(${RakNet_SOURCE_DIR}/CmakeIncludes/FindMacros.txt)#The macros for setting variables and performing finds
+#include(${RakNet_SOURCE_DIR}/CmakeIncludes/FindMacros.txt)#The macros for setting variables and performing finds
