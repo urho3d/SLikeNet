@@ -72,7 +72,6 @@ Table of Contents
    3.4.1   Migrating from RakNet to SLikeNet
    3.4.2   Building RakNet compatibility mode yourself
    3.4.3   In-place replacement of RakNet
-   3.4.4   Dealing with RakNet forward declarations
    3.5     Development notes on differences between RakNet and SLikeNet
    3.5.1   General notes
    3.5.2   Retail configuration
@@ -945,14 +944,6 @@ required.
 
 Since the protocol was kept compatible with RakNet, you can even run the server
 using RakNet and the client(s) running SLikeNet (or vice versa).
-
-3.4.4 Dealing with RakNet forward declarations
-A limitation of the RakNet compatibility mode is to handle RakNet forward
-declarations of types/classes. If you use any forward declaration in your
-project, you'll run into compile issues when compiling in the compatibility
-mode.
-The suggested workaround for this case is to replace your forward declaration
-with an appropriate RakNet header include.
 
 3.5 Development notes on differences between RakNet and SLikeNet
 
@@ -2002,20 +1993,20 @@ impossible for us to continue the effort which went into the RakNet library.
 
 Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
-- Alex Howland: https://github.com/alliekins (pull request: RAKPR_48)
+- Alex Howland: https://github.com/alliekins (pull request: RAKNET_48)
 - AlιAѕѕaѕѕιN: https://github.com/0x416c69 (pull requests: SLNET_30)
-- GBearUK: https://github.com/GBearUK (pull request: RAKPR_67)
-- Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR_31)
+- GBearUK: https://github.com/GBearUK (pull request: RAKNET_67)
+- Hunter Mayer: https://github.com/orionnoir (pull request: RAKNET_31)
 - Ian Clarkson: https://github.com/aardvarkk (pull request: RAKNET_84)
-- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR_56)
-- jaynus: https://github.com/jaynus (pull request: RAKPR_64)
-- lenky0401: https://github.com/lenky0401 (pull request: RAKPR_60)
-- Peter Hille: https://github.com/png85 (pull request: RAKPR_7)
-- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKPR_10 and RAKPR_14)
-- TheComet: https://github.com/TheComet (pull request: RAKPR_29)
-- Tim Ullrich: https://github.com/tullrich (pull request: RAKPR_63)
-- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKPR_51, RAKPR_54, and RAKPR_57)
-- Viktor Korsun: https://github.com/bitekas (pull request: RAKPR_80)
+- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKNET_56)
+- jaynus: https://github.com/jaynus (pull request: RAKNET_64)
+- lenky0401: https://github.com/lenky0401 (pull request: RAKNET_60)
+- Peter Hille: https://github.com/png85 (pull request: RAKNET_7)
+- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKNET_10 and RAKNET_14)
+- TheComet: https://github.com/TheComet (pull request: RAKNET_29)
+- Tim Ullrich: https://github.com/tullrich (pull request: RAKNET_63)
+- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKNET_51, RAKNET_54, and RAKNET_57)
+- Viktor Korsun: https://github.com/bitekas (pull request: RAKNET_80)
 
 We'd also like to thank those contributors who have requested to remain
 anonymous and/or those who we could not contact at all (due to lack of contact

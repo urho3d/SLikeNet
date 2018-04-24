@@ -169,18 +169,18 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|x64'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|x64'">false</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|x64'">$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|x64'">SLikeNet_$(ProjectName)_$(Configuration)_$(Platform)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

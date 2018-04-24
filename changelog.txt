@@ -20,6 +20,8 @@ General:
   * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30, #186 - RAKNET_80)
   * several documentation updates (#130)
 Core:
+  * General
+    * fixed broken ABI compatibility with RakNet 4.081/4.082 (#203)
   * RakPeer:
     * improve handling of disconnecting peers (#123 - SLNET_16)
   * RakNetSocket2:
