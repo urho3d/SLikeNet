@@ -107,9 +107,6 @@
     <ClCompile Include="..\..\Source\src\EmailSender.cpp">
       <Filter>RakNet</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\src\EncodeClassName.cpp">
-      <Filter>RakNet</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\src\EpochTimeToString.cpp">
       <Filter>RakNet</Filter>
     </ClCompile>
@@ -290,9 +287,6 @@
     <ClCompile Include="..\..\Source\src\SendToThread.cpp">
       <Filter>RakNet</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\src\SHA1.cpp">
-      <Filter>RakNet</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\src\SignaledEvent.cpp">
       <Filter>RakNet</Filter>
     </ClCompile>
@@ -362,6 +356,7 @@
     <ClCompile Include="..\..\Source\src\WSAStartupSingleton.cpp">
       <Filter>RakNet</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\src\DR_SHA1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinPhone8.h" />
@@ -649,9 +644,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\defines.h">
       <Filter>RakNet</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\include\slikenet\definesoverrides.h">
-      <Filter>RakNet</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h">
       <Filter>RakNet</Filter>
     </ClInclude>
@@ -722,9 +714,6 @@
       <Filter>RakNet</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\SendToThread.h">
-      <Filter>RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\include\slikenet\SHA1.h">
       <Filter>RakNet</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\SignaledEvent.h">
@@ -823,18 +812,16 @@
     <ClInclude Include="..\..\Source\include\slikenet\XBox360Includes.h">
       <Filter>RakNet</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\DR_SHA1.h" />
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h">
+      <Filter>RakNet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="WMAppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Source\RakNet.vcproj">
-      <Filter>RakNet</Filter>
-    </None>
-    <None Include="..\..\Source\RakNet_vc8.vcproj">
-      <Filter>RakNet</Filter>
-    </None>
-    <None Include="..\..\Source\RakNet_vc9.vcproj">
       <Filter>RakNet</Filter>
     </None>
   </ItemGroup>

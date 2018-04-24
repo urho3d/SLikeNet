@@ -282,9 +282,6 @@
     <ClCompile Include="..\..\Source\src\SendToThread.cpp">
       <Filter>RakNet_Sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\src\SHA1.cpp">
-      <Filter>RakNet_Sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\src\SignaledEvent.cpp">
       <Filter>RakNet_Sources</Filter>
     </ClCompile>
@@ -360,9 +357,8 @@
     <ClCompile Include="..\..\DependentExtensions\WinPhone8\ThreadEmulation.cpp">
       <Filter>RakNet_Additional</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\RakNetSocket2_WindowsStore8.cpp">
-      <Filter>RakNet_Sources</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\Source\src\RakNetSocket2_WindowsStore8.cpp" />
+    <ClCompile Include="..\..\Source\src\DR_SHA1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -722,9 +718,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\SendToThread.h">
       <Filter>RakNet_Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\include\slikenet\SHA1.h">
-      <Filter>RakNet_Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\SignaledEvent.h">
       <Filter>RakNet_Headers</Filter>
     </ClInclude>
@@ -830,6 +823,7 @@
     <ClInclude Include="..\..\DependentExtensions\WinPhone8\ThreadEmulation.h">
       <Filter>RakNet_Additional</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\DR_SHA1.h" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />

@@ -147,6 +147,7 @@
     <ClInclude Include="..\..\Source\include\slikenet\ConnectionGraph2.h" />
     <ClInclude Include="..\..\Source\include\slikenet\ConsoleServer.h" />
     <ClInclude Include="..\..\Source\include\slikenet\DataCompressor.h" />
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\DirectoryDeltaTransfer.h" />
     <ClInclude Include="..\..\Source\include\slikenet\DS_BinarySearchTree.h" />
     <ClInclude Include="..\..\Source\include\slikenet\DS_BPlusTree.h" />
@@ -224,7 +225,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\memoryoverride.h" />
     <ClInclude Include="..\..\Source\include\slikenet\commandparser.h" />
     <ClInclude Include="..\..\Source\include\slikenet\defines.h" />
-    <ClInclude Include="..\..\Source\include\slikenet\definesoverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket2.h" />
@@ -311,7 +311,6 @@
     <ClCompile Include="..\..\Source\src\DS_Table.cpp" />
     <ClCompile Include="..\..\Source\src\DynDNS.cpp" />
     <ClCompile Include="..\..\Source\src\EmailSender.cpp" />
-    <ClCompile Include="..\..\Source\src\EncodeClassName.cpp" />
     <ClCompile Include="..\..\Source\src\EpochTimeToString.cpp" />
     <ClCompile Include="..\..\Source\src\FileList.cpp" />
     <ClCompile Include="..\..\Source\src\FileListTransfer.cpp" />

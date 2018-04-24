@@ -187,11 +187,11 @@ licenses/_quick_licensing_slikenet_extended.txt
 1. What is SLikeNet?
 
 SLikeNet™ is an Open Source/Free Software cross-platform network engine written
-in C++ and specifially designed for games (and applications which have
+in C++ and specifically designed for games (and applications which have
 comparable requirements on a network engine like games) building upon the
 discontinued RakNet network engine which had more than 13 years of active
 development. SLikeNet currently supports Windows, Linux and Mac with limited
-support for iPhone®, Android™, and Windows Phone™ 8.
+support for iPhone®, Android™, Windows Phone™ 8, and Windows Store 8.
 SLikeNet is not a simple rebranding of RakNet, but rather incorporates already
 in its initial version several bug- and security fixes as well as changes to
 bring the engine back on track with recent compiler and language changes.
@@ -215,7 +215,7 @@ community. However, it turned out that since GitHub® wasn't opened up, no
 organized community established itself and the idea of the development of
 RakNet being taken over by the community didn't come true.
 While there were quite a few talented developers who provided patches on
-GitHub and helped with providing support, there didn't seem to be any endevour
+GitHub and helped with providing support, there didn't seem to be any endeavor
 to get an organizational structure around the continuous development of RakNet.
 Hence, to the developers of SLikeNet the question arose how they could actually
 help out here and what would be the best way to ensure that RakNet will
@@ -234,9 +234,9 @@ The initial versions on the way towards the 1.0.0 release will use the version
 number 0.x.y to reflect the current (early) development stage of SLikeNet.
 However, since SLikeNet is heavily based on the very well tested RakNet
 library, we consider already these early versions way more stable than what you
-would normally excpect from a library with such a version number.
+would normally expect from a library with such a version number.
 Furthermore, since our aim for SLikeNet 1.0.0 is to keep ABI/API/Protocol
-compaitibilty with RakNet 4.081/4.082, we consider the API/ABI/Protocol of the
+compatibility with RakNet 4.081/4.082, we consider the API/ABI/Protocol of the
 0.x.y releases already stable and do plan to change them only in order to fix
 (undesired/unintended) API/ABI/Protocol incompatibility with RakNet which might
 have slipped in during development.
@@ -244,7 +244,7 @@ Hence, in contrast to what the Semantic Versioning 2.0.0 permits, we are
 considering the 0.1.0 API being stable, already.
 
 1.2.2 Alpha releases
-Starting wirh 1.0.0, for each new release we will go through a >= 2-weeks alpha
+Starting with 1.0.0, for each new release we will go through a >= 2-weeks alpha
 release period. During this period we will only implement bugfixes which are
 considered safe or are fixes for regressions. Anything else will be postponed
 and scheduled for a following version. If significant changes need to be made
@@ -363,7 +363,7 @@ The following list presents the known restrictions:
 	- Xbox 360®
 	- PlayStation® Vita
 	- Playstation 3
-- limited support for iOS, Android, Windows Phone 8 (later)
+- limited support for iOS, Android, Windows Phone 8, Windows Store 8 (later)
 - limited support for Samples and Tests (later)
 - limited support for RakVoiceFMOD (later)
 - limited support for SWIG and the C# interface (later)

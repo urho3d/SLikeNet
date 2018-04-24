@@ -1,11 +1,16 @@
 ﻿/*
- *  Copyright (c) 2014, Oculus VR, Inc.
+ *  Original work: Copyright (c) 2014, Oculus VR, Inc.
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
  *  RakNet License.txt file in the licenses directory of this source tree. An additional grant 
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
+ *
+ *  Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 //
@@ -34,7 +39,7 @@ using namespace Windows::UI::Xaml::Navigation;
 #include "RakPeerInterface.h"
 #include "RakSleep.h"
 #include "MessageIdentifiers.h"
-using namespace RakNet;
+using namespace SLNet;
 #define DEFAULT_SERVER_PORT 61111
 #define DEFAULT_SERVER_ADDRESS "natpunch.jenkinssoftware.com"
 

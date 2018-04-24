@@ -96,12 +96,14 @@
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453</DisableSpecificWarnings>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453</DisableSpecificWarnings>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -111,6 +113,7 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;WINDOWS_STORE_RT;_RAKNET_SUPPORT_TCPInterface=0;_RAKNET_SUPPORT_PacketizedTCP=0;_RAKNET_SUPPORT_EmailSender=0;_RAKNET_SUPPORT_HTTPConnection=0;_RAKNET_SUPPORT_HTTPConnection2=0;_RAKNET_SUPPORT_TelnetTransport=0;_RAKNET_SUPPORT_NatTypeDetectionServer=0;_RAKNET_SUPPORT_UDPProxyServer=0;_RAKNET_SUPPORT_UDPProxyCoordinator=0;_RAKNET_SUPPORT_UDPForwarder=0</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)DependentExtensions\WinPhone8;$(SolutionDir)DependentExtensions\WinRT;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,18 +123,21 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;WINDOWS_STORE_RT;_RAKNET_SUPPORT_TCPInterface=0;_RAKNET_SUPPORT_PacketizedTCP=0;_RAKNET_SUPPORT_EmailSender=0;_RAKNET_SUPPORT_HTTPConnection=0;_RAKNET_SUPPORT_HTTPConnection2=0;_RAKNET_SUPPORT_TelnetTransport=0;_RAKNET_SUPPORT_NatTypeDetectionServer=0;_RAKNET_SUPPORT_UDPProxyServer=0;_RAKNET_SUPPORT_UDPProxyCoordinator=0;_RAKNET_SUPPORT_UDPForwarder=0</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(SolutionDir)DependentExtensions\WinPhone8;$(SolutionDir)DependentExtensions\WinRT;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453</DisableSpecificWarnings>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453</DisableSpecificWarnings>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@
 #include "WinRTSockAddr.h"
 #include "SocketIncludes.h"
 
-namespace RakNet
+namespace SLNet
 {                    
 	int WinRTClose( Windows::Networking::Sockets::DatagramSocket ^s);
 
