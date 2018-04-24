@@ -13,7 +13,7 @@ If you require a more detailed list on the changes, please refer to the
 Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
 
 version 0.2.0 (xx-xx-xxxx xx:xx UTC)
-*** This release satisfies/processes 4 complete 3 partial GitHub pull requests (up to pull request RAKNET_96)
+*** This release satisfies/processes 6 complete 3 partial GitHub pull requests (up to pull request RAKNET_124)
 *** This release resolves 1 user reported issues (1 partially)
 General:
   * extended supported compilers to VS 2017 15.4.1 (#163)
@@ -22,6 +22,8 @@ General:
 Core:
   * RakPeer:
     * improve handling of disconnecting peers (#123 - SLNET_16)
+  * RakNetSocket2:
+    * fixed out of bounds read in RNS2_Berkley::BindSharedIPV4And6() with RAKNET_SUPPORT_IPV6 set to 1 (#202 - RAKNET_116)
   * RakString:
     * fixed crash/stack corruption if freeing the returned wide char pointer from RakString::ToWideChar() for an empty string (#190)
   * ReliabilityLayer:
@@ -45,6 +47,7 @@ Building:
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
     * fixed build errors with CMake < 3.0.0 (#183)
+    * small tweaks/improvements to CMake files (#130)
   iOS:
     * updated file name reference in XCode project (#188 - RAKNET_84)
 
@@ -178,7 +181,7 @@ Building:
     * resolved compile/link warnings (#11)
   CMake:
     * resolved CMake warnings/issues (#11, #78, #98, #99)
-    * update to CMake file to support VS 2015 (#46 - RAKNET_64)
+    * update to CMake file to support VS 2015 (#46 - RAKNET_64, RAKNET_105, RAKNET_110)
     * updated FindBoost CMake file from CMake 2.8.0 -> CMake 2.8.10.2 (#99)
     * updated CMake file to detect FMOD Ex up to version 4.44.59 (#78)
     * changed to not build sample projects on Linux/Mac by default (#79)
