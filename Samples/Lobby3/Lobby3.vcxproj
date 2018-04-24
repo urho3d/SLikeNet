@@ -353,6 +353,7 @@
     <ClCompile Include="..\..\Source\src\WSAStartupSingleton.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\_FindFirst.h" />
     <ClInclude Include="..\..\Source\include\slikenet\AutopatcherPatchContext.h" />
     <ClInclude Include="..\..\Source\include\slikenet\AutopatcherRepositoryInterface.h" />
@@ -447,7 +448,6 @@
     <ClInclude Include="..\..\Source\include\slikenet\memoryoverride.h" />
     <ClInclude Include="..\..\Source\include\slikenet\commandparser.h" />
     <ClInclude Include="..\..\Source\include\slikenet\defines.h" />
-    <ClInclude Include="..\..\Source\include\slikenet\definesoverrides.h" />
     <ClInclude Include="..\..\Source\include\slikenet\smartptr.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket.h" />
     <ClInclude Include="..\..\Source\include\slikenet\socket2.h" />
