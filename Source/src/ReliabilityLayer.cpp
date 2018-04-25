@@ -807,6 +807,8 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 
 				for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
 					messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingAcks minIndex > maxIndex or maxIndex is max value", BYTES_TO_BITS(length), systemAddress, true);
+
+				// it's an invalid incoming package --- let's abort processing (there's no point in continuing processing other ranges if the package is invalid)
 				return false;
 			}
 			for (datagramNumber=incomingAcks.ranges[i].minIndex; datagramNumber >= incomingAcks.ranges[i].minIndex && datagramNumber <= incomingAcks.ranges[i].maxIndex; datagramNumber++)
@@ -879,6 +881,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 			for (unsigned int messageHandlerIndex=0; messageHandlerIndex < messageHandlerList.Size(); messageHandlerIndex++)
 				messageHandlerList[messageHandlerIndex]->OnReliabilityLayerNotification("incomingNAKs.Deserialize failed", BYTES_TO_BITS(length), systemAddress, true);			
 
+			// it's an invalid incoming package --- let's abort processing (there's no point in continuing processing other ranges if the package is invalid)
 			return false;
 		}
 		for (i=0; i<incomingNAKs.ranges.Size();i++)
@@ -1561,7 +1564,7 @@ CONTINUE_SOCKET_DATA_PARSE_LOOP:
 
 	}
 
-
+	// #med - review --- is this correct to not increase in error cases?
 	receivePacketCount++;
 
 	return true;
@@ -3858,14 +3861,14 @@ bool ReliabilityLayer::ResendBufferOverflow(void) const
 ReliabilityLayer::MessageNumberNode* ReliabilityLayer::GetMessageNumberNodeByDatagramIndex(DatagramSequenceNumberType index, CCTimeType *timeSent)
 {
 	if (datagramHistory.IsEmpty())
-		return 0;
+		return nullptr;
 
 	if (congestionManager.LessThan(index, datagramHistoryPopCount))
-		return 0;
+		return nullptr;
 
 	DatagramSequenceNumberType offsetIntoList = index - datagramHistoryPopCount;
 	if (offsetIntoList >= datagramHistory.Size())
-		return 0;
+		return nullptr;
 
 	*timeSent=datagramHistory[offsetIntoList].timeSent;
 	return datagramHistory[offsetIntoList].head;

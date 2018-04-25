@@ -247,12 +247,7 @@ namespace DataStructures
 	template <class list_type>
 	void List<list_type>::Insert( const list_type &input, const unsigned int position, const char *file, unsigned int line )
 	{
-#ifdef _DEBUG
-		if (position>list_size)
-		{
-			RakAssert( position <= list_size );
-		}
-#endif
+		RakAssert( position <= list_size );
 
 		// Reallocate list if necessary
 		if ( list_size == allocation_size )

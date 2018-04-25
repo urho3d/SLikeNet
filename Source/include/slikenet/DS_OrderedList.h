@@ -195,7 +195,7 @@ namespace DataStructures
 		}
 		else
 		{
-			orderedList.Insert(data,index, file, line);
+			orderedList.Insert(data, index, file, line);
 			return index;
 		}		
 	}
