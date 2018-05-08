@@ -1,4 +1,4 @@
-SLikeNet™ 0.1.1
+SLikeNet™ 0.1.2
 ===============
 Copyright © 2016-2018 SLikeSoft™ UG (haftungsbeschränkt)
 
@@ -185,11 +185,11 @@ licenses/_quick_licensing_slikenet_extended.txt
 1. What is SLikeNet?
 
 SLikeNet™ is an Open Source/Free Software cross-platform network engine written
-in C++ and specifially designed for games (and applications which have
+in C++ and specifically designed for games (and applications which have
 comparable requirements on a network engine like games) building upon the
 discontinued RakNet network engine which had more than 13 years of active
 development. SLikeNet currently supports Windows, Linux and Mac with limited
-support for iPhone®, Android™, and Windows Phone™ 8.
+support for iPhone®, Android™, Windows Phone™ 8, and Windows Store 8.
 SLikeNet is not a simple rebranding of RakNet, but rather incorporates already
 in its initial version several bug- and security fixes as well as changes to
 bring the engine back on track with recent compiler and language changes.
@@ -213,7 +213,7 @@ community. However, it turned out that since GitHub® wasn't opened up, no
 organized community established itself and the idea of the development of
 RakNet being taken over by the community didn't come true.
 While there were quite a few talented developers who provided patches on
-GitHub and helped with providing support, there didn't seem to be any endevour
+GitHub and helped with providing support, there didn't seem to be any endeavor
 to get an organizational structure around the continuous development of RakNet.
 Hence, to the developers of SLikeNet the question arose how they could actually
 help out here and what would be the best way to ensure that RakNet will
@@ -232,9 +232,9 @@ The initial versions on the way towards the 1.0.0 release will use the version
 number 0.x.y to reflect the current (early) development stage of SLikeNet.
 However, since SLikeNet is heavily based on the very well tested RakNet
 library, we consider already these early versions way more stable than what you
-would normally excpect from a library with such a version number.
+would normally expect from a library with such a version number.
 Furthermore, since our aim for SLikeNet 1.0.0 is to keep ABI/API/Protocol
-compaitibilty with RakNet 4.081/4.082, we consider the API/ABI/Protocol of the
+compatibility with RakNet 4.081/4.082, we consider the API/ABI/Protocol of the
 0.x.y releases already stable and do plan to change them only in order to fix
 (undesired/unintended) API/ABI/Protocol incompatibility with RakNet which might
 have slipped in during development.
@@ -242,7 +242,7 @@ Hence, in contrast to what the Semantic Versioning 2.0.0 permits, we are
 considering the 0.1.0 API being stable, already.
 
 1.2.2 Alpha releases
-Starting wirh 1.0.0, for each new release we will go through a >= 2-weeks alpha
+Starting with 1.0.0, for each new release we will go through a >= 2-weeks alpha
 release period. During this period we will only implement bugfixes which are
 considered safe or are fixes for regressions. Anything else will be postponed
 and scheduled for a following version. If significant changes need to be made
@@ -361,7 +361,7 @@ The following list presents the known restrictions:
 	- Xbox 360®
 	- PlayStation® Vita
 	- Playstation 3
-- limited support for iOS, Android, Windows Phone 8 (later)
+- limited support for iOS, Android, Windows Phone 8, Windows Store 8 (later)
 - limited support for Samples and Tests (later)
 - limited support for RakVoiceFMOD (later)
 - limited support for SWIG and the C# interface (later)
@@ -915,9 +915,9 @@ named RakNet. This will be changed in SLikeNet 0.2.0.
 3.4.1 Migrating from RakNet to SLikeNet
 SLikeNet provides a simple way to migrate from RakNet to SLikeNet. All you need
 to do is to make sure that your project defines RAKNET_COMPATIBILITY in
-NativeFeatureIncludesOverrides.h, redirect your include and library folders to
-the SLikeNet ones (see chapter 3.2.1 for how this is done with Visual Studio),
-adjust the .lib filename, and rebuild you game/application without further
+defineoverrides.h, redirect your include and library folders to the SLikeNet
+ones (see chapter 3.2.1 for how this is done with Visual Studio), adjust the
+.lib file name, and rebuild your game/application without further
 modifications.
 
 Note that you can also continue pointing your include directory to
@@ -927,8 +927,7 @@ if you need to.
 
 3.4.2 Building RakNet compatibility mode yourself
 If you want to build SLikeNet in RakNet compatibility mode yourself on Windows,
-follow the steps described in chapter 3.2.2, ensure RAKNET_COMPATIBILITY is
-defined in NativeFeatureIncludesOverrides.h and build the corresponding project
+follow the steps described in chapter 3.2.2 and build the corresponding project
 listed under RakNet_Backwards_Compatibility in the SLikeNet solution.
 
 Note that at the moment SLikeNet only provides building the RakNet
@@ -943,7 +942,7 @@ game/application will start and run without any issues and no further changes
 required.
 
 Since the protocol was kept compatible with RakNet, you can even run the server
-using RakNet and the client(s) run(ning) SLikeNet (or vice versa).
+using RakNet and the client(s) running SLikeNet (or vice versa).
 
 3.5 Development notes on differences between RakNet and SLikeNet
 
@@ -958,7 +957,7 @@ using the libraries which are noteworthy:
 3. RAKNET_VERSION, RAKNET_VERSION_NUMBER, RAKNET_VERSION_NUMBER_INT, and
    RAKNET_DATE were kept due to backwards compatibility with RakNet but were
    updated to 4.082 and 7/26/2017 respectively and will stay at these values for
-   all SLikeNet 1.x.x releases.
+   all SLikeNet 0.x.x/1.x.x releases.
    In order to distinguish between different SLikeNet versions, you should use
    the newly introduced SLIKENET_VERSION, SLIKNET_VERSION_NUMBER,
    SLIKENET_VERSION_NUMBER_INT, and SLIKNET_DATE macros.
@@ -997,11 +996,11 @@ Since this property was introduced in CMake 2.8.18 building SLikeNet with CMake
 absolute path like RakNet did.
 
 3.5.4 PacketLogger FormatLine() changes
-For security improvements SLikeNet introduces two overloads of the virtual
+For security reasons SLikeNet introduces two overloads of the virtual
 PacketLogger::FormatLine() method which take an additional size parameter for
 the output buffer. Internally only these new overloads are called. If you
 overwrote the implementation of the FormatLine() method and relied on this
-being used/called from the library, you will have to adjust your overwrote to
+being used/called from the library, you will have to adjust your overrides to
 overwrite the new variants instead.
 
 3.6 Configuring SLikeNet
@@ -1985,17 +1984,18 @@ impossible for us to continue the effort which went into the RakNet library.
 
 Further, we'd like to thank the following contributors who handed in pull
 requests to the RakNet project on GitHub which are incorporated in SLikeNet:
-- Alex Howland: https://github.com/alliekins (pull request: RAKPR_48)
-- GBearUK: https://github.com/GBearUK (pull request: RAKPR_67)
-- Hunter Mayer: https://github.com/orionnoir (pull request: RAKPR_31)
-- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKPR_56)
-- jaynus: https://github.com/jaynus (pull request: RAKPR_64)
-- lenky0401: https://github.com/lenky0401 (pull request: RAKPR_60)
-- Peter Hille: https://github.com/png85 (pull request: RAKPR_7)
-- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKPR_10 and RAKPR_14)
-- TheComet: https://github.com/TheComet (pull request: RAKPR_29)
-- Tim Ullrich: https://github.com/tullrich (pull request: RAKPR_63)
-- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKPR_51, RAKPR_54, and RAKPR_57)
+- Alex Howland: https://github.com/alliekins (pull request: RAKNET_48)
+- GBearUK: https://github.com/GBearUK (pull request: RAKNET_67)
+- Hunter Mayer: https://github.com/orionnoir (pull request: RAKNET_31)
+- Jalmari Ikävalko: https://github.com/tzaeru (pull request: RAKNET_56)
+- jaynus: https://github.com/jaynus (pull request: RAKNET_64)
+- lenky0401: https://github.com/lenky0401 (pull request: RAKNET_60)
+- Peter Hille: https://github.com/png85 (pull request: RAKNET_7)
+- Rhys Kidd:  https://github.com/Echelon9 (pull requests: RAKNET_10 and RAKNET_14)
+- TheComet: https://github.com/TheComet (pull request: RAKNET_29)
+- Tim Ullrich: https://github.com/tullrich (pull request: RAKNET_63)
+- Tobias Kahlert: https://github.com/SrTobi (pull requests: RAKNET_51, RAKNET_54, and RAKNET_57)
+- Viktor Korsun: https://github.com/bitekas (pull request: RAKNET_80)
 
 We'd also like to thank those contributors who have requested to remain
 anonymous and/or those who we could not contact at all (due to lack of contact

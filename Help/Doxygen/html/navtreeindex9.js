@@ -1,5 +1,6 @@
 var NAVTREEINDEX9 =
 {
+"d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#aefb93bc7c31786d286c5b2a541f48426":[3,0,1,62,1,22],
 "d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#af0cda19e8ddbaf5ca2cb7cc3c9b0e4f1":[3,0,1,62,1,24],
 "d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#affac472b2385d65de4e675d2b90335cd":[3,0,1,62,1,14],
 "d6/d52/class_s_l_net_1_1_huffman_encoding_tree.xhtml":[3,0,1,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX9 =
 "d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aa2b7eba1b79cfbe6e07b1077e654e18ef":[4,0,0,0,0,107,8,3],
 "d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aa3cb3f36d6ab3a00980ce84184e02887a":[4,0,0,0,0,107,8,4],
 "d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aa82f6a6b5d3b5ae80741c5dbce7914afd":[4,0,0,0,0,107,8,0],
-"d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aa95572b7e0833ff73cd4c839d6440db4e":[4,0,0,0,0,107,8,2],
-"d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aaa26af3cbf4d081f1c432c5991a5768d1":[4,0,0,0,0,107,8,7]
+"d6/de8/_replica_manager3_8h.xhtml#gga4d0f10f0e557bd96237574321b79a68aa95572b7e0833ff73cd4c839d6440db4e":[4,0,0,0,0,107,8,2]
 };

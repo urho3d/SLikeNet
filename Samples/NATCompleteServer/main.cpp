@@ -154,7 +154,7 @@ struct NatPunchthroughServerFramework : public SampleFramework, public NatPuncht
 };
 struct RelayPluginFramework : public SampleFramework
 {
-	RelayPluginFramework() {isSupported=RelayPlugin_Supported;}
+	RelayPluginFramework() {relayPlugin=nullptr;isSupported=RelayPlugin_Supported;}
 	virtual const char * QueryName(void) {return "RelayPlugin";}
 	virtual const char * QueryRequirements(void) {return "None.";}
 	virtual const char * QueryFunction(void) {return "Relays messages between named connections.";}
@@ -394,7 +394,7 @@ struct UDPProxyServerFramework : public SampleFramework, public UDPProxyServerRe
 };
 struct CloudServerFramework : public SampleFramework
 {
-	CloudServerFramework() {isSupported=CloudServerFramework_Supported;}
+	CloudServerFramework() {cloudServer=nullptr;isSupported=CloudServerFramework_Supported;}
 	virtual const char * QueryName(void) {return "CloudServer";}
 	virtual const char * QueryRequirements(void) {return "None.";}
 	virtual const char * QueryFunction(void) {return "Single instance cloud server that maintains connection counts\nUseful as a directory server to find other client instances.";}

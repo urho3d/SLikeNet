@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -327,8 +327,14 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 		ret = bind__(rns2Socket, aip->ai_addr, (int) aip->ai_addrlen );
 		if (ret>=0)
 		{
-			// Is this valid?
-			memcpy(&boundAddress.address.addr6, aip->ai_addr, sizeof(boundAddress.address.addr6));
+			if (aip->ai_family == AF_INET)
+			{
+				memcpy(&boundAddress.address.addr4, aip->ai_addr, sizeof(sockaddr_in));
+			}
+			else
+			{
+				memcpy(&boundAddress.address.addr6, aip->ai_addr, sizeof(sockaddr_in6));
+			}
 
 			freeaddrinfo(servinfo); // free the linked-list
 
