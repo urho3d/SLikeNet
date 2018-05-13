@@ -1,5 +1,6 @@
 var NAVTREEINDEX23 =
 {
+"df/dd8/class_s_l_net_1_1_t_c_p_interface.xhtml#a7800dc1ce89b0127884503b6168ceb27":[3,0,1,67,8],
 "df/dd8/class_s_l_net_1_1_t_c_p_interface.xhtml#a7c0331ed4bff87b28af932d203bf54e5":[3,0,1,67,45],
 "df/dd8/class_s_l_net_1_1_t_c_p_interface.xhtml#a7da4384d5f38a5094cbcf094b6cdd04c":[3,0,1,67,36],
 "df/dd8/class_s_l_net_1_1_t_c_p_interface.xhtml#a7db6ce7942a3fe51c1500233e6d7c0c6":[3,0,1,67,7],
@@ -179,8 +180,8 @@ var NAVTREEINDEX23 =
 "functions_func_0x77.xhtml":[3,3,1,22],
 "functions_func_0x7e.xhtml":[3,3,1,23],
 "functions_rela.xhtml":[3,3,5],
-"functions_vars.xhtml":[3,3,2,0],
 "functions_vars.xhtml":[3,3,2],
+"functions_vars.xhtml":[3,3,2,0],
 "functions_vars_0x61.xhtml":[3,3,2,1],
 "functions_vars_0x62.xhtml":[3,3,2,2],
 "functions_vars_0x63.xhtml":[3,3,2,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX23 =
 "modules.xhtml":[1],
 "namespacemembers.xhtml":[2,1,0,0],
 "namespacemembers.xhtml":[2,1,0],
-"namespacemembers_0x61.xhtml":[2,1,0,1],
-"namespacemembers_0x62.xhtml":[2,1,0,2]
+"namespacemembers_0x61.xhtml":[2,1,0,1]
 };

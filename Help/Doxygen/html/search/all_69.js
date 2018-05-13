@@ -314,6 +314,7 @@ var searchData=
   ['isuploaded',['isUploaded',['../d8/df5/group___c_l_o_u_d___g_r_o_u_p.xhtml#a08adcfc39da0e0ddb797073a1193a535',1,'SLNet::CloudServer::CloudData']]],
   ['isvalidated',['isValidated',['../d0/d63/group___r_e_p_l_i_c_a___m_a_n_a_g_e_r___g_r_o_u_p3.xhtml#af713225641af86fa0d4bd6e419858a0f',1,'SLNet::Connection_RM3']]],
   ['isvalidpath',['isValidPath',['../dd/d9f/class_data_structures_1_1_weighted_graph.xhtml#ac48608c2c44bfa4f9655c05eddd56940',1,'DataStructures::WeightedGraph']]],
+  ['iswithinrange',['IsWithinRange',['../d4/df2/class_data_structures_1_1_range_list.xhtml#a9a1cbc8374cb80903bb08472deb924a7',1,'DataStructures::RangeList']]],
   ['isworking',['IsWorking',['../d1/dbc/struct_thread_pool.xhtml#a90b37c13ba8b9f67db4bd99ee4a5d811',1,'ThreadPool']]],
   ['item',['item',['../db/d19/class_data_structures_1_1_binary_search_tree.xhtml#aae201835a5764223f821b246ebd3f700',1,'DataStructures::BinarySearchTree::node::item()'],['../d3/dbe/class_data_structures_1_1_circular_linked_list.xhtml#a1b20aa76186c8a46ba105ef014f52a72',1,'DataStructures::CircularLinkedList::node::item()']]],
   ['itematindex',['ItemAtIndex',['../d6/d83/class_data_structures_1_1_hash.xhtml#a5fec5e2f5f479ddeebefe9a0ff1c50e4',1,'DataStructures::Hash']]],

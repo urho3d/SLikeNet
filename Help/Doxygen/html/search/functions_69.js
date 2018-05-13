@@ -67,6 +67,7 @@ var searchData=
   ['isundefined',['IsUndefined',['../d3/da8/struct_s_l_net_1_1_address_or_g_u_i_d.xhtml#a61d231c237e3eaea84445c47b4003ddc',1,'SLNet::AddressOrGUID']]],
   ['isunique',['IsUnique',['../d6/d84/class_s_l_net_1_1_rak_net_smart_ptr.xhtml#a2e69e4796eb02b8a0c9bafc717edf142',1,'SLNet::RakNetSmartPtr']]],
   ['isunused',['IsUnused',['../d8/df5/group___c_l_o_u_d___g_r_o_u_p.xhtml#aff15de50fc7e6c60dfcb3594ed9eac6c',1,'SLNet::CloudServer::CloudData::IsUnused()'],['../d8/df5/group___c_l_o_u_d___g_r_o_u_p.xhtml#acf62342a88ab24c82e0830e6bee81ba4',1,'SLNet::CloudServer::CloudDataList::IsUnused()'],['../d8/df5/group___c_l_o_u_d___g_r_o_u_p.xhtml#abd5de8116fc1799e36aa4890d3eb3ab9',1,'SLNet::CloudServer::RemoteCloudClient::IsUnused()']]],
+  ['iswithinrange',['IsWithinRange',['../d4/df2/class_data_structures_1_1_range_list.xhtml#a9a1cbc8374cb80903bb08472deb924a7',1,'DataStructures::RangeList']]],
   ['isworking',['IsWorking',['../d1/dbc/struct_thread_pool.xhtml#a90b37c13ba8b9f67db4bd99ee4a5d811',1,'ThreadPool']]],
   ['itematindex',['ItemAtIndex',['../d6/d83/class_data_structures_1_1_hash.xhtml#a5fec5e2f5f479ddeebefe9a0ff1c50e4',1,'DataStructures::Hash']]],
   ['itoa',['Itoa',['../db/dad/_itoa_8cpp.xhtml#a60c5047c23d6086e1ee85dea82a26b65',1,'Itoa(int value, char *result, int base):&#160;Itoa.cpp'],['../de/d3e/_itoa_8h.xhtml#a60c5047c23d6086e1ee85dea82a26b65',1,'Itoa(int value, char *result, int base):&#160;Itoa.cpp']]]

@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a43eacd3c80d27df603fe9be59174359b":[3,0,1,33,142],
 "d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a452757b3566ac9c79478f5a2ad86272c":[3,0,1,33,114],
 "d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a4541da876eef1161bd7460f2cbfcc3bd":[3,0,1,33,97],
 "d5/dbf/class_s_l_net_1_1_rak_peer.xhtml#a457bbddaa4e1242a971e9c27ee1ec5bd":[3,0,1,33,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX8 =
 "d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#ae5063532a1f198b619c0ecbe9f49b413":[3,0,1,62,1,5],
 "d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#ae530c645429722c71630344521285cc4":[3,0,1,62,1,3],
 "d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#ae7738a392ef425a252d8e743f98c01f1":[3,0,1,62,1,6],
-"d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#aedb806b4552131310ffb8eb85cd405cf":[3,0,1,62,1,12],
-"d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#aefb93bc7c31786d286c5b2a541f48426":[3,0,1,62,1,22]
+"d6/d4f/struct_s_l_net_1_1_statistics_history_1_1_time_and_value_queue.xhtml#aedb806b4552131310ffb8eb85cd405cf":[3,0,1,62,1,12]
 };
