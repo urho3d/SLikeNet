@@ -56,7 +56,12 @@ using namespace pp;
 //SocketLayerOverride *SocketLayer::slo=0;
 
 #ifdef _WIN32
+
+#include "slikenet/WSAStartupSingleton.h"
+#include "slikenet/WindowsIncludes.h"
+
 #else
+
 #include <string.h> // memcpy
 #include <unistd.h>
 #include <fcntl.h>
@@ -74,26 +79,6 @@ using namespace pp;
 
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-#if   defined(_WIN32)
-#include "slikenet/WSAStartupSingleton.h"
-#include "slikenet/WindowsIncludes.h"
-
-#else
-#include <unistd.h>
-#endif
-
 #include "slikenet/sleep.h"
 #include <stdio.h>
 #include "slikenet/Itoa.h"
@@ -103,12 +88,6 @@ namespace SLNet
 	extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, SLNet::TimeUS timeRead );
 	//extern void ProcessNetworkPacket( const SystemAddress systemAddress, const char *data, const int length, RakPeer *rakPeer, RakNetSocket* rakNetSocket, SLNet::TimeUS timeRead );
 }
-
-#ifdef _DEBUG
-#include <stdio.h>
-#endif
-
- 
 
 // http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#ip4to6
 // http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#getaddrinfo

@@ -25,6 +25,10 @@
 
 #ifdef _WIN32
 #include <tchar.h>	// used for _tprintf() (via RAKNET_DEBUG_TPRINTF)
+#else
+#include <sys/types.h>  // used for getaddrinfo()
+#include <sys/socket.h> // used for getaddrinfo()
+#include <netdb.h>      // used for getaddrinfo()
 #endif
 
 #include "slikenet/Itoa.h"
@@ -179,20 +183,10 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 
 	// Fill in the rest of the address structure
 	boundAddress.address.addr4.sin_family = AF_INET;
-	
-
-
-
 
 	if (bindParameters->hostAddress && bindParameters->hostAddress[0])
 	{
-
-
-
-
-
 		inet_pton(AF_INET, bindParameters->hostAddress, &boundAddress.address.addr4.sin_addr.s_addr);
-
 	}
 	else
 	{
@@ -200,23 +194,11 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		boundAddress.address.addr4.sin_addr.s_addr = INADDR_ANY;
 	}
 
-
-
-
-
 	// bind our name to the socket
 	ret = bind__( rns2Socket, ( struct sockaddr * ) &boundAddress.address.addr4, sizeof( boundAddress.address.addr4 ) );
 
 	if ( ret <= -1 )
 	{
-
-
-
-
-
-
-
-
 #if defined(_WIN32)
 		closesocket__(rns2Socket);
 		return BR_FAILED_TO_BIND_SOCKET;
@@ -226,10 +208,8 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		{
 		case EBADF:
 			RAKNET_DEBUG_PRINTF("bind__(): sockfd is not a valid descriptor.\n"); break;
-
 		case ENOTSOCK:
 			RAKNET_DEBUG_PRINTF("bind__(): Argument is a descriptor for a file, not a socket.\n"); break;
-
 		case EINVAL:
 			RAKNET_DEBUG_PRINTF("bind__(): The addrlen is wrong, or the socket was not in the AF_UNIX family.\n"); break;
 		case EROFS:
@@ -247,10 +227,8 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 		case EACCES:
 			// Port reserved on PS4
 			RAKNET_DEBUG_PRINTF("bind__(): Search permission is denied on a component of the path prefix.\n"); break;
-
 		case ELOOP:
 			RAKNET_DEBUG_PRINTF("bind__(): Too many symbolic links were encountered in resolving my_addr.\n"); break;
-
 		default:
 			RAKNET_DEBUG_PRINTF("Unknown bind__() error %i.\n", ret); break;
 		}
@@ -260,10 +238,16 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4( RNS2_BerkleyBindParameters *bindPar
 	}
 
 	GetSystemAddressIPV4(rns2Socket, &boundAddress );
-
 	return BR_SUCCESS;
-
 }
+
+void PrepareAddrInfoHints2(addrinfo *hints)
+{
+	memset(hints, 0, sizeof(addrinfo)); // make sure the struct is empty
+	hints->ai_socktype = SOCK_DGRAM; // UDP sockets
+	hints->ai_flags = AI_PASSIVE; // fill in my IP for me
+}
+
 RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bindParameters, const char *file, unsigned int line ) {
 	
 	(void) file;
@@ -301,24 +285,6 @@ RNS2BindResult RNS2_Berkley::BindSharedIPV4And6( RNS2_BerkleyBindParameters *bin
 
 		if (rns2Socket == -1)
 			return BR_FAILED_TO_BIND_SOCKET;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		ret = bind__(rns2Socket, aip->ai_addr, (int) aip->ai_addrlen );
 		if (ret>=0)
@@ -368,26 +334,12 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 	int dataOutSize;
 	const int flag=0;
 
-
-
-
-
-
-
-
-
-
-
 	{
 		sockLen=sizeof(their_addr);
 		sockAddrPtr=(sockaddr*) &their_addr;
 	}
 
-
-
-
 	dataOutSize=MAXIMUM_MTU_SIZE;
-
 
 	recvFromStruct->bytesRead = recvfrom__(rns2Socket, recvFromStruct->data, dataOutSize, flag, sockAddrPtr, socketlenPtr );
 
@@ -408,26 +360,9 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 	}	
 #endif
 
-
-
-
-
-
-
-
-
-
 	if (recvFromStruct->bytesRead<=0)
 		return;
 	recvFromStruct->timeRead= SLNet::GetTimeUS();
-
-
-
-
-
-
-
-
 
 	{
 		if (their_addr.ss_family==AF_INET)
@@ -444,7 +379,6 @@ void RNS2_Berkley::RecvFromBlockingIPV4And6(RNS2RecvStruct *recvFromStruct)
 		}
 	}
 
-
 #else
 	(void) recvFromStruct;
 #endif
@@ -459,26 +393,6 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 	memset(&sa,0,sizeof(sockaddr_in));
 	const int flag=0;
 	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	{
 		sockLen=sizeof(sa);
 		sa.sin_family = AF_INET;
@@ -487,14 +401,6 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 	}
 
 	recvFromStruct->bytesRead = recvfrom__( GetSocket(), recvFromStruct->data, sizeof(recvFromStruct->data), flag, sockAddrPtr, socketlenPtr );
-
-
-
-
-
-
-
-
 
 	if (recvFromStruct->bytesRead<=0)
 	{
@@ -528,16 +434,7 @@ void RNS2_Berkley::RecvFromBlockingIPV4(RNS2RecvStruct *recvFromStruct)
 	}
 	recvFromStruct->timeRead= SLNet::GetTimeUS();
 
-
-
-
-
-
-
-
-
 	{
-		
 		recvFromStruct->systemAddress.SetPortNetworkOrder( sa.sin_port );
 		recvFromStruct->systemAddress.address.addr4.sin_addr.s_addr=sa.sin_addr.s_addr;
 	}
