@@ -60,7 +60,7 @@ void SignaledEvent::InitEvent(void)
 
 #else
 
-#if !defined(ANDROID)
+#if !defined(__ANDROID__)
 		pthread_condattr_init( &condAttr );
 		pthread_cond_init(&eventList, &condAttr);
 #else
@@ -91,7 +91,7 @@ void SignaledEvent::CloseEvent(void)
 #else
 	pthread_cond_destroy(&eventList);
 	pthread_mutex_destroy(&hMutex);
-#if !defined(ANDROID)
+#if !defined(__ANDROID__)
 	pthread_condattr_destroy( &condAttr );
 #endif
 	pthread_mutexattr_destroy( &mutexAttr );

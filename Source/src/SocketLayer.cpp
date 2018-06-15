@@ -68,7 +68,7 @@ using namespace pp;
 #include <arpa/inet.h>
 #include <errno.h>  // error numbers
 #include <stdio.h> // RAKNET_DEBUG_PRINTF
-#if !defined(ANDROID)
+#if !defined(__ANDROID__)
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>

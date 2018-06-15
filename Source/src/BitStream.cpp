@@ -38,7 +38,7 @@
 #else
 #include <arpa/inet.h>
 #include <memory.h>
-#if defined(ANDROID)
+#if defined(__ANDROID__)
 #include <math.h>
 #else
 #include <cmath>

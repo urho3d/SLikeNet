@@ -19,7 +19,7 @@
 
 #include <stdio.h> // RAKNET_DEBUG_PRINTF
 #include "slikenet/assert.h"
-#if defined(ANDROID)
+#if defined(__ANDROID__)
 #include <asm/io.h>
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #include <io.h>
