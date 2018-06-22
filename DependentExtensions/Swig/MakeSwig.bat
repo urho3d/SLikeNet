@@ -50,8 +50,13 @@ if "%option%" == "--copyToTestDir" (
 
 echo Performing SWIG build
 
+REM create mandatory output directories
+if not exist SwigOutput mkdir SwigOutput
+if not exist SwigOutput\SwigCSharpOutput mkdir SwigOutput\SwigCSharpOutput
+if not exist SwigOutput\CplusDLLIncludes mkdir SwigOutput\CplusDLLIncludes
+
 REM clear output folder
-if exist SwigOutput\SwigCSharpOutput del /F /Q SwigOutput\SwigCSharpOutput\*
+del /F /Q SwigOutput\SwigCSharpOutput\*
 
 REM run SWIG
 %swigCommand% -c++ -csharp -namespace RakNet %swigIncludes% %swigDefines% -outdir SwigOutput\SwigCSharpOutput -o SwigOutput\CplusDLLIncludes\RakNet_wrap.cxx SwigInterfaceFiles\RakNet.i
