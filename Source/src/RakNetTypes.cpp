@@ -34,7 +34,8 @@
 #include "slikenet/WindowsIncludes.h"
 
 #else
-#include <sys/socket.h>
+#include <sys/socket.h> // used for getnameinfo()
+#include <netdb.h>      // used for getnameinfo()
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif

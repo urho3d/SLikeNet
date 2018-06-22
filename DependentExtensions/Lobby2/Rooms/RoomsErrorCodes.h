@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2017-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -16,6 +16,7 @@
 #ifndef __ROOMS_ERROR_CODES_H
 #define __ROOMS_ERROR_CODES_H
 
+#include "slikenet/defines.h" // used for SLNet -> RakNet namespace change in RAKNET_COMPATIBILITY mode
 namespace SLNet
 {
 

@@ -18,6 +18,7 @@ version 0.2.0 (xx-xx-xxxx xx:xx UTC)
 General:
   * extended supported compilers to VS 2017 15.4.1 (#163)
   * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30)
+  * updated changelog entries related to security issues in previous versions (#130)
 Core:
   RakNetSocket2:
     * revised RakNetSocket2::GetMyIP() to determine own IPs more reliably (f.e. on OSX) (#217 - SLNET_36)
@@ -33,12 +34,17 @@ Samples:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
 Building:
   General:
+    * fixed compile errors when enabling IPv6 on Linux/OSX (#220)
     * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
     * small tweaks/improvements to CMake files (#130)
   iOS:
     * updated file name reference in XCode project (#188 - RAKNET_84)
+  CrashReporter:
+    * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
+  Lobby2:
+    * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
 
 version 0.1.2 (05-06-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 1 partial GitHub pull request (up to pull request RAKNET_124)

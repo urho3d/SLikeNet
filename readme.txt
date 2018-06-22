@@ -1958,7 +1958,7 @@ BSD license.
 License file(s): licenses/FindIrrlicht CMake License.txt
 
 7.2.11 (DependentExtension/Swig) arrays_csharp.i
-SWIG library file containing a two approaches to marshalling arrays. Being a
+SWIG library file containing two approaches to marshalling arrays. Being a
 file located inside the Lib directory of the SWIG library, no particular
 license applies. The software is free to be used on any terms one wishes. Since
 the original file contains a license reference, we put the license note into

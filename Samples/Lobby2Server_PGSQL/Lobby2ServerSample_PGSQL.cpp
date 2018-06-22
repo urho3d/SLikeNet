@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -41,13 +41,10 @@
 #include "slikenet/NatTypeDetectionServer.h"
 #include "slikenet/SocketLayer.h"
 static const char *COORDINATOR_PASSWORD="Dummy Coordinator Password";
-#ifdef _ALSO_ACT_AS_NAT_PUNCH_SERVER
-
-#endif
 
 void main(void)
 {
-	printf("The 2nd interation of the lobby server.\n");
+	printf("The 2nd interaction of the lobby server.\n");
 	printf("Difficulty: Intermediate\n\n");
 
 	char serverPort[30];
