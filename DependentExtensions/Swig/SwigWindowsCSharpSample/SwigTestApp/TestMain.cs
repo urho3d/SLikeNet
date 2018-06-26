@@ -1,6 +1,12 @@
 ﻿/*
- * This file was taken from RakNet 4.082 without any modifications.
+ * This file was taken from RakNet 4.082.
  * Please see licenses/RakNet license.txt for the underlying license and related copyright.
+ *
+ *
+ *  Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+ *
+ *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+ *  license found in the license.txt file in the root directory of this source tree.
  */
 
 using System;
@@ -30,7 +36,7 @@ namespace SwigTestApp
             {
                 RakString dllCallTest = new RakString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("DLL issue\nAdd SwigOutput/CplusDLLIncludes/RakNetWrap.cxx to the project\nDLL_Swig/RakNet.sln and rebuild.\nPress enter to quit.");
                 Console.Read();

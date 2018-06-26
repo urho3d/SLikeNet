@@ -1,31 +1,38 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
+
 
 //------------------------------Header includes for parsing by swig----------------------------
 //This is included in a different section than the C++ version of these includes so a macro was not made to include
 //it in both types
 //These files are parsed by Swig
-%include "RakNetDefines.h"
+%include "defines.h"
 %include "Export.h"
 %include "NativeFeatureIncludes.h"
-//%include "RakNetSmartPtr.h"
+//%include "smartptr.h"
 %include "MessageIdentifiers.h"
 %include "SimpleMutex.h"
 %include "NativeTypes.h"
 %include "SocketIncludes.h"
-%include "RakNetTypes.h"
-%include "RakString.h"
-%include "RakWString.h"
+%include "types.h"
+%include "string.h"
+%include "wstring.h"
 %include "BitStream.h"
 %include "DS_List.h"
 %include "DS_ByteQueue.h"
-%include "RakNetSocket.h"
-%include "RakNetStatistics.h"
+%include "socket.h"
+%include "statistics.h"
 %include "NetworkIDObject.h"
 %include "NetworkIDManager.h"
-%include "RakNetTime.h"	
+%include "time.h"	
 %include "PacketPriority.h"
 //The below three classes have been removed from interface, if PluginInterface2 is fully exposed again
 //or another class needs them uncomment them and the related typemaps
@@ -33,8 +40,8 @@
 //%include "PacketizedTCP.h"
 //%include "InternalPacket.h"
 %include "PluginInterface2.h"
-%include "RakPeerInterface.h"
-%include "RakPeer.h"
+%include "peerinterface.h"
+%include "peer.h"
 %include "PacketLogger.h"
 %include "PacketFileLogger.h"
 %include "NatTypeDetectionClient.h"
@@ -68,7 +75,7 @@
 %include "DS_Multilist.h"
 %include "ConnectionGraph2.h"
 %include "GetTime.h"
-//%include "RakNetTransport2.h"
+//%include "transport2.h"
 //%include "RoomsPlugin.h"\
 
 #ifdef SWIG_ADDITIONAL_SQL_LITE

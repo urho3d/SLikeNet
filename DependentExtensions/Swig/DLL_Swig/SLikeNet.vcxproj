@@ -78,7 +78,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuildDebug.bat</Command>
+      <Command>PostBuild.bat $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,7 +107,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>PostBuildRelease.bat</Command>
+      <Command>PostBuild.bat $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -230,6 +230,7 @@
     <ClCompile Include="..\..\..\Source\src\VariadicSQLParser.cpp" />
     <ClCompile Include="..\..\..\Source\src\VitaIncludes.cpp" />
     <ClCompile Include="..\..\..\Source\src\WSAStartupSingleton.cpp" />
+    <ClCompile Include="..\SwigOutput\CplusDLLIncludes\RakNet_wrap.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\include\slikenet\_FindFirst.h" />
@@ -383,6 +384,7 @@
     <ClInclude Include="..\..\..\Source\include\slikenet\WindowsIncludes.h" />
     <ClInclude Include="..\..\..\Source\include\slikenet\WSAStartupSingleton.h" />
     <ClInclude Include="..\..\..\Source\include\slikenet\XBox360Includes.h" />
+    <ClInclude Include="..\SwigOutput\CplusDLLIncludes\RakNet_wrap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

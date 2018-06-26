@@ -159,11 +159,10 @@ Table of Contents
             main.cpp
    7.2.10   (DependentExtension/speex related) FindSpeex.cmake,
             FindSpeexDSP.cmake
-   7.2.11   (DependentExtension/Swig) arrays_csharp.i
-   7.2.12   (Samples/nacl_sdk) httpd.py
-   7.2.13   (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake,
+   7.2.11   (Samples/nacl_sdk) httpd.py
+   7.2.12   (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake,
             FindPkgMacros.cmake, PreprocessorUtils.cmake
-   7.2.14   (Samples/Ogre3D related) BspCollision.cpp
+   7.2.13   (Samples/Ogre3D related) BspCollision.cpp
    8.       Donations
    9.       Thanks / Acknowledgments
    10.      Trademark Notes / Affiliation Statement
@@ -1957,25 +1956,17 @@ CMake modules to locate the corresponding libraries. These files are copyright
 BSD license.
 License file(s): licenses/FindIrrlicht CMake License.txt
 
-7.2.11 (DependentExtension/Swig) arrays_csharp.i
-SWIG library file containing two approaches to marshalling arrays. Being a
-file located inside the Lib directory of the SWIG library, no particular
-license applies. The software is free to be used on any terms one wishes. Since
-the original file contains a license reference, we put the license note into
-the licenses-directory, nevertheless.
-License file(s): licenses/SWIG library files license.txt
-
-7.2.12 (Samples/nacl_sdk) httpd.py
+7.2.11 (Samples/nacl_sdk) httpd.py
 This file was taken from the Native Client SDK and is Copyright (c) 2012 The
 Chromium Authors. It is provided under the Modified BSD License.
 License file(s): licenses/nacl license.txt
 
-7.2.13 (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake, FindPkgMacros.cmake, PreprocessorUtils.cmake
+7.2.12 (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake, FindPkgMacros.cmake, PreprocessorUtils.cmake
 CMake modules to locate the corresponding libraries. The source files are part
 of OGRE (Object-oriented Graphics Rendering Engine) http://www.ogre3d.org/ .
 They are provided as public domain.
 
-7.2.14 (Samples/Ogre3D related) BspCollision.cpp
+7.2.13 (Samples/Ogre3D related) BspCollision.cpp
 This is a sample file to demonstrate integration into Ogre3D. The source file
 is part of OGRE (Object-oriented Graphics Rendering Engine)
 http://www.ogre3d.org/ and Copyright (c) 2000-2006 Torus Knot Software Ltd. It
