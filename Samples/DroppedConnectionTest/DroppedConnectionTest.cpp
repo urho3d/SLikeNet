@@ -17,14 +17,13 @@
 #include "slikenet/Rand.h" // randomMT
 #include "slikenet/MessageIdentifiers.h" // Enumerations
 #include "slikenet/types.h" // SystemAddress
+#include "slikenet/Kbhit.h"
 #include <cstdio>
 using namespace SLNet;
 
 #ifdef _WIN32
-#include "slikenet/Kbhit.h"
 #include "slikenet/WindowsIncludes.h" // Sleep
 #else
-#include "slikenet/Kbhit.h"
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

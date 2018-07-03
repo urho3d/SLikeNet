@@ -32,11 +32,10 @@
 #include <stdlib.h>
 #include <limits> // used for std::numeric_limits
 #include "slikenet/types.h"
-#ifdef _WIN32
 #include "slikenet/Kbhit.h"
+#ifdef _WIN32
 #include "slikenet/WindowsIncludes.h" // Sleep
 #else
-#include "slikenet/Kbhit.h"
 #include <unistd.h> // usleep
 #endif
 #include "slikenet/Gets.h"

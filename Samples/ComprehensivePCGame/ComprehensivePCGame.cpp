@@ -7,7 +7,7 @@
  *  of patent rights can be found in the RakNet Patents.txt file in the same directory.
  *
  *
- *  Modified work: Copyright (c) 2016-2017, SLikeSoft UG (haftungsbeschränkt)
+ *  Modified work: Copyright (c) 2016-2018, SLikeSoft UG (haftungsbeschränkt)
  *
  *  This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
  *  license found in the license.txt file in the root directory of this source tree.
@@ -41,7 +41,6 @@
 #include "slikenet/ReadyEvent.h"	
 #include "slikenet/PacketLogger.h"
 #include "slikenet/RPC4Plugin.h"
-#include "slikenet/Kbhit.h"
 #include "slikenet/HTTPConnection2.h"
 #include "slikenet/linux_adapter.h"
 #include "slikenet/osx_adapter.h"
