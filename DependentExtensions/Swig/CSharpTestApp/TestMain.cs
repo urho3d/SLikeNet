@@ -17,17 +17,17 @@ using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using System.IO;
-using RakNet;
+using SLNet;
 
-namespace SwigTestApp
+namespace CSharpTestApp
 {
     class TestMain
     {
         static void Main(string[] args)
         {
-            if (!File.Exists("RakNet.dll"))
+            if (!File.Exists("SLikeNet.dll"))
             {
-                Console.WriteLine("The SWIG build of the DLL has not been copied to the executable directory\nCopy from Swig/SwigWindowsCSharpSample/SwigTestApp/bin/X86/Debug/RakNet.dll to\nSwigWindowsCSharpSample/SwigTestApp/bin/Debug/RakNet.dll\nPress enter to quit.");
+                Console.WriteLine("The SLikeNet DLL is missing.\nPress enter to quit.");
                 Console.Read();
                 return;
             }
@@ -38,7 +38,7 @@ namespace SwigTestApp
             }
             catch (Exception)
             {
-                Console.WriteLine("DLL issue\nAdd SwigOutput/CplusDLLIncludes/RakNetWrap.cxx to the project\nDLL_Swig/RakNet.sln and rebuild.\nPress enter to quit.");
+                Console.WriteLine("DLL issue.\nMost likely the provided DLL wasn't build with the C# wrapper file.\nPress enter to quit.");
                 Console.Read();
                 return;
             }
@@ -114,7 +114,7 @@ namespace SwigTestApp
                 testServer.DeallocatePacket(testPacket);
                 loopNumber++;
                 System.Threading.Thread.Sleep(50);
-                SystemAddress sa = RakNet.RakNet.UNASSIGNED_SYSTEM_ADDRESS;
+                SystemAddress sa = SLNet.SLikeNet.UNASSIGNED_SYSTEM_ADDRESS;
                 testClient.Send(stringTestSendBitStream, PacketPriority.LOW_PRIORITY, PacketReliability.RELIABLE_ORDERED, (char)0, new AddressOrGUID(new SystemAddress("127.0.0.1", 60001)), false);
             }
             //If RakString is not freed before program exit it will crash
