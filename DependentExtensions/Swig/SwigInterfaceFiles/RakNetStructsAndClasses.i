@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //----------------------------Additional Class/Struct Defines-----------------------
 //These is here because it is a nested class and swig doesn't handle nested/structs/classes, this presents the interface for this struct. If the struct changes in the code so must this
@@ -52,7 +58,7 @@ struct  Cell
  	/// Binary
  	void Get(char *output, int *outputLength);
  
- 	RakNet::RakString ToString(DataStructures::Table::ColumnType columnType);
+ 	SLNet::RakString ToString(DataStructures::Table::ColumnType columnType);
  
  	// assignment operator and copy constructor
  	Cell& operator = ( const Cell& input );
@@ -156,7 +162,7 @@ struct FileProgressStruct
 	OnFileStruct *onFileStruct;
 	/// \param[out] partCount The zero based index into partTotal. The percentage complete done of this file is 100 * (partCount+1)/partTotal
 	unsigned int partCount;
-	/// \param[out] partTotal The total number of parts this file was split into. Each part will be roughly the MTU size, minus the UDP header and RakNet headers
+	/// \param[out] partTotal The total number of parts this file was split into. Each part will be roughly the MTU size, minus the UDP header and SLikeNet headers
 	unsigned int partTotal;
 	/// \param[out] dataChunkLength How many bytes long firstDataChunk and iriDataChunk are
 	unsigned int dataChunkLength;
@@ -170,7 +176,7 @@ struct FileProgressStruct
 	SystemAddress senderSystemAddress;
 	/// \param[out] Who sent this file. Not valid when using TCP, only RakPeer (UDP)
 	RakNetGUID senderGuid;
-	/// \param[in] allocateIrIDataChunkAutomatically If true, then RakNet will hold iriDataChunk for you and return it in OnFile. Defaults to true
+	/// \param[in] allocateIrIDataChunkAutomatically If true, then SLikeNet will hold iriDataChunk for you and return it in OnFile. Defaults to true
 	bool allocateIrIDataChunkAutomatically;
 };
 

@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //------------------------------TypeMaps--------------------------
 //Swig typemaps help to either convert a C++ type into a C# type or tell it which types are the same
@@ -20,7 +26,7 @@
 CSHARP_ARRAYS(char *,string)
 
 //INOUT char to byte array
-//This is used because RakNet uses char arrays as byte arrays, C# char arrays are unicode
+//This is used because SLikeNet uses char arrays as byte arrays, C# char arrays are unicode
 %apply unsigned char INOUT[] {unsigned char* inputByteArray};
 %apply unsigned char INOUT[] {unsigned char* inByteArray};
 %apply unsigned char INOUT[] {unsigned char* inByteArray2};
@@ -116,13 +122,13 @@ CSHARP_ARRAYS(char *,string)
 //AWSSimpleDBInterface
 
 //Define RakString as a simple object situation Only needed once
-SIMPLE_OBJECT_OUTPUT_TYPEMAP(RakNet::RakString,RakString)
+SIMPLE_OBJECT_OUTPUT_TYPEMAP(SLNet::RakString,RakString)
 
 //Apply to the specific function parameters, need for each parameter
 //out prefixed items like outItemCount help prevent mistakes
-%apply RakNet::RakString &OUTPUT {RakNet::RakString &itemCount};
-%apply RakNet::RakString &OUTPUT {RakNet::RakString &columnCount};
-%apply RakNet::RakString &OUTPUT {RakNet::RakString &rowCount};
+%apply SLNet::RakString &OUTPUT {SLNet::RakString &itemCount};
+%apply SLNet::RakString &OUTPUT {SLNet::RakString &columnCount};
+%apply SLNet::RakString &OUTPUT {SLNet::RakString &rowCount};
 
 //Classless
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
@@ -136,10 +142,10 @@ SIMPLE_OBJECT_OUTPUT_TYPEMAP(RakNet::RakString,RakString)
 //----------------byte array out charmap for ByteQueue
 %typemap(cstype, out="byte[]") unsigned char* PeekContiguousBytesHelper "byte[]"
 
-%typemap(csout, excode=SWIGEXCODE2) unsigned char* PeekContiguousBytesHelper  
-%{
+%typemap(csout, excode=SWIGEXCODE2, noblock=1) unsigned char* PeekContiguousBytesHelper  
+{
   {
-      IntPtr cPtr = RakNetPINVOKE.ByteQueue_PeekContiguousBytesHelper(swigCPtr, out outLength);
+      IntPtr cPtr = SLikeNetPINVOKE.ByteQueue_PeekContiguousBytesHelper(swigCPtr, out outLength);
       int len = (int)outLength;
       if (len <= 0)
       {
@@ -149,7 +155,7 @@ SIMPLE_OBJECT_OUTPUT_TYPEMAP(RakNet::RakString,RakString)
       Marshal.Copy(cPtr, returnBytes, 0, len);
       return returnBytes;
   }
-%}
+}
 
 //This is more efficient than the loop version but less compatible
 /*
@@ -176,14 +182,14 @@ IN_LEN_METHOD- Something to get the length of the C/C++ array for marshalling. T
 		IN_DATA_CHANGE_FUNCTION (value, value.Length);    
 	}
 %}
-%typemap(csvarout, excode=SWIGEXCODE2) CTYPE  
-%{
+%typemap(csvarout, excode=SWIGEXCODE2, noblock=1) CTYPE  
+{
         get
         {
             INCSTYPE[] returnArray;
             if (!BOOLNAME)
             {
-                IntPtr cPtr = RakNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
+                IntPtr cPtr = SLikeNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
                 int len = (int) IN_LEN_METHOD;
 		if (len<=0)
 		{
@@ -202,7 +208,7 @@ IN_LEN_METHOD- Something to get the length of the C/C++ array for marshalling. T
             }
             return returnArray;
         }
- %}
+}
 %enddef
 
 //More compatible version of the above macro
@@ -220,14 +226,14 @@ IN_LEN_METHOD- Something to get the length of the C/C++ array for marshalling. T
 		IN_DATA_CHANGE_FUNCTION (value, value.Length);    
 	}
 %}
-%typemap(csvarout, excode=SWIGEXCODE2) CTYPE  
-%{
+%typemap(csvarout, excode=SWIGEXCODE2, noblock=1) CTYPE  
+{
         get
         {
             INCSTYPE[] returnArray;
             if (!BOOLNAME)
             {
-                IntPtr cPtr = RakNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
+                IntPtr cPtr = SLikeNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
                 int len = (int) IN_LEN_METHOD;
 		if (len<=0)
 		{
@@ -249,17 +255,17 @@ IN_LEN_METHOD- Something to get the length of the C/C++ array for marshalling. T
             }
             return returnArray;
         }
- %}
+}
 %enddef
 
-STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(bytesInSendBufferIsCached,bytesInSendBufferCache,double bytesInSendBuffer[ NUMBER_OF_PRIORITIES ],double,double,SetBytesInSendBuffer,RakNetStatistics_bytesInSendBuffer_get,RakNet::RakNetStatistics,PacketPriority.NUMBER_OF_PRIORITIES,(double));
+STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(bytesInSendBufferIsCached,bytesInSendBufferCache,double bytesInSendBuffer[ NUMBER_OF_PRIORITIES ],double,double,SetBytesInSendBuffer,RakNetStatistics_bytesInSendBuffer_get,SLNet::RakNetStatistics,PacketPriority.NUMBER_OF_PRIORITIES,(double));
 
-STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(messageInSendBufferIsCached,messageInSendBufferCache,unsigned messageInSendBuffer[ NUMBER_OF_PRIORITIES ],uint,int,SetMessageInSendBuffer,RakNetStatistics_messageInSendBuffer_get,RakNet::RakNetStatistics,PacketPriority.NUMBER_OF_PRIORITIES,(uint));
+STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(messageInSendBufferIsCached,messageInSendBufferCache,unsigned messageInSendBuffer[ NUMBER_OF_PRIORITIES ],uint,int,SetMessageInSendBuffer,RakNetStatistics_messageInSendBuffer_get,SLNet::RakNetStatistics,PacketPriority.NUMBER_OF_PRIORITIES,(uint));
 
-namespace RakNet
+namespace SLNet
 {
-STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(runningTotalIsCached,runningTotalCache,unsigned long long runningTotal [ RNS_PER_SECOND_METRICS_COUNT ],ulong,long,SetRunningTotal,RakNetStatistics_runningTotal_get,RakNet::RakNetStatistics,RNSPerSecondMetrics.RNS_PER_SECOND_METRICS_COUNT,(ulong));
-STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(valueOverLastSecondIsCached,valueOverLastSecondCache,unsigned long long valueOverLastSecond [ RNS_PER_SECOND_METRICS_COUNT ],ulong,long,SetValueOverLastSecond,RakNetStatistics_valueOverLastSecond_get,RakNet::RakNetStatistics,RNSPerSecondMetrics.RNS_PER_SECOND_METRICS_COUNT,(ulong));
+STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(runningTotalIsCached,runningTotalCache,unsigned long long runningTotal [ RNS_PER_SECOND_METRICS_COUNT ],ulong,long,SetRunningTotal,RakNetStatistics_runningTotal_get,SLNet::RakNetStatistics,RNSPerSecondMetrics.RNS_PER_SECOND_METRICS_COUNT,(ulong));
+STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP_LOOP_COPY(valueOverLastSecondIsCached,valueOverLastSecondCache,unsigned long long valueOverLastSecond [ RNS_PER_SECOND_METRICS_COUNT ],ulong,long,SetValueOverLastSecond,RakNetStatistics_valueOverLastSecond_get,SLNet::RakNetStatistics,RNSPerSecondMetrics.RNS_PER_SECOND_METRICS_COUNT,(ulong));
 }
 
 %typemap(imtype, out="IntPtr") char *firstDataChunk "IntPtr"
@@ -274,7 +280,7 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
 //Many of these typemaps are required to copy the
 //cached or changed data back into C++ when the pointer is passed into a C++ function
 //Think of it as a type of cache writeback
-%typemap(csbody) RakNet::OnFileStruct
+%typemap(csbody) SLNet::OnFileStruct
 %{
   private HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -297,7 +303,7 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
   }
 %}
 
-%typemap(csbody) RakNet::Packet 
+%typemap(csbody) SLNet::Packet 
 %{
   private HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -352,7 +358,7 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
   }
 %}
 
-%typemap(csbody) RakNet::RakNetStatistics 
+%typemap(csbody) SLNet::RakNetStatistics 
 %{
   private HandleRef swigCPtr;
   protected bool swigCMemOwn;
@@ -394,11 +400,11 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
 
 //Removed from interface, commented rather than removed in case needed later
 /*
-%typemap(csbody) InternalPacket 
-%{
+%typemap(csbody, noblock=1) InternalPacket 
+{
   private HandleRef swigCPtr;
 
-  internal InternalPacket(IntPtr cPtr, bool cMemoryOwn) : base(RakNetPINVOKE.InternalPacketUpcast(cPtr), cMemoryOwn) 
+  internal InternalPacket(IntPtr cPtr, bool cMemoryOwn) : base(SLikeNetPINVOKE.InternalPacketUpcast(cPtr), cMemoryOwn) 
   {
     swigCPtr = new HandleRef(this, cPtr);
   }
@@ -414,13 +420,13 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
       }
       return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
-%}*/
+}*/
 
 //Extra C# code
 //These typemaps add C# code to the postprocessed file, mostly to improve the user interface so it matches the original
 //API for things Swig doesn't support
 
-//This adds to the main RakNet class, generally used for globals
+//This adds to the main SLikeNet class, generally used for globals
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
 	%pragma(csharp) modulecode=
 	%{ 
@@ -456,7 +462,7 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
 	%}
 #endif
 //BitStream
-%typemap(cscode) RakNet::BitStream 
+%typemap(cscode) SLNet::BitStream 
 %{
   //String reading using original api, but converted to c# logic
   public bool Read(out string varString) 
@@ -716,15 +722,15 @@ STRUCT_CUSTOM_GENERAL_ARRAY_TYPEMAP(fileDataIsCached,fileDataCache,char *fileDat
  %}
 
 //RakPeer
-%typemap(cscode) RakNet::RakPeer 
+%typemap(cscode) SLNet::RakPeer 
 RAKPEERANDINTERFACECSCODE(override)
 
 //RakPeerInterface
-%typemap(cscode) RakNet::RakPeerInterface
+%typemap(cscode) SLNet::RakPeerInterface
 RAKPEERANDINTERFACECSCODE(virtual)
 
 
-%typemap(cscode) RakNet::PacketLogger 
+%typemap(cscode) SLNet::PacketLogger 
 %{
   public virtual void FormatLine(ref string preInitializedStringBigEnoughToFitResult, string dir, string type, uint packet, uint frame, byte messageIdentifier, uint bitLen, ulong time, SystemAddress local, SystemAddress remote, uint splitPacketId, uint splitPacketIndex, uint splitPacketCount, uint orderingIndex) {
 	preInitializedStringBigEnoughToFitResult=FormatLineHelper( preInitializedStringBigEnoughToFitResult, dir, type,  packet, frame,  messageIdentifier, bitLen,  time, local,  remote, splitPacketId,  splitPacketIndex, splitPacketCount,  orderingIndex);
@@ -735,14 +741,14 @@ RAKPEERANDINTERFACECSCODE(virtual)
   }
 %}
 
-%typemap(csimports) RakNet::SystemAddress 
+%typemap(csimports) SLNet::SystemAddress 
 %{
 using System;
 using System.Runtime.InteropServices;
 #pragma warning disable 0660
 %}
 
-%typemap(cscode) RakNet::SystemAddress 
+%typemap(cscode) SLNet::SystemAddress 
 %{
 
 	public override int GetHashCode()
@@ -803,7 +809,7 @@ using System.Runtime.InteropServices;
 	}
 %}
 
-%typemap(csimports) RakNet::RakNetGUID
+%typemap(csimports) SLNet::RakNetGUID
 %{
 using System;
 using System.Runtime.InteropServices;
@@ -811,7 +817,7 @@ using System.Runtime.InteropServices;
 %}
 
 
-%typemap(cscode) RakNet::RakNetGUID 
+%typemap(cscode) SLNet::RakNetGUID 
 %{
 
 	public override int GetHashCode()
@@ -868,15 +874,15 @@ using System.Runtime.InteropServices;
 	}
 %}
 
-%typemap(csimports) RakNet::RakString  
+%typemap(csimports) SLNet::RakString  
 %{
 using System;
 using System.Runtime.InteropServices;
 #pragma warning disable 0660
 %}
 
-%typemap(cscode) RakNet::RakString 
-%{
+%typemap(cscode, noblock=1) SLNet::RakString 
+{
 
 	public override int GetHashCode()
 	{
@@ -983,7 +989,7 @@ using System.Runtime.InteropServices;
 
 	public static RakString operator +(RakString a, RakString b)
 	{
-		return RakNet.OpPlus(a,b);
+		return SLikeNet.OpPlus(a,b);
 	}
 
 	public static implicit operator RakString(String s)
@@ -1015,9 +1021,9 @@ using System.Runtime.InteropServices;
 	{
 		Replace(index,count,(byte)inChar);
 	}
-%}
+}
 
-%typemap(cscode) RakNet::AddressOrGUID
+%typemap(cscode) SLNet::AddressOrGUID
 %{
 	public static implicit operator AddressOrGUID(SystemAddress systemAddress)
 	{
@@ -1077,14 +1083,14 @@ using System.Runtime.InteropServices;
 %}
 */
 
-%typemap(csimports) RakNet::uint24_t
+%typemap(csimports) SLNet::uint24_t
 %{
 using System;
 using System.Runtime.InteropServices;
 #pragma warning disable 0660
 %}
 
-%typemap(cscode) RakNet::uint24_t
+%typemap(cscode) SLNet::uint24_t
 %{
 
 	public override int GetHashCode()
@@ -1227,7 +1233,7 @@ using System.Runtime.InteropServices;
 %}
 %enddef
 
-%typemap(cscode) RakNet::FileListNode
+%typemap(cscode) SLNet::FileListNode
 %{
     private bool dataIsCached = false;
     private byte[] dataCache;
@@ -1245,10 +1251,10 @@ using System.Runtime.InteropServices;
 STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(fileDataIsCached,fileDataCache)
 
 //Packet->data related typemaps
-%typemap(cscode) RakNet::Packet
+%typemap(cscode) SLNet::Packet
 STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)
 
-%typemap(cscode) RakNet::NetworkIDObject
+%typemap(cscode) SLNet::NetworkIDObject
 %{
   NetworkIDManager oldManager;
   public virtual void SetNetworkIDManager(NetworkIDManager manager) 
@@ -1271,14 +1277,14 @@ STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)
   }
 %}
 
-%typemap(csimports) RakNet::NetworkIDManager
+%typemap(csimports) SLNet::NetworkIDManager
 %{
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 %}
 
-%typemap(cscode) RakNet::NetworkIDManager
+%typemap(cscode) SLNet::NetworkIDManager
 %{
     public Dictionary<IntPtr, NetworkIDObject> pointerDictionary = new Dictionary<IntPtr, NetworkIDObject>();
 
@@ -1289,7 +1295,7 @@ using System.Collections.Generic;
 
 %}
 
-%typemap(cscode) RakNet::ConnectionGraph2
+%typemap(cscode) SLNet::ConnectionGraph2
 %{
     public bool GetConnectionListForRemoteSystem(RakNetGUID remoteSystemGuid, SystemAddress[] saOut, RakNetGUID[] guidOut, ref uint inOutLength)
     {
@@ -1334,7 +1340,7 @@ using System.Collections.Generic;
 %typemap(cscode) InternalPacket
 STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)*/
 
-%typemap(cscode) RakNet::RakNetStatistics
+%typemap(cscode) SLNet::RakNetStatistics
 %{
 
 	private bool bytesInSendBufferIsCached  = false;
@@ -1350,7 +1356,8 @@ STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)*/
 %define STRUCT_CUSTOM_UNSIGNED_CHAR_ARRAY_TYPEMAP(BOOLNAME,CACHENAME,CTYPE,IN_DATA_CHANGE_FUNCTION,IN_DATA_GET_FUNCTION,IN_CLASS,IN_LEN_METHOD)
 %typemap(cstype, out="byte[]") CTYPE "byte[]"
 
-%typemap(csvarin, excode=SWIGEXCODE2) CTYPE %{
+%typemap(csvarin, excode=SWIGEXCODE2) CTYPE
+%{
 	set 
 	{
 	    	CACHENAME=value;
@@ -1360,13 +1367,14 @@ STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)*/
 
 	}
 %}
-%typemap(csvarout, excode=SWIGEXCODE2) CTYPE  %{
+%typemap(csvarout, excode=SWIGEXCODE2, noblock=1) CTYPE
+{
         get
         {
             byte[] returnBytes;
             if (!BOOLNAME)
             {
-                IntPtr cPtr = RakNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
+                IntPtr cPtr = SLikeNetPINVOKE.IN_DATA_GET_FUNCTION (swigCPtr);
                 int len = (int)((IN_CLASS)swigCPtr.Wrapper).IN_LEN_METHOD;
 		if (len<=0)
 		{
@@ -1383,11 +1391,11 @@ STRUCT_UNSIGNED_CHAR_ARRAY_ONLY_CSCODE(dataIsCached,dataCache)*/
             }
             return returnBytes;
         }
- %}
+}
 %enddef
 
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
-	%typemap (cscode) RakNet::AutopatcherServer
+	%typemap (cscode) SLNet::AutopatcherServer
 	%{
 		public void StartThreads(int numThreads, AutopatcherRepositoryInterface [] sqlConnectionPtrArray) 
 		{

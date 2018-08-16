@@ -168,6 +168,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherPostgreRepository\Release\AutopatcherPostgreSQLRepository.lib;C:\Program Files (x86)\PostgreSQL\9.2\lib\libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -194,6 +195,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherPostgreRepository\Retail\AutopatcherPostgreSQLRepository.lib;C:\Program Files (x86)\PostgreSQL\9.2\lib\libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -220,6 +222,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherPostgreRepository\Release - Unicode\AutopatcherPostgreSQLRepository.lib;C:\Program Files (x86)\PostgreSQL\9.2\lib\libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -246,6 +249,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherPostgreRepository\Retail - Unicode\AutopatcherPostgreSQLRepository.lib;C:\Program Files (x86)\PostgreSQL\9.2\lib\libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>

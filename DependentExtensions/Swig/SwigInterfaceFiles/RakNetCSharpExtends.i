@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //--------------------------------Extends-----------------------------------
 //This file extends classes with new C++ code, note that not all things are possible because
@@ -10,7 +16,7 @@
 //An example of a problem is accessing private variables and functions.
 //Also instead of just calling the function in the class you use a pointer called self that is a pointer to the object
 
-%extend RakNet::BitStream
+%extend SLNet::BitStream
 {
 	inline const char * CSharpStringReader(const char * inString)
 	{
@@ -182,14 +188,14 @@
 }
 %enddef
 
-%extend RakNet::RakPeerInterface
+%extend SLNet::RakPeerInterface
 RAKPEERANDINTERFACEEXTEND()
 
 
-%extend RakNet::RakPeer
+%extend SLNet::RakPeer
 RAKPEERANDINTERFACEEXTEND()
 
-%extend RakNet::RakString
+%extend SLNet::RakString
 {
 	void AppendBytes(unsigned char *inByteArray, unsigned int count)
 	{
@@ -202,7 +208,7 @@ RAKPEERANDINTERFACEEXTEND()
 
 //Removed from interface, commented rather than removed in case needed later
 /*
-%extend RakNet::PluginInterface2
+%extend SLNet::PluginInterface2
 {
 
 	void OnDirectSocketReceive(unsigned char *inByteArray, const BitSize_t bitsUsed, SystemAddress remoteSystemAddress)
@@ -237,7 +243,7 @@ RAKPEERANDINTERFACEEXTEND()
 	}
 %enddef
 
-%extend RakNet::Packet
+%extend SLNet::Packet
 {
 	Packet()
 	{
@@ -293,7 +299,7 @@ RAKPEERANDINTERFACEEXTEND()
 	}	
 %enddef
 
-%extend RakNet::RakNetStatistics
+%extend SLNet::RakNetStatistics
 {
 STRUCT_DOUBLE_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetBytesInSendBuffer,bytesInSendBuffer);
 STRUCT_UNSIGNED_INT_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetMessageInSendBuffer,messageInSendBuffer);
@@ -358,7 +364,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 
 }
 
-%extend RakNet::IncrementalReadInterface
+%extend SLNet::IncrementalReadInterface
 {
 	unsigned int GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, unsigned char  *inOutByteArray, FileListNodeContext context)
 	{
@@ -388,7 +394,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 	}
 }
 
-%extend RakNet::PacketLogger
+%extend SLNet::PacketLogger
 {
         const char * FormatLineHelper(char* into, const char* dir, const char* type, unsigned int packet, unsigned int frame, unsigned char messageIdentifier, const BitSize_t bitLen, unsigned long long time, const SystemAddress& local, const SystemAddress& remote,unsigned int splitPacketId, unsigned int splitPacketIndex, unsigned int splitPacketCount, unsigned int orderingIndex)
 	{
@@ -450,7 +456,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 	}
 %enddef
 
-%extend RakNet::FileListNode
+%extend SLNet::FileListNode
 {
 	FileListNode()
 	{
@@ -459,10 +465,10 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 		return returnVal;
 	}
 
-	STRUCT_CHAR_TO_BYTE_ARRAY_TYPEMAP_INSIDE_EXTEND(dataIsCached,dataCache,SetData,FileListNode_data_get,RakNet::FileListNode,dataLengthBytes,data)
+	STRUCT_CHAR_TO_BYTE_ARRAY_TYPEMAP_INSIDE_EXTEND(dataIsCached,dataCache,SetData,FileListNode_data_get,SLNet::FileListNode,dataLengthBytes,data)
 }
 
-%extend RakNet::TransportInterface
+%extend SLNet::TransportInterface
 {
 	void Send( SystemAddress systemAddress, unsigned char * inByteArray)
 	{
@@ -470,7 +476,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 	}
 }
 
-%extend RakNet::FileList
+%extend SLNet::FileList
 {
 	void AddFile(const char *filename, const char *fullPathToFile, unsigned char *inByteArray, const unsigned dataLength, const unsigned fileLength, FileListNodeContext context, bool isAReference=false)
 	{
@@ -479,7 +485,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 
 }
 
-%extend RakNet::ConnectionGraph2
+%extend SLNet::ConnectionGraph2
 {
 
 	bool GetConnectionListForRemoteSystemHelper(RakNetGUID remoteSystemGuid, DataStructures::List<SystemAddress> * saOut, DataStructures::List<RakNetGUID> * guidOut, unsigned int *inOutLength)
@@ -491,7 +497,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 
 		bool returnVal = self->GetConnectionListForRemoteSystem(remoteSystemGuid,tempInSystemAddress,tempInRakNetGUID,inOutLength);
 
-		for (int i=0;i<*inOutLength;i++)
+		for (unsigned int i=0;i<*inOutLength;i++)
 		{
 			saOut->Insert(tempInSystemAddress[i],__FILE__,__LINE__);
 			guidOut->Insert(tempInRakNetGUID[i],__FILE__,__LINE__);
@@ -537,7 +543,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
 
-	%extend RakNet::AutopatcherServer
+	%extend SLNet::AutopatcherServer
 	{
 	       void StartThreadsHelper(int numThreads, DataStructures::List<AutopatcherRepositoryInterface *> *sqlConnectionPtrArray)
 		{
@@ -551,7 +557,7 @@ STRUCT_UNSIGNED_INT64_ARRAY_EXTEND_SPECIAL_RAKNETSTATISTICS(SetValueOverLastSeco
 		}
 	}
 
-	%extend RakNet::AutopatcherMySQLRepository
+	%extend SLNet::AutopatcherMySQLRepository
 	{
 
 		/// Calls mysql_real_connect with the implicit mySqlConnection 

@@ -1,150 +1,156 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //---------------------------------Template Defines-------------------------
 //Swig needs to manually define templates you wish to use, this is done here.
 
-%template(Serialize) RakNet::BitStream::Serialize <bool>;
-%template(Serialize) RakNet::BitStream::Serialize <unsigned char>;
-%template(Serialize) RakNet::BitStream::Serialize <short>;
-%template(Serialize) RakNet::BitStream::Serialize <unsigned short>;
-%template(Serialize) RakNet::BitStream::Serialize <long>;
-%template(Serialize) RakNet::BitStream::Serialize <long long>;
-%template(Serialize) RakNet::BitStream::Serialize <float>;
-%template(Serialize) RakNet::BitStream::Serialize <RakNet::RakString>;
-%template(Serialize) RakNet::BitStream::Serialize <RakNetGUID>;
-%template(Serialize) RakNet::BitStream::Serialize <uint24_t>;
+%template(Serialize) SLNet::BitStream::Serialize <bool>;
+%template(Serialize) SLNet::BitStream::Serialize <unsigned char>;
+%template(Serialize) SLNet::BitStream::Serialize <short>;
+%template(Serialize) SLNet::BitStream::Serialize <unsigned short>;
+%template(Serialize) SLNet::BitStream::Serialize <long>;
+%template(Serialize) SLNet::BitStream::Serialize <long long>;
+%template(Serialize) SLNet::BitStream::Serialize <float>;
+%template(Serialize) SLNet::BitStream::Serialize <SLNet::RakString>;
+%template(Serialize) SLNet::BitStream::Serialize <RakNetGUID>;
+%template(Serialize) SLNet::BitStream::Serialize <uint24_t>;
 
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <bool>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <unsigned char>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <short>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <unsigned short>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <long>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <long long>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <float>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <RakNet::RakString>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <RakNetGUID>;
-%template(SerializeDelta) RakNet::BitStream::SerializeDelta <uint24_t>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <bool>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <unsigned char>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <short>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <unsigned short>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <long>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <long long>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <float>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <SLNet::RakString>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <RakNetGUID>;
+%template(SerializeDelta) SLNet::BitStream::SerializeDelta <uint24_t>;
 
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <bool>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <unsigned char>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <short>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <unsigned short>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <long>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <long long>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <float>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <RakNet::RakString>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <RakNetGUID>;
-%template(SerializeCompressed) RakNet::BitStream::SerializeCompressed <uint24_t>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <bool>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <unsigned char>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <short>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <unsigned short>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <long>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <long long>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <float>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <SLNet::RakString>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <RakNetGUID>;
+%template(SerializeCompressed) SLNet::BitStream::SerializeCompressed <uint24_t>;
 
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <bool>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <unsigned char>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <short>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <unsigned short>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <long>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <long long>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <float>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <RakNet::RakString>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <RakNetGUID>;
-%template(SerializeCompressedDelta) RakNet::BitStream::SerializeCompressedDelta <uint24_t>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <bool>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <unsigned char>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <short>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <unsigned short>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <long>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <long long>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <float>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <SLNet::RakString>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <RakNetGUID>;
+%template(SerializeCompressedDelta) SLNet::BitStream::SerializeCompressedDelta <uint24_t>;
 
-%template(Write) RakNet::BitStream::Write <const char *>;
-%template(Write) RakNet::BitStream::Write <bool>;
-%template(Write) RakNet::BitStream::Write <unsigned char>;
-%template(Write) RakNet::BitStream::Write <char>;
-%template(Write) RakNet::BitStream::Write <short>;
-%template(Write) RakNet::BitStream::Write <unsigned short>;
-%template(Write) RakNet::BitStream::Write <long>;
-%template(Write) RakNet::BitStream::Write <long long>;
-%template(Write) RakNet::BitStream::Write <float>;
-%template(Write) RakNet::BitStream::Write <RakNet::RakString>;
-%template(Write) RakNet::BitStream::Write <RakNetGUID>;
-%template(Write) RakNet::BitStream::Write <uint24_t>;
+%template(Write) SLNet::BitStream::Write <const char *>;
+%template(Write) SLNet::BitStream::Write <bool>;
+%template(Write) SLNet::BitStream::Write <unsigned char>;
+%template(Write) SLNet::BitStream::Write <char>;
+%template(Write) SLNet::BitStream::Write <short>;
+%template(Write) SLNet::BitStream::Write <unsigned short>;
+%template(Write) SLNet::BitStream::Write <long>;
+%template(Write) SLNet::BitStream::Write <long long>;
+%template(Write) SLNet::BitStream::Write <float>;
+%template(Write) SLNet::BitStream::Write <SLNet::RakString>;
+%template(Write) SLNet::BitStream::Write <RakNetGUID>;
+%template(Write) SLNet::BitStream::Write <uint24_t>;
 
-%template(WriteDelta) RakNet::BitStream::WriteDelta <const char *>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <bool>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <unsigned char>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <char>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <short>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <unsigned short>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <long>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <long long>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <float>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <RakNet::RakString>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <RakNetGUID>;
-%template(WriteDelta) RakNet::BitStream::WriteDelta <uint24_t>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <const char *>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <bool>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <unsigned char>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <char>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <short>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <unsigned short>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <long>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <long long>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <float>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <SLNet::RakString>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <RakNetGUID>;
+%template(WriteDelta) SLNet::BitStream::WriteDelta <uint24_t>;
 
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <const char*>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <bool>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <unsigned char>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <char>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <short>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <unsigned short>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <long>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <long long>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <float>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <RakNet::RakString>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <RakNetGUID>;
-%template(WriteCompressed) RakNet::BitStream::WriteCompressed <uint24_t>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <const char*>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <bool>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <unsigned char>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <char>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <short>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <unsigned short>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <long>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <long long>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <float>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <SLNet::RakString>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <RakNetGUID>;
+%template(WriteCompressed) SLNet::BitStream::WriteCompressed <uint24_t>;
 
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <const char *>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <bool>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <unsigned char>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <char>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <short>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <unsigned short>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <long>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <long long>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <float>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <RakNet::RakString>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <RakNetGUID>;
-%template(WriteCompressedDelta) RakNet::BitStream::WriteCompressedDelta <uint24_t>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <const char *>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <bool>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <unsigned char>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <char>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <short>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <unsigned short>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <long>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <long long>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <float>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <SLNet::RakString>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <RakNetGUID>;
+%template(WriteCompressedDelta) SLNet::BitStream::WriteCompressedDelta <uint24_t>;
 
-%template(Read) RakNet::BitStream::Read <bool>;
-%template(Read) RakNet::BitStream::Read <unsigned char>;
-%template(Read) RakNet::BitStream::Read <short>;
-%template(Read) RakNet::BitStream::Read <unsigned short>;
-%template(Read) RakNet::BitStream::Read <long>;
-%template(Read) RakNet::BitStream::Read <long long>;
-%template(Read) RakNet::BitStream::Read <float>;
-%template(Read) RakNet::BitStream::Read <RakNet::RakString>;
-%template(Read) RakNet::BitStream::Read <RakNetGUID>;
-%template(Read) RakNet::BitStream::Read <uint24_t>;
+%template(Read) SLNet::BitStream::Read <bool>;
+%template(Read) SLNet::BitStream::Read <unsigned char>;
+%template(Read) SLNet::BitStream::Read <short>;
+%template(Read) SLNet::BitStream::Read <unsigned short>;
+%template(Read) SLNet::BitStream::Read <long>;
+%template(Read) SLNet::BitStream::Read <long long>;
+%template(Read) SLNet::BitStream::Read <float>;
+%template(Read) SLNet::BitStream::Read <SLNet::RakString>;
+%template(Read) SLNet::BitStream::Read <RakNetGUID>;
+%template(Read) SLNet::BitStream::Read <uint24_t>;
 
-%template(ReadDelta) RakNet::BitStream::ReadDelta <bool>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <unsigned char>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <short>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <unsigned short>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <long>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <long long>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <float>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <RakNet::RakString>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <RakNetGUID>;
-%template(ReadDelta) RakNet::BitStream::ReadDelta <uint24_t>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <bool>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <unsigned char>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <short>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <unsigned short>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <long>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <long long>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <float>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <SLNet::RakString>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <RakNetGUID>;
+%template(ReadDelta) SLNet::BitStream::ReadDelta <uint24_t>;
 
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <bool>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <unsigned char>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <short>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <unsigned short>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <long>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <long long>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <float>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <RakNet::RakString>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <RakNetGUID>;
-%template(ReadCompressed) RakNet::BitStream::ReadCompressed <uint24_t>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <bool>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <unsigned char>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <short>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <unsigned short>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <long>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <long long>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <float>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <SLNet::RakString>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <RakNetGUID>;
+%template(ReadCompressed) SLNet::BitStream::ReadCompressed <uint24_t>;
 
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <bool>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <unsigned char>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <short>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <unsigned short>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <long>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <long long>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <float>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <RakNet::RakString>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <RakNetGUID>;
-%template(ReadCompressedDelta) RakNet::BitStream::ReadCompressedDelta <uint24_t>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <bool>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <unsigned char>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <short>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <unsigned short>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <long>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <long long>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <float>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <SLNet::RakString>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <RakNetGUID>;
+%template(ReadCompressedDelta) SLNet::BitStream::ReadCompressedDelta <uint24_t>;
 
 %define ADD_LIST_TYPE(CTYPE,CSTYPE,RENAME_TYPE)
 %typemap(cscode) DataStructures::List<CTYPE>
@@ -165,13 +171,13 @@
 %template(RENAME_TYPE) DataStructures::List <CTYPE>;
 %enddef
 
-ADD_LIST_TYPE(RakNet::RakNetGUID,RakNetGUID,RakNetListRakNetGUID)
-ADD_LIST_TYPE(RakNet::SystemAddress,SystemAddress,RakNetListSystemAddress)
-ADD_LIST_TYPE(RakNet::RakString,RakString,RakNetListRakString)
+ADD_LIST_TYPE(SLNet::RakNetGUID,RakNetGUID,RakNetListRakNetGUID)
+ADD_LIST_TYPE(SLNet::SystemAddress,SystemAddress,RakNetListSystemAddress)
+ADD_LIST_TYPE(SLNet::RakString,RakString,RakNetListRakString)
 ADD_LIST_TYPE(Cell,Cell,RakNetListCell)
 ADD_LIST_TYPE(ColumnDescriptor,ColumnDescriptor,RakNetListColumnDescriptor)
 ADD_LIST_TYPE(Row,Row,RakNetListTableRow);
-ADD_LIST_TYPE(RakNet::FileListNode,FileListNode,RakNetListFileListNode);
+ADD_LIST_TYPE(SLNet::FileListNode,FileListNode,RakNetListFileListNode);
 ADD_LIST_TYPE(FilterQuery,FilterQuery,RakNetListFilterQuery);
 ADD_LIST_TYPE(SortQuery,SortQuery,RakNetListSortQuery);
 
@@ -349,6 +355,6 @@ ADD_PRIMITIVE_LIST_TYPE(unsigned,uint,RakNetListUnsignedInt,SWIGTYPE_p_unsigned_
 
 #ifdef SWIG_ADDITIONAL_SQL_LITE
 ADD_STANDARD_MULTILIST_TYPE(SQLite3Row*,SQLite3Row,RakNetMultiListML_StackSQLite3RowP)
-ADD_STANDARD_MULTILIST_TYPE(RakNet::RakString,RakString,RakNetMultiListML_StackRakString)
-ADD_STANDARD_MULTILIST_TYPE(RakNet::SQLite3PluginResultInterface *,SQLite3PluginResultInterface,RakNetMultiListML_StackSQLite3PluginResultInterfaceP)
+ADD_STANDARD_MULTILIST_TYPE(SLNet::RakString,RakString,RakNetMultiListML_StackRakString)
+ADD_STANDARD_MULTILIST_TYPE(SLNet::SQLite3PluginResultInterface *,SQLite3PluginResultInterface,RakNetMultiListML_StackSQLite3PluginResultInterfaceP)
 #endif

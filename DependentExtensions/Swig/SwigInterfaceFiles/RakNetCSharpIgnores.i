@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //----------Ignores----------------
 //This file specifies things that should be ignored by Swig
@@ -9,51 +15,51 @@
 //,it should not be exposed, or the item is internal and it would take time to convert
 
 //BitStream
-%ignore RakNet::BitStream::Write(unsigned char * const inTemplateVar);
-%ignore RakNet::BitStream::WriteCompressed(unsigned char * const inTemplateVar);
-%ignore RakNet::BitStream::Write(const unsigned char * const inTemplateVar);
-%ignore RakNet::BitStream::WriteCompressed(const unsigned char * const inTemplateVar);
-%ignore RakNet::BitStream::Write( const char* inputByteArray, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::Read(char *varString);
-%ignore RakNet::BitStream::Read(unsigned char *varString);
-%ignore RakNet::BitStream::Read( char* output, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::ReadCompressedDelta(char &outTemplateVar);
-%ignore RakNet::BitStream::ReadDelta(char &outTemplateVar);
-%ignore RakNet::BitStream::ReadCompressed(char &outTemplateVar);
-%ignore RakNet::BitStream::ReadCompressedDelta(char* &outTemplateVar);
-%ignore RakNet::BitStream::ReadDelta(char* &outTemplateVar);
-%ignore RakNet::BitStream::ReadCompressed(char* &outTemplateVar);
-%ignore RakNet::BitStream::CopyData(unsigned char** _data ) const;
-%ignore RakNet::BitStream::PrintBits(char *out) const;
-%ignore RakNet::BitStream::PrintHex(char *out) const;
-%ignore RakNet::BitStream::GetData;
-%ignore RakNet::BitStream::Serialize(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::SerializeDelta(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::SerializeCompressed(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::SerializeCompressedDelta(bool writeToBitstream, char* inputByteArray, const unsigned int numberOfBytes );
-%ignore RakNet::BitStream::ReadAlignedBytesSafe( char *inOutByteArray, int &inputLength, const int maxBytesToRead );
-%ignore RakNet::BitStream::ReadAlignedBytesSafe( char *inOutByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
-%ignore RakNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, int &inputLength, const int maxBytesToRead );
-%ignore RakNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
-%ignore RakNet::BitStream::WriteAlignedVar8(const char *inByteArray);
-%ignore RakNet::BitStream::WriteAlignedVar8(const char *inByteArray);
-%ignore RakNet::BitStream::ReadAlignedVar8(char *inOutByteArray);		
-%ignore RakNet::BitStream::WriteAlignedVar16(const char *inByteArray);		
-%ignore RakNet::BitStream::ReadAlignedVar16(char *inOutByteArray);	
-%ignore RakNet::BitStream::WriteAlignedVar32(const char *inByteArray);	
-%ignore RakNet::BitStream::ReadAlignedVar32(char *inOutByteArray);
-%ignore RakNet::BitStream::WriteAlignedBytesSafe( const char *inByteArray, const unsigned int inputLength, const unsigned int maxBytesToWrite );
-%ignore RakNet::BitStream::Read( BitStream &bitStream, BitSize_t numberOfBits );
-%ignore RakNet::BitStream::Read( BitStream &bitStream );
-%ignore RakNet::BitStream::Write( BitStream &bitStream, BitSize_t numberOfBits );
-%ignore RakNet::BitStream::Write( BitStream &bitStream );
-%ignore RakNet::BitStream::ReadAlignedBytesSafeAlloc( char ** outByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
-%ignore RakNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, int &inputLength, const unsigned int maxBytesToRead );
+%ignore SLNet::BitStream::Write(unsigned char * const inTemplateVar);
+%ignore SLNet::BitStream::WriteCompressed(unsigned char * const inTemplateVar);
+%ignore SLNet::BitStream::Write(const unsigned char * const inTemplateVar);
+%ignore SLNet::BitStream::WriteCompressed(const unsigned char * const inTemplateVar);
+%ignore SLNet::BitStream::Write( const char* inputByteArray, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::Read(char *varString);
+%ignore SLNet::BitStream::Read(unsigned char *varString);
+%ignore SLNet::BitStream::Read( char* output, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::ReadCompressedDelta(char &outTemplateVar);
+%ignore SLNet::BitStream::ReadDelta(char &outTemplateVar);
+%ignore SLNet::BitStream::ReadCompressed(char &outTemplateVar);
+%ignore SLNet::BitStream::ReadCompressedDelta(char* &outTemplateVar);
+%ignore SLNet::BitStream::ReadDelta(char* &outTemplateVar);
+%ignore SLNet::BitStream::ReadCompressed(char* &outTemplateVar);
+%ignore SLNet::BitStream::CopyData(unsigned char** _data ) const;
+%ignore SLNet::BitStream::PrintBits(char *out) const;
+%ignore SLNet::BitStream::PrintHex(char *out) const;
+%ignore SLNet::BitStream::GetData;
+%ignore SLNet::BitStream::Serialize(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::SerializeDelta(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::SerializeCompressed(bool writeToBitstream,  char* inputByteArray, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::SerializeCompressedDelta(bool writeToBitstream, char* inputByteArray, const unsigned int numberOfBytes );
+%ignore SLNet::BitStream::ReadAlignedBytesSafe( char *inOutByteArray, int &inputLength, const int maxBytesToRead );
+%ignore SLNet::BitStream::ReadAlignedBytesSafe( char *inOutByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
+%ignore SLNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, int &inputLength, const int maxBytesToRead );
+%ignore SLNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
+%ignore SLNet::BitStream::WriteAlignedVar8(const char *inByteArray);
+%ignore SLNet::BitStream::WriteAlignedVar8(const char *inByteArray);
+%ignore SLNet::BitStream::ReadAlignedVar8(char *inOutByteArray);		
+%ignore SLNet::BitStream::WriteAlignedVar16(const char *inByteArray);		
+%ignore SLNet::BitStream::ReadAlignedVar16(char *inOutByteArray);	
+%ignore SLNet::BitStream::WriteAlignedVar32(const char *inByteArray);	
+%ignore SLNet::BitStream::ReadAlignedVar32(char *inOutByteArray);
+%ignore SLNet::BitStream::WriteAlignedBytesSafe( const char *inByteArray, const unsigned int inputLength, const unsigned int maxBytesToWrite );
+%ignore SLNet::BitStream::Read( BitStream &bitStream, BitSize_t numberOfBits );
+%ignore SLNet::BitStream::Read( BitStream &bitStream );
+%ignore SLNet::BitStream::Write( BitStream &bitStream, BitSize_t numberOfBits );
+%ignore SLNet::BitStream::Write( BitStream &bitStream );
+%ignore SLNet::BitStream::ReadAlignedBytesSafeAlloc( char ** outByteArray, unsigned int &inputLength, const unsigned int maxBytesToRead );
+%ignore SLNet::BitStream::ReadAlignedBytesSafeAlloc( char **outByteArray, int &inputLength, const unsigned int maxBytesToRead );
 
 //RakPeer
 %define IGNORERAKPEERANDINTERFACE(theMacroInputFunction)
-%ignore RakNet::RakPeer::theMacroInputFunction;
-%ignore RakNet::RakPeerInterface::theMacroInputFunction;
+%ignore SLNet::RakPeer::theMacroInputFunction;
+%ignore SLNet::RakPeerInterface::theMacroInputFunction;
 %enddef
 
 IGNORERAKPEERANDINTERFACE(GetIncomingPassword( char* passwordData, int *passwordDataLength  ))
@@ -61,8 +67,8 @@ IGNORERAKPEERANDINTERFACE(GetOfflinePingResponse( char **data, unsigned int *len
 IGNORERAKPEERANDINTERFACE(RegisterAsRemoteProcedureCall( const char* uniqueID, void ( *functionPointer ) ( RPCParameters *rpcParms ) ))
 IGNORERAKPEERANDINTERFACE(RegisterClassMemberRPC( const char* uniqueID, void *functionPointer ))
 IGNORERAKPEERANDINTERFACE(UnregisterAsRemoteProcedureCall( const char* uniqueID ))
-IGNORERAKPEERANDINTERFACE(RPC( const char* uniqueID, const char *data, BitSize_t bitLength, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RakNetTime *includedTimestamp, NetworkID networkID, RakNet::BitStream *replyFromTarget ))
-IGNORERAKPEERANDINTERFACE(RPC( const char* uniqueID, const RakNet::BitStream *bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RakNetTime *includedTimestamp, NetworkID networkID, RakNet::BitStream *replyFromTarget ))
+IGNORERAKPEERANDINTERFACE(RPC( const char* uniqueID, const char *data, BitSize_t bitLength, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RakNetTime *includedTimestamp, NetworkID networkID, SLNet::BitStream *replyFromTarget ))
+IGNORERAKPEERANDINTERFACE(RPC( const char* uniqueID, const SLNet::BitStream *bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, RakNetTime *includedTimestamp, NetworkID networkID, SLNet::BitStream *replyFromTarget ))
 IGNORERAKPEERANDINTERFACE(GetRPCString( const char *data, const BitSize_t bitSize, const SystemAddress systemAddress))
 IGNORERAKPEERANDINTERFACE(SendOutOfBand(const char *host, unsigned short remotePort, MessageID header, const char *data, BitSize_t dataLength, unsigned connectionSocketIndex=0 ))
 IGNORERAKPEERANDINTERFACE(SetUserUpdateThread(void (*_userUpdateThreadPtr)(RakPeerInterface *, void *), void *_userUpdateThreadData))
@@ -79,58 +85,58 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 //RakPeer only
 //Swig doesn't know how to handle friend functions, so even if it is in the protected section 
 //They must be explicitly ignored
-//This Specific case is somehow placed in the RakNet namespace rather than RakNet::RakPeer
+//This Specific case is somehow placed in the SLNet namespace rather than SLNet::RakPeer
 //Ignore both to be safe
-%ignore RakNet::RakPeerInterface::GetStatisticsList;
-%ignore RakNet::RakPeer::GetStatisticsList;
-%ignore RakNet::RakPeer::ProcessOfflineNetworkPacket;
-%ignore RakNet::RakPeer::ProcessNetworkPacket;
-%ignore RakNet::ProcessOfflineNetworkPacket;
-%ignore RakNet::ProcessNetworkPacket;
+%ignore SLNet::RakPeerInterface::GetStatisticsList;
+%ignore SLNet::RakPeer::GetStatisticsList;
+%ignore SLNet::RakPeer::ProcessOfflineNetworkPacket;
+%ignore SLNet::RakPeer::ProcessNetworkPacket;
+%ignore SLNet::ProcessOfflineNetworkPacket;
+%ignore SLNet::ProcessNetworkPacket;
 
 //RakString
 %ignore AppendBytes(const char *bytes, unsigned int count);//Interface remade
-%ignore RakNet::RakString::FPrintf(FILE *fp); //Expects C file pointer
+%ignore SLNet::RakString::FPrintf(FILE *fp); //Expects C file pointer
 //RakString Internal
-%ignore RakNet::RakString::RakString( SharedString *_sharedString );
-%ignore RakNet::RakString::sharedString;
-%ignore RakNet::RakString::RakString(const unsigned char *format, ...);
-%ignore RakNet::RakString::freeList;
-%ignore RakNet::RakString::emptyString;
+%ignore SLNet::RakString::RakString( SharedString *_sharedString );
+%ignore SLNet::RakString::sharedString;
+%ignore SLNet::RakString::RakString(const unsigned char *format, ...);
+%ignore SLNet::RakString::freeList;
+%ignore SLNet::RakString::emptyString;
 
 //List
 %ignore DataStructures::List::operator[];
 
 //SystemAddress
-%ignore RakNet::SystemAddress::ToString(bool writePort, char *dest) const;
-%ignore RakNet::SystemAddress::ToString() const;
+%ignore SLNet::SystemAddress::ToString(bool writePort, char *dest) const;
+%ignore SLNet::SystemAddress::ToString() const;
 
 //RakNetGUID
-%ignore RakNet::RakNetGUID::ToString(char *dest) const;
+%ignore SLNet::RakNetGUID::ToString(char *dest) const;
 
 //AddressOrGUID
-%ignore RakNet::AddressOrGUID::ToString(bool writePort, char *dest) const;
-%ignore RakNet::AddressOrGUID::ToString() const;
+%ignore SLNet::AddressOrGUID::ToString(bool writePort, char *dest) const;
+%ignore SLNet::AddressOrGUID::ToString() const;
 
 //PacketizedTCP
-%ignore RakNet::PacketizedTCP::SendList;
-%ignore RakNet::TCPInterface::SendList;
+%ignore SLNet::PacketizedTCP::SendList;
+%ignore SLNet::TCPInterface::SendList;
 
 //InternalPacket
-%ignore RakNet::InternalPacket::refCountedData;
-%ignore RakNet::InternalPacketRefCountedData;
+%ignore SLNet::InternalPacket::refCountedData;
+%ignore SLNet::InternalPacketRefCountedData;
 
 //RemoteClient
-%ignore RakNet::RemoteClient::SendOrBuffer;
+%ignore SLNet::RemoteClient::SendOrBuffer;
 
 //NetworkIDManager
-%ignore RakNet::NetworkIDManager::GET_OBJECT_FROM_ID;
-%ignore RakNet::NetworkIDManager::TrackNetworkIDObject;
-%ignore RakNet::NetworkIDManager::StopTrackingNetworkIDObject;
+%ignore SLNet::NetworkIDManager::GET_OBJECT_FROM_ID;
+%ignore SLNet::NetworkIDManager::TrackNetworkIDObject;
+%ignore SLNet::NetworkIDManager::StopTrackingNetworkIDObject;
 
 //NetworkIDObject
-%ignore RakNet::NetworkIDObject::SetParent;
-%ignore RakNet::NetworkIDObject::GetParent;
+%ignore SLNet::NetworkIDObject::SetParent;
+%ignore SLNet::NetworkIDObject::GetParent;
 
 //RakNetSocket
 %ignore RakNetSocket::recvEvent;
@@ -138,60 +144,60 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 
 //To allow easier future support if needed, rather than not parsing the PluginInterface2 ignore the functions
 //Later if decided that is needed remove the ignores and the commented typemaps and includes
-%ignore RakNet::PluginInterface2::OnAttach;
-%ignore RakNet::PluginInterface2::OnDetach;
-%ignore RakNet::PluginInterface2::Update;
-%ignore RakNet::PluginInterface2::OnReceive;
-%ignore RakNet::PluginInterface2::OnStartup;
-%ignore RakNet::PluginInterface2::OnShutdown;
-%ignore RakNet::PluginInterface2::OnClosedConnection;
-%ignore RakNet::PluginInterface2::OnNewConnection;
-%ignore RakNet::PluginInterface2::OnFailedConnectionAttempt;
-%ignore RakNet::PluginInterface2::OnDirectSocketSend;
-%ignore RakNet::PluginInterface2::OnInternalPacket;
-%ignore RakNet::PluginInterface2::OnAck;
-%ignore RakNet::PluginInterface2::OnPushBackPacket;
-%ignore RakNet::PluginInterface2::OnDirectSocketReceive;
-%ignore RakNet::PluginInterface2::OnRakPeerShutdown;
-%ignore RakNet::PluginInterface2::OnRakPeerStartup;
-%ignore RakNet::PluginInterface2::OnReliabilityLayerPacketError;
+%ignore SLNet::PluginInterface2::OnAttach;
+%ignore SLNet::PluginInterface2::OnDetach;
+%ignore SLNet::PluginInterface2::Update;
+%ignore SLNet::PluginInterface2::OnReceive;
+%ignore SLNet::PluginInterface2::OnStartup;
+%ignore SLNet::PluginInterface2::OnShutdown;
+%ignore SLNet::PluginInterface2::OnClosedConnection;
+%ignore SLNet::PluginInterface2::OnNewConnection;
+%ignore SLNet::PluginInterface2::OnFailedConnectionAttempt;
+%ignore SLNet::PluginInterface2::OnDirectSocketSend;
+%ignore SLNet::PluginInterface2::OnInternalPacket;
+%ignore SLNet::PluginInterface2::OnAck;
+%ignore SLNet::PluginInterface2::OnPushBackPacket;
+%ignore SLNet::PluginInterface2::OnDirectSocketReceive;
+%ignore SLNet::PluginInterface2::OnRakPeerShutdown;
+%ignore SLNet::PluginInterface2::OnRakPeerStartup;
+%ignore SLNet::PluginInterface2::OnReliabilityLayerPacketError;
 
 //NatPunchthroughClient
 	/// \internal For plugin handling
-%ignore  RakNet::NatPunchthroughClient::Update(void);
+%ignore  SLNet::NatPunchthroughClient::Update(void);
 	/// \internal For plugin handling
-%ignore RakNet::NatPunchthroughClient::OnReceive(Packet *packet);
+%ignore SLNet::NatPunchthroughClient::OnReceive(Packet *packet);
 	/// \internal For plugin handling
-%ignore RakNet::NatPunchthroughClient::OnNewConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
+%ignore SLNet::NatPunchthroughClient::OnNewConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 	/// \internal For plugin handling
-%ignore RakNet::NatPunchthroughClient::OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
-%ignore RakNet::NatPunchthroughClient::OnAttach();
-%ignore RakNet::NatPunchthroughClient::OnDetach();
-%ignore RakNet::NatPunchthroughClient::OnRakPeerShutdown();
+%ignore SLNet::NatPunchthroughClient::OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
+%ignore SLNet::NatPunchthroughClient::OnAttach();
+%ignore SLNet::NatPunchthroughClient::OnDetach();
+%ignore SLNet::NatPunchthroughClient::OnRakPeerShutdown();
 
 //Uin24_t
-%ignore RakNet::uint24_t::operator++(int);
-%ignore RakNet::uint24_t::operator--(int);
+%ignore SLNet::uint24_t::operator++(int);
+%ignore SLNet::uint24_t::operator--(int);
 
 //ReadyEvent
-%ignore RakNet::ReadyEvent::RemoteSystemCompBySystemAddress;
-%ignore RakNet::ReadyEvent::RemoteSystem;
-%ignore RakNet::ReadyEvent::ReadyEventNodeComp;
-%ignore RakNet::ReadyEvent::ReadyEventNode;
+%ignore SLNet::ReadyEvent::RemoteSystemCompBySystemAddress;
+%ignore SLNet::ReadyEvent::RemoteSystem;
+%ignore SLNet::ReadyEvent::ReadyEventNodeComp;
+%ignore SLNet::ReadyEvent::ReadyEventNode;
 
 //PacketLoggger
-%ignore RakNet::PacketLogger::FormatLine;
+%ignore SLNet::PacketLogger::FormatLine;
 
 //FullyConnectedMesh2
-%ignore RakNet::FullyConnectedMesh2::GetElapsedRuntime;
-%ignore RakNet::FullyConnectedMesh2::OnReceive;
+%ignore SLNet::FullyConnectedMesh2::GetElapsedRuntime;
+%ignore SLNet::FullyConnectedMesh2::OnReceive;
 
 //Structs
-%ignore RakNet::PI2_FailedConnectionAttemptReason;
-%ignore RakNet::PI2_LostConnectionReason;
+%ignore SLNet::PI2_FailedConnectionAttemptReason;
+%ignore SLNet::PI2_LostConnectionReason;
 //These are internal
-%ignore RakNet::PluginInterface2::SetRakPeerInterface;
-%ignore RakNet::PluginInterface2::SetPacketizedTCP;
+%ignore SLNet::PluginInterface2::SetRakPeerInterface;
+%ignore SLNet::PluginInterface2::SetPacketizedTCP;
 
 //ByteQueue
 %ignore DataStructures::ByteQueue::WriteBytes(const char *in, unsigned length, const char *file, unsigned int line);
@@ -199,26 +205,26 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore DataStructures::ByteQueue::PeekContiguousBytes(unsigned int *outLength) const;
 
 //UDPProxyClient
-%ignore RakNet::UDPProxyClient::pingServerGroups;
-%ignore RakNet::UDPProxyClient::OnReceive;
+%ignore SLNet::UDPProxyClient::pingServerGroups;
+%ignore SLNet::UDPProxyClient::OnReceive;
 
 //NatPunchThroughServer
-%ignore RakNet::NatPunchthroughServer::NatPunchthroughUserComp;
+%ignore SLNet::NatPunchthroughServer::NatPunchthroughUserComp;
 
 //UDPForwarder
-%ignore RakNet::UDPForwarder::threadOperationIncomingQueue;
-%ignore RakNet::UDPForwarder::threadOperationOutgoingQueue;
-%ignore RakNet::UDPForwarder::forwardList;
-%ignore AddForwardingEntry(SrcAndDest srcAndDest, RakNet::TimeMS timeoutOnNoDataMS, unsigned short *port, const char *forceHostAddress);
+%ignore SLNet::UDPForwarder::threadOperationIncomingQueue;
+%ignore SLNet::UDPForwarder::threadOperationOutgoingQueue;
+%ignore SLNet::UDPForwarder::forwardList;
+%ignore AddForwardingEntry(SrcAndDest srcAndDest, SLNet::TimeMS timeoutOnNoDataMS, unsigned short *port, const char *forceHostAddress);
 
 //MessageFilter
-%ignore RakNet::FilterSet;//internal
-%ignore RakNet::MessageFilterStrComp;//internal
-%ignore RakNet::FilterSetComp;//internal
-%ignore RakNet::FilteredSystem;//internal
-%ignore RakNet::FilteredSystemComp;//internal
-%ignore RakNet::MessageFilter::SetDisallowedMessageCallback(int filterSetID, void *userData, void (*invalidMessageCallback)(RakPeerInterface *peer, AddressOrGUID addressOrGUID, int filterSetID, void *userData, unsigned char messageID)); //Void pointer
-%ignore RakNet::MessageFilter::SetTimeoutCallback(int filterSetID, void *userData, void (*invalidMessageCallback)(RakPeerInterface *peer, AddressOrGUID addressOrGUID, int filterSetID, void *userData)); //Void pointer
+%ignore SLNet::FilterSet;//internal
+%ignore SLNet::MessageFilterStrComp;//internal
+%ignore SLNet::FilterSetComp;//internal
+%ignore SLNet::FilteredSystem;//internal
+%ignore SLNet::FilteredSystemComp;//internal
+%ignore SLNet::MessageFilter::SetDisallowedMessageCallback(int filterSetID, void *userData, void (*invalidMessageCallback)(RakPeerInterface *peer, AddressOrGUID addressOrGUID, int filterSetID, void *userData, unsigned char messageID)); //Void pointer
+%ignore SLNet::MessageFilter::SetTimeoutCallback(int filterSetID, void *userData, void (*invalidMessageCallback)(RakPeerInterface *peer, AddressOrGUID addressOrGUID, int filterSetID, void *userData)); //Void pointer
 
 //Table
 //%ignore DataStructures::Table::GetRows;
@@ -258,18 +264,18 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore DataStructures::Page::data;
  
 //FileList Lists
-%ignore DataStructures::List<RakNet::FileListNode>::GetIndexOf;
-%ignore RakNet::FileList::GetCallbacks(DataStructures::List<FileListProgress*> &callbacks);
+%ignore DataStructures::List<SLNet::FileListNode>::GetIndexOf;
+%ignore SLNet::FileList::GetCallbacks(DataStructures::List<FileListProgress*> &callbacks);
 
 // FileListTransfer
-%ignore RakNet::FileListTransfer::GetCallbacks(DataStructures::List<FileListProgress*> &callbacks);
+%ignore SLNet::FileListTransfer::GetCallbacks(DataStructures::List<FileListProgress*> &callbacks);
 %ignore SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutput, void* perThreadData);
 
 //Bplus
 %ignore DataStructures::BPlusTree::ValidateTree;
 
 //File
-%ignore RakNet::IncrementalReadInterface::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context);
+%ignore SLNet::IncrementalReadInterface::GetFilePart( const char *filename, unsigned int startReadBytes, unsigned int numBytesToRead, void *preallocatedDestination, FileListNodeContext context);
 
 //FileList
 %ignore AddFile(const char *filename, const char *fullPathToFile, const char *data, const unsigned dataLength, const unsigned fileLength, FileListNodeContext context, bool isAReference=false, bool takeDataPointer=false);
@@ -283,7 +289,7 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore SendCommandList(TransportInterface *transport, SystemAddress systemAddress);
 
 //TransportInterface
-%ignore RakNet::TransportInterface::Send( SystemAddress systemAddress, const char *data, ... );
+%ignore SLNet::TransportInterface::Send( SystemAddress systemAddress, const char *data, ... );
 
 //Router2
 %ignore OnReceive(Packet *packet);
@@ -292,26 +298,26 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore DataStructures::Multilist::ForEach;
 
 //ConnectionGraph2
-%ignore RakNet::ConnectionGraph2::SystemAddressAndGuid;
-%ignore RakNet::ConnectionGraph2::SystemAddressAndGuidComp;
-%ignore RakNet::ConnectionGraph2::RemoteSystem;
-%ignore RakNet::ConnectionGraph2::RemoteSystemComp;
-%ignore RakNet::ConnectionGraph2::GetConnectionList;
-%ignore RakNet::ConnectionGraph2::GetParticipantList;
+%ignore SLNet::ConnectionGraph2::SystemAddressAndGuid;
+%ignore SLNet::ConnectionGraph2::SystemAddressAndGuidComp;
+%ignore SLNet::ConnectionGraph2::RemoteSystem;
+%ignore SLNet::ConnectionGraph2::RemoteSystemComp;
+%ignore SLNet::ConnectionGraph2::GetConnectionList;
+%ignore SLNet::ConnectionGraph2::GetParticipantList;
 
 #ifdef SWIG_ADDITIONAL_SQL_LITE
 //LogParameter
-%ignore RakNet::LogParameter::LogParameter(void *t);
-%ignore RakNet::LogParameter::LogParameter(void *t);
-%ignore RakNet::LogParameter::LogParameter(const unsigned char t[]);
-%ignore RakNet::LogParameter::LogParameter(const char t[]);
-%ignore RakNet::LogParameter::LogParameter(BlobDescriptor t);
-%ignore RakNet::LogParameter::LogParameter(RGBImageBlob t);
+%ignore SLNet::LogParameter::LogParameter(void *t);
+%ignore SLNet::LogParameter::LogParameter(void *t);
+%ignore SLNet::LogParameter::LogParameter(const unsigned char t[]);
+%ignore SLNet::LogParameter::LogParameter(const char t[]);
+%ignore SLNet::LogParameter::LogParameter(BlobDescriptor t);
+%ignore SLNet::LogParameter::LogParameter(RGBImageBlob t);
 
 //SQLite3Row List and SQLLite3Table, not pointers so these functions not needed and will error
-%ignore DataStructures::Multilist<ML_STACK, RakNet::RakString,RakNet::RakString,DefaultIndexType>::GetPtr;
-%ignore DataStructures::Multilist<ML_STACK, RakNet::RakString,RakNet::RakString,DefaultIndexType>::ClearPointers;
-%ignore DataStructures::Multilist<ML_STACK, RakNet::RakString,RakNet::RakString,DefaultIndexType>::ClearPointer;
+%ignore DataStructures::Multilist<ML_STACK, SLNet::RakString,SLNet::RakString,DefaultIndexType>::GetPtr;
+%ignore DataStructures::Multilist<ML_STACK, SLNet::RakString,SLNet::RakString,DefaultIndexType>::ClearPointers;
+%ignore DataStructures::Multilist<ML_STACK, SLNet::RakString,SLNet::RakString,DefaultIndexType>::ClearPointer;
 
 //common
 %ignore LogParameter;
@@ -319,11 +325,11 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore RGBImageBlob;
 
 //SQLiteClientLogger
-%ignore RakNet::SQLiteClientLoggerPlugin::CheckQuery;
-%ignore RakNet::SQLiteClientLoggerPlugin::ParameterListHelper;
-%ignore RakNet::SQLiteClientLoggerPlugin::SqlLog;
-%ignore RakNet::SQLiteClientLoggerPlugin::__sqlLogInternal;
-%ignore RakNet::SQLiteClientLoggerPlugin::logger;
+%ignore SLNet::SQLiteClientLoggerPlugin::CheckQuery;
+%ignore SLNet::SQLiteClientLoggerPlugin::ParameterListHelper;
+%ignore SLNet::SQLiteClientLoggerPlugin::SqlLog;
+%ignore SLNet::SQLiteClientLoggerPlugin::__sqlLogInternal;
+%ignore SLNet::SQLiteClientLoggerPlugin::logger;
 #endif
 
 //Global
@@ -347,9 +353,9 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 %ignore operator /=;
 
 //RakString
-%ignore RakNet::RakString::operator = (char *);
-%ignore RakNet::RakString::operator == (char *) const;
-%ignore RakNet::RakString::operator != (char *) const;
+%ignore SLNet::RakString::operator = (char *);
+%ignore SLNet::RakString::operator == (char *) const;
+%ignore SLNet::RakString::operator != (char *) const;
 
 //Structs
 %ignore RPCParameters;
@@ -359,9 +365,9 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
 	%ignore CreatePatch; //Custom C# wrapper written for it
-	%ignore RakNet::AutopatcherServer::StartThreads;
-	%ignore RakNet::AutopatcherClient::OnThreadCompletion;
-	%ignore RakNet::MemoryCompressor::Compress(char *input, const unsigned inputLength, bool finish);
-	%ignore RakNet::MemoryDecompressor::MemoryDecompress(unsigned char *inputByteArray, const unsigned inputLength, bool ignoreStreamEnd);
+	%ignore SLNet::AutopatcherServer::StartThreads;
+	%ignore SLNet::AutopatcherClient::OnThreadCompletion;
+	%ignore SLNet::MemoryCompressor::Compress(char *input, const unsigned inputLength, bool finish);
+	%ignore SLNet::MemoryDecompressor::MemoryDecompress(unsigned char *inputByteArray, const unsigned inputLength, bool ignoreStreamEnd);
 	%ignore CompressorBase::GetOutput;
 #endif

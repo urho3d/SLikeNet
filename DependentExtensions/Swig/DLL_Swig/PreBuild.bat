@@ -7,4 +7,4 @@ REM This source code was modified by SLikeSoft. Modifications are licensed under
 REM license found in the license.txt file in the root directory of this source tree.
 
 cd ..
-call MakeSwig.bat "..\.." "" --copyToTestDir
+call MakeSwig.bat "..\.." "" %1

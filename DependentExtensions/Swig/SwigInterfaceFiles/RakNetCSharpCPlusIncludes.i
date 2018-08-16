@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //This is not parsed by swig but inserted into the generated C++ wrapper, these includes
 //are needed so the wrapper includes the needed .h filese
@@ -24,85 +30,84 @@ typedef uint32_t DefaultIndexType;
 typedef unsigned int SOCKET;
 #endif
 //Includes
-#include "RakNetSmartPtr.h"
-#include "RakNetDefines.h"
-#include "MessageIdentifiers.h"
-#include "Export.h"
-#include "SimpleMutex.h"
-#include "RakString.h"
-#include "RakWString.h"
-#include "BitStream.h"
-#include "DS_List.h"	
-#include "DS_ByteQueue.h"
-#include "RakAssert.h"
-#include "NativeTypes.h"
-#include "SocketIncludes.h"
-#include "RakNetTime.h"
-#include "Export.h"
-#include "RakMemoryOverride.h"
-#include "RakNetTypes.h"
-#include "RakNetSocket.h"
-#include "RakNetStatistics.h"
-#include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
-#include "RakNetTime.h"	
+#include "slikenet/smartptr.h"
+#include "slikenet/defines.h"
+#include "slikenet/MessageIdentifiers.h"
+#include "slikenet/Export.h"
+#include "slikenet/SimpleMutex.h"
+#include "slikenet/string.h"
+#include "slikenet/wstring.h"
+#include "slikenet/BitStream.h"
+#include "slikenet/DS_List.h"	
+#include "slikenet/DS_ByteQueue.h"
+#include "slikenet/assert.h"
+#include "slikenet/NativeTypes.h"
+#include "slikenet/SocketIncludes.h"
+#include "slikenet/time.h"
+#include "slikenet/Export.h"
+#include "slikenet/memoryoverride.h"
+#include "slikenet/types.h"
+#include "slikenet/socket.h"
+#include "slikenet/statistics.h"
+#include "slikenet/NetworkIDObject.h"
+#include "slikenet/NetworkIDManager.h"
 //The below three classes have been removed from interface, if PluginInterface2 is fully exposed again
 //or another class needs them uncomment them and the related typemaps
-//#include "TCPInterface.h"
-//#include "PacketizedTCP.h"
-//#include "InternalPacket.h"
-#include "PluginInterface2.h"
-#include "RakPeerInterface.h"
-#include "RakPeer.h"
-#include "PacketPriority.h"
-#include "PacketLogger.h"
-#include "PacketFileLogger.h"
-#include "NatTypeDetectionClient.h"
-#include "NatPunchthroughClient.h"
-#include "Router2.h"
-#include "UDPProxyClient.h"
-#include "FullyConnectedMesh2.h"
-#include "ReadyEvent.h"
-//#include "TeamBalancer.h"
-#include "TeamManager.h"
-#include "NatPunchthroughServer.h"
-#include "UDPForwarder.h"
-#include "UDPProxyServer.h"
-#include "UDPProxyCoordinator.h"
-#include "NatTypeDetectionServer.h"
-#include "DS_BPlusTree.h"
-#include "DS_Table.h"
-#include "FileListTransferCBInterface.h"//
-#include "IncrementalReadInterface.h"//
-#include "FileListNodeContext.h"//
-#include "FileList.h"//
-#include "TransportInterface.h"//
-#include "CommandParserInterface.h"//
-#include "LogCommandParser.h"//
-#include "MessageFilter.h"//
-#include "DirectoryDeltaTransfer.h"//
-#include "FileListTransfer.h"//
-#include "ThreadsafePacketLogger.h"//
-#include "PacketConsoleLogger.h"//
-#include "PacketFileLogger.h"//
-#include "DS_Multilist.h"
-#include "ConnectionGraph2.h"
-#include "GetTime.h"
-//#include "RakNetTransport2.h"
-//#include "RoomsPlugin.h"
+//#include "slikenet/TCPInterface.h"
+//#include "slikenet/PacketizedTCP.h"
+//#include "slikenet/InternalPacket.h"
+#include "slikenet/PluginInterface2.h"
+#include "slikenet/peerinterface.h"
+#include "slikenet/peer.h"
+#include "slikenet/PacketPriority.h"
+#include "slikenet/PacketLogger.h"
+#include "slikenet/PacketFileLogger.h"
+#include "slikenet/NatTypeDetectionClient.h"
+#include "slikenet/NatPunchthroughClient.h"
+#include "slikenet/Router2.h"
+#include "slikenet/UDPProxyClient.h"
+#include "slikenet/FullyConnectedMesh2.h"
+#include "slikenet/ReadyEvent.h"
+//#include "slikenet/TeamBalancer.h"
+#include "slikenet/TeamManager.h"
+#include "slikenet/NatPunchthroughServer.h"
+#include "slikenet/UDPForwarder.h"
+#include "slikenet/UDPProxyServer.h"
+#include "slikenet/UDPProxyCoordinator.h"
+#include "slikenet/NatTypeDetectionServer.h"
+#include "slikenet/DS_BPlusTree.h"
+#include "slikenet/DS_Table.h"
+#include "slikenet/FileListTransferCBInterface.h"//
+#include "slikenet/IncrementalReadInterface.h"//
+#include "slikenet/FileListNodeContext.h"//
+#include "slikenet/FileList.h"//
+#include "slikenet/TransportInterface.h"//
+#include "slikenet/CommandParserInterface.h"//
+#include "slikenet/LogCommandParser.h"//
+#include "slikenet/MessageFilter.h"//
+#include "slikenet/DirectoryDeltaTransfer.h"//
+#include "slikenet/FileListTransfer.h"//
+#include "slikenet/ThreadsafePacketLogger.h"//
+#include "slikenet/PacketConsoleLogger.h"//
+#include "slikenet/PacketFileLogger.h"//
+#include "slikenet/DS_Multilist.h"
+#include "slikenet/ConnectionGraph2.h"
+#include "slikenet/GetTime.h"
+//#include "slikenet/transport2.h"
+//#include "slikenet/RoomsPlugin.h"
 //Macros
 //Swig C++ code only TypeDefs
 //Most of these are nested structs/classes that swig needs to understand as global
 //They will reference the nested struct/class while appearing global
-typedef RakNet::RakString::SharedString SharedString;
+typedef SLNet::RakString::SharedString SharedString;
 typedef DataStructures::Table::Row Row;
 typedef DataStructures::Table::Cell Cell; 
 typedef DataStructures::Table::FilterQuery FilterQuery;
 typedef DataStructures::Table::ColumnDescriptor ColumnDescriptor;
 typedef DataStructures::Table::SortQuery SortQuery;
-typedef RakNet::FileListTransferCBInterface::OnFileStruct OnFileStruct;
-typedef RakNet::FileListTransferCBInterface::FileProgressStruct FileProgressStruct;
-typedef RakNet::FileListTransferCBInterface::DownloadCompleteStruct DownloadCompleteStruct;
+typedef SLNet::FileListTransferCBInterface::OnFileStruct OnFileStruct;
+typedef SLNet::FileListTransferCBInterface::FileProgressStruct FileProgressStruct;
+typedef SLNet::FileListTransferCBInterface::DownloadCompleteStruct DownloadCompleteStruct;
 
  %}
 
@@ -116,8 +121,8 @@ typedef RakNet::FileListTransferCBInterface::DownloadCompleteStruct DownloadComp
 		#include "SQLite3ServerPlugin.h"
 		#include "SQLiteServerLoggerPlugin.h"
 	#endif
-	typedef RakNet::LogParameter::DataUnion DataUnion;
-	typedef RakNet::SQLiteClientLoggerPlugin::ParameterListHelper ParameterListHelper;
+	typedef SLNet::LogParameter::DataUnion DataUnion;
+	typedef SLNet::SQLiteClientLoggerPlugin::ParameterListHelper ParameterListHelper;
 	%}
 #endif
 
@@ -134,7 +139,13 @@ typedef RakNet::FileListTransferCBInterface::DownloadCompleteStruct DownloadComp
 	%}
 #endif
 
+#ifdef RAKNET_COMPATIBILITY
 %{
 using namespace RakNet;
 %}
+#else
+%{
+using namespace SLNet;
+%}
+#endif
 

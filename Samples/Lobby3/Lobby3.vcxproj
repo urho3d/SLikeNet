@@ -152,6 +152,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -177,6 +178,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -202,6 +204,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -227,6 +230,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>

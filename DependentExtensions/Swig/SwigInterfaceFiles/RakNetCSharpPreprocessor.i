@@ -1,7 +1,13 @@
 //
-// This file was taken from RakNet 4.082 without any modifications.
+// This file was taken from RakNet 4.082.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
+//
+//
+// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
+//
+// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
+// license found in the license.txt file in the root directory of this source tree.
 
 //----------------Extra Swig PreProcessor------------
 //To keep everything clean general swig preprocessor commands are stuck here
@@ -22,7 +28,7 @@ typedef unsigned int SOCKET;
 typedef unsigned int __UDPSOCKET__ ;
 typedef unsigned int __TCPSOCKET__;
 #endif
-typedef RakNet::RakString::SharedString SharedString;
+typedef SLNet::RakString::SharedString SharedString;
 //Global Inserts
 #define SWIG_CSHARP_NO_IMCLASS_STATIC_CONSTRUCTOR 1;
 
