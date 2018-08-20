@@ -191,6 +191,7 @@ copy ".\..\..\Lib\SLikeNet_DLL_$(Configuration)_$(Platform).dll"  $(ProjectDir)
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../lib/SLikeNet_DLL_Retail_Win32.lib;ws2_32.lib;OgreMain.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -249,6 +250,7 @@ copy ".\..\..\Lib\SLikeNet_DLL_$(Configuration)_$(Platform).dll"  $(ProjectDir)
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../lib/SLikeNet_DLL_Retail - Unicode_Win32.lib;ws2_32.lib;OgreMain.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>

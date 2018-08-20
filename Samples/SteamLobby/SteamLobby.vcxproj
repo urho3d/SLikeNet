@@ -191,6 +191,7 @@ copy C:\Steamworks\SteamworksExample\steam_appid.txt  $(ProjectDir)
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;steam_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -249,6 +250,7 @@ copy C:\Steamworks\SteamworksExample\steam_appid.txt  $(ProjectDir)
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;steam_api.lib;%(AdditionalDependencies)</AdditionalDependencies>

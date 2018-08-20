@@ -104,23 +104,23 @@
 		%include "AutopatcherRepositoryInterface.h"
 	#ifdef SWIGWIN
 		#ifdef SWIG_ADDITIONAL_AUTOPATCHER_MYSQL 
-			%include "MySQLInterface\MySQLInterface.h"
-			%include "Autopatcher\AutopatcherMySQLRepository\AutopatcherMySQLRepository.h"
+			%include "MySQLInterface.h"
+			%include "AutopatcherMySQLRepository\AutopatcherMySQLRepository.h"
 		#endif
-		%include "Autopatcher\AutopatcherServer.h"
-		%include "Autopatcher\AutopatcherClient.h"
-		%include "Autopatcher\CreatePatch.h"
-		%include "Autopatcher\MemoryCompressor.h"
-		%include "Autopatcher\ApplyPatch.h"
+		%include "AutopatcherServer.h"
+		%include "AutopatcherClient.h"
+		%include "CreatePatch.h"
+		%include "MemoryCompressor.h"
+		%include "ApplyPatch.h"
 	#else
 		#ifdef SWIG_ADDITIONAL_AUTOPATCHER_MYSQL 
-			%include "MySQLInterface/MySQLInterface.h"
-			%include "Autopatcher/AutopatcherMySQLRepository/AutopatcherMySQLRepository.h"
+			%include "MySQLInterface.h"
+			%include "AutopatcherMySQLRepository/AutopatcherMySQLRepository.h"
 		#endif
-		%include "Autopatcher/AutopatcherServer.h"
-		%include "Autopatcher/AutopatcherClient.h"
-		%include "Autopatcher/CreatePatch.h"
-		%include "Autopatcher/MemoryCompressor.h"
-		%include "Autopatcher/ApplyPatch.h"
+		%include "AutopatcherServer.h"
+		%include "AutopatcherClient.h"
+		%include "CreatePatch.h"
+		%include "MemoryCompressor.h"
+		%include "ApplyPatch.h"
 	#endif
 #endif

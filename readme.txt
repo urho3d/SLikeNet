@@ -727,7 +727,7 @@ of the license file.
                 written in C and C++ with a variety of high-level programming
                 languages.
    URL: http://www.swig.org/
-   Supported versions: 2.0.1
+   Supported versions: 2.0.0-2.0.12
    Used in:
       - Swig (see 4.12)
 

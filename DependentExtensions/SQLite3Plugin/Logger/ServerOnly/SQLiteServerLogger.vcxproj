@@ -188,6 +188,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -244,6 +245,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>

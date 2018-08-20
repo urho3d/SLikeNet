@@ -342,6 +342,7 @@ IGNORERAKPEERANDINTERFACE(SetIncomingDatagramEventHandler( bool (*_incomingDatag
 //Operators
 //These need te be handled manually or not at all
 %ignore operator const char*;
+%ignore operator wchar_t*;
 %ignore operator uint32_t;
 %ignore operator &; //Not overloadable in C#
 %ignore operator <<;//Doesn't work the same in C#, only usable with int

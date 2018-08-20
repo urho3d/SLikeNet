@@ -1,85 +1,157 @@
-if ! type -P swig &>/dev/null
-then
-    echo "Swig is not installed want this script to download,make, and install it? ( y/n )"
-    read answer
-    if [ "$answer" = "n" ] || [ "$answer" = "N" ]
-    then
-	echo "Aborting"
-	exit
-    fi
- if [ ! -d "swig-2.0.0" ]
-      then
-             wget http://prdownloads.sourceforge.net/swig/swig-2.0.0.tar.gz
-	     tar xzf swig-2.0.0.tar.gz 
-	     cd swig-2.0.0
-            ./configure 
-	    make
-            echo "Switching to root, enter root password"
-	    su root -c "make install" #Automatically switches back after this command
-	    echo "Exited root"
-	    cd ../
-    else
-	    cd swig-2.0.0
-            ./configure 
-	    make
-            echo "Switching to root, enter root password"
-	    su root -c "make install" #Automatically switches back after this command
-	    echo "Exited root"
-	    cd ../
-    fi
+# settings
+BZIP2_VERSION=1.0.6
+SWIG_VERSION=2.0.12
+
+function syntaxError
+{
+	echo "Usage:"
+	echo "  MakeSwig.bat <slikenet_root_path> [<dependent_extension>]"
+	echo "    [--rakNetCompatibility]"
+	echo
+	echo "  slikenet_root_path  Path to the SLikeNet root directory."
+	echo "  dependent_extension The dependent extension which should be included."
+	echo "                      Supported values: MYSQL_AUTOPATCHER, SQLITE"
+	echo
+	echo "Options:"
+	echo "  --rakNetCompatibility If specified, creates the C# wrapper in RakNet"
+	echo "                        compatibility mode."
+}
+
+# read mandatory parameter
+ROOT_DIR=${1%/} # remove trailing '/'
+
+if [ "$ROOT_DIR" == "" ]; then
+	echo "Invalid number of parameters"
+	syntaxError
+	exit 1
 fi
-if [ "$1" == "" ]
-then
-	echo "Invalid number of parameters, Usage: MakeSwig.sh directory"
-else
-	echo "Performing Swig build"
-	rm -f ./SwigOutput/SwigCSharpOutput/*
-	if [ "$2" == "" ]
-	then
-		echo "without SQLiteClientLogger"
-		swig -c++ -csharp -namespace RakNet -I"$1" -I"SwigInterfaceFiles" -outdir SwigOutput/SwigCSharpOutput -o SwigOutput/CplusDLLIncludes/RakNet_wrap.cxx SwigInterfaceFiles/RakNet.i
-	swigReturn=$?	
-	else
-		echo "with SQLiteClientLogger"
-		swig -c++ -csharp -namespace RakNet -I"$1" -I"SwigInterfaceFiles" -I"$2" -DSWIG_ADDITIONAL_SQL_LITE -outdir SwigOutput/SwigCSharpOutput -o SwigOutput/CplusDLLIncludes/RakNet_wrap.cxx SwigInterfaceFiles/RakNet.i
-	swigReturn=$?
-	fi
-	if [ $swigReturn == 0 ]
-	then
-		echo "Swig build complete"
-		echo "Removing and replacing the sample cs files with fresh ones"
-		mv ./SwigLinuxCSharpSample/TestMain.cs ./SwigLinuxCSharpSample/TestMain.txt 
-		rm ./SwigLinuxCSharpSample/*.cs
-		mv ./SwigLinuxCSharpSample/TestMain.txt ./SwigLinuxCSharpSample/TestMain.cs 
-		cp ./SwigOutput/SwigCSharpOutput/*.cs ./SwigLinuxCSharpSample/
-		echo "Building the Swig Dynamic Link"
-		savedDir=`pwd`		
-		cd $1
-		if [ "$2" == "" ]
-		then
-			echo "Building without SQLiteClientLogger"
-			g++ *.cpp ../DependentExtensions/Swig/SwigOutput/CplusDLLIncludes/RakNet_wrap.cxx -l pthread -I./ -shared -o RakNet
-		gccReturn=$?
-		else
-			echo "Building with SQLiteClientLogger"  
-			g++ *.cpp ../DependentExtensions/Swig/SwigOutput/CplusDLLIncludes/RakNet_wrap.cxx "$2/SQLite3ClientPlugin.cpp"  "$2/SQLite3PluginCommon.cpp" "$2/Logger/ClientOnly/SQLiteClientLoggerPlugin.cpp"  "$2/Logger/SQLiteLoggerCommon.cpp"  -l pthread -I./ -I"$2/Logger/ClientOnly" -I"$2/Logger" -I"$2" -shared -o RakNet
-		gccReturn=$?
-		fi
-		if [ $gccReturn == 0 ]
-		then
-			echo "Copying to /usr/lib/ will need root password"
-		        if su root -c "cp ./RakNet /usr/lib" #Automatically switches back after this command
-			then
-				echo "RakNet lib copied"
-			else
-				echo "RakNet lib copy failed"
-			fi
-		        echo "Exited root"		
-		else
-			echo "There was an error durion the DLL build"
-		fi
-		cd $savedDir
-	else
-		echo "Swig had an error during build"
-	fi
+
+# initialize variables to defaults
+RAKNET_COMPATIBILITY_MODE=0
+BUILD_BZIP2=0
+SOURCE_DIR=$ROOT_DIR/Source
+SWIG_ADDITIONAL_INCLUDES=
+SWIG_INCLUDES="-I$SOURCE_DIR/include/slikenet -ISwigInterfaceFiles"
+SWIG_DEFINES=
+GCC_ADDITIONAL_FILES=
+GCC_ADDITIONAL_INCLUDES=
+GCC_ADDITIONAL_LIBS=
+GCC_DEFINES=
+NAMESPACE=SLNet
+OUTPUT_DIR=../../bindings/csharp/interfaces
+OUTPUT_WRAPPER_FILENAME=../../bindings/csharp/wrapper/slikenet_wrapper.cpp
+SO_NAME=SLikeNet
+
+# check if we have a dependent extension specified in the 2nd argument
+if [ "$2" == "SQLITE" ]; then
+	# TODO #med - find a way around the additional variables and rather only work with a single one (aka: SWIG_INCLUDES)
+	SWIG_ADDITIONAL_INCLUDES="-I$ROOT_DIR/DependentExtensions/SQLite3Plugin"
+	SWIG_DEFINES=-DSWIG_ADDITIONAL_SQL_LITE
+	GCC_ADDITIONAL_FILES="$ROOT_DIR/DependentExtensions/SQLite3Plugin/SQLite3ClientPlugin.cpp $ROOT_DIR/DependentExtensions/SQLite3Plugin/SQLite3PluginCommon.cpp $ROOT_DIR/DependentExtensions/SQLite3Plugin/Logger/ClientOnly/SQLiteClientLoggerPlugin.cpp $ROOT_DIR/DependentExtensions/SQLite3Plugin/Logger/SQLiteLoggerCommon.cpp"
+	GCC_ADDITIONAL_INCLUDES="-I$ROOT_DIR/DependentExtensions/SQLite3Plugin/Logger/ClientOnly -I$ROOT_DIR/DependentExtensions/SQLite3Plugin/Logger -I$ROOT_DIR/DependentExtensions/SQLite3Plugin"
+elif [ "$2" == "MYSQL_AUTOPATCHER" ]; then
+	SWIG_ADDITIONAL_INCLUDES="-I$ROOT_DIR/DependentExtensions/Autopatcher -I$ROOT_DIR/DependentExtensions/MySQLInterface"
+	SWIG_DEFINES=-DSWIG_ADDITIONAL_AUTOPATCHER_MYSQL
+	GCC_ADDITIONAL_FILES="blocksort.o bzip2.o bzlib.o compress.o crctable.o decompress.o dlltest.o huffman.o randtable.o $ROOT_DIR/DependentExtensions/Autopatcher/ApplyPatch.cpp $ROOT_DIR/DependentExtensions/Autopatcher/AutopatcherClient.cpp $ROOT_DIR/DependentExtensions/Autopatcher/AutopatcherMySQLRepository/AutopatcherMySQLRepository.cpp $ROOT_DIR/DependentExtensions/Autopatcher/AutopatcherServer.cpp $ROOT_DIR/DependentExtensions/Autopatcher/CreatePatch.cpp $ROOT_DIR/DependentExtensions/Autopatcher/MemoryCompressor.cpp $ROOT_DIR/DependentExtensions/MySQLInterface/MySQLInterface.cpp"
+	GCC_ADDITIONAL_INCLUDES="-I/usr/include/mysql/ -I$ROOT_DIR/DependentExtensions/Autopatcher/AutopatcherMySQLRepository -I$ROOT_DIR/DependentExtensions/Autopatcher -I$ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION -I$ROOT_DIR/DependentExtensions/MySQLInterface"
+	GCC_ADDITIONAL_LIBS=-lmysqlclient
+	BUILD_BZIP2=1
+elif [ "$2" == "--rakNetCompatibility" ]; then
+	# TODO #med - improve the handling of optional parameters (according to how it's done in MakeSwig.bat)
+	RAKNET_COMPATIBILITY_MODE=1
+elif [ ! "$2" == "" ]; then
+	echo "Unsupported dependent extension (or option): '$2'"
+	syntaxError
+	exit 1
 fi
+
+# parse optional parameters
+if [ "$3" == "--rakNetCompatibility" ]; then
+	RAKNET_COMPATIBILITY_MODE=1
+elif [ ! "$3" == "" ]; then
+	echo "Unsupported option: '$3'"
+	syntaxError
+	exit 1
+fi
+
+# install SWIG, if missing
+type -P swig &>/dev/null
+if [ ! $? == 0 ]; then
+	echo "SWIG is not installed. Do you want this script to download, make, and install SWIG version $SWIG_VERSION? ( y/N )"
+	read answer
+	if [ ! "$answer" = "y" ] && [ ! "$answer" = "Y" ]; then
+		echo "Aborting"
+		exit 2
+	fi
+
+	if [ ! -d "swig-$SWIG_VERSION" ]; then
+		wget https://prdownloads.sourceforge.net/swig/swig-$SWIG_VERSION.tar.gz
+		tar xzf swig-$SWIG_VERSION.tar.gz
+	fi
+
+	cd swig-$SWIG_VERSION
+	./configure
+	make
+	echo "Installing SWIG requires root privileges, enter password"
+	sudo make install
+	cd ..
+
+	# remove the downloaded SWIG source, after it was installed
+	rm -R swig-$SWIG_VERSION
+	rm swig-$SWIG_VERSION.tar.gz
+fi
+
+# adjust variables for RakNet compatibility mode
+if [ $RAKNET_COMPATIBILITY_MODE == 1 ]; then
+	NAMESPACE=RakNet
+	SWIG_DEFINES="$SWIG_DEFINES -DRAKNET_COMPATIBILITY"
+	GCC_DEFINES=-DRAKNET_COMPATIBILITY=1
+	OUTPUT_DIR=../../bindings/raknet_backwards_compatibility/csharp/interfaces
+	OUTPUT_WRAPPER_FILENAME=../../bindings/raknet_backwards_compatibility/csharp/wrapper/RakNet_wrap.cxx
+	SO_NAME=RakNet
+fi
+
+echo "Generating C# wrapper/interface files"
+# clear output folder
+rm -f $OUTPUT_DIR/*
+
+swig -c++ -csharp -namespace $NAMESPACE $SWIG_INCLUDES $SWIG_ADDITIONAL_INCLUDES $SWIG_DEFINES -outdir $OUTPUT_DIR -o $OUTPUT_WRAPPER_FILENAME SwigInterfaceFiles/RakNet.i
+if [ ! $? == 0 ]; then
+	echo "SWIG had an error while generating the C# wrappers/interfaces"
+	exit 3
+fi
+echo "C# wrapper/interface files generated succesfully"
+
+OLD_DIR=`pwd`
+cd $SOURCE_DIR/src
+
+if [ $BUILD_BZIP2 == 1 ]; then
+	echo "Building BZip2 $BZIP2_VERSION"
+	gcc -c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/blocksort.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/bzip2.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/bzlib.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/compress.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/crctable.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/decompress.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/dlltest.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/huffman.c $ROOT_DIR/DependentExtensions/bzip2-$BZIP2_VERSION/randtable.c
+	if [ ! $? == 0 ]; then
+		echo "Error building BZip2".
+		cd $OLD_DIR
+		exit 4
+	fi
+	echo "BZip2 was built successfully"
+fi
+
+echo "Building the C# capable shared library"
+g++ *.cpp $OUTPUT_WRAPPER_FILENAME $GCC_ADDITIONAL_FILES $GCC_DEFINES -std=c++0x -fPIC -lpthread $GCC_ADDITIONAL_LIBS -I$SOURCE_DIR/include $GCC_ADDITIONAL_INCLUDES -shared -o $SO_NAME
+if [ ! $? == 0 ]; then
+	echo "There was an error building the shared library"
+	cd $OLD_DIR
+	exit 5
+fi
+echo "Building the C# capable shared library succeeded"
+
+echo "Copying to /usr/lib/ requires root privileges; enter password"
+sudo cp ./$SO_NAME /usr/lib
+if [ ! $? == 0 ]; then
+	echo "$SO_NAME lib copy failed"
+	cd $OLD_DIR
+	exit 6
+fi
+
+echo "$SO_NAME lib copied"
+cd $OLD_DIR

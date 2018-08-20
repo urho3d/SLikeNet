@@ -21,7 +21,7 @@
 #define _WIN32
 #define _DEBUG
 #define _RAKNET_DLL
-#endif SWIGWIN
+#endif
 //TypeDefs
 typedef int int32_t;
 typedef unsigned int uint32_t;
@@ -128,14 +128,14 @@ typedef SLNet::FileListTransferCBInterface::DownloadCompleteStruct DownloadCompl
 
 #ifdef SWIG_ADDITIONAL_AUTOPATCHER
 	%{
-	#include "AutopatcherRepositoryInterface.h"
+	#include "slikenet/AutopatcherRepositoryInterface.h"
 	#include "AutopatcherServer.h"
 	#include "AutopatcherClient.h"
 	#include "AutopatcherMySQLRepository.h"
 	#include "CreatePatch.h"
 	#include "MemoryCompressor.h"
 	#include "ApplyPatch.h"
-	#include "AutopatcherPatchContext.h"
+	#include "slikenet/AutopatcherPatchContext.h"
 	%}
 #endif
 

@@ -6,21 +6,35 @@ REM
 REM This file is licensed under the MIT-style license found in the license.txt
 REM file in the root directory of this source tree.
 
+SETLOCAL ENABLEDELAYEDEXPANSION
 
 REM import mandatory command line parameters first
 set rootDir=%~1
 set swigPath=%~2
 
 REM verify mandatory parameters
-if "%rootDir%"=="" goto syntaxError
+if "%rootDir%" == "" goto syntaxError
 
 REM remove trailing backslashes from input paths
 if "%rootDir:~-1%" == "\" set rootDir=%rootDir:~0,-1%
-if "%swigPath:~-1%" == "\" set swigPath=%swigPath:~0,-1%
+if not "%swigPath%" == "" (
+	if "!swigPath:~-1!" == "\" set swigPath=!swigPath:~0,-1!
+)
 
 REM normalize swigPath
 REM only add trailing \ to path, if a path is specified (otherwise swigCommand should become "swig.exe" only to ensure it's looking it up via PATH)
 if not "%swigPath%" == "" set swigPath=%swigPath%\
+
+REM initialize variables to defaults
+set rakNetCompatibilityMode=0
+set swigCommand="%swigPath%swig.exe"
+set sourceDir=%rootDir%\Source
+set dependentExtensionDir=%rootDir%\DependentExtensions
+set swigDefines=
+set swigIncludes=-I"%sourceDir%\include\slikenet" -I"SwigInterfaceFiles"
+set namespace=SLNet
+set outputDirectory=..\..\bindings\csharp\interfaces
+set outputWrapperFilename=..\..\bindings\csharp\wrapper\slikenet_wrapper.cpp
 
 REM check if we have a dependent extension specified in the 3rd argument
 set dependentExtension=%3
@@ -44,9 +58,6 @@ if not "%dependentExtension:~0,1%" == "-" (
 	)
 )
 
-REM initialize variables to defaults
-set rakNetCompatibilityMode=0
-
 REM parse/verify option parameter
 :parameterProcessing
 if "%3" == "" ( 
@@ -62,20 +73,10 @@ goto parameterProcessing
 :processingComplete
 
 
-REM set required variables
-set swigCommand="%swigPath%swig.exe"
-set sourceDir=%rootDir%\Source
-set dependentExtensionDir=%rootDir%\DependentExtensions
-set swigDefines=
-set swigIncludes=-I"%sourceDir%\include\slikenet" -I"SwigInterfaceFiles"
-set namespace=SLNet
-set outputDirectory=..\..\bindings\csharp\interfaces
-set outputWrapperFilename=..\..\bindings\csharp\wrapper\slikenet_wrapper.cpp
-
 REM adjust variables for RakNet compatibility mode
 if %rakNetCompatibilityMode% == 1 (
 	set namespace=RakNet
-	set swigDefines=-DRAKNET_COMPATIBILITY
+	set swigDefines=%swigDefines% -DRAKNET_COMPATIBILITY
 	set outputDirectory=..\..\bindings\raknet_backwards_compatibility\csharp\interfaces
 	set outputWrapperFilename=..\..\bindings\raknet_backwards_compatibility\csharp\wrapper\RakNet_wrap.cxx
 )
@@ -97,7 +98,7 @@ echo Usage:
 echo   MakeSwig.bat ^<slikenet_root_path^> ^<swig_path^>
 echo     [^<dependent_extension^>] [--rakNetCompatibility]
 echo.
-echo   slikenet_root_path  Path to the SLikeNet root path.
+echo   slikenet_root_path  Path to the SLikeNet root directory.
 echo   swig_path           Path to the SWIG binary (swig.exe). Use "" to
 echo                       indicate using swig.exe from the PATH environment
 echo                       variable.

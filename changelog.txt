@@ -36,6 +36,8 @@ Samples:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
 Building:
   General:
+    * all libs build with runtime type information by default (#130)
+    * enabled security checks in non retail builds (#130)
     * fixed compile errors when enabling IPv6 on Linux/OSX (#220)
     * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
   CMake:
@@ -48,9 +50,13 @@ Building:
   Lobby2:
     * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
   Swig:
-    * fixed errors when generating SWIG files if output directories don't exist (#193 - SLNET_37/RAKNET_93)
+    * raised supported SWIG version to 2.0.12 (#159)
+    * fixed errors when generating C# files if output directories don't exist (#193 - SLNET_37/RAKNET_93)
     * fixed non-working created DLL when using the Visual Studio project (#228)
+    * fixed build error building the C# shared library with MySQL Autopatcher support on Linux (#244)
     * fixed compile errors in CSharpTestApp (previously called SwigTestApp) (#226)
+    * fixed warning/error when building shared library with C# integration (#242, #243)
+    * fixed multiple warnings when generating C# files (#227)
     * removed unnecessary shipped SWIG include file "arrays_csharp.i" (#224)
 
 version 0.1.2 (05-06-2018 21:00 UTC)

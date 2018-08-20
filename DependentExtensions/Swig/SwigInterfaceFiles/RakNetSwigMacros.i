@@ -1,13 +1,7 @@
 //
-// This file was taken from RakNet 4.082.
+// This file was taken from RakNet 4.082 without any modifications.
 // Please see licenses/RakNet license.txt for the underlying license and related copyright.
 //
-//
-//
-// Modified work: Copyright (c) 2018, SLikeSoft UG (haftungsbeschränkt)
-//
-// This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
-// license found in the license.txt file in the root directory of this source tree.
 
 //Macros that are not in a specific file are placed here, note that not all macros are here some are spread throughout the other files
 

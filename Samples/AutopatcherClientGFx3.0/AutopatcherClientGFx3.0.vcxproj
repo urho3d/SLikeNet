@@ -194,6 +194,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail_Win32.lib;ws2_32.lib;libgfx.lib;libjpeg.lib;zlib.lib;imm32.lib;winmm.lib;libgrenderer_d3d9.lib;d3dx9.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -244,6 +245,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Retail - Unicode_Win32.lib;ws2_32.lib;libgfx.lib;libjpeg.lib;zlib.lib;imm32.lib;winmm.lib;libgrenderer_d3d9.lib;d3dx9.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
