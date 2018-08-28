@@ -18,6 +18,7 @@ version 0.2.0 (xx-xx-xxxx xx:xx UTC)
 General:
   * extended supported compilers to VS 2017 15.4.1 (#163)
   * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30, #236, #238)
+  * documentation updates (#130, #160)
   * updated changelog entries related to security issues in previous versions (#130)
 Core:
   RakNetSocket2:
@@ -31,6 +32,9 @@ Core:
     * provide means to ensure sending outstanding ACKs (#123 - SLNET_16)
   WindowsStore8:
     * some minor code tweaks (#195 - RAKNET_96)
+Extensions:
+  Swig:
+    + added prebuilt C# bindings and integrated C# wrappers in prebuild DLLs (#157)
 Samples:
   General:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
@@ -50,6 +54,10 @@ Building:
   Lobby2:
     * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
   Swig:
+    + added support to build C# bindings in RakNet compatibility mode (#158)
+    + added support for 64-bit, Unicode, and Retail configurations (#157)
+    * restored support to build C# bindings (#157)
+    * consolidated separate MakeSwigWithExtras scripts into MakeSwig scripts (#157)
     * raised supported SWIG version to 2.0.12 (#159)
     * fixed errors when generating C# files if output directories don't exist (#193 - SLNET_37/RAKNET_93)
     * fixed non-working created DLL when using the Visual Studio project (#228)
@@ -58,6 +66,7 @@ Building:
     * fixed warning/error when building shared library with C# integration (#242, #243)
     * fixed multiple warnings when generating C# files (#227)
     * removed unnecessary shipped SWIG include file "arrays_csharp.i" (#224)
+    * countless of other related improvements/changes (too many to list here) (#157)
 
 version 0.1.2 (05-06-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 1 partial GitHub pull request (up to pull request RAKNET_124)
