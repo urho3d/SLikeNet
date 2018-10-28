@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\crypto">
+      <UniqueIdentifier>{0ea56a19-3783-4ee9-b730-73b56000ea34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\crypto">
+      <UniqueIdentifier>{fb0b9d0e-9b23-44bc-aaad-9d5dcbfa9e88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\src\_FindFirst.cpp">
@@ -346,6 +352,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\src\osx_adapter.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\src\crypto\securestring.cpp">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\src\crypto\factory.cpp">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\src\crypto\fileencrypter.cpp">
+      <Filter>Source Files\crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -810,6 +825,18 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\include\slikenet\defineoverrides.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\crypto\securestring.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\crypto\factory.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\crypto\fileencrypter.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\include\slikenet\crypto\ifileencrypter.h">
+      <Filter>Header Files\crypto</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

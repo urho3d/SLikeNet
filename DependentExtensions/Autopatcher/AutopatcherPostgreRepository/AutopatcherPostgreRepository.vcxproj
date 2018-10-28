@@ -105,6 +105,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
     <Lib>
@@ -123,6 +124,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
     <Lib>
@@ -139,6 +141,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
     <Lib>
@@ -172,6 +175,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
     <Lib>

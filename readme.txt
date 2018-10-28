@@ -82,6 +82,7 @@ Table of Contents
    3.5.6.1 MakeSwig.bat/.sh
    3.5.6.2 C#/Swig Visual Studio projects
    3.5.6.3 C# new bindings directory
+   3.5.7   Reorganized files/path structure
    3.6     Configuring SLikeNet
    3.6.1   Security relevant settings
    3.7     SLikeNet and C#
@@ -271,8 +272,8 @@ beta test phase of at least 2 weeks. During that period we will only fix
 regressions introduced in the new versions. Anything else will be postponed and
 scheduled for a following version. If there is a regression fix during the beta
 phase, we will release a new beta version and restart the 2 week test period.
-The version numbering will be x.y.z-beta.d where d begins with 1 and is incremented
-by 1 for each successive beta release of the same version.
+The version numbering will be x.y.z-beta.d where d begins with 1 and is
+incremented by 1 for each successive beta release of the same version.
 
 1.2.4 1.x.y releases
 The 1.x.y releases will ensure API, ABI, and protocol compatibility with RakNet
@@ -658,7 +659,7 @@ of the license file.
                 Layer Security (TLS) and Secure Socket Layer (SSL) protocols.
                 It is also a general-purpose cryptography library.
    URL: https://www.openssl.org/
-   Supported versions: 1.0.0d (bundled)
+   Supported versions: 1.0.0d-1.0.0t (1.0.0t bundled)
    Used in:
       - Core (if OPEN_SSL_CLIENT_SUPPORT is set  to 1)
    License: BSD-style license
@@ -969,8 +970,8 @@ using the libraries which are noteworthy:
    where previously you used the RakNet namespace.
 3. RAKNET_VERSION, RAKNET_VERSION_NUMBER, RAKNET_VERSION_NUMBER_INT, and
    RAKNET_DATE were kept due to backwards compatibility with RakNet but were
-   updated to 4.082 and 7/26/2017 respectively and will stay at these values for
-   all SLikeNet 0.x.x/1.x.x releases.
+   updated to 4.082 and 7/26/2017 respectively and will stay at these values
+   for all SLikeNet 0.x.x/1.x.x releases.
    In order to distinguish between different SLikeNet versions, you should use
    the newly introduced SLIKENET_VERSION, SLIKNET_VERSION_NUMBER,
    SLIKENET_VERSION_NUMBER_INT, and SLIKNET_DATE macros.
@@ -1060,6 +1061,25 @@ SLikeNet root directory.
 Related is the change that the interface files are no longer copied to the
 sample/test project. Instead these projects link the generated C# interfaces
 now directly from their new bindings directory.
+
+3.5.7 Reorganized files/path structure
+Compared to RakNet, SLikeNet made some changes to the file and path structure.
+The following table provides an overview of the more likely cases
+users of RakNet might have relied on and hence are impacted by the change.
+If you realize that SLikeNet is missing some files which were previously
+shipped with RakNet and are required for your case, please contact
+support@slikesoft.com. We'll then consider to readd these files then in a later
+version again.
+
+RakNet path                              | SLikeNet path               | Rationale
+DependentExtensions/openssl-1.0.0d       | DependentExtensions/openssl | [1]
+DependentExtensions/openssl-1.0.0d/*.dll | [REMOVED]                   | [2]
+
+[1] To prevent changes to path whenever the external is upgraded.
+    Additionally lib, bin, and include directories contain subdirectories for
+    the different platforms/configurations now.
+[2] Removes redundant file. Provided also in
+    DependentExtensions/openssl-1.0.0d/bin/*.dll
 
 3.6 Configuring SLikeNet
 SLikeNet uses macros to control certain settings. The overview of the available
@@ -1588,7 +1608,8 @@ overview of all the samples:
       - the server acts as host, if connecting to own IP
       - the server acts as host and points the domain name to our own IP, if
         connecting to another system fails
-      - the server treats any already existing system on the domain name as host
+      - the server treats any already existing system on the domain name as
+        host
    For the host connection the TwoWayAuthentication plugin is used to validate
    that the system is actually a host by checking a pre-designated password.
    Using a local CloudClient instance, querying the cloud server. The retrieved

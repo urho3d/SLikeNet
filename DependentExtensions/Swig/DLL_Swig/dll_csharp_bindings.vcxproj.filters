@@ -319,6 +319,15 @@
     <ClCompile Include="..\..\..\bindings\csharp\wrapper\slikenet_wrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\src\crypto\securestring.cpp">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\src\crypto\factory.cpp">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\src\crypto\fileencrypter.cpp">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\include\slikenet\_FindFirst.h">
@@ -777,6 +786,18 @@
     <ClInclude Include="..\..\..\bindings\csharp\wrapper\slikenet_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\securestring.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\factory.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\fileencrypter.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\ifileencrypter.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -784,6 +805,12 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{88be61b6-39c1-4405-a2b0-ccf04e0917cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\crypto">
+      <UniqueIdentifier>{238fd40d-ad94-4a7a-964c-2b4788fd2b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\crypto">
+      <UniqueIdentifier>{24539297-9d2f-4bd0-825f-b59893184023}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

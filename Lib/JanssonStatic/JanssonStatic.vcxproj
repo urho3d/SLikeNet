@@ -188,6 +188,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -206,6 +207,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -227,6 +229,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -248,6 +251,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(SolutionName)_$(ProjectName)_$(Configuration)_$(Platform).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -267,6 +271,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -306,6 +311,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -348,6 +354,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -393,6 +400,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>

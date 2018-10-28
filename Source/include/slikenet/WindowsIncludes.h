@@ -21,6 +21,7 @@
 #elif defined (_WIN32)
 #include <winsock2.h>
 #include <windows.h>
+#include <Wincrypt.h> // used for CryptProtectMemory, CryptUnprotectMemory, CRYPTPROTECTMEMORY_BLOCK_SIZE
 #include <ws2tcpip.h>
 #include <IPHlpApi.h> // used for GetAdaptersAddresses()
 #pragma comment(lib, "IPHLPAPI.lib") // used for GetAdaptersAddresses()

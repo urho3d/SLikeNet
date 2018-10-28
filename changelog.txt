@@ -21,6 +21,8 @@ General:
   * documentation updates (#130, #160)
   * updated changelog entries related to security issues in previous versions (#130)
 Core:
+  FullyConnectedMesh2:
+    * fixed incorrect delete in FullyConnectedMesh2::Clear() when using a custom allocator (#249)
   RakNetSocket2:
     * revised RakNetSocket2::GetMyIP() to determine own IPs more reliably (f.e. on OSX) (#217 - SLNET_36)
   RakPeer:
@@ -30,6 +32,11 @@ Core:
   ReliabilityLayer:
     * fixed case where larger bitstreams/packets would be corrupted on the receiver's side (#177 - LARKU_2/SLNET_28/SLNET_30)
     * provide means to ensure sending outstanding ACKs (#123 - SLNET_16)
+  ReplicaManager3:
+    * fixed multiple threading issues, with using ReplicaManager3 (#248)
+    * fixed incorrect delete in ReplicaManager3::Clear() when using a custom allocator (#249)
+  TeamManager:
+    * fixed incorrect delete in TeamManager::Clear() when using a custom allocator (#249)
   WindowsStore8:
     * some minor code tweaks (#195 - RAKNET_96)
 Extensions:
@@ -38,6 +45,9 @@ Extensions:
 Samples:
   General:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
+3rd Part Libraries:
+  OpenSSL:
+    * updated bundled version to 1.0.0t (#3)
 Building:
   General:
     * all libs build with runtime type information by default (#130)
@@ -53,6 +63,10 @@ Building:
     * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
   Lobby2:
     * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
+  OpenSSL:
+    + add debug and 64-bit flavors for OpenSSL (#254)
+    * added support for version 1.0.0e-1.0.0t (#3)
+    * several smaller changes (#253)
   Swig:
     + added support to build C# bindings in RakNet compatibility mode (#158)
     + added support for 64-bit, Unicode, and Retail configurations (#157)

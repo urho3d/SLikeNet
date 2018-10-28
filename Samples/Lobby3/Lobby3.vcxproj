@@ -95,7 +95,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/include/x86/debug;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -104,22 +104,24 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\debug\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Unicode|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/x86/debug;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -128,23 +130,25 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\debug\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/x86/release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -153,24 +157,26 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\release\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/x86/release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_RETAIL;NDEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -182,22 +188,23 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\release\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - Unicode|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/x86/release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -206,24 +213,26 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\release\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail - Unicode|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions\openssl-1.0.0d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../../Source/include;./../../DependentExtensions;$(SolutionDir)DependentExtensions\jansson-2.4\src;$(SolutionDir)DependentExtensions/openssl/include/x86/release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_RETAIL;NDEBUG;_CONSOLE;OPEN_SSL_CLIENT_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -235,15 +244,16 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/libeay32.lib;./../../DependentExtensions/openssl-1.0.0d/lib/ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>../../DependentExtensions/openssl/lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy .\..\..\DependentExtensions\openssl-1.0.0d\bin\*.dll .\</Command>
+      <Command>copy .\..\..\DependentExtensions\openssl\bin\x86\release\*.dll .\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -111,6 +111,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Debug_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Debug\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -142,6 +143,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Debug - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Debug - Unicode\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -171,6 +173,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -228,6 +231,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>./../../Lib/SLikeNet_LibStatic_Release - Unicode_Win32.lib;ws2_32.lib;./../../DependentExtensions\Autopatcher\AutopatcherMySQLRepository\Release - Unicode\AutopatcherMySQLRepository.lib;C:\Program Files (x86)\MySQL\MySQL Server 5.1\lib\opt\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>

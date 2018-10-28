@@ -235,6 +235,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -264,6 +265,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -293,6 +295,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -322,6 +325,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -347,6 +351,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <PreLinkEvent>
       <Command>
@@ -375,6 +380,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <PreLinkEvent>
       <Command>
@@ -461,6 +467,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <PreLinkEvent>
       <Command>
@@ -489,6 +496,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>true</MinimalRebuild>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <PreLinkEvent>
       <Command>
@@ -578,6 +586,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\bindings\csharp\wrapper\slikenet_wrapper.cpp" />
+    <ClCompile Include="..\..\..\Source\src\crypto\factory.cpp" />
+    <ClCompile Include="..\..\..\Source\src\crypto\fileencrypter.cpp" />
+    <ClCompile Include="..\..\..\Source\src\crypto\securestring.cpp" />
     <ClCompile Include="..\..\..\Source\src\_FindFirst.cpp" />
     <ClCompile Include="..\..\..\Source\src\Base64Encoder.cpp" />
     <ClCompile Include="..\..\..\Source\src\BitStream.cpp" />
@@ -686,6 +697,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\bindings\csharp\wrapper\slikenet_wrapper.h" />
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\factory.h" />
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\fileencrypter.h" />
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\ifileencrypter.h" />
+    <ClInclude Include="..\..\..\Source\include\slikenet\crypto\securestring.h" />
     <ClInclude Include="..\..\..\Source\include\slikenet\defineoverrides.h" />
     <ClInclude Include="..\..\..\Source\include\slikenet\_FindFirst.h" />
     <ClInclude Include="..\..\..\Source\include\slikenet\AutopatcherPatchContext.h" />

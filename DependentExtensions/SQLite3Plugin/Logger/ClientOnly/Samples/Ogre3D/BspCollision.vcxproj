@@ -113,6 +113,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>OgreMain_d.lib;OIS_d.lib;ReferenceAppLayer_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -147,6 +148,7 @@ copy $(OGRE_HOME)\bin\$(Configuration)\Media.cfg .\
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>OgreMain_d.lib;OIS_d.lib;ReferenceAppLayer_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -184,6 +186,7 @@ copy $(OGRE_HOME)\bin\$(Configuration)\Media.cfg .\
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>OgreMain.lib;OIS.lib;ReferenceAppLayer.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -259,6 +262,7 @@ copy $(OGRE_HOME)\bin\$(Configuration)\Media.cfg .\
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <AdditionalDependencies>OgreMain.lib;OIS.lib;ReferenceAppLayer.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
