@@ -26,6 +26,7 @@
 #elif defined (_WIN32) || defined(__MINGW32__)
 #include <winsock2.h>
 #include <windows.h>
+#include <Wincrypt.h> // used for CryptProtectMemory, CryptUnprotectMemory, CRYPTPROTECTMEMORY_BLOCK_SIZE
 #include <ws2tcpip.h>
 #if defined(__MINGW32__)
 #include <iphlpapi.h> // used for GetAdaptersAddresses()
