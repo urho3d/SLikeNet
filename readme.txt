@@ -78,8 +78,21 @@ Table of Contents
    3.5.3   OSX usage of @rpath for install_name
    3.5.4   PacketLogger FormatLine() changes
    3.5.5   CMake install destinations for non-Windows platforms
+   3.5.6   Swig/C# wrapper changes
+   3.5.6.1 MakeSwig.bat/.sh
+   3.5.6.2 C#/Swig Visual Studio projects
+   3.5.6.3 C# new bindings directory
+   3.5.7   Reorganized files/path structure
    3.6     Configuring SLikeNet
    3.6.1   Security relevant settings
+   3.7     SLikeNet and C#
+   3.7.1   Using SLikeNet in a C# project
+   3.7.2   RakNet compatibility mode
+   3.7.3   Generating C# bindings
+   3.7.3.1 Generating C# bindings on Windows
+   3.7.3.2 Generating C# bindings on Linux
+   3.7.3.3 MakeSwig.sh/.bat syntax
+   3.7     SLikeNet and C#
    4.      Dependent Extensions
    4.1     AutopatcherMySQLRepository
    4.2     AutopatcherPostgreRepository
@@ -92,7 +105,7 @@ Table of Contents
    4.9     PostgreSQLInterface
    4.10    Rackspace
    4.11    SQLite3Plugin / SQLite3ClientLogger / SQLite3ServerLogger
-   4.12    Swig / DLL_Swig
+   4.12    Swig
    5.      Samples
    5.1     AutopatcherClient
    5.2     AutopatcherClientGFx3.0
@@ -141,32 +154,31 @@ Table of Contents
    5.45    UDP Forwarder
    5.46    WinPhone8
    6.      Help and Support
-   6.1     Documenation
+   6.1     Documentation
    6.2     Contact Information and Support
    7.      A word on licensing
    7.1     SLikeNet licensing (core and extended)
    7.2     Licensed Code
-   7.2.1    (core) RakNet
-   7.2.2    (core) DR_SHA1.cpp/.h (SHA-1 algorithm - version 2.1)
-   7.2.3    (core) Rand.cpp (Mersenne Twister random number generator MT19937)
-   7.2.4    (core) KBhit.h
-   7.2.5    (core) FindBoost.cmake
-   7.2.6    (DependentExtension/Autopatcher) ApplyPatch.cpp, CreatePatch.cpp
-   7.2.7    (DependentExtension/DXTCompressor) OpenGLWindow.hpp
-   7.2.8    (DependentExtension/IrrlichtDemo) FindIrrlicht.cmake,
-            FindIrrKlang.cmake
-   7.2.9    (DependentExtension/IrrlichtDemo) CDemo.cpp/.h, CMainMenu.cpp/.h,
-            main.cpp
-   7.2.10   (DependentExtension/speex related) FindSpeex.cmake,
-            FindSpeexDSP.cmake
-   7.2.11   (DependentExtension/Swig) arrays_csharp.i
-   7.2.12   (Samples/nacl_sdk) httpd.py
-   7.2.13   (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake,
-            FindPkgMacros.cmake, PreprocessorUtils.cmake
-   7.2.14   (Samples/Ogre3D related) BspCollision.cpp
-   8.       Donations
-   9.       Thanks / Acknowledgments
-   10.      Trademark Notes / Affiliation Statement
+   7.2.1   (core) RakNet
+   7.2.2   (core) DR_SHA1.cpp/.h (SHA-1 algorithm - version 2.1)
+   7.2.3   (core) Rand.cpp (Mersenne Twister random number generator MT19937)
+   7.2.4   (core) KBhit.h
+   7.2.5   (core) FindBoost.cmake
+   7.2.6   (DependentExtension/Autopatcher) ApplyPatch.cpp, CreatePatch.cpp
+   7.2.7   (DependentExtension/DXTCompressor) OpenGLWindow.hpp
+   7.2.8   (DependentExtension/IrrlichtDemo) FindIrrlicht.cmake,
+           FindIrrKlang.cmake
+   7.2.9   (DependentExtension/IrrlichtDemo) CDemo.cpp/.h, CMainMenu.cpp/.h,
+           main.cpp
+   7.2.10  (DependentExtension/speex related) FindSpeex.cmake,
+           FindSpeexDSP.cmake
+   7.2.11  (Samples/nacl_sdk) httpd.py
+   7.2.12  (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake,
+           FindPkgMacros.cmake, PreprocessorUtils.cmake
+   7.2.13  (Samples/Ogre3D related) BspCollision.cpp
+   8.      Donations
+   9.      Thanks / Acknowledgments
+   10.     Trademark Notes / Affiliation Statement
 
 
 
@@ -260,8 +272,8 @@ beta test phase of at least 2 weeks. During that period we will only fix
 regressions introduced in the new versions. Anything else will be postponed and
 scheduled for a following version. If there is a regression fix during the beta
 phase, we will release a new beta version and restart the 2 week test period.
-The version numbering will be x.y.z-beta.d where d begins with 1 and is incremented
-by 1 for each successive beta release of the same version.
+The version numbering will be x.y.z-beta.d where d begins with 1 and is
+incremented by 1 for each successive beta release of the same version.
 
 1.2.4 1.x.y releases
 The 1.x.y releases will ensure API, ABI, and protocol compatibility with RakNet
@@ -365,7 +377,6 @@ The following list presents the known restrictions:
 - limited support for iOS, Android, Windows Phone 8, Windows Store 8 (later)
 - limited support for Samples and Tests (later)
 - limited support for RakVoiceFMOD (later)
-- limited support for SWIG and the C# interface (later)
 - missing support for server related features like Lobby3, MasterServer,
   MasterServer2, etc. (later)
 
@@ -648,7 +659,7 @@ of the license file.
                 Layer Security (TLS) and Secure Socket Layer (SSL) protocols.
                 It is also a general-purpose cryptography library.
    URL: https://www.openssl.org/
-   Supported versions: 1.0.0d (bundled)
+   Supported versions: 1.0.0d-1.0.0t (1.0.0t bundled)
    Used in:
       - Core (if OPEN_SSL_CLIENT_SUPPORT is set  to 1)
    License: BSD-style license
@@ -728,7 +739,7 @@ of the license file.
                 written in C and C++ with a variety of high-level programming
                 languages.
    URL: http://www.swig.org/
-   Supported versions: 2.0.1
+   Supported versions: 2.0.0-2.0.12
    Used in:
       - Swig (see 4.12)
 
@@ -945,6 +956,8 @@ required.
 Since the protocol was kept compatible with RakNet, you can even run the server
 using RakNet and the client(s) running SLikeNet (or vice versa).
 
+This also works for C# projects. See 3.7.2 for details.
+
 3.5 Development notes on differences between RakNet and SLikeNet
 
 3.5.1 General notes
@@ -953,19 +966,19 @@ using the libraries which are noteworthy:
 1. (except for RakNet compatibility mode) You should include SLikeNet headers
    via <slikenet/foobar.h> where RakNet required you to include only
    <foobar.h>.
-2. (except for RakNet compatibility mode) You need to use the SLikeNet
-   namespace where previously you used the RakNet namespace.
+2. (except for RakNet compatibility mode) You need to use the SLNet namespace
+   where previously you used the RakNet namespace.
 3. RAKNET_VERSION, RAKNET_VERSION_NUMBER, RAKNET_VERSION_NUMBER_INT, and
    RAKNET_DATE were kept due to backwards compatibility with RakNet but were
-   updated to 4.082 and 7/26/2017 respectively and will stay at these values for
-   all SLikeNet 0.x.x/1.x.x releases.
+   updated to 4.082 and 7/26/2017 respectively and will stay at these values
+   for all SLikeNet 0.x.x/1.x.x releases.
    In order to distinguish between different SLikeNet versions, you should use
    the newly introduced SLIKENET_VERSION, SLIKNET_VERSION_NUMBER,
    SLIKENET_VERSION_NUMBER_INT, and SLIKNET_DATE macros.
 
 3.5.2 Retail configuration
 RakNet only shipped with a debug and a release configuration while SLikeNet
-ships 3 different configurations: debug, release, and retail.
+ships with 3 different configurations: debug, release, and retail.
 The debug configuration provides full debugging support without any kind of
 optimization. The focus of this configuration lies in debugging capabilities
 (and not on performance). This is in principle the same what RakNet provided.
@@ -1012,8 +1025,63 @@ changed in SLikeNet 0.2.0. As of this version, running 'make install' will
 install the lib/header files in the usual locations which are configurable via
 the CMAKE_INSTALL_PREFIX variable.
 
-3.6 Configuring SLikeNet
+3.5.6 Swig/C# wrapper changes
 
+3.5.6.1 MakeSwig.bat/.sh
+The MakeSwig script files (batch and bash ones) were completely revised and
+their usage unified/simplified. This includes that functionality of the old
+MakeSwigWithExtras scripts is now incorporated in the MakeSwig scripts
+directly. The old MakeSwigWithExtras scripts were therefore removed.
+See chapter 3.7.3.3 for a description of the new syntax.
+
+A notable difference is that SLikeNet requires only a single path (to the
+SLikeNet root directory) while RakNet required the path to the source code
+directory and in some cases also the path to a dependent extension.
+Therefore, SLikeNet relies on the source code folder remaining not being
+modified.
+
+For the bash script RakNet downloaded SWIG 2.0.0 and utilized the su-command.
+Since changing the user to the root user is usually not required nowadays (and
+can actually fail depending on the distro/setup), the command was switched to
+use sudo instead. In addition SLikeNet installs the recommended SWIG version
+now (which usually is the latest supported one). If you rely on a particular
+older version being used, you should make sure that particular version is
+installed prior to using the bash file.
+
+3.5.6.2 C#/Swig Visual Studio projects
+RakNet contained distinct solution/project files for its C# integration.
+SLikeNet simplified the usage of these projects significantly and so has them
+directly included in the main solution now.
+
+3.5.6.3 C# new bindings directory
+RakNet built the C# bindings in newly created output directories located under
+DependenExtensions/Swig. This behavior was changed in SLikeNet and generated
+wrapper/interface files are put into the new bindings directory under the
+SLikeNet root directory.
+Related is the change that the interface files are no longer copied to the
+sample/test project. Instead these projects link the generated C# interfaces
+now directly from their new bindings directory.
+
+3.5.7 Reorganized files/path structure
+Compared to RakNet, SLikeNet made some changes to the file and path structure.
+The following table provides an overview of the more likely cases
+users of RakNet might have relied on and hence are impacted by the change.
+If you realize that SLikeNet is missing some files which were previously
+shipped with RakNet and are required for your case, please contact
+support@slikesoft.com. We'll then consider to readd these files then in a later
+version again.
+
+RakNet path                              | SLikeNet path               | Rationale
+DependentExtensions/openssl-1.0.0d       | DependentExtensions/openssl | [1]
+DependentExtensions/openssl-1.0.0d/*.dll | [REMOVED]                   | [2]
+
+[1] To prevent changes to path whenever the external is upgraded.
+    Additionally lib, bin, and include directories contain subdirectories for
+    the different platforms/configurations now.
+[2] Removes redundant file. Provided also in
+    DependentExtensions/openssl-1.0.0d/bin/*.dll
+
+3.6 Configuring SLikeNet
 SLikeNet uses macros to control certain settings. The overview of the available
 settings can be found in the accompanying Doxygen generated documentation
 (refer to the documentation regarding defines.h and NativeFeatureIncludes.h).
@@ -1021,7 +1089,6 @@ These "settings" can be redefined in the corresponding override-headers
 (definesoverrides.h / NativeFeatureIncludeOverrides.h).
 
 3.6.1 Security relevant settings
-
 When using SLikeNet to transfer files between peers (f.e. via the AutoPatcher
 or directly via FileListTransfer), SLikeNet allocates a single memory chunk to
 retrieve the incoming file. For rather large files (up to 4 GiB), this can
@@ -1033,6 +1100,220 @@ To mitigate these cases, it's *strongly* suggested to redefine
 SLNET_MAX_RETRIEVABLE_FILESIZE to a reasonable value for your application. In
 principle a lower setting is always preferred. So if you know that you never
 transmit files > 20 MiB over the wire, you'd define the macro to 20971520.
+
+3.7 SLikeNet and C#
+To use SLikeNet in a C# project, you require a SLikeNet DLL (Windows) or a
+shared library (Linux/macOS) with built-in C# wrapper capability and the
+C# interface files.
+Pre-generated bindings are located in the bindings directory. The prebuilt DLLs
+shipped in the Lib/prebuild directory are already built with the C# wrapper
+capability and hence can be used with a C# project directly.
+
+If the default configuration these bindings are built with is not suitable for
+your needs, customized bindings and DLLs can be generated. See chapter 3.7.3
+for further details.
+
+The C# bindings are not only compatible with the .Net Framework, but also with
+Mono and Portable.Net and hence can be used on Windows, Linux, and macOS.
+Chapter 3.7.1 describes how to use SLikeNet in a C# project.
+
+If your existing project uses RakNet, you should take a look at chapter 3.7.2:
+RakNet compatibility mode. That mode allows you to run your existing RakNet
+project with SLikeNet without any code changes.
+
+Please note that unless you are planning to regenerate the C# bindings
+yourself, you won't need to install SWIG to use SLikeNet in a C# project.
+
+3.7.1 Using SLikeNet in a C# project
+To use SLikeNet with C# you need to include the interface files in the project.
+These files are located under bindings/csharp/interfaces.
+In addition to that, you need to put a SLikeNet DLL/shared library into the
+search path so the application can find it.
+On Windows the easiest way to get started is to copy one of the prebuilt DLLs
+under
+Lib/prebuild/VS_xxxx/SLikeNet_DLL_[configuration]_[core|ext]_[platform].dll
+to the directory where the C# executable will be built to and rename it to
+SLikeNet.dll.
+On Linux you are required to build a shared library yourself since SLikeNet
+isn't shipped with prebuilds for Linux. Simply follow the steps under 3.7.3.2
+which will take care about building such library and put it into an
+appropriate directory.
+
+For Windows you can also take a quick look at the CSharpTestApp project which
+demonstrates how to access the basic functionality of SLikeNet in C#.
+
+Note that the C# namespace for SLikeNet is the same as the one used in C++:
+SLNet. The global C# class is named SLikeNet (i.e. SLNet.SLikeNet).
+
+3.7.2 RakNet compatibility mode
+If you have an existing C# project which uses RakNet, you can utilize SLikeNet
+in the RakNet compatibility mode. This mode allows you to build your existing
+RakNet C# project with SLikeNet without any required modifications.
+To do this, use the bindings under
+bindings/raknet_backwards_compatibility/chsarp/interfaces with your project and
+instead of the SLikeNet_DLL_xxxx.dll file use one of the RakNet_DLL_xxxx.dll
+files (renamed to RakNet.dll).
+Note that since SLikeNet introduced the Retail configuration, you most likely
+want to use a DLL of the retail configuration, if you previously used the
+RakNet release configuration (see chapter 3.5.2 for details).
+
+Note that you can even run your existing C# project built with the C# interface
+files taken from RakNet 4.082 and replace the RakNet.dll file with one from the
+SLikeNet prebuild directory (without having to rebuild the project) to give it
+a quick try. Since the protocol version is compatible, it's even possible to
+run the server with the RakNet.dll taken from SLikeNet while the clients still
+use the RakNet 4.082 one (or vice versa).
+
+If you want/need to generate the C# bindings (and DLL) yourself (as explained
+in chapter 3.7.3 ff.), you can either use the "RakNet_DLL (CSharp bindings)"-
+project in Visual Studio or call the MakeSwig batch/bash script with the
+--rakNetCompatibility option (see chapter 3.7.3.3).
+
+Note that in the RakNet compatibility mode the C# namespace and global class
+are both called RakNet (i.e. the global C# class is therefore RakNet.RakNet).
+
+3.7.3 Generating C# bindings
+The default bindings shipped with SLikeNet are not built with support for any
+of the dependent extensions. If you need support for one (f.e. for the SQLite
+plugin) or if you simply want to generate the bindings yourself, you can do so
+using SWIG.
+The following two sections provide step-by-step instructions on how to do this
+on Windows and Linux.
+
+3.7.3.1 Generating C# bindings on Windows
+First of all you need a supported version of SWIG installed on your system.
+Versions can be downloaded directly from the SWIG homepage at
+http://www.swig.com/. For a list of supported versions see chapter 2.4.22.
+After you downloaded the version, extract the archive into a directory (for
+this documentation we assume you extracted the package to C:\swig).
+
+Next you'd add the directory to the Path environment variable.
+On Windows 10 simply press the Windows start button and enter "advanced system"
+for the search term. This should bring up the entry: "View advanced system
+settings". Click on that entry. The "System Properties" dialog should show up.
+In there click on Advanced -> Environment Variables...
+This will open the "Environment Variables" dialog. Here you should find two
+entries for the "Path" variable. One time under "User variables for [username]"
+and once under "System variables". If you modify the Path variable for the
+user, SWIG will only be recognized as a command under the current Windows user.
+If you modify the system variable instead, the command will be recognized for
+any user on that machine.
+If unsure which one to modify, edit the "System variables" entry.
+In the new dialog "Edit environment variable" click the "New" button and enter
+the directory you extracted the archive to (i.e. C:\swig). Click OK in the
+dialog to confirm the changes.
+
+After SWIG was installed, open the SLikeNet solution in Visual Studio, select
+the desired configuration and platform (f.e. Retail and x64), and build the
+"DLL (CSharp bindings)"-project. This generates the C# interface files (under
+bindings/csharp/interfaces), the wrapper files for the DLL (under
+bindings/csharp/wrapper), and also the corresponding DLL in the Lib directory.
+The name for the DLL follows the following naming convention:
+SLikeNet_DLL_[configuration]_[platform].dll. Remember to rename the DLL to
+SLikeNet.dll (see chapter 3.7.1) before you use it.
+Note that the "DLL (CSharp bindings)"-project generates the C# bindings without
+support for any dependent extension. If you need support for a dependent
+extension or if you don't use Visual Studio, you can also manually generate the
+C# bindings as described next.
+
+An alternative approach to generate the C# bindings is to run the MakeSwig.bat
+file manually. For that, open a command prompt and switch to the directory:
+DependentExtensions/Swig. In there call MakeSwig.bat with the appropriate
+parameters (see chapter 3.7.3.3 for the full syntax).
+
+Note that after you used MakeSwig.bat you'll have to build the DLL with the
+included C# wrapper yourself. For Visual Studio the easiest way is to remove
+the pre-build event for the "DLL (CSharp bindings)"-project and then build that
+project.
+
+3.7.3.2 Generating C# bindings on Linux
+To generate the C# bindings, SWIG must be installed.
+Depending on the distribution you'd usually favor installing SWIG using the
+package manager, since this ensures the easiest/safest way to install SWIG.
+Installing SWIG using the package manager on Debian or Ubuntu is usually as
+simple as running: "sudo apt-get install swig" and then following the on-screen
+instructions.
+
+However, based on the distribution, the version installed by default could
+either be an older one than the latest supported version (which is usually the
+recommended one) or a later version than what SLikeNet supports.
+If that's the case, you should *NOT* use the package manager and instead let
+SLikeNet's MakeSwig bash script handle the installation of the appropriate
+version for you. Of course you can also manually download and install SWIG
+directly from http://www.swig.org/ (please follow the instructions in the SWIG
+docu on how to install the version manually).
+
+To generate the C# bindings (and, if required, run the SWIG installation) open
+a terminal window, switch to the DependentExtensions/Swig directory and run
+MakeSwig.sh. To be able to execute the bash script, it must be granted
+execution privileges first. To do so, run: "chmod 775 ./MakeSwig.sh"
+Following this, you are able to execute the script. See chapter 3.7.3.3 for
+details on the syntax.
+
+The script first checks whether the swig command is available and if it is
+missing downloads and installs the recommended SWIG version itself (you'll have
+to answer the question whether it should be installed with 'y' or the script
+aborts).
+After the successful installation of SWIG the C# bindings will be generated and
+put into bindings/csharp/interfaces and bindings/csharp/wrapper. Following
+that, the script will build the shared library with the integrated C# wrapper
+and copy it to /usr/lib.
+
+3.7.3.3 MakeSwig.sh/.bat syntax
+The syntax for MakeSwig.sh and MakeSwig.bat are mostly the same with only the
+following differences:
+- for MakeSwig.bat use '\' as the path delimiter. For MakeSwig.sh use '/'. Note
+  that in the following examples we stick with '/' as the path delimiter. When
+  used with MakeSwig.bat, these must be replaced with '\'
+- MakeSwig.bat requires the path to swig.exe as the second parameter while
+  MakeSwig.sh does not. In the examples below that parameter is denoted with
+  [""]. When calling MakeSwig.sh simply omit that parameter. When calling
+  MakeSwig.bat, pass it in as "" (i.e. without the []).
+- the root path must not contain any spaces, when using MakeSwig.bat (even if
+  the path is quoted)
+
+Examples:
+./MakeSwig ../..
+Generates the C# bindings without any dependent extension support in SLikeNet
+mode.
+
+./MakeSwig ../.. [""] --rakNetCompatibility
+Generates the C# bindings without any dependent extension support in RakNet
+compatibility mode.
+
+./MakeSwig ../.. [""] SQLITE --rakNetCompatibility
+Generates the C# bindings with added support for the SQLite dependent extension
+in RakNet compatibility mode.
+
+Specific example for MakeSwig.bat:
+MakeSwig.bat ..\.. C:\swig-2.0.0 SQLITE
+Generates the C# bindings with added support for the SQLite dependent extension
+using the SWIG version located in C:\swig-2.0.0 in SLikeNet mode.
+
+Complete syntax:
+MakeSwig <slikenet_root_path> <swig_path> [<dependent_extension>]
+         [--rakNetCompatibility]
+
+slikenet_root_path:
+  Path to the SLikeNet root directory.
+  Usually you'll pass ../.. here, if invoked from inside
+  DependentExtensions/Swig.
+  In case of MakeSwig.bat the path *MUST NOT* contain any spaces (even not if
+  the argument/path is quoted)!
+
+swig_path:
+  MakeSwig.bat only
+  Path to the SWIG binary (swig.exe). Use "" to indicate using swig.exe from
+  the PATH environment variable.
+
+dependent_extension:
+  The dependent extension which should be included.
+  Supported values:
+    MYSQL_AUTOPATCHER: adds MySQL autopatcher support
+    SQLITE: adds SQLite support
+
+--rakNetCompatibility:
+  If specified, creates the C# wrapper in RakNet compatibility mode.
 
 
 
@@ -1225,10 +1506,12 @@ extensions:
       - DXTCompressor (SQLite3SeverLogger only - see 4.4)
       - SQLite (see 2.4.20)
 
-4.12 Swig / DLL_Swig
-   Description: Generates a C# interface for the SLikeNet DLL.
+4.12 Swig
+   Description: Generates C# bindings for the SLikeNet.
    Dependencies:
       - SWIG (see 2.4.22)
+   Notes:
+   For further details see chapter 3.7 ff.
 
 
 
@@ -1325,7 +1608,8 @@ overview of all the samples:
       - the server acts as host, if connecting to own IP
       - the server acts as host and points the domain name to our own IP, if
         connecting to another system fails
-      - the server treats any already existing system on the domain name as host
+      - the server treats any already existing system on the domain name as
+        host
    For the host connection the TwoWayAuthentication plugin is used to validate
    that the system is actually a host by checking a pre-designated password.
    Using a local CloudClient instance, querying the cloud server. The retrieved
@@ -1763,7 +2047,7 @@ overview of all the samples:
 
 6. Help and Support
 
-6.1 Documenation
+6.1 Documentation
 This readme.txt file contains the most up-to-date information and supersedes
 any older documentation, in case of contradicting statements.
 The changelog.txt covers the changes of the different releases.
@@ -1957,25 +2241,17 @@ CMake modules to locate the corresponding libraries. These files are copyright
 BSD license.
 License file(s): licenses/FindIrrlicht CMake License.txt
 
-7.2.11 (DependentExtension/Swig) arrays_csharp.i
-SWIG library file containing a two approaches to marshalling arrays. Being a
-file located inside the Lib directory of the SWIG library, no particular
-license applies. The software is free to be used on any terms one wishes. Since
-the original file contains a license reference, we put the license note into
-the licenses-directory, nevertheless.
-License file(s): licenses/SWIG library files license.txt
-
-7.2.12 (Samples/nacl_sdk) httpd.py
+7.2.11 (Samples/nacl_sdk) httpd.py
 This file was taken from the Native Client SDK and is Copyright (c) 2012 The
 Chromium Authors. It is provided under the Modified BSD License.
 License file(s): licenses/nacl license.txt
 
-7.2.13 (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake, FindPkgMacros.cmake, PreprocessorUtils.cmake
+7.2.12 (Samples/Ogre3D related) FindOGRE.cmake, FindOIS.cmake, FindPkgMacros.cmake, PreprocessorUtils.cmake
 CMake modules to locate the corresponding libraries. The source files are part
 of OGRE (Object-oriented Graphics Rendering Engine) http://www.ogre3d.org/ .
 They are provided as public domain.
 
-7.2.14 (Samples/Ogre3D related) BspCollision.cpp
+7.2.13 (Samples/Ogre3D related) BspCollision.cpp
 This is a sample file to demonstrate integration into Ogre3D. The source file
 is part of OGRE (Object-oriented Graphics Rendering Engine)
 http://www.ogre3d.org/ and Copyright (c) 2000-2006 Torus Knot Software Ltd. It

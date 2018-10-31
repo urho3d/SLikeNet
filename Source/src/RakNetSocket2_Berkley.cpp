@@ -26,9 +26,10 @@
 #ifdef _WIN32
 #include <tchar.h>	// used for _tprintf() (via RAKNET_DEBUG_TPRINTF)
 #else
-#include <sys/types.h>  // used for getaddrinfo()
-#include <sys/socket.h> // used for getaddrinfo()
-#include <netdb.h>      // used for getaddrinfo()
+#include "slikenet/LinuxStrings.h" // used for _stricmp()
+#include <sys/types.h>             // used for getaddrinfo()
+#include <sys/socket.h>            // used for getaddrinfo()
+#include <netdb.h>                 // used for getaddrinfo()
 #endif
 
 #include "slikenet/Itoa.h"

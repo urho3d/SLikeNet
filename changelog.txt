@@ -13,32 +13,74 @@ If you require a more detailed list on the changes, please refer to the
 Subversion repository history at: https://www.slikesoft.com/svn/slikenet/
 
 version 0.2.0 (xx-xx-xxxx xx:xx UTC)
-*** This release satisfies/processes 3 complete 3 partial GitHub pull requests
+*** This release satisfies/processes 4 complete 3 partial GitHub pull requests
 *** This release resolves 1 user reported issue (1 completely)
 General:
   * extended supported compilers to VS 2017 15.4.1 (#163)
-  * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30)
+  * several smaller changes, fixes, and code cleanup (#130, #136, #181 - SLNET_28/SLNET_30, #236, #238)
+  * documentation updates (#130, #160)
+  * updated changelog entries related to security issues in previous versions (#130)
 Core:
+  FullyConnectedMesh2:
+    * fixed incorrect delete in FullyConnectedMesh2::Clear() when using a custom allocator (#249)
   RakNetSocket2:
     * revised RakNetSocket2::GetMyIP() to determine own IPs more reliably (f.e. on OSX) (#217 - SLNET_36)
   RakPeer:
     * improve handling of disconnecting peers (#123 - SLNET_16)
+  RakWString:
+    * added missing definition of global +-operator for two RakWStrings (#225)
   ReliabilityLayer:
     * fixed case where larger bitstreams/packets would be corrupted on the receiver's side (#177 - LARKU_2/SLNET_28/SLNET_30)
     * provide means to ensure sending outstanding ACKs (#123 - SLNET_16)
+  ReplicaManager3:
+    * fixed multiple threading issues, with using ReplicaManager3 (#248)
+    * fixed incorrect delete in ReplicaManager3::Clear() when using a custom allocator (#249)
+  TeamManager:
+    * fixed incorrect delete in TeamManager::Clear() when using a custom allocator (#249)
   WindowsStore8:
     * some minor code tweaks (#195 - RAKNET_96)
+Extensions:
+  Swig:
+    + added prebuilt C# bindings and integrated C# wrappers in prebuild DLLs (#157)
 Samples:
   General:
     * add validation for user provided port numbers/number of connections throughout applicable samples (#145)
+3rd Part Libraries:
+  OpenSSL:
+    * updated bundled version to 1.0.0t (#3)
 Building:
   General:
+    * all libs build with runtime type information by default (#130)
+    * enabled security checks in non retail builds (#130)
+    * fixed compile errors when enabling IPv6 on Linux/OSX (#220)
     * change projects to consistently use warning level 4 in all configurations with Visual Studio (#128, #129, #135, #137, #138, #139, #140, #142, #144, #146, #147, #149, #151, #152, #153, #154, #155, #162)
   CMake:
     * changed default install location for SLikeNet to CMAKE_INSTALL_PREFIX-based include/lib directories (#54 - RAKNET_29, #67 - RAKNET_41)
     * small tweaks/improvements to CMake files (#130)
   iOS:
     * updated file name reference in XCode project (#188 - RAKNET_84)
+  CrashReporter:
+    * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
+  Lobby2:
+    * fixed compile error when compiling in RAKNET_COMPATIBILITY mode (#223)
+  OpenSSL:
+    + add debug and 64-bit flavors for OpenSSL (#254)
+    * added support for version 1.0.0e-1.0.0t (#3)
+    * several smaller changes (#253)
+  Swig:
+    + added support to build C# bindings in RakNet compatibility mode (#158)
+    + added support for 64-bit, Unicode, and Retail configurations (#157)
+    * restored support to build C# bindings (#157)
+    * consolidated separate MakeSwigWithExtras scripts into MakeSwig scripts (#157)
+    * raised supported SWIG version to 2.0.12 (#159)
+    * fixed errors when generating C# files if output directories don't exist (#193 - SLNET_37/RAKNET_93)
+    * fixed non-working created DLL when using the Visual Studio project (#228)
+    * fixed build error building the C# shared library with MySQL Autopatcher support on Linux (#244)
+    * fixed compile errors in CSharpTestApp (previously called SwigTestApp) (#226)
+    * fixed warning/error when building shared library with C# integration (#242, #243)
+    * fixed multiple warnings when generating C# files (#227)
+    * removed unnecessary shipped SWIG include file "arrays_csharp.i" (#224)
+    * countless of other related improvements/changes (too many to list here) (#157)
 
 version 0.1.2 (05-06-2018 21:00 UTC)
 *** This release satisfies/processes 3 complete and 1 partial GitHub pull request (up to pull request RAKNET_124)
